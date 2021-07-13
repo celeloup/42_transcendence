@@ -4,8 +4,9 @@ services:
   postgres:
     image: postgres:latest
     ports:
-    - "5432:5432"
+    - "5000:5432"
     volumes:
+    - ./postgres-entrypoint:/docker-entrypoint-initdb.d
     - ./postgres_data:/var/lib/postgresql/data
     env_file:
     - docker.env
