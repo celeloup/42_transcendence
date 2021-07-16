@@ -196,8 +196,28 @@ describe('AppController (e2e)', () => {
       });
     });
 
-    // logout
-    // reauth after logout
-    // ?
+    describe('logout', () => {
+      it('should return an empty cookie', () => {
+        return request(app.getHttpServer())
+          .post('/api/authentication/log-out')
+          .set('cookie', cookie)
+          .expect(200)
+          .expect('set-cookie', 'Authentication=; HttpOnly; Path=/; Max-Age=0')
+          .then((res) => {
+            cookie = res.headers['set-cookie'][0];
+          });
+      })
+    });
+
+    describe('authenticate with logout empty cookie', () => {
+      it('should throw an error', () => {
+        return request(app.getHttpServer())
+          .get('/api/authentication')
+          .set('cookie', cookie)
+          .expect(401)
+      });
+    });
+
   });
+  
 });
