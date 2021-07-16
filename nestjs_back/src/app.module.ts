@@ -6,8 +6,6 @@ import { AuthenticationModule } from './authentication/authentication.module';
 import * as Joi from '@hapi/joi';
 import { ExceptionsLoggerFilter } from './utils/exceptionsLogger.filter';
 import { APP_FILTER } from '@nestjs/core';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
  
 @Module({
   imports: [
