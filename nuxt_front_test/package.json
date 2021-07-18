@@ -10,8 +10,11 @@
   },
   "dependencies": {
     "@nuxtjs/axios": "^5.13.6",
+    "@nuxtjs/proxy": "^2.1.0",
+    "@types/cookie": "^0.4.1",
     "bootstrap": "^4.6.0",
     "bootstrap-vue": "^2.21.2",
+    "cookie-universal-nuxt": "^2.1.5",
     "core-js": "^3.15.1",
     "nuxt": "^2.15.7"
   },
