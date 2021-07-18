@@ -1,16 +1,17 @@
-import { Module } from '@nestjs/common';
+import { Module, HttpModule } from '@nestjs/common';
 import { AuthenticationService } from './authentication.service';
 import { UsersModule } from '../users/users.module';
 import { AuthenticationController } from './authentication.controller';
 import { PassportModule } from '@nestjs/passport';
-import { LocalStrategy } from './local.strategy';
 import { JwtStrategy } from './jwt.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { FortyTwoStrategy } from './42.strategy';
  
 @Module({
   imports: [
     UsersModule,
+    HttpModule,
     PassportModule,
     ConfigModule,
     JwtModule.registerAsync({
@@ -24,7 +25,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
       }),
     }),
   ],
-  providers: [AuthenticationService, LocalStrategy, JwtStrategy],
+  providers: [AuthenticationService, FortyTwoStrategy, JwtStrategy ],
   controllers: [AuthenticationController]
 })
 export class AuthenticationModule {}

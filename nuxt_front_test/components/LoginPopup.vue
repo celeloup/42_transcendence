@@ -23,7 +23,7 @@ export default {
 
   computed: {
     loginUri() {
-      return `#`
+      return 'https://api.intra.42.fr/oauth/authorize?client_id=19e5ab89328bbc134e124cc4611ecc7c3fd0d88176bd38eda6e7ee23d649df3b&redirect_uri=http%3A%2F%2Flocalhost%3A8080%2Fapi%2Fauthentication%2Foauth&response_type=code'
     }
   }
 };

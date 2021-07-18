@@ -5,18 +5,20 @@ import { Exclude } from 'class-transformer';
 @Entity()
 class User {
   @PrimaryGeneratedColumn()
-  @Exclude()
   public id?: number;
+
+  @Column({ unique: true })
+  public id42: number;
  
   @Column({ unique: true })
   public email: string;
  
   @Column()
   public name: string;
- 
-  @Column()
-  @Exclude()
-  public password: string;
+
+  //@Column()
+  //@Exclude()
+  //public password: string;
 
   // EXAMPLE -> relation one to many: a post have one user / a user can have multiple posts
   //@OneToMany(() => Post, (post: Post) => post.author)
