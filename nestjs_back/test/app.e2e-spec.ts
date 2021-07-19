@@ -65,12 +65,13 @@ describe('AppController (e2e)', () => {
     await app.close();
   });
 
+/* old local auth, to change for 42 oauth
   const userData = {
     name: "bob",
     email: "bob@test.com",
     password: "iambobybob"
   }
-
+  
   describe('Authentication', () => {
 
     describe('registering with valid data', () => {
@@ -86,6 +87,7 @@ describe('AppController (e2e)', () => {
           .expect(expectedData);
       })
     });
+    
 
     describe('and incomplete data', () => {
       it('should throw an error', () => {
@@ -219,5 +221,5 @@ describe('AppController (e2e)', () => {
     });
 
   });
-  
+*/
 });

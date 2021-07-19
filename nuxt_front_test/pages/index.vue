@@ -2,6 +2,7 @@
   <div id="page">
     <LoginPopup v-if="!user"/>
     <LoggedPopup v-else :user="user"/>
+    <NameForm v-if="user" :user="user"/>
   </div>
 </template>
 
@@ -9,13 +10,15 @@
 import Vue from 'vue';
 import LoginPopup from '../components/LoginPopup.vue';
 import LoggedPopup from '../components/LoggedPopup.vue';
+import NameForm from '../components/NameForm.vue';
 
 export default Vue.extend({
   name: "index",
 
   components: {
     LoginPopup,
-    LoggedPopup
+    LoggedPopup,
+    NameForm
   },
 
   data() {
@@ -27,7 +30,7 @@ export default Vue.extend({
   async asyncData({ $axios }) {
     let user = null;
     try {
-      user = await $axios.$get('http://localhost:8080/api/authentication/', { withCredentials: true });
+      user = await $axios.$get('/authentication/', { withCredentials: true });
     } catch (error) {
       console.error(`Get user ${error}`);
     }
