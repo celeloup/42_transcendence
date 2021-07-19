@@ -27,29 +27,18 @@ export class AuthenticationController {
     return request.user;
   }
 
-  /*
+  /* for testing
   @Post('register')
   async register(@Body() registrationData: RegisterDto) {
     return this.authenticationService.register(registrationData);
   }
- 
-  @HttpCode(200)
-  @UseGuards(LocalAuthenticationGuard)
-  @Post('log-in')
-  async logIn(@Req() request: RequestWithUser) {
-    const user = request.user;
-    user.password = undefined;
-    const cookie = this.authenticationService.getCookieWithJwtToken(user.id);
-    request.res.setHeader('Set-Cookie', cookie);
-      return user;
-  }
+  */
 
   @HttpCode(200)
   @UseGuards(JwtAuthenticationGuard)
   @Post('log-out')
   async logOut(@Req() request: Request) {
-	const cookie = this.authenticationService.getCookieForLogOut();
+  const cookie = this.authenticationService.getCookieForLogOut();
     request.res.setHeader('Set-Cookie', cookie);
   }
-  */
 }

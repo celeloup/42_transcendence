@@ -12,18 +12,27 @@
     </h3>
     <h3 class="login-text">
       <b-badge
-        :href="`https://profile.intra.42.fr/users/${user.name}`"
         variant="dark"
         class="badge"
       >
-		    <img src="/42_logo.svg" class="logo-42" alt="logo-42">
 		    {{user.name}}
 	    </b-badge>
 	  </h3>
+    <p class="login-text">
+      <b-button
+        variant="primary"
+        class="button"
+        v-b-modal.mod-name-modal
+      ><b-icon icon="gear" class="icon"/>Modifier pseudo</b-button>
+    </p>
   </b-modal>
 </template>
 
-<script>
+<script lang="ts">
+import Vue, { PropOptions } from 'vue';
+interface User {
+  name: string
+};
 
 export default {
   name: "LoggedPopup",
@@ -32,19 +41,20 @@ export default {
     user: {
       type: Object,
       required: true
-    }
+    } as PropOptions<User>
   },
 };
 </script>
 
 <style scoped>
 
+.icon {
+  margin-right: 0.5rem;
+}
+
 .login-text {
   text-align: center;
 }
 
-.logo-42 {
-  width: 32px;
-}
 
 </style>
