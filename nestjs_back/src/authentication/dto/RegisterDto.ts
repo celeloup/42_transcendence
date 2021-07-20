@@ -2,7 +2,7 @@ import { IsEmail, IsString, IsNotEmpty, IsNumber } from 'class-validator';
 
 class RegisterDto {
   @IsNumber()
-  public id42: number;
+  id42: number;
 
   @IsEmail()
   email: string;

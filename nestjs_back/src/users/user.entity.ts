@@ -1,6 +1,5 @@
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
 import { Exclude } from 'class-transformer';
-//import Post from '../posts/post.entity';
  
 @Entity()
 class User {
@@ -17,13 +16,18 @@ class User {
   @Column()
   public name: string;
 
-  //@Column()
-  //@Exclude()
-  //public password: string;
+  @Column({ nullable: true })
+  @Exclude()
+  public currentHashedRefreshToken?: string;
 
-  // EXAMPLE -> relation one to many: a post have one user / a user can have multiple posts
-  //@OneToMany(() => Post, (post: Post) => post.author)
-  //public posts: Post[];
+  @Column({ nullable: true })
+  @Exclude()
+  public twoFactorAuthenticationSecret?: string;
+
+  @Column({ default: false })
+  @Exclude()
+  public isTwoFactorAuthenticationEnabled: boolean;
+
 }
  
 export default User;

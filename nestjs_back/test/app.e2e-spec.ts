@@ -24,6 +24,8 @@ describe('AppController (e2e)', () => {
             POSTGRES_TEST_DB: Joi.string().required(),
             JWT_SECRET: Joi.string().required(),
             JWT_EXPIRATION_TIME: Joi.string().required(),
+            JWT_REFRESH_TOKEN_SECRET: Joi.string().required(),
+            JWT_REFRESH_TOKEN_EXPIRATION_TIME: Joi.string().required(),
           })
         }),
         TypeOrmModule.forRootAsync({
@@ -65,114 +67,60 @@ describe('AppController (e2e)', () => {
     await app.close();
   });
 
-/* old local auth, to change for 42 oauth
-  const userData = {
-    name: "bob",
-    email: "bob@test.com",
-    password: "iambobybob"
+  // test users directly registered without oauth
+  const user1 = {
+    name: 'fhenrion',
+    email: 'fhenrion@student.42.fr',
+    id42: 1
+  }
+  const user2 = {
+    name: 'jgonfroy',
+    email: 'jgonfroy@student.42.fr',
+    id42: 2
+  }
+  const user3 = {
+    name: 'cleloup',
+    email: 'cleloup@student.42.fr',
+    id42: 3
   }
   
+  let cookies: Array<string>;
+
   describe('Authentication', () => {
-
-    describe('registering with valid data', () => {
-      it('should respond with the data of the user without the password', () => {
-        const expectedData = {
-          ...userData
-        }
-        delete expectedData.password;
+    describe('registering users for tests', () => {
+      it('user1', () => {
         return request(app.getHttpServer())
           .post('/api/authentication/register')
-          .send(userData)
-          .expect(201)
-          .expect(expectedData);
-      })
-    });
-    
-
-    describe('and incomplete data', () => {
-      it('should throw an error', () => {
-        return request(app.getHttpServer())
-          .post('/api/authentication/register')
-          .send({
-            name: 'bob'
-          })
-          .expect(400)
-      })
-    });
-
-    describe('and invalid email', () => {
-      it('should throw an error', () => {
-        return request(app.getHttpServer())
-          .post('/api/authentication/register')
-          .send({
-            name: userData.name,
-            password: userData.password,
-            email: 'notvalidemail'
-          })
-          .expect(400)
-      })
-    });
-
-    describe('and to short password', () => {
-      it('should throw an error', () => {
-        return request(app.getHttpServer())
-          .post('/api/authentication/register')
-          .send({
-            name: userData.name,
-            password: 'i',
-            email: userData.email
-          })
-          .expect(400)
-      })
-    });
-
-    describe('and email already exist', () => {
-      it('should throw an error', () => {
-        return request(app.getHttpServer())
-          .post('/api/authentication/register')
-          .send(userData)
-          .expect(400)
-      })
-    });
-
-    describe('login with wrong credentials', () => {
-      it('should throw an error', () => {
-        return request(app.getHttpServer())
-          .post('/api/authentication/log-in')
-          .send({
-            email: userData.email,
-            password: 'wrong'
-          })
-          .expect(400)
-      })
-      it('should throw an error', () => {
-        return request(app.getHttpServer())
-          .post('/api/authentication/log-in')
-          .send({
-            email: 'not@exist.com',
-            password: userData.password
-          })
-          .expect(400)
-      })
-    });
-
-    let cookie: string;
-    describe('login with right credentials', () => {
-      it('should return user and cookie', () => {
-        return request(app.getHttpServer())
-          .post('/api/authentication/log-in')
-          .send({
-            email: userData.email,
-            password: userData.password
-          })
-          .expect(200)
+          .send(user1)
           .expect({
-            email: userData.email,
-            name: userData.name
+            ...user1,
+            id: 1
           })
-          .expect('set-cookie', /Authentication=.*; HttpOnly; Path=\/; Max-Age=72000/)
+          .expect(201);
+      });
+      it('user2', () => {
+        return request(app.getHttpServer())
+          .post('/api/authentication/register')
+          .send(user2)
+          .expect({
+            ...user2,
+            id: 2
+          })
+          .expect(201);
+      });
+      // cleloup is the testing user !
+      it('user3 -> check the cookie', () => {
+        return request(app.getHttpServer())
+          .post('/api/authentication/register')
+          .send(user3)
+          .expect({
+            ...user3,
+            id: 3
+          })
+          .expect(201)
+          .expect('set-cookie', /Authentication=.*; HttpOnly; Path=\/; Max-Age=900,Refresh=.*; HttpOnly; Path=\/; Max-Age=72000/)
           .then((res) => {
-            cookie = res.headers['set-cookie'][0];
+            cookies = res.headers['set-cookie'];
           });
       })
     });
@@ -189,11 +137,32 @@ describe('AppController (e2e)', () => {
       it('should return user', () => {
         return request(app.getHttpServer())
           .get('/api/authentication')
-          .set('cookie', cookie)
+          .set('cookie', cookies[0])
           .expect(200)
           .expect({
-            email: userData.email,
-            name: userData.name
+            ...user3,
+            id: 3
+          })
+      });
+    });
+
+    describe('refresh the jwt token without cookie', () => {
+      it('should throw an error', () => {
+        return request(app.getHttpServer())
+          .get('/api/authentication/refresh')
+          .expect(401)
+      });
+    });
+
+    describe('refresh the jwt token with cookie', () => {
+      it('should return user', () => {
+        return request(app.getHttpServer())
+          .get('/api/authentication/refresh')
+          .set('cookie', cookies[1])
+          .expect(200)
+          .expect({
+            ...user3,
+            id: 3
           })
       });
     });
@@ -202,24 +171,24 @@ describe('AppController (e2e)', () => {
       it('should return an empty cookie', () => {
         return request(app.getHttpServer())
           .post('/api/authentication/log-out')
-          .set('cookie', cookie)
+          .set('cookie', cookies[0])
           .expect(200)
-          .expect('set-cookie', 'Authentication=; HttpOnly; Path=/; Max-Age=0')
+          .expect('set-cookie', 'Authentication=; HttpOnly; Path=/; Max-Age=0,Refresh=; HttpOnly; Path=/; Max-Age=0')
           .then((res) => {
-            cookie = res.headers['set-cookie'][0];
+            cookies = res.headers['set-cookie'];
           });
       })
     });
 
-    describe('authenticate with logout empty cookie', () => {
+    describe('authenticate after logout with empty cookie', () => {
       it('should throw an error', () => {
         return request(app.getHttpServer())
           .get('/api/authentication')
-          .set('cookie', cookie)
+          .set('cookie', cookies[0])
           .expect(401)
       });
     });
 
   });
-*/
+
 });
