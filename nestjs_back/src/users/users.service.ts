@@ -2,6 +2,7 @@ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import User from './user.entity';
+import * as bcrypt from 'bcrypt';
 import CreateUserDto from './dto/createUser.dto';
 import UpdateUserDto from './dto/updateUser.dto';
  
@@ -11,14 +12,6 @@ export class UsersService {
     @InjectRepository(User)
     private usersRepository: Repository<User>
   ) {}
- 
-  async getByEmail(email: string) {
-    const user = await this.usersRepository.findOne({ email });
-    if (user) {
-      return user;
-    }
-    throw new HttpException('User with this email does not exist', HttpStatus.NOT_FOUND);
-  }
 
   async getById(id: number) {
     const user = await this.usersRepository.findOne({ id });
@@ -29,7 +22,11 @@ export class UsersService {
   }
 
   async getBy42Id(id42: number) {
-    return this.usersRepository.findOne({ id42 });
+    const user = await this.usersRepository.findOne({ id42 });
+    if (user) {
+      return user;
+    }
+    throw new HttpException('User with this 42 id does not exist', HttpStatus.NOT_FOUND);
   }
   
   async create(userData: CreateUserDto) {
@@ -47,4 +44,39 @@ export class UsersService {
     throw new HttpException('User not found', HttpStatus.NOT_FOUND);
   }
 
+  async setCurrentRefreshToken(refreshToken: string, userId: number) {
+    const currentHashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    await this.usersRepository.update(userId, {
+      currentHashedRefreshToken
+    });
+  }
+
+  async getUserIfRefreshTokenMatches(refreshToken: string, userId: number) {
+    const user = await this.getById(userId);
+    const isRefreshTokenMatching = await bcrypt.compare(
+      refreshToken,
+      user.currentHashedRefreshToken
+    );
+    if (isRefreshTokenMatching) {
+      return user;
+    }
+  }
+
+  async removeRefreshToken(userId: number) {
+    return this.usersRepository.update(userId, {
+      currentHashedRefreshToken: null
+    });
+  }
+
+  async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
+    return this.usersRepository.update(userId, {
+      twoFactorAuthenticationSecret: secret
+    });
+  }
+
+  async turnOnTwoFactorAuthentication(userId: number) {
+    return this.usersRepository.update(userId, {
+      isTwoFactorAuthenticationEnabled: true
+    });
+  }
 }
