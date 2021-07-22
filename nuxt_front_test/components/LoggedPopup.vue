@@ -25,6 +25,13 @@
         v-b-modal.mod-name-modal
       ><b-icon icon="gear" class="icon"/>Modifier pseudo</b-button>
     </p>
+    <p class="login-text">
+      <b-button
+        variant="danger"
+        class="button"
+        v-on:click="logout"
+      ><b-icon icon="door-open" class="icon"/>logout</b-button>
+    </p>
   </b-modal>
 </template>
 
@@ -34,7 +41,7 @@ interface User {
   name: string
 };
 
-export default {
+export default Vue.extend({
   name: "LoggedPopup",
 
   props: {
@@ -43,7 +50,14 @@ export default {
       required: true
     } as PropOptions<User>
   },
-};
+
+  methods: {
+    async logout() {
+      await this.$axios.$post('/authentication/log-out', { withCredentials: true })
+      this.$emit('update:user', null);
+    }
+  }
+});
 </script>
 
 <style scoped>

@@ -94,7 +94,8 @@ describe('AppController (e2e)', () => {
           .send(user1)
           .expect({
             ...user1,
-            id: 1
+            id: 1,
+            isTwoFactorAuthenticationEnabled: false
           })
           .expect(201);
       });
@@ -104,10 +105,13 @@ describe('AppController (e2e)', () => {
           .send(user2)
           .expect({
             ...user2,
-            id: 2
+            id: 2,
+            isTwoFactorAuthenticationEnabled: false
           })
           .expect(201);
       });
+
+      const cookies_regex = /Authentication=.*; HttpOnly; Path=\/; SameSite=Strict; Max-Age=900,Refresh=.*; HttpOnly; Path=\/; SameSite=Strict; Max-Age=72000,Expired=; Path=\/; SameSite=Strict; Max-Age=900/;
       // cleloup is the testing user !
       it('user3 -> check the cookie', () => {
         return request(app.getHttpServer())
@@ -115,10 +119,11 @@ describe('AppController (e2e)', () => {
           .send(user3)
           .expect({
             ...user3,
-            id: 3
+            id: 3,
+            isTwoFactorAuthenticationEnabled: false
           })
           .expect(201)
-          .expect('set-cookie', /Authentication=.*; HttpOnly; Path=\/; Max-Age=900,Refresh=.*; HttpOnly; Path=\/; Max-Age=72000/)
+          .expect('set-cookie', cookies_regex)
           .then((res) => {
             cookies = res.headers['set-cookie'];
           });
@@ -141,7 +146,8 @@ describe('AppController (e2e)', () => {
           .expect(200)
           .expect({
             ...user3,
-            id: 3
+            id: 3,
+            isTwoFactorAuthenticationEnabled: false
           })
       });
     });
@@ -162,18 +168,21 @@ describe('AppController (e2e)', () => {
           .expect(200)
           .expect({
             ...user3,
-            id: 3
+            id: 3,
+            isTwoFactorAuthenticationEnabled: false
           })
       });
     });
 
     describe('logout', () => {
-      it('should return an empty cookie', () => {
+      const empty_cookies = 'Authentication=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0,Refresh=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0,Expired=; Path=\/; SameSite=Strict; Max-Age=0';
+      
+      it('should return empty cookies', () => {
         return request(app.getHttpServer())
           .post('/api/authentication/log-out')
           .set('cookie', cookies[0])
           .expect(200)
-          .expect('set-cookie', 'Authentication=; HttpOnly; Path=/; Max-Age=0,Refresh=; HttpOnly; Path=/; Max-Age=0')
+          .expect('set-cookie', empty_cookies)
           .then((res) => {
             cookies = res.headers['set-cookie'];
           });

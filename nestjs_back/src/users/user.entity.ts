@@ -25,7 +25,6 @@ class User {
   public twoFactorAuthenticationSecret?: string;
 
   @Column({ default: false })
-  @Exclude()
   public isTwoFactorAuthenticationEnabled: boolean;
 
 }

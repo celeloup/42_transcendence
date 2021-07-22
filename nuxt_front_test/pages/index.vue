@@ -1,8 +1,8 @@
 <template>
   <div id="page">
     <LoginPopup v-if="!user"/>
-    <LoggedPopup v-else :user="user"/>
-    <NameForm v-if="user" :user="user"/>
+    <LoggedPopup v-else :user="user" v-on:update:user="user = $event"/>
+    <NameForm v-if="user" :user="user" v-on:update:name="user.name = $event"/>
   </div>
 </template>
 
@@ -27,15 +27,9 @@ export default Vue.extend({
     }
   },
 
-  async asyncData({ $axios }) {
-    let user = null;
-    try {
-      user = await $axios.$get('/authentication/', { withCredentials: true });
-    } catch (error) {
-      console.error(`Get user ${error}`);
-    }
+  async asyncData({ $axios, app }) {
     return {
-      user: user
+      user: await $axios.$get('/authentication/', { withCredentials: true })
     }
   }
 

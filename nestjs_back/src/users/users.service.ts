@@ -26,7 +26,6 @@ export class UsersService {
     if (user) {
       return user;
     }
-    throw new HttpException('User with this 42 id does not exist', HttpStatus.NOT_FOUND);
   }
   
   async create(userData: CreateUserDto) {
