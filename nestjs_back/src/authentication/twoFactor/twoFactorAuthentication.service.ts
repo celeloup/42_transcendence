@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { authenticator } from 'otplib';
 import User from '../../users/user.entity';
 import { UsersService } from '../../users/users.service';
-import { toFileStream } from 'qrcode';
+import { toDataURL, toFileStream } from 'qrcode';
 import { Response } from 'express';
  
 @Injectable()
@@ -23,8 +23,10 @@ export class TwoFactorAuthenticationService {
     }
   }
 
-  public async pipeQrCodeStream(stream: Response, otpauthUrl: string) {
-    return toFileStream(stream, otpauthUrl);
+  public async pipeQrCodeStream(otpauthUrl: string) {
+    const response = await toDataURL(otpauthUrl);
+    console.log(response);
+    return response; 
   }
 
   public isTwoFactorAuthenticationCodeValid(twoFactorAuthenticationCode: string, user: User) {

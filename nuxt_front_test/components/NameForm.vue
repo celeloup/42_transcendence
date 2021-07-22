@@ -1,6 +1,7 @@
 <template>
   <b-modal
     id="mod-name-modal"
+    ref="modal"
     centered
     no-close-on-backdrop
     no-close-on-esc
@@ -83,6 +84,7 @@ export default Vue.extend({
         ).then(() => {
           this.$emit('update:name', user.name);
           this.active = true;
+          (this.$refs['modal'] as any).hide();
         });
       } catch {
         this.$bvModal.msgBoxOk(

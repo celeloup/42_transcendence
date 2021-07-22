@@ -27,6 +27,13 @@
     </p>
     <p class="login-text">
       <b-button
+        variant="primary"
+        class="button"
+        v-b-modal.2fa-modal
+      ><b-icon icon="gear" class="icon"/>Double Facteur</b-button>
+    </p>
+    <p class="login-text">
+      <b-button
         variant="danger"
         class="button"
         v-on:click="logout"
