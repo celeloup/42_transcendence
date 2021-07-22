@@ -3,8 +3,8 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Request } from 'express';
-import { UsersService } from '../users/users.service';
-import TokenPayload from './tokenPayload.interface';
+import { UsersService } from '../../users/users.service';
+import TokenPayload from '../tokenPayload.interface';
  
 @Injectable()
 export class JwtRefreshTokenStrategy extends PassportStrategy(
@@ -17,7 +17,7 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
   ) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([(request: Request) => {
-		return request?.cookies?.Refresh;
+		    return request?.cookies?.Refresh;
       }]),
       secretOrKey: configService.get('JWT_REFRESH_TOKEN_SECRET'),
       passReqToCallback: true,
@@ -26,6 +26,14 @@ export class JwtRefreshTokenStrategy extends PassportStrategy(
  
   async validate(request: Request, payload: TokenPayload) {
     const refreshToken = request.cookies?.Refresh;
-    return this.userService.getUserIfRefreshTokenMatches(refreshToken, payload.userId);
+    const user = await this.userService.getUserIfRefreshTokenMatches(refreshToken, payload.userId)
+    if (user) {
+      if (!user.isTwoFactorAuthenticationEnabled) {
+        return user;
+      }
+      if (payload.isSecondFactorAuthenticated) {
+        return user;
+      }
+    }
   }
 }

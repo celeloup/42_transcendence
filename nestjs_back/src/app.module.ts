@@ -20,6 +20,13 @@ import { APP_FILTER } from '@nestjs/core';
         JWT_EXPIRATION_TIME: Joi.string().required(),
         JWT_REFRESH_TOKEN_SECRET: Joi.string().required(),
         JWT_REFRESH_TOKEN_EXPIRATION_TIME: Joi.string().required(),
+        OAUTH_URL: Joi.string().required(),
+        OAUTH_CLIENT_ID: Joi.string().required(),
+        OAUTH_CLIENT_SECRET: Joi.string().required(),
+        OAUTH_CALLBACK_PARAM: Joi.string().required(),
+        OAUTH_CALLBACK_URL: Joi.string().required(),
+        OAUTH_SCOPE: Joi.string().required(),
+        OAUTH_ME_URL: Joi.string().required(),
       })
     }),
     DatabaseModule,

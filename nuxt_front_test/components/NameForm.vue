@@ -71,7 +71,7 @@ export default Vue.extend({
       try {
         const user = await this.putUser();
         this.$bvModal.msgBoxOk(
-          `Bienvenue ${user.name}`,
+          `You're now known as ${user.name}`,
           {
             size: 'sm',
             buttonSize: 'sm',
@@ -81,6 +81,7 @@ export default Vue.extend({
             centered: true
           }
         ).then(() => {
+          this.$emit('update:name', user.name);
           this.active = true;
         });
       } catch {

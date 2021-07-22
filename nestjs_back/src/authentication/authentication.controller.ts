@@ -1,11 +1,11 @@
-import { Body, Req, Get, Controller, HttpCode, Post, UseGuards } from '@nestjs/common';
+import { Body, Req, Get, Controller, HttpCode, Post, UseGuards, UnauthorizedException } from '@nestjs/common';
 import { AuthenticationService } from './authentication.service';
 import RegisterDto from './dto/RegisterDto';
 import RequestWithUser from './requestWithUser.interface';
-import JwtAuthenticationGuard from './jwtAuthentication.guard';
-import FortyTwoAuthenticationGuard from './42Authentication.guard';
+import FortyTwoAuthenticationGuard from './guard/42Authentication.guard';
 import { Request } from 'express';
-import JwtRefreshGuard from './jwtRefresh.guard';
+import JwtRefreshGuard from './guard/jwtRefresh.guard';
+import JwtTwoFactorGuard from './guard/jwtTwoFactor.guard';
 
 @Controller('authentication')
 export class AuthenticationController {
@@ -19,21 +19,29 @@ export class AuthenticationController {
     const {user} = request;
     const accessTokenCookie = this.authenticationService.getCookieWithJwtToken(user.id);
     const refreshTokenCookie = await this.authenticationService.getCookieWithJwtRefreshToken(user.id);
-    request.res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie]);
+    const expiredCookie = this.authenticationService.getExpiredCookie();
+    request.res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie, expiredCookie]);
     return request.res.redirect('http://localhost:3000/');
   }
 
   @UseGuards(JwtRefreshGuard)
   @Get('refresh')
   refresh(@Req() request: RequestWithUser) {
+    if (!request.user) {
+      throw new UnauthorizedException();
+    }
     const accessTokenCookie = this.authenticationService.getCookieWithJwtToken(request.user.id);
-    request.res.setHeader('Set-Cookie', accessTokenCookie);
+    const expiredCookie = this.authenticationService.getExpiredCookie();
+    request.res.setHeader('Set-Cookie', [accessTokenCookie, expiredCookie]);
     return request.user;
   }
 
-  @UseGuards(JwtAuthenticationGuard)
+  @UseGuards(JwtTwoFactorGuard)
   @Get()
   authenticate(@Req() request: RequestWithUser) {
+    if (!request.user) {
+      throw new UnauthorizedException();
+    }
     return request.user;
   }
 
@@ -43,14 +51,18 @@ export class AuthenticationController {
     const fakeUser = await this.authenticationService.register(registrationData);
     const accessTokenCookie = this.authenticationService.getCookieWithJwtToken(fakeUser.id);
     const refreshTokenCookie = await this.authenticationService.getCookieWithJwtRefreshToken(fakeUser.id);
-    req.res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie]);
+    const expiredCookie = this.authenticationService.getExpiredCookie();
+    req.res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie, expiredCookie]);
     return fakeUser;
   }
 
-  @UseGuards(JwtAuthenticationGuard)
+  @UseGuards(JwtTwoFactorGuard)
   @Post('log-out')
   @HttpCode(200)
   async logOut(@Req() request: RequestWithUser) {
+    if (!request.user) {
+      throw new UnauthorizedException();
+    }
     await this.authenticationService.removeRefreshToken(request.user.id);
     request.res.setHeader('Set-Cookie', this.authenticationService.getCookieForLogOut());
   }

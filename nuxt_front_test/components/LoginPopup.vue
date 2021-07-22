@@ -1,5 +1,6 @@
 <template>
   <b-modal
+    visible
     centered
     no-close-on-backdrop
     no-close-on-esc

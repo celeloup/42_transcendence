@@ -3,14 +3,14 @@ import { AuthenticationService } from './authentication.service';
 import { UsersModule } from '../users/users.module';
 import { AuthenticationController } from './authentication.controller';
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from './jwt.strategy';
-import { JwtRefreshTokenStrategy } from './jwtRefresh.strategy';
+import { JwtStrategy } from './strategy/jwt.strategy';
+import { JwtRefreshTokenStrategy } from './strategy/jwtRefresh.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { FortyTwoStrategy } from './42.strategy';
+import { FortyTwoStrategy } from './strategy/42.strategy';
 import { TwoFactorAuthenticationController } from './twoFactor/twoFactorAuthentication.controller';
 import { TwoFactorAuthenticationService } from './twoFactor/twoFactorAuthentication.service';
-import { UsersService } from 'src/users/users.service';
+import { JwtTwoFactorStrategy } from './strategy/jwtTwoFactor.strategy';
  
 @Module({
   imports: [
@@ -29,7 +29,7 @@ import { UsersService } from 'src/users/users.service';
       }),
     }),
   ],
-  providers: [AuthenticationService, TwoFactorAuthenticationService, FortyTwoStrategy, JwtStrategy, JwtRefreshTokenStrategy],
+  providers: [AuthenticationService, TwoFactorAuthenticationService, FortyTwoStrategy, JwtStrategy, JwtRefreshTokenStrategy, JwtTwoFactorStrategy],
   controllers: [AuthenticationController, TwoFactorAuthenticationController]
 })
 export class AuthenticationModule {}

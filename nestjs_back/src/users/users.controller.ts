@@ -1,9 +1,8 @@
 import { Body, Controller, Put, Req, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import UpdateUserDto from './dto/updateUser.dto';
-
 import RequestWithUser from '../authentication/requestWithUser.interface';
-import JwtAuthenticationGuard from '../authentication/jwtAuthentication.guard';
+import JwtTwoFactorGuard from '../authentication/guard/jwtTwoFactor.guard';
  
 @Controller('users')
 export default class UsersController {
@@ -11,7 +10,7 @@ export default class UsersController {
     private readonly userService: UsersService
   ) {}
 
-  @UseGuards(JwtAuthenticationGuard)
+  @UseGuards(JwtTwoFactorGuard)
   @Put('me')
   async replacePost(@Req() req: RequestWithUser, @Body() user: UpdateUserDto) {
     return this.userService.changeName(req.user.id, user);

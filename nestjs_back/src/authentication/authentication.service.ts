@@ -30,20 +30,21 @@ export class AuthenticationService {
 	  }
   }
 
-  public getCookieWithJwtToken(userId: number) {
-    const payload: TokenPayload = { userId };
+  public getCookieWithJwtToken(userId: number, isSecondFactorAuthenticated = false) {
+    const payload: TokenPayload = { userId, isSecondFactorAuthenticated };
     const expire_time = this.configService.get('JWT_EXPIRATION_TIME');
     const token = this.jwtService.sign(payload, {
       secret: this.configService.get('JWT_SECRET'),
       expiresIn: `${expire_time}s`
     });
-    return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${expire_time}`;
+    return `Authentication=${token}; HttpOnly; Path=/; SameSite=Strict; Max-Age=${expire_time}`;
   }
 
   public getCookieForLogOut() {
     return [
-      'Authentication=; HttpOnly; Path=/; Max-Age=0',
-      'Refresh=; HttpOnly; Path=/; Max-Age=0'
+      'Authentication=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0',
+      'Refresh=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0',
+      'Expired=; Path=/; SameSite=Strict; Max-Age=0'
     ];
   }
 
@@ -51,15 +52,21 @@ export class AuthenticationService {
     this.usersService.removeRefreshToken(userId);
   }
 
-  public async getCookieWithJwtRefreshToken(userId: number) {
-    const payload: TokenPayload = { userId };
+  public async getCookieWithJwtRefreshToken(userId: number, isSecondFactorAuthenticated = false) {
+    const payload: TokenPayload = { userId, isSecondFactorAuthenticated };
     const expire_time = this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME');
     const token = this.jwtService.sign(payload, {
       secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
       expiresIn: `${expire_time}s`
     });
-    const cookie = `Refresh=${token}; HttpOnly; Path=/; Max-Age=${expire_time}`;
+    const cookie = `Refresh=${token}; HttpOnly; Path=/; SameSite=Strict; Max-Age=${expire_time}`;
     await this.usersService.setCurrentRefreshToken(token, userId);
+    return cookie;
+  }
+
+  public getExpiredCookie() {
+    const expire_time = this.configService.get('JWT_EXPIRATION_TIME');
+    const cookie = `Expired=; Path=/; SameSite=Strict; Max-Age=${expire_time}`;
     return cookie;
   }
   
