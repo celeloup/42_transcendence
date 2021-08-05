@@ -13,6 +13,9 @@ const interceptor: Plugin = ({ app: { $axios, $cookies } }) => {
           return config;
         }
       })
+      .catch((e) => {
+        console.error(`Refresh: ${e}`);
+      })
     }
   });
 }

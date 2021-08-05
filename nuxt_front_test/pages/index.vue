@@ -31,11 +31,19 @@ export default Vue.extend({
   },
 
   async asyncData({ $axios, app }) {
-    const nocookie = app.$cookies.get('Expired') == undefined;
+    let user = null;
+    if (app.$cookies.get('Expired') !== undefined) {
+      try {
+        user = await $axios.$get('/authentication/', { withCredentials: true });
+      } catch (e) {
+        console.error(`Auth: ${e}`);
+      }
+    }
     return {
-      user: nocookie ? null : await $axios.$get('/authentication/', { withCredentials: true })
+      user
     }
   }
+
 
 })
 </script>
