@@ -22,8 +22,8 @@ ps:
 	$(DC) --project-name $(NAME) ps
 clean:
 	$(DC) --project-name $(NAME) down --rmi all --volumes
-	rm -frv ./nestjs_back/dist
-	rm -frv ./nestjs_back/node_modules
-	rm -frv ./nuxt_front_test/dist
-	rm -frv ./nuxt_front_test/.nuxt
-	sudo rm -frv ./postgres_data
+	rm -fr ./nestjs_back/dist
+	rm -fr ./nestjs_back/node_modules
+	rm -fr ./nuxt_front_test/dist
+	rm -fr ./nuxt_front_test/.nuxt
+	sudo rm -fr ./postgres_data
