@@ -1,12 +1,30 @@
 version: '3'
 
 services:
+  front:
+    image: node:15.14.0-alpine3.12
+    command: sh -c "npm install && npm run dev"
+    ports:
+      - "3000:3000"
+    environment:
+      HOST: 0.0.0.0
+    volumes:
+      - ./nuxt_front_test/.:/usr/src/app
+    working_dir: /usr/src/app
+
+  back:
+    image: node:15.14.0-alpine3.12
+    command: sh -c "npm install && npm run start:dev"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./nestjs_back/.:/usr/src/app
+    working_dir: /usr/src/app
+
   postgres:
     image: postgres:latest
-    ports:
-    - "5000:5432"
     volumes:
-    - ./postgres-entrypoint:/docker-entrypoint-initdb.d
-    - ./postgres_data:/var/lib/postgresql/data
+      - ./postgres-entrypoint:/docker-entrypoint-initdb.d
+      - ./postgres_data:/var/lib/postgresql/data
     env_file:
-    - docker.env
+      - docker.env

@@ -25,7 +25,6 @@ export class TwoFactorAuthenticationService {
 
   public async pipeQrCodeStream(otpauthUrl: string) {
     const response = await toDataURL(otpauthUrl);
-    console.log(response);
     return response; 
   }
 
