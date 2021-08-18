@@ -6,9 +6,9 @@ class Paddle {
 	  this.ychange = 0;
   
 	  if (isLeft) {
-		this.x = this.w;
+		this.x = this.w * 2;
 	  } else {
-		this.x = width - this.w;
+		this.x = width - this.w * 2;
 	  }
 	}
   
