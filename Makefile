@@ -9,11 +9,11 @@ logs:
 front.logs:
 	$(DC) --project-name $(NAME) logs --follow front
 front.shell:
-	$(DC) --project-name $(NAME) exec ui sh
+	$(DC) --project-name $(NAME) exec front sh
 back.logs:
-	$(DC) --project-name $(NAME) logs --follow front
+	$(DC) --project-name $(NAME) logs --follow back
 back.shell:
-	$(DC) --project-name $(NAME) exec ui sh
+	$(DC) --project-name $(NAME) exec back sh
 stop:
 	$(DC) --project-name $(NAME) stop
 down:
