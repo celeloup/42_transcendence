@@ -26,4 +26,4 @@ clean:
 	rm -fr ./nestjs_back/node_modules
 	rm -fr ./nuxt_front_test/dist
 	rm -fr ./nuxt_front_test/.nuxt
-	sudo rm -fr ./postgres_data
+	rm -fr ./postgres_data
