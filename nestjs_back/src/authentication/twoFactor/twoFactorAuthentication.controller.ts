@@ -64,9 +64,13 @@ export class TwoFactorAuthenticationController {
       throw new UnauthorizedException('Wrong authentication code');
     }
     const {user} = request;
-    const accessTokenCookie = this.authenticationService.getCookieWithJwtToken(user.id, true);
-    const refreshTokenCookie = await this.authenticationService.getCookieWithJwtRefreshToken(user.id, true);
+    const { accessTokenCookie, accessTokenExpiration } = this.authenticationService.getCookieWithJwtToken(user.id, true);
+    const { refreshTokenCookie, refreshTokenExpiration } = await this.authenticationService.getCookieWithJwtRefreshToken(user.id, true);
     request.res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie]);
-    return user;
+    return {
+      ...user,
+      accessTokenExpiration,
+      refreshTokenExpiration
+    };
   }
 }

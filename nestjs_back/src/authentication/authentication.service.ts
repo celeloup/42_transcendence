@@ -37,7 +37,10 @@ export class AuthenticationService {
       secret: this.configService.get('JWT_SECRET'),
       expiresIn: `${expire_time}s`
     });
-    return `Authentication=${token}; HttpOnly; Path=/; SameSite=Strict; Max-Age=${expire_time}`;
+    const accessTokenExpiration = new Date();
+    accessTokenExpiration.setSeconds(accessTokenExpiration.getSeconds() + expire_time);
+    const accessTokenCookie = `Authentication=${token}; HttpOnly; Path=/; SameSite=Strict; Expires=${accessTokenExpiration.toUTCString()}`;
+    return { accessTokenCookie, accessTokenExpiration };
   }
 
   public getCookieForLogOut() {
@@ -59,15 +62,11 @@ export class AuthenticationService {
       secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
       expiresIn: `${expire_time}s`
     });
-    const cookie = `Refresh=${token}; HttpOnly; Path=/; SameSite=Strict; Max-Age=${expire_time}`;
+    const refreshTokenExpiration = new Date();
+    refreshTokenExpiration.setSeconds(refreshTokenExpiration.getSeconds() + expire_time);
+    const refreshTokenCookie = `Refresh=${token}; HttpOnly; Path=/; SameSite=Strict; Expires=${refreshTokenExpiration.toUTCString()}`;
     await this.usersService.setCurrentRefreshToken(token, userId);
-    return cookie;
-  }
-
-  public getExpiredCookie() {
-    const expire_time = this.configService.get('JWT_EXPIRATION_TIME');
-    const cookie = `Expired=; Path=/; SameSite=Strict; Max-Age=${expire_time}`;
-    return cookie;
+    return { refreshTokenCookie, refreshTokenExpiration };
   }
   
 }

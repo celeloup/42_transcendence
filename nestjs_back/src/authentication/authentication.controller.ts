@@ -17,23 +17,30 @@ export class AuthenticationController {
   @Get('oauth')
   async oauth(@Req() request: RequestWithUser) {
     const {user} = request;
-    const accessTokenCookie = this.authenticationService.getCookieWithJwtToken(user.id);
-    const refreshTokenCookie = await this.authenticationService.getCookieWithJwtRefreshToken(user.id);
-    const expiredCookie = this.authenticationService.getExpiredCookie();
-    request.res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie, expiredCookie]);
-    return request.res.redirect('http://localhost:3000/');
+    const { accessTokenCookie, accessTokenExpiration } = this.authenticationService.getCookieWithJwtToken(user.id);
+    const { refreshTokenCookie, refreshTokenExpiration } = await this.authenticationService.getCookieWithJwtRefreshToken(user.id);
+    request.res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie]);
+    return {
+      ...user,
+      accessTokenExpiration,
+      refreshTokenExpiration
+    };
   }
 
   @UseGuards(JwtRefreshGuard)
   @Get('refresh')
-  refresh(@Req() request: RequestWithUser) {
+  async refresh(@Req() request: RequestWithUser) {
     if (!request.user) {
       throw new UnauthorizedException();
     }
-    const accessTokenCookie = this.authenticationService.getCookieWithJwtToken(request.user.id);
-    const expiredCookie = this.authenticationService.getExpiredCookie();
-    request.res.setHeader('Set-Cookie', [accessTokenCookie, expiredCookie]);
-    return request.user;
+    const { accessTokenCookie, accessTokenExpiration } = this.authenticationService.getCookieWithJwtToken(request.user.id);
+    const { refreshTokenCookie, refreshTokenExpiration } = await this.authenticationService.getCookieWithJwtRefreshToken(request.user.id);
+    request.res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie]);
+    return {
+      ...request.user,
+      accessTokenExpiration,
+      refreshTokenExpiration
+    };
   }
 
   @UseGuards(JwtTwoFactorGuard)
@@ -49,11 +56,14 @@ export class AuthenticationController {
   @Post('register')
   async register(@Body() registrationData: RegisterDto, @Req() req: Request) {
     const fakeUser = await this.authenticationService.register(registrationData);
-    const accessTokenCookie = this.authenticationService.getCookieWithJwtToken(fakeUser.id);
-    const refreshTokenCookie = await this.authenticationService.getCookieWithJwtRefreshToken(fakeUser.id);
-    const expiredCookie = this.authenticationService.getExpiredCookie();
-    req.res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie, expiredCookie]);
-    return fakeUser;
+    const { accessTokenCookie, accessTokenExpiration } = this.authenticationService.getCookieWithJwtToken(fakeUser.id);
+    const { refreshTokenCookie, refreshTokenExpiration } = await this.authenticationService.getCookieWithJwtRefreshToken(fakeUser.id);
+    req.res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie]);
+    return {
+      ...fakeUser,
+      accessTokenExpiration,
+      refreshTokenExpiration
+    };
   }
 
   @UseGuards(JwtTwoFactorGuard)
