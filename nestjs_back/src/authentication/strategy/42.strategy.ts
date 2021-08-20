@@ -2,10 +2,10 @@ import { PassportStrategy } from '@nestjs/passport';
 import { Injectable, HttpService } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Strategy } from 'passport-oauth2';
-import { AuthenticationService } from '../authentication.service';
+import AuthenticationService from '../authentication.service';
 
 @Injectable()
-export class FortyTwoStrategy extends PassportStrategy(Strategy, '42')
+export default class FortyTwoStrategy extends PassportStrategy(Strategy, '42')
 {
 	constructor(
 		private readonly configService: ConfigService,

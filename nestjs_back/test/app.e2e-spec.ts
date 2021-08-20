@@ -4,10 +4,10 @@ import * as Joi from '@hapi/joi';
 import { ClassSerializerInterceptor, INestApplication, ValidationPipe } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersModule } from '../src/users/users.module';
-import { AuthenticationModule } from '../src/authentication/authentication.module';
 import { Reflector } from '@nestjs/core';
 import * as cookieParser from 'cookie-parser';
+import UsersModule from '../src/users/users.module';
+import AuthenticationModule from '../src/authentication/authentication.module';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;

@@ -1,16 +1,16 @@
 import { Module, HttpModule } from '@nestjs/common';
-import { AuthenticationService } from './authentication.service';
-import { UsersModule } from '../users/users.module';
-import { AuthenticationController } from './authentication.controller';
 import { PassportModule } from '@nestjs/passport';
-import { JwtStrategy } from './strategy/jwt.strategy';
-import { JwtRefreshTokenStrategy } from './strategy/jwtRefresh.strategy';
 import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { FortyTwoStrategy } from './strategy/42.strategy';
-import { TwoFactorAuthenticationController } from './twoFactor/twoFactorAuthentication.controller';
-import { TwoFactorAuthenticationService } from './twoFactor/twoFactorAuthentication.service';
-import { JwtTwoFactorStrategy } from './strategy/jwtTwoFactor.strategy';
+import AuthenticationService from './authentication.service';
+import UsersModule from '../users/users.module';
+import AuthenticationController from './authentication.controller';
+import JwtStrategy from './strategy/jwt.strategy';
+import JwtRefreshTokenStrategy from './strategy/jwtRefresh.strategy';
+import FortyTwoStrategy from './strategy/42.strategy';
+import TwoFactorAuthenticationController from './twoFactor/twoFactorAuthentication.controller';
+import TwoFactorAuthenticationService from './twoFactor/twoFactorAuthentication.service';
+import JwtTwoFactorStrategy from './strategy/jwtTwoFactor.strategy';
  
 @Module({
   imports: [
@@ -32,4 +32,4 @@ import { JwtTwoFactorStrategy } from './strategy/jwtTwoFactor.strategy';
   providers: [AuthenticationService, TwoFactorAuthenticationService, FortyTwoStrategy, JwtStrategy, JwtRefreshTokenStrategy, JwtTwoFactorStrategy],
   controllers: [AuthenticationController, TwoFactorAuthenticationController]
 })
-export class AuthenticationModule {}
+export default class AuthenticationModule {}

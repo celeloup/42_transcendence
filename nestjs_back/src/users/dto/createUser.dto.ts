@@ -1,6 +1,6 @@
-import { IsEmail, IsString, IsNotEmpty, MinLength, IsNumber } from 'class-validator';
+import { IsEmail, IsString, IsNotEmpty, IsNumber } from 'class-validator';
 
-export class CreateUserDto {
+export default class CreateUserDto {
 	@IsNumber()
   public id42: number;
   
@@ -16,5 +16,3 @@ export class CreateUserDto {
   //@MinLength(7)
 	//password: string;
 }
-   
-export default CreateUserDto;
