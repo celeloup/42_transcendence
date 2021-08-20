@@ -1,14 +1,23 @@
-import { Body, Req, Get, Controller, HttpCode, Post, UseGuards, UnauthorizedException } from '@nestjs/common';
-import { AuthenticationService } from './authentication.service';
+import {
+  Body,
+  Req,
+  Get,
+  Controller,
+  HttpCode,
+  Post,
+  UseGuards,
+  UnauthorizedException
+} from '@nestjs/common';
+import { Request } from 'express';
+import AuthenticationService from './authentication.service';
 import RegisterDto from './dto/RegisterDto';
 import RequestWithUser from './requestWithUser.interface';
 import FortyTwoAuthenticationGuard from './guard/42Authentication.guard';
-import { Request } from 'express';
 import JwtRefreshGuard from './guard/jwtRefresh.guard';
 import JwtTwoFactorGuard from './guard/jwtTwoFactor.guard';
 
 @Controller('authentication')
-export class AuthenticationController {
+export default class AuthenticationController {
   constructor(
     private readonly authenticationService: AuthenticationService
   ) {}
@@ -16,12 +25,13 @@ export class AuthenticationController {
   @UseGuards(FortyTwoAuthenticationGuard)
   @Get('oauth')
   async oauth(@Req() request: RequestWithUser) {
-    const {user} = request;
+    const { user } = request;
     const { accessTokenCookie, accessTokenExpiration } = this.authenticationService.getCookieWithJwtToken(user.id);
     const { refreshTokenCookie, refreshTokenExpiration } = await this.authenticationService.getCookieWithJwtRefreshToken(user.id);
     request.res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie]);
     return {
-      ...user,
+      id: user.id,
+      name: user.name,
       accessTokenExpiration,
       refreshTokenExpiration
     };
@@ -37,7 +47,8 @@ export class AuthenticationController {
     const { refreshTokenCookie, refreshTokenExpiration } = await this.authenticationService.getCookieWithJwtRefreshToken(request.user.id);
     request.res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie]);
     return {
-      ...request.user,
+      id: request.user.id,
+      name: request.user.name,
       accessTokenExpiration,
       refreshTokenExpiration
     };
@@ -60,7 +71,8 @@ export class AuthenticationController {
     const { refreshTokenCookie, refreshTokenExpiration } = await this.authenticationService.getCookieWithJwtRefreshToken(fakeUser.id);
     req.res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie]);
     return {
-      ...fakeUser,
+      id: fakeUser.id,
+      name: fakeUser.name,
       accessTokenExpiration,
       refreshTokenExpiration
     };

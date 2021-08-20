@@ -1,6 +1,6 @@
 import { IsEmail, IsString, IsNotEmpty, IsNumber } from 'class-validator';
 
-class RegisterDto {
+export default class RegisterDto {
   @IsNumber()
   id42: number;
 
@@ -12,5 +12,3 @@ class RegisterDto {
   name: string;
 
 }
-
-export default RegisterDto;

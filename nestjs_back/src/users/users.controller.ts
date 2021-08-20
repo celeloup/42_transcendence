@@ -1,5 +1,5 @@
 import { Body, Controller, Put, Req, UseGuards } from '@nestjs/common';
-import { UsersService } from './users.service';
+import UsersService from './users.service';
 import UpdateUserDto from './dto/updateUser.dto';
 import RequestWithUser from '../authentication/requestWithUser.interface';
 import JwtTwoFactorGuard from '../authentication/guard/jwtTwoFactor.guard';

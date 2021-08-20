@@ -7,7 +7,7 @@ import CreateUserDto from './dto/createUser.dto';
 import UpdateUserDto from './dto/updateUser.dto';
  
 @Injectable()
-export class UsersService {
+export default class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>

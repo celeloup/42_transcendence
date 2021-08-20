@@ -1,5 +1,5 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
+import UsersService from '../users/users.service';
 import RegisterDto from './dto/RegisterDto';
 import { PostgresErrorCode } from '../database/postgresErrorCodes.enum';
 import { JwtService } from '@nestjs/jwt';
@@ -7,7 +7,7 @@ import { ConfigService } from '@nestjs/config';
 import TokenPayload from './tokenPayload.interface';
 
 @Injectable()
-export class AuthenticationService {
+export default class AuthenticationService {
 	constructor(
 	  private readonly usersService: UsersService,
     private readonly jwtService: JwtService,

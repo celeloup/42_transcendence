@@ -3,24 +3,22 @@ import {
   Controller,
   Post,
   UseInterceptors,
-  Res,
   UseGuards,
   Req,
   HttpCode,
   Body,
   UnauthorizedException,
 } from '@nestjs/common';
-import { TwoFactorAuthenticationService } from './twoFactorAuthentication.service';
-import { Response } from 'express';
+import TwoFactorAuthenticationService from './twoFactorAuthentication.service';
 import JwtAuthenticationGuard from '../guard/jwtAuthentication.guard';
 import RequestWithUser from '../requestWithUser.interface';
-import { UsersService } from '../../users/users.service';
-import { TwoFactorAuthenticationCodeDto } from './dto/twoFactorAuthenticationCode.dto';
-import { AuthenticationService } from '../authentication.service';
+import UsersService from '../../users/users.service';
+import TwoFactorAuthenticationCodeDto from './dto/twoFactorAuthenticationCode.dto';
+import AuthenticationService from '../authentication.service';
    
 @Controller('2fa')
 @UseInterceptors(ClassSerializerInterceptor)
-export class TwoFactorAuthenticationController {
+export default class TwoFactorAuthenticationController {
 	constructor(
     private readonly twoFactorAuthenticationService: TwoFactorAuthenticationService,
     private readonly usersService: UsersService,
@@ -68,7 +66,8 @@ export class TwoFactorAuthenticationController {
     const { refreshTokenCookie, refreshTokenExpiration } = await this.authenticationService.getCookieWithJwtRefreshToken(user.id, true);
     request.res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie]);
     return {
-      ...user,
+      id: user.id,
+      name: user.name,
       accessTokenExpiration,
       refreshTokenExpiration
     };
