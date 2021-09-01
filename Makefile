@@ -1,8 +1,10 @@
 NAME := transcendance
 DC := docker-compose
 
+all: up logs
+
 up:
-	[[ -d postgres_data ]] || mkdir postgres_data
+	if [ -d "postgres_data" ]; then mkdir postgres_data; fi
 	$(DC) --project-name $(NAME) up --detach
 logs:
 	$(DC) --project-name $(NAME) logs --follow
