@@ -1,16 +1,16 @@
 version: '3'
 
 services:
-  front:
-    image: node:15.14.0-alpine3.12
-    command: sh -c "npm install && npm run dev"
-    ports:
-      - "3000:3000"
-    environment:
-      HOST: 0.0.0.0
-    volumes:
-      - ./nuxt_front_test/.:/usr/src/app
-    working_dir: /usr/src/app
+  # front:
+  #   image: node:15.14.0-alpine3.12
+  #   command: sh -c "npm install && npm run dev"
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     HOST: 0.0.0.0
+  #   volumes:
+  #     - ./nuxt_front_test/.:/usr/src/app
+  #   working_dir: /usr/src/app
 
   back:
     image: node:15.14.0-alpine3.12
@@ -26,5 +26,17 @@ services:
     volumes:
       - ./postgres-entrypoint:/docker-entrypoint-initdb.d
       - ./postgres_data:/var/lib/postgresql/data
+    env_file:
+      - docker.env
+
+  pgadmin:
+    links:
+      - postgres:postgres
+    container_name: pgadmin
+    image: dpage/pgadmin4
+    ports:
+      - "8081:80"
+    volumes:
+      - /data/pgadmin:/root/.pgadmin
     env_file:
       - docker.env
