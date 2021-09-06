@@ -4,7 +4,7 @@ DC := docker-compose
 all: up logs
 
 up:
-	if [ -d "postgres_data" ]; then mkdir postgres_data; fi
+	if [ !-d "postgres_data" ]; then mkdir postgres_data; fi
 	$(DC) --project-name $(NAME) up --detach
 logs:
 	$(DC) --project-name $(NAME) logs --follow
@@ -28,4 +28,5 @@ clean:
 	rm -fr ./nestjs_back/node_modules
 	rm -fr ./nuxt_front_test/dist
 	rm -fr ./nuxt_front_test/.nuxt
+	rm -fr ./websocket_client/node_modules
 	rm -fr ./postgres_data
