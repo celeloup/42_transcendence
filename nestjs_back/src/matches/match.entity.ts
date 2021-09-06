@@ -4,10 +4,7 @@ import { Exclude } from 'class-transformer';
 @Entity()
 class Match {
   @PrimaryGeneratedColumn()
-  public pg_id?: number;
-
-	@Column()
-  public id: number;
+  public id?: number;
   
   @Column()
   public user1: number;
