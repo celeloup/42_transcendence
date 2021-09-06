@@ -13,30 +13,23 @@ export default class MatchesService {
     private matchesRepository: Repository<Match>
   ) {}
 
-  async getById(pg_id: number) {
-    const match = await this.matchesRepository.findOne({ pg_id });
+  async getMatchById(id: number) {
+    const match = await this.matchesRepository.findOne({ id });
     if (match) {
       return match;
     }
     throw new HttpException('Match with this id does not exist', HttpStatus.NOT_FOUND);
   }
-
-  async getByOurId(id: number) {
-    const match = await this.matchesRepository.findOne({ id });
-    if (match) {
-      return match;
-    }
-  }
   
-  async create(matchData: CreateMatchDto) {
-    const newMatch = await this.matchesRepository.create(matchData);
+  async createMatch(matchData: CreateMatchDto) {
+    const newMatch = await this.matchesRepository.create({...matchData});
     await this.matchesRepository.save(newMatch);
     return newMatch;
   }
 
   async changeName(id: number, matchData: UpdateMatchDto) {
     await this.matchesRepository.update(id, matchData);
-    const updatedMatch = await this.getById(id);
+    const updatedMatch = await this.getMatchById(id);
     if (updatedMatch) {
       return updatedMatch;
     }
