@@ -1,6 +1,8 @@
 const io = require("socket.io-client");
 
-const connector = io("http://back:8082/messages", { path: "/socket/" });
+const URL = "http://back:8082/messages";
+const CONFIG = { path: "/socket/" }
+const connector = io(URL, CONFIG);
 
 connector.on("connect_error", (err) => {
   console.error(`Connection error: ${err.message}, restart in 5 secondes...`);
@@ -10,11 +12,13 @@ connector.on("connect_error", (err) => {
 });
 
 connector.on("connect", () => {
+  connector.disconnect();
+  
   const clients = [
-    io("http://back:8082/messages", { path: "/socket/" }),
-    io("http://back:8082/messages", { path: "/socket/" }),
-    io("http://back:8082/messages", { path: "/socket/" }),
-    io("http://back:8082/messages", { path: "/socket/" }),
+    io(URL, CONFIG),
+    io(URL, CONFIG),
+    io(URL, CONFIG),
+    io(URL, CONFIG),
   ]
   
   for (const [i, client] of clients.entries()) {

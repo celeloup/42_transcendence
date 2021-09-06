@@ -7,6 +7,7 @@ import UsersModule from './users/users.module';
 import MatchesModule from './matches/matches.module'
 import AuthenticationModule from './authentication/authentication.module';
 import ExceptionsLoggerFilter from './utils/exceptionsLogger.filter';
+import SocketGateway from './socket/socket.gateway';
 
  
 @Module({
@@ -42,6 +43,7 @@ import ExceptionsLoggerFilter from './utils/exceptionsLogger.filter';
       provide: APP_FILTER,
       useClass: ExceptionsLoggerFilter,
     },
+    SocketGateway
   ],
 })
 export class AppModule {}
