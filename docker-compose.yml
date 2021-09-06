@@ -17,6 +17,7 @@ services:
     command: sh -c "npm install && npm run start:dev"
     ports:
       - "8080:8080"
+      - "8082:8082"
     volumes:
       - ./nestjs_back/.:/usr/src/app
     working_dir: /usr/src/app
@@ -40,3 +41,10 @@ services:
       - /data/pgadmin:/root/.pgadmin
     env_file:
       - docker.env
+  
+  websocket_client:
+    image: node:15.14.0-alpine3.12
+    command: sh -c "npm install && npx nodemon"
+    volumes:
+      - ./websocket_client/.:/usr/src/app
+    working_dir: /usr/src/app
