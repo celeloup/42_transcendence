@@ -4,7 +4,7 @@ DC := docker-compose
 all: up logs
 
 up:
-	if [ -d "postgres_data" ]; then mkdir postgres_data; fi
+	if [ !-d "postgres_data" ]; then mkdir postgres_data; fi
 	$(DC) --project-name $(NAME) up --detach
 logs:
 	$(DC) --project-name $(NAME) logs --follow
