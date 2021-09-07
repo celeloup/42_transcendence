@@ -11,7 +11,7 @@ import {
 import { Server, Socket } from 'socket.io';
 import SocketService from './socket.service';
  
-@WebSocketGateway(8082, { path: '/socket', serveClient: false, namespace: '/test' })
+@WebSocketGateway({ serveClient: false, namespace: '/test' })
 export default class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   private server: Server;
@@ -29,20 +29,26 @@ export default class SocketGateway implements OnGatewayInit, OnGatewayConnection
   }
 
   async handleConnection(client: Socket, ...args: any[]) {
-    if (this.counter == -1) {
-      this.connectedUser.set(client.id, "connector");
-      this.logger.log(`Connection: ${this.connectedUser.get(client.id)}`);
-      this.counter++;
+    const user = await this.socketService.getUserFromSocket(client);
+    if (user) {
+      this.connectedUser.set(client.id, user.name);
     } else {
-      const user = await this.socketService.getUserFromSocket(client);
-      this.connectedUser.set(client.id, user ? user.name : `client ${this.counter++}`);
-      this.logger.log(`Connection: ${this.connectedUser.get(client.id)}`);
+      this.connectedUser.set(client.id, this.counter == -1 ? "connector" : `client ${this.counter}`);
+      this.counter++;
     }
+    this.logger.log(`Connection: ${this.connectedUser.get(client.id)}`);
   }
 
   handleDisconnect(client: Socket) {
     this.logger.log(`Disconnect: ${this.connectedUser.get(client.id)}`);
     this.connectedUser.delete(client.id);
+  }
+
+  @SubscribeMessage("whoami")
+  handleWhoami(client: Socket): WsResponse<string> {
+    const user = this.connectedUser.get(client.id);
+    this.logger.log(`Whoami from ${user}`);
+    return { event: "receive_message", data: user };
   }
 
   @SubscribeMessage("Hello_server")
