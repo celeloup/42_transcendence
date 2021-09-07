@@ -1,6 +1,9 @@
-import { IsEmail, IsString, IsNotEmpty, IsNumber } from 'class-validator';
+import { IsEmail, IsString, IsNotEmpty, IsNumber, IsBoolean } from 'class-validator';
 
 export default class CreateMatchDto {  
+  @IsBoolean()
+  friendly: boolean;
+  
   @IsNumber()
   user1: number;
 
@@ -13,6 +16,8 @@ export default class CreateMatchDto {
   @IsNumber()
   score_user2: number;
   
+  @IsNumber()
+  winner: number;
   //@IsString()
   //@IsNotEmpty()
   //@MinLength(7)

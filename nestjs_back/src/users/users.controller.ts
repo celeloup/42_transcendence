@@ -1,4 +1,5 @@
-import { Body, Controller, Put, Req, UseGuards } from '@nestjs/common';
+import { Body, Controller, Put, Req, Get, UseGuards, Param } from '@nestjs/common';
+import FindOneParams from '../utils/findOneParams';
 import UsersService from './users.service';
 import UpdateUserDto from './dto/updateUser.dto';
 import RequestWithUser from '../authentication/requestWithUser.interface';
@@ -16,6 +17,10 @@ export default class UsersController {
     return this.userService.changeName(req.user.id, user);
   }
 
+  @Get(':id')
+  getById(@Param() { id }: FindOneParams) {
+    return this.userService.getById(Number(id));
+  }
   /* ajouter des amis ? modifier des stats ? */
 
 }

@@ -14,7 +14,7 @@ export default class MatchesService {
   ) {}
 
   async getMatchById(id: number) {
-    const match = await this.matchesRepository.findOne({ id });
+    const match = await this.matchesRepository.findOne(id);
     if (match) {
       return match;
     }
@@ -22,7 +22,7 @@ export default class MatchesService {
   }
   
   async createMatch(matchData: CreateMatchDto) {
-    const newMatch = await this.matchesRepository.create({...matchData});
+    const newMatch = await this.matchesRepository.create(matchData);
     await this.matchesRepository.save(newMatch);
     return newMatch;
   }

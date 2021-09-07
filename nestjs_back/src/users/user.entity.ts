@@ -6,6 +6,9 @@ class User {
   @PrimaryGeneratedColumn()
   public id?: number;
 
+  @Column({nullable: true})
+  public admin: boolean;
+
   @Column({ unique: true })
   public id42: number;
  

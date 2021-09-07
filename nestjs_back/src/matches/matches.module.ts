@@ -8,7 +8,6 @@ import MatchesController from './matches.controller';
 @Module({
   imports: [
     TypeOrmModule.forFeature([Match]),
-    ConfigModule,
   ],
   providers: [MatchesService],
   controllers: [MatchesController],
