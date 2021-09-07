@@ -16,6 +16,8 @@ back.logs:
 	$(DC) --project-name $(NAME) logs --follow back
 back.shell:
 	$(DC) --project-name $(NAME) exec back sh
+back.test:
+	$(DC) --project-name $(NAME) exec back npm run test
 stop:
 	$(DC) --project-name $(NAME) stop
 down:

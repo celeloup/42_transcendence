@@ -14,7 +14,7 @@ services:
 
   back:
     image: node:15.14.0-alpine3.12
-    command: sh -c "npm install --legacy-peer-deps && npm run start:dev"
+    command: sh -c "npm install && npm run start:dev"
     ports:
       - "8080:8080"
       - "8082:8082"
