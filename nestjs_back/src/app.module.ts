@@ -7,7 +7,7 @@ import UsersModule from './users/users.module';
 import MatchesModule from './matches/matches.module'
 import AuthenticationModule from './authentication/authentication.module';
 import ExceptionsLoggerFilter from './utils/exceptionsLogger.filter';
-import SocketGateway from './socket/socket.gateway';
+import SocketModule from './socket/socket.module';
 
  
 @Module({
@@ -34,16 +34,15 @@ import SocketGateway from './socket/socket.gateway';
     }),
     DatabaseModule,
     UsersModule,
-    MatchesModule,
-    AuthenticationModule
+    AuthenticationModule,
+    SocketModule
   ],
   controllers: [],
   providers: [
     {
       provide: APP_FILTER,
       useClass: ExceptionsLoggerFilter,
-    },
-    SocketGateway
+    }
   ],
 })
 export class AppModule {}

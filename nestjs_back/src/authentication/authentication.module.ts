@@ -30,6 +30,7 @@ import JwtTwoFactorStrategy from './strategy/jwtTwoFactor.strategy';
     }),
   ],
   providers: [AuthenticationService, TwoFactorAuthenticationService, FortyTwoStrategy, JwtStrategy, JwtRefreshTokenStrategy, JwtTwoFactorStrategy],
-  controllers: [AuthenticationController, TwoFactorAuthenticationController]
+  controllers: [AuthenticationController, TwoFactorAuthenticationController],
+  exports: [AuthenticationService]
 })
 export default class AuthenticationModule {}

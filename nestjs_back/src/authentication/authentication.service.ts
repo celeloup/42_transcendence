@@ -18,6 +18,15 @@ export default class AuthenticationService {
     return this.usersService.getBy42Id(id42);
   }
 
+  public async getUserFromAuthenticationToken(token: string) {
+    const payload: TokenPayload = this.jwtService.verify(token, {
+      secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET')
+    });
+    if (payload.userId) {
+      return this.usersService.getById(payload.userId);
+    }
+  }
+
   public async register(registrationData: RegisterDto) {
 	  try {
 		  return await this.usersService.create(registrationData);
