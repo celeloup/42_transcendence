@@ -38,7 +38,7 @@ services:
     ports:
       - "8081:80"
     volumes:
-      - /data/pgadmin:/root/.pgadmin
+      - ./pgadmin/_data:/root/.pgadmin
     env_file:
       - docker.env
   
