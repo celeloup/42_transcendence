@@ -8,6 +8,8 @@ import { Reflector } from '@nestjs/core';
 import * as cookieParser from 'cookie-parser';
 import UsersModule from '../src/users/users.module';
 import AuthenticationModule from '../src/authentication/authentication.module';
+import io from 'socket.io-client';
+import SocketModule from '../src/socket/socket.module';
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -44,7 +46,8 @@ describe('AppController (e2e)', () => {
           })
         }),
         UsersModule,
-        AuthenticationModule
+        AuthenticationModule,
+        SocketModule
       ],
     }).compile();
     app = moduleFixture.createNestApplication();
@@ -60,7 +63,7 @@ describe('AppController (e2e)', () => {
     );
     app.use(cookieParser());
     app.setGlobalPrefix('api');
-    await app.init();
+    await app.listen(9090);
   });
 
   afterAll(async () => {
@@ -92,10 +95,11 @@ describe('AppController (e2e)', () => {
         return request(app.getHttpServer())
           .post('/api/authentication/register')
           .send(user1)
-          .expect({
-            ...user1,
-            id: 1,
-            isTwoFactorAuthenticationEnabled: false
+          .expect((res) =>  {
+            expect(res.body).toMatchObject({
+              id: 1,
+              name: user1.name
+            })
           })
           .expect(201);
       });
@@ -103,30 +107,30 @@ describe('AppController (e2e)', () => {
         return request(app.getHttpServer())
           .post('/api/authentication/register')
           .send(user2)
-          .expect({
-            ...user2,
-            id: 2,
-            isTwoFactorAuthenticationEnabled: false
+          .expect((res) =>  {
+            expect(res.body).toMatchObject({
+              id: 2,
+              name: user2.name
+            })
           })
           .expect(201);
       });
 
-      const cookies_regex = /Authentication=.*; HttpOnly; Path=\/; SameSite=Strict; Max-Age=900,Refresh=.*; HttpOnly; Path=\/; SameSite=Strict; Max-Age=72000,Expired=; Path=\/; SameSite=Strict; Max-Age=900/;
+      const cookies_regex = /Authentication=.*; HttpOnly; Path=\/; SameSite=Strict; Expires=.*,Refresh=.*; HttpOnly; Path=\/; SameSite=Strict; Expires=.*/;
       // cleloup is the testing user !
-      it('user3 -> check the cookie', () => {
-        return request(app.getHttpServer())
+      it('user3 -> check the cookie', async () => {
+        const res_1 = await request(app.getHttpServer())
           .post('/api/authentication/register')
           .send(user3)
-          .expect({
-            ...user3,
-            id: 3,
-            isTwoFactorAuthenticationEnabled: false
+          .expect((res) => {
+            expect(res.body).toMatchObject({
+              id: 3,
+              name: user3.name
+            });
           })
           .expect(201)
-          .expect('set-cookie', cookies_regex)
-          .then((res) => {
-            cookies = res.headers['set-cookie'];
-          });
+          .expect('set-cookie', cookies_regex);
+        cookies = res_1.headers['set-cookie'];
       })
     });
 
@@ -143,12 +147,13 @@ describe('AppController (e2e)', () => {
         return request(app.getHttpServer())
           .get('/api/authentication')
           .set('cookie', cookies[0])
-          .expect(200)
-          .expect({
-            ...user3,
-            id: 3,
-            isTwoFactorAuthenticationEnabled: false
+          .expect((res) =>  {
+            expect(res.body).toMatchObject({
+              id: 3,
+              name: user3.name
+            })
           })
+          .expect(200)
       });
     });
 
@@ -165,12 +170,39 @@ describe('AppController (e2e)', () => {
         return request(app.getHttpServer())
           .get('/api/authentication/refresh')
           .set('cookie', cookies[1])
-          .expect(200)
-          .expect({
-            ...user3,
-            id: 3,
-            isTwoFactorAuthenticationEnabled: false
+          .expect((res) =>  {
+            expect(res.body).toMatchObject({
+              id: 3,
+              name: user3.name
+            })
           })
+          .expect(200)
+      });
+    });
+
+    describe('websocket test gateway with cookie', () => {
+      it('should connect and return the username', (done) => {
+        const URL = "http://localhost:9090/test"
+        const CONFIG = {
+          extraHeaders: {
+            cookie: cookies[0]
+          }
+        }
+        const socket = io(URL, CONFIG);
+
+        socket.on("connect", () => {
+          socket.emit("whoami");
+        });
+
+        socket.on("connect_error", (err) => {
+          expect(err).toBe("no error");
+        });
+
+        socket.on('receive_message', (recievedMessage: string) => {
+          expect(recievedMessage).toBe(user3.name);
+          socket.disconnect();
+          done();
+        });
       });
     });
 

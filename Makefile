@@ -28,4 +28,5 @@ clean:
 	rm -fr ./nestjs_back/node_modules
 	rm -fr ./nuxt_front_test/dist
 	rm -fr ./nuxt_front_test/.nuxt
+	rm -fr ./websocket_client/node_modules
 	rm -fr ./postgres_data
