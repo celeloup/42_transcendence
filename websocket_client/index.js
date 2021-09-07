@@ -1,31 +1,35 @@
 const io = require("socket.io-client");
 
-const connector = io("http://back:8082/messages", { path: "/socket/" });
+const URL = "http://back:8082/test"
+const CONFIG = { path: "/socket/" }
+const connector = io(URL, CONFIG);
 
+// connector wait for successful connection and launch the tests
 connector.on("connect_error", (err) => {
-  console.error(`Connection error: ${err.message}, restart in 5 secondes...`);
+  console.error(`Connection error: ${err.message}, restart in 15 secondes...`);
   setTimeout(() => {
     connector.connect();
-  }, 5000);
+  }, 15000);
 });
 
 connector.on("connect", () => {
+
   const clients = [
-    io("http://back:8082/messages", { path: "/socket/" }),
-    io("http://back:8082/messages", { path: "/socket/" }),
-    io("http://back:8082/messages", { path: "/socket/" }),
-    io("http://back:8082/messages", { path: "/socket/" }),
+    io(URL, CONFIG),
+    io(URL, CONFIG),
+    io(URL, CONFIG),
+    io(URL, CONFIG),
   ]
   
   for (const [i, client] of clients.entries()) {
     client.on("connect", () => {
       console.log(`client ${i}: connected!`);
       setTimeout(() => {
-        client.emit("Hello_server", `Hello from client ${i}!`);  
+        client.emit("Hello_server", `Hello from client ${i}!`);
       }, Math.random() * (8000 - 3000) + 3000);
     
       setTimeout(() => {
-        client.emit("send_to_all", `Hello from client ${i}!`);  
+        client.emit("send_to_all", `Hello from client ${i}!`);
       }, Math.random() * (8000 - 3000) + 3000);
   
       setTimeout(() => {
@@ -35,8 +39,13 @@ connector.on("connect", () => {
     });
     
     client.on("receive_message", (data) => {
-      console.log(`client ${i} received message: ${data}`);
+      console.log(`client ${i}: ${data}`);
     });
   }
-});
 
+  setTimeout(() => {
+    console.log(`End of the test! send reset to the api...`);
+    connector.emit("reset_counter");
+    connector.disconnect();
+  }, 10000);
+});
