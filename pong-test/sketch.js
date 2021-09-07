@@ -16,7 +16,7 @@ function setup() {
 	puck = new Puck();
 	left = new Paddle(true);
 	right = new Paddle(false);
-	meteor = new Meteor();
+	// meteor = new Meteor();
 	noLoop();
 	frameRate(50);
 	imageMode(CENTER);
@@ -31,11 +31,11 @@ function draw() {
 
 	puck.checkPaddleRight(right);
 	puck.checkPaddleLeft(left);
-	puck.checkMeteor(meteor);
+	// puck.checkMeteor(meteor);
 
 	left.show();
 	right.show();
-	meteor.show();
+	// meteor.show();
 	left.update(true, puck.y);
 	right.update(false, 0);
 
