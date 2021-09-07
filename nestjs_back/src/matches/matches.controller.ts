@@ -2,7 +2,6 @@ import { Body, Controller, HttpCode, Param, Put, Req, UseGuards, Post, Get } fro
 import MatchesService from './matches.service';
 import CreateMatchDto from './dto/createMatch.dto'
 import FindOneParams from '../utils/findOneParams';
-import getMatchById from './matches.service';
  
 @Controller('matches')
 export default class MatchesController {
@@ -16,8 +15,7 @@ export default class MatchesController {
   }
 
 
-  @Post('create')
-  @HttpCode(201)
+  @Post()
   async createMatch(@Body() match: CreateMatchDto){
     return this.matchesService.createMatch(match);
   }

@@ -5,6 +5,9 @@ import { Exclude } from 'class-transformer';
 class Match {
   @PrimaryGeneratedColumn()
   public id?: number;
+
+  @Column()
+  public friendly: boolean;
   
   @Column()
   public user1: number;
@@ -18,10 +21,9 @@ class Match {
   @Column()
   public score_user2: number;
   
-  @Column()
+  @Column({nullable: true}) 
   public winner?: number;
 
 }
-
  
 export default Match;
