@@ -11,10 +11,12 @@ import {
 import { Request } from 'express';
 import AuthenticationService from './authentication.service';
 import RegisterDto from './dto/RegisterDto';
-import RequestWithUser from './requestWithUser.interface';
+import RequestWithUser from './interface/requestWithUser.interface';
 import FortyTwoAuthenticationGuard from './guard/42Authentication.guard';
 import JwtRefreshGuard from './guard/jwtRefresh.guard';
 import JwtTwoFactorGuard from './guard/jwtTwoFactor.guard';
+import AuthInfos from './interface/authInfos.interface';
+import { ApiResponse, ApiCookieAuth } from '@nestjs/swagger';
 
 @Controller('authentication')
 export default class AuthenticationController {
@@ -24,7 +26,13 @@ export default class AuthenticationController {
   
   @UseGuards(FortyTwoAuthenticationGuard)
   @Get('oauth')
-  async oauth(@Req() request: RequestWithUser) {
+  @ApiResponse({
+    status: 200,
+    description: 'The user has been successfully authenticated.',
+    type: AuthInfos
+  })
+  @ApiResponse({ status: 401, description: '42 Oauth token invalid.'})
+  async oauth(@Req() request: RequestWithUser): Promise<AuthInfos> {
     const { user } = request;
     const { accessTokenCookie, accessTokenExpiration } = this.authenticationService.getCookieWithJwtToken(user.id);
     const { refreshTokenCookie, refreshTokenExpiration } = await this.authenticationService.getCookieWithJwtRefreshToken(user.id);
@@ -37,9 +45,16 @@ export default class AuthenticationController {
     };
   }
 
+  @ApiCookieAuth('Refresh')
   @UseGuards(JwtRefreshGuard)
   @Get('refresh')
-  async refresh(@Req() request: RequestWithUser) {
+  @ApiResponse({
+    status: 200,
+    description: 'The tokens has been successfully refreshed.',
+    type: AuthInfos
+  })
+  @ApiResponse({ status: 401, description: 'Refresh token invalid.'})
+  async refresh(@Req() request: RequestWithUser): Promise<AuthInfos> {
     if (!request.user) {
       throw new UnauthorizedException();
     }
@@ -54,21 +69,30 @@ export default class AuthenticationController {
     };
   }
 
+  @ApiCookieAuth('Authentication')
   @UseGuards(JwtTwoFactorGuard)
   @Get()
-  authenticate(@Req() request: RequestWithUser) {
+  @ApiResponse({ status: 200, description: 'The user has been successfully authenticated.'})
+  @ApiResponse({ status: 401, description: 'Authenticaation token invalid.'})
+  authenticate(@Req() request: RequestWithUser): AuthInfos {
     if (!request.user) {
       throw new UnauthorizedException();
     }
     return {
       id: request.user.id,
-      name: request.user.name
+      name: request.user.name,
     };
   }
 
   // for testing
   @Post('register')
-  async register(@Body() registrationData: RegisterDto, @Req() req: Request) {
+  @ApiResponse({
+    status: 201,
+    description: 'The user has been successfully registered.',
+    type: AuthInfos
+  })
+  @ApiResponse({ status: 401, description: 'Authenticaation token invalid.'})
+  async register(@Body() registrationData: RegisterDto, @Req() req: Request): Promise<AuthInfos> {
     const fakeUser = await this.authenticationService.register(registrationData);
     const { accessTokenCookie, accessTokenExpiration } = this.authenticationService.getCookieWithJwtToken(fakeUser.id);
     const { refreshTokenCookie, refreshTokenExpiration } = await this.authenticationService.getCookieWithJwtRefreshToken(fakeUser.id);
@@ -81,8 +105,11 @@ export default class AuthenticationController {
     };
   }
 
+  @ApiCookieAuth('Authentication')
   @UseGuards(JwtTwoFactorGuard)
   @Post('log-out')
+  @ApiResponse({ status: 200, description: 'The user has been successfully logout.'})
+  @ApiResponse({ status: 401, description: 'Authenticaation token invalid.'})
   @HttpCode(200)
   async logOut(@Req() request: RequestWithUser) {
     if (!request.user) {

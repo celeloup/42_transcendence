@@ -11,10 +11,11 @@ import {
 } from '@nestjs/common';
 import TwoFactorAuthenticationService from './twoFactorAuthentication.service';
 import JwtAuthenticationGuard from '../guard/jwtAuthentication.guard';
-import RequestWithUser from '../requestWithUser.interface';
+import RequestWithUser from '../interface/requestWithUser.interface';
 import UsersService from '../../users/users.service';
 import TwoFactorAuthenticationCodeDto from './dto/twoFactorAuthenticationCode.dto';
 import AuthenticationService from '../authentication.service';
+import AuthInfos from '../interface/authInfos.interface';
    
 @Controller('2fa')
 @UseInterceptors(ClassSerializerInterceptor)
@@ -27,7 +28,7 @@ export default class TwoFactorAuthenticationController {
    
 	@Post('generate')
 	@UseGuards(JwtAuthenticationGuard)
-	async register(@Req() request: RequestWithUser) {
+	async register(@Req() request: RequestWithUser): Promise<string> {
 	  const { otpauthUrl } = await this.twoFactorAuthenticationService.generateTwoFactorAuthenticationSecret(request.user);
 	  return this.twoFactorAuthenticationService.pipeQrCodeStream(otpauthUrl);
   }
@@ -54,7 +55,7 @@ export default class TwoFactorAuthenticationController {
   async authenticate(
     @Req() request: RequestWithUser,
     @Body() { twoFactorAuthenticationCode } : TwoFactorAuthenticationCodeDto
-  ) {
+  ): Promise<AuthInfos> {
     const isCodeValid = this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
       twoFactorAuthenticationCode, request.user
     );

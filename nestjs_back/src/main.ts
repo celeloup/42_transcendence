@@ -2,11 +2,11 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as cookieParser from 'cookie-parser';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
-import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
+import { SwaggerModule, DocumentBuilder, SwaggerCustomOptions } from '@nestjs/swagger';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
-  
+
   app.useGlobalPipes(
     new ValidationPipe({
       whitelist: true,
@@ -25,13 +25,24 @@ async function bootstrap() {
   });
 
   const config = new DocumentBuilder()
-    .setTitle('PONG WARS')
-    .setDescription('Pong wars API description')
+    .setTitle('PONG WARS API')
+    .setDescription('API documentation for our wonderful front-end dev! ❤️')
     .setVersion('0.1')
-    .addTag('ft_transcendance')
+    .addCookieAuth('Authentication, Refresh')
     .build();
   const document = SwaggerModule.createDocument(app, config);
-  SwaggerModule.setup('docs', app, document);
+  const customOptions: SwaggerCustomOptions = {
+    swaggerOptions: {
+      persistAuthorization: true,
+      requestInterceptor: (req: { credentials: string; }) => {
+        req.credentials = 'include';
+        return req;
+      },
+    },
+    customCss: '.swagger-ui .topbar { display: none; }',
+    customSiteTitle: 'PONG WARS API',
+  };
+  SwaggerModule.setup('docs', app, document, customOptions);
 
   await app.listen(8080);
 }
