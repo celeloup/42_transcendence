@@ -1,8 +1,7 @@
 const io = require("socket.io-client");
 
-const URL = "http://back:8082/test"
-const CONFIG = { path: "/socket/" }
-const connector = io(URL, CONFIG);
+const URL = "http://back:8080/test"
+const connector = io(URL);
 
 // connector wait for successful connection and launch the tests
 connector.on("connect_error", (err) => {
@@ -14,10 +13,10 @@ connector.on("connect_error", (err) => {
 
 connector.on("connect", () => {
   const clients = [
-    io(URL, CONFIG),
-    io(URL, CONFIG),
-    io(URL, CONFIG),
-    io(URL, CONFIG),
+    io(URL),
+    io(URL),
+    io(URL),
+    io(URL),
   ]
   
   for (const [i, client] of clients.entries()) {

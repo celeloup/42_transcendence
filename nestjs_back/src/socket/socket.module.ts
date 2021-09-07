@@ -1,6 +1,6 @@
 import { Module } from "@nestjs/common";
 import SocketGateway from "./socket.gateway";
-import AuthenticationModule from "src/authentication/authentication.module";
+import AuthenticationModule from "../authentication/authentication.module";
 import SocketService from "./socket.service";
 
 @Module({

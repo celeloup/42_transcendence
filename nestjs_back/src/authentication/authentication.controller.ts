@@ -60,7 +60,10 @@ export default class AuthenticationController {
     if (!request.user) {
       throw new UnauthorizedException();
     }
-    return request.user;
+    return {
+      id: request.user.id,
+      name: request.user.name
+    };
   }
 
   // for testing
