@@ -1,6 +1,6 @@
 import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, UpdateResult } from 'typeorm';
 import User from './user.entity';
 import * as bcrypt from 'bcrypt';
 import CreateUserDto from './dto/createUser.dto';
@@ -13,7 +13,7 @@ export default class UsersService {
     private usersRepository: Repository<User>
   ) {}
 
-  async getById(id: number) {
+  async getById(id: number): Promise<User> {
     const user = await this.usersRepository.findOne({ id });
     if (user) {
       return user;
@@ -21,20 +21,20 @@ export default class UsersService {
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
-  async getBy42Id(id42: number) {
+  async getBy42Id(id42: number): Promise<User> {
     const user = await this.usersRepository.findOne({ id42 });
     if (user) {
       return user;
     }
   }
   
-  async create(userData: CreateUserDto) {
+  async create(userData: CreateUserDto): Promise<User> {
     const newUser = await this.usersRepository.create(userData);
     await this.usersRepository.save(newUser);
     return newUser;
   }
 
-  async changeName(id: number, userData: UpdateUserDto) {
+  async changeName(id: number, userData: UpdateUserDto): Promise<User> {
     await this.usersRepository.update(id, userData);
     const updatedUser = await this.getById(id);
     if (updatedUser) {
@@ -50,7 +50,7 @@ export default class UsersService {
     });
   }
 
-  async getUserIfRefreshTokenMatches(refreshToken: string, userId: number) {
+  async getUserIfRefreshTokenMatches(refreshToken: string, userId: number): Promise<User> {
     const user = await this.getById(userId);
     const isRefreshTokenMatching = await bcrypt.compare(
       refreshToken,
@@ -61,19 +61,19 @@ export default class UsersService {
     }
   }
 
-  async removeRefreshToken(userId: number) {
+  async removeRefreshToken(userId: number): Promise<UpdateResult> {
     return this.usersRepository.update(userId, {
       currentHashedRefreshToken: null
     });
   }
 
-  async setTwoFactorAuthenticationSecret(secret: string, userId: number) {
+  async setTwoFactorAuthenticationSecret(secret: string, userId: number): Promise<UpdateResult> {
     return this.usersRepository.update(userId, {
       twoFactorAuthenticationSecret: secret
     });
   }
 
-  async turnOnTwoFactorAuthentication(userId: number) {
+  async turnOnTwoFactorAuthentication(userId: number): Promise<UpdateResult> {
     return this.usersRepository.update(userId, {
       isTwoFactorAuthenticationEnabled: true
     });
