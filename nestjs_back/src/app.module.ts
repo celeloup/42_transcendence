@@ -34,6 +34,7 @@ import SocketModule from './socket/socket.module';
     }),
     DatabaseModule,
     UsersModule,
+    MatchesModule,
     AuthenticationModule,
     SocketModule
   ],

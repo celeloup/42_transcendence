@@ -21,6 +21,12 @@ export default class UsersController {
   getById(@Param() { id }: FindOneParams) {
     return this.userService.getById(Number(id));
   }
+
+  @Get('matches/:id')
+  getMatchesByUserId(@Param() { id }: FindOneParams) {
+    return this.userService.getMatchesByUserId(Number(id));
+  }
+
   /* ajouter des amis ? modifier des stats ? */
 
 }
