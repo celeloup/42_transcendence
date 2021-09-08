@@ -4,8 +4,9 @@ import User from './user.entity';
 import UpdateUserDto from './dto/updateUser.dto';
 import RequestWithUser from '../authentication/interface/requestWithUser.interface';
 import JwtTwoFactorGuard from '../authentication/guard/jwtTwoFactor.guard';
-import { ApiResponse } from '@nestjs/swagger';
- 
+import { ApiResponse, ApiTags } from '@nestjs/swagger';
+
+@ApiTags('users')
 @Controller('users')
 export default class UsersController {
   constructor(

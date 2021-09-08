@@ -16,8 +16,9 @@ import FortyTwoAuthenticationGuard from './guard/42Authentication.guard';
 import JwtRefreshGuard from './guard/jwtRefresh.guard';
 import JwtTwoFactorGuard from './guard/jwtTwoFactor.guard';
 import AuthInfos from './interface/authInfos.interface';
-import { ApiResponse, ApiCookieAuth } from '@nestjs/swagger';
+import { ApiResponse, ApiCookieAuth, ApiTags } from '@nestjs/swagger';
 
+@ApiTags('authentication')
 @Controller('authentication')
 export default class AuthenticationController {
   constructor(
@@ -45,9 +46,9 @@ export default class AuthenticationController {
     };
   }
 
-  @ApiCookieAuth('Refresh')
   @UseGuards(JwtRefreshGuard)
   @Get('refresh')
+  @ApiCookieAuth('Refresh')
   @ApiResponse({
     status: 200,
     description: 'The tokens has been successfully refreshed.',
@@ -69,11 +70,11 @@ export default class AuthenticationController {
     };
   }
 
-  @ApiCookieAuth('Authentication')
   @UseGuards(JwtTwoFactorGuard)
   @Get()
+  @ApiCookieAuth('Authentication')
   @ApiResponse({ status: 200, description: 'The user has been successfully authenticated.'})
-  @ApiResponse({ status: 401, description: 'Authenticaation token invalid.'})
+  @ApiResponse({ status: 401, description: 'Authentication token invalid.'})
   authenticate(@Req() request: RequestWithUser): AuthInfos {
     if (!request.user) {
       throw new UnauthorizedException();
