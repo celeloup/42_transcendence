@@ -1,8 +1,6 @@
 import {
-  ClassSerializerInterceptor,
   Controller,
   Post,
-  UseInterceptors,
   UseGuards,
   Req,
   HttpCode,
@@ -16,26 +14,40 @@ import UsersService from '../../users/users.service';
 import TwoFactorAuthenticationCodeDto from './dto/twoFactorAuthenticationCode.dto';
 import AuthenticationService from '../authentication.service';
 import AuthInfos from '../interface/authInfos.interface';
-   
+import { ApiResponse, ApiCookieAuth, ApiTags } from '@nestjs/swagger';
+
+@ApiTags('2 Factors authentication')
 @Controller('2fa')
-@UseInterceptors(ClassSerializerInterceptor)
 export default class TwoFactorAuthenticationController {
 	constructor(
     private readonly twoFactorAuthenticationService: TwoFactorAuthenticationService,
     private readonly usersService: UsersService,
     private readonly authenticationService: AuthenticationService
 	) {}
-   
+
+  @UseGuards(JwtAuthenticationGuard)
 	@Post('generate')
-	@UseGuards(JwtAuthenticationGuard)
+  @ApiCookieAuth('Authentication')
+  @ApiResponse({
+    status: 201,
+    description: 'Qrcode code generation successful (return as a base64 string).',
+    type: String
+  })
+  @ApiResponse({ status: 401, description: 'Authentication token invalid.'})
 	async register(@Req() request: RequestWithUser): Promise<string> {
 	  const { otpauthUrl } = await this.twoFactorAuthenticationService.generateTwoFactorAuthenticationSecret(request.user);
 	  return this.twoFactorAuthenticationService.pipeQrCodeStream(otpauthUrl);
   }
   
+  @UseGuards(JwtAuthenticationGuard)
   @Post('turn-on')
   @HttpCode(200)
-  @UseGuards(JwtAuthenticationGuard)
+  @ApiCookieAuth('Authentication')
+  @ApiResponse({
+    status: 200,
+    description: '2 factor authentication successfully enabled.',
+  })
+  @ApiResponse({ status: 401, description: 'Authentication token invalid or Wrong authentication code.'})
   async turnOnTwoFactorAuthentication(
     @Req() request: RequestWithUser,
     @Body() { twoFactorAuthenticationCode } : TwoFactorAuthenticationCodeDto
@@ -49,9 +61,16 @@ export default class TwoFactorAuthenticationController {
     await this.usersService.turnOnTwoFactorAuthentication(request.user.id);
   }
 
+  @UseGuards(JwtAuthenticationGuard)
   @Post('authenticate')
   @HttpCode(200)
-  @UseGuards(JwtAuthenticationGuard)
+  @ApiCookieAuth('Authentication')
+  @ApiResponse({
+    status: 200,
+    description: '2 factor authentication successfully enabled.',
+    type: AuthInfos
+  })
+  @ApiResponse({ status: 401, description: 'Authentication token invalid or Wrong authentication code.'})
   async authenticate(
     @Req() request: RequestWithUser,
     @Body() { twoFactorAuthenticationCode } : TwoFactorAuthenticationCodeDto
