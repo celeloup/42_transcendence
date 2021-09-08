@@ -13,8 +13,16 @@ export default class UsersService {
     private usersRepository: Repository<User>
   ) {}
 
-  async getById(id: number) {
+  public async getById(id: number) {
     const user = await this.usersRepository.findOne({ id });
+    if (user) {
+      return user;
+    }
+    throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
+  }
+   
+  async getMatchesByUserId(id: number) {
+    const user = await this.usersRepository.findOne(id, { relations: ['matches1'] });
     if (user) {
       return user;
     }

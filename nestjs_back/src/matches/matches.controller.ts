@@ -14,8 +14,7 @@ export default class MatchesController {
     return this.matchesService.getMatchById(Number(id));
   }
 
-
-  @Post()
+  @Post('create')
   async createMatch(@Body() match: CreateMatchDto){
     return this.matchesService.createMatch(match);
   }

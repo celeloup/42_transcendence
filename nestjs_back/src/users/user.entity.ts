@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, OneToMany, JoinTable } from 'typeorm';
 import { Exclude } from 'class-transformer';
+import Match from '../matches/match.entity';
  
 @Entity()
 class User {
@@ -16,7 +17,6 @@ class User {
   public email: string;
 
   @Column({ unique: true })
-  @Column()
   public name: string;
 
   @Column({ nullable: true })
@@ -30,6 +30,11 @@ class User {
   @Column({ default: false })
   public isTwoFactorAuthenticationEnabled: boolean;
 
+  @OneToMany(() => Match, (match: Match) => match.user1)
+  public matches1: Match[];
+
+  @OneToMany(() => Match, (match: Match) => match.user2)
+  public matches2: Match[]; 
 }
  
 export default User;
