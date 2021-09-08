@@ -1,5 +1,7 @@
 import { Logger } from '@nestjs/common';
 import {
+  ConnectedSocket,
+  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
@@ -9,20 +11,19 @@ import {
   WsResponse,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import SocketService from './socket.service';
+import ChannelService from './channel.service'
  
-@WebSocketGateway({ serveClient: false, namespace: '/test' })
+@WebSocketGateway({ serveClient: false, namespace: '/channel' })
 export default class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   private server: Server;
-  private logger: Logger = new Logger("SocketGateway");
+  private logger: Logger = new Logger("ChannelGateway");
 
   private connectedUser: Map<string, string> = new Map();
-  private socketUsers: Map<string, socket> = new Map();
-  private counter: number = -1;
+  private socketUsers: Map<string, Socket> = new Map();
 
   constructor(
-    private readonly socketService: SocketService
+    private readonly channelService: ChannelService
   ) {}
 
   afterInit(server: Server) {
@@ -30,11 +31,11 @@ export default class SocketGateway implements OnGatewayInit, OnGatewayConnection
   }
 
   async handleConnection(client: Socket, ...args: any[]) {
-    const user = await this.socketService.getUserFromSocket(client);
+    const user = await this.channelService.getUserFromSocket(client);
     if (user) {
-		this.connectedUser.set(client.id, user);
-		this.socketUsers.set(client.id, Socket);
-		this.counter++;
+      //si id compris dans client pourquoi ne pas garder qu'une map socket user ?
+     this.connectedUser.set(client.id, user.name);
+      this.socketUsers.set(client.id, client);
     }
     this.logger.log(`Connection: ${this.connectedUser.get(client.id)}`);
   }
@@ -45,19 +46,17 @@ export default class SocketGateway implements OnGatewayInit, OnGatewayConnection
     this.socketUsers.delete(client.id);
   }
 
-  /*channel a creer
+  /*remplacer recipient string par channel une fois cree
   	on emit le message a tous les users connecte du chan ?
   */
-  @SubscribeMessage("Hello_server")
-  handleHello(client: Socket, text: string, recipient: Channel): WsResponse<string> {
-    this.logger.log(`Hello from ${this.connectedUser.get(client.id)}: ${text}`);
-    return { event: "receive_message", data: `Hello from server!` };
-  }
-
-  @SubscribeMessage("send_to_all")
-  handleBroadcast(client: Socket, text: string): void {
-    this.logger.log(`Message from ${this.connectedUser.get(client.id)}: ${text}`);
-    this.server.emit("receive_message", text);
+  
+  @SubscribeMessage('send_message')
+  async listenForMessages(
+    @MessageBody() content: string, recipient: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+    this.logger.log(`Message from ${this.connectedUser.get(client.id)}: ${content}`);
+    this.server.sockets.emit('receive_message', content);
   }
 
 }
