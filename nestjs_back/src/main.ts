@@ -28,6 +28,10 @@ async function bootstrap() {
     .setTitle('PONG WARS API')
     .setDescription('API documentation for our wonderful front-end dev! ❤️')
     .setVersion('0.1')
+    .addBearerAuth({ type: 'http' }, 'bearer-authentication')
+    .addBearerAuth({ type: 'http' }, 'bearer-refresh')
+    .addCookieAuth('Authentication', { type: 'apiKey'}, 'cookie-authentication')
+    .addCookieAuth('Refresh', { type: 'apiKey' }, 'cookie-refresh')
     .build();
   const document = SwaggerModule.createDocument(app, config);
   const customOptions: SwaggerCustomOptions = {

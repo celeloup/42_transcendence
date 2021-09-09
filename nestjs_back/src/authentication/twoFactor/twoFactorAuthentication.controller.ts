@@ -14,7 +14,7 @@ import UsersService from '../../users/users.service';
 import TwoFactorAuthenticationCodeDto from './dto/twoFactorAuthenticationCode.dto';
 import AuthenticationService from '../authentication.service';
 import AuthInfos from '../interface/authInfos.interface';
-import { ApiResponse, ApiCookieAuth, ApiTags } from '@nestjs/swagger';
+import { ApiResponse, ApiTags, ApiBearerAuth, ApiCookieAuth } from '@nestjs/swagger';
 
 @ApiTags('2 Factors authentication')
 @Controller('2fa')
@@ -27,7 +27,8 @@ export default class TwoFactorAuthenticationController {
 
   @UseGuards(JwtAuthenticationGuard)
 	@Post('generate')
-  @ApiCookieAuth('Authentication')
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
   @ApiResponse({
     status: 201,
     description: 'Qrcode code generation successful (return as a base64 string).',
@@ -42,7 +43,8 @@ export default class TwoFactorAuthenticationController {
   @UseGuards(JwtAuthenticationGuard)
   @Post('turn-on')
   @HttpCode(200)
-  @ApiCookieAuth('Authentication')
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
   @ApiResponse({
     status: 200,
     description: '2 factor authentication successfully enabled.',
@@ -64,7 +66,8 @@ export default class TwoFactorAuthenticationController {
   @UseGuards(JwtAuthenticationGuard)
   @Post('authenticate')
   @HttpCode(200)
-  @ApiCookieAuth('Authentication')
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
   @ApiResponse({
     status: 200,
     description: '2 factor authentication successfully enabled.',
@@ -81,13 +84,17 @@ export default class TwoFactorAuthenticationController {
     if (!isCodeValid) {
       throw new UnauthorizedException('Wrong authentication code');
     }
-    const {user} = request;
-    const { accessTokenCookie, accessTokenExpiration } = this.authenticationService.getCookieWithJwtToken(user.id, true);
-    const { refreshTokenCookie, refreshTokenExpiration } = await this.authenticationService.getCookieWithJwtRefreshToken(user.id, true);
+    const { user } = request;
+    const accessJwt = this.authenticationService.getJwtToken(user.id, true);
+    const { accessTokenCookie, accessTokenExpiration } = this.authenticationService.getCookieForJwtToken(accessJwt);
+    const refreshJwt = await this.authenticationService.getJwtRefreshToken(user.id, true);
+    const { refreshTokenCookie, refreshTokenExpiration } = this.authenticationService.getCookieForJwtRefreshToken(refreshJwt);
     request.res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie]);
     return {
       id: user.id,
       name: user.name,
+      authentication: accessJwt.token,
+      refresh: refreshJwt.token,
       accessTokenExpiration,
       refreshTokenExpiration
     };

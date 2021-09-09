@@ -8,8 +8,14 @@ export default class AuthInfos {
   name: string;
 
   @ApiProperty()
-  accessTokenExpiration?: Date;
+	authentication: string;
 
   @ApiProperty()
-  refreshTokenExpiration?: Date;
+  refresh: string;
+
+  @ApiProperty()
+  accessTokenExpiration: Date;
+
+  @ApiProperty()
+  refreshTokenExpiration: Date;
 }

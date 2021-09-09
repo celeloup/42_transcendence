@@ -6,6 +6,7 @@ import { PostgresErrorCode } from '../database/postgresErrorCodes.enum';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import TokenPayload from './interface/tokenPayload.interface';
+import jwt from './interface/jwt.interface';
 
 @Injectable()
 export default class AuthenticationService {
@@ -21,7 +22,7 @@ export default class AuthenticationService {
 
   public async getUserFromAuthenticationToken(token: string): Promise<User> {
     const payload: TokenPayload = this.jwtService.verify(token, {
-      secret: this.configService.get('JWT_ACCESS_TOKEN_SECRET')
+      secret: this.configService.get('JWT_authentication_SECRET')
     });
     if (payload.userId) {
       return this.usersService.getById(payload.userId);
@@ -40,16 +41,20 @@ export default class AuthenticationService {
 	  }
   }
 
-  public getCookieWithJwtToken(userId: number, isSecondFactorAuthenticated = false) {
+  public getJwtToken(userId: number, isSecondFactorAuthenticated = false): jwt {
     const payload: TokenPayload = { userId, isSecondFactorAuthenticated };
     const expire_time = this.configService.get('JWT_EXPIRATION_TIME');
     const token = this.jwtService.sign(payload, {
       secret: this.configService.get('JWT_SECRET'),
       expiresIn: `${expire_time}s`
     });
+    return { token, expire_time };
+  }
+
+  public getCookieForJwtToken(jwt: jwt) {
     const accessTokenExpiration = new Date();
-    accessTokenExpiration.setSeconds(accessTokenExpiration.getSeconds() + expire_time);
-    const accessTokenCookie = `Authentication=${token}; HttpOnly; Path=/; SameSite=Strict; Expires=${accessTokenExpiration.toUTCString()}`;
+    accessTokenExpiration.setSeconds(accessTokenExpiration.getSeconds() + jwt.expire_time);
+    const accessTokenCookie = `Authentication=${jwt.token}; HttpOnly; Path=/; SameSite=Strict; Expires=${accessTokenExpiration.toUTCString()}`;
     return { accessTokenCookie, accessTokenExpiration };
   }
 
@@ -64,17 +69,21 @@ export default class AuthenticationService {
     this.usersService.removeRefreshToken(userId);
   }
 
-  public async getCookieWithJwtRefreshToken(userId: number, isSecondFactorAuthenticated = false) {
+  public async getJwtRefreshToken(userId: number, isSecondFactorAuthenticated = false): Promise<jwt> {
     const payload: TokenPayload = { userId, isSecondFactorAuthenticated };
     const expire_time = this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME');
     const token = this.jwtService.sign(payload, {
       secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
       expiresIn: `${expire_time}s`
     });
-    const refreshTokenExpiration = new Date();
-    refreshTokenExpiration.setSeconds(refreshTokenExpiration.getSeconds() + expire_time);
-    const refreshTokenCookie = `Refresh=${token}; HttpOnly; Path=/; SameSite=Strict; Expires=${refreshTokenExpiration.toUTCString()}`;
     await this.usersService.setCurrentRefreshToken(token, userId);
+    return { token, expire_time };
+  }
+
+  public getCookieForJwtRefreshToken(jwt: jwt) {
+    const refreshTokenExpiration = new Date();
+    refreshTokenExpiration.setSeconds(refreshTokenExpiration.getSeconds() + jwt.expire_time);
+    const refreshTokenCookie = `Refresh=${jwt.token}; HttpOnly; Path=/; SameSite=Strict; Expires=${refreshTokenExpiration.toUTCString()}`;
     return { refreshTokenCookie, refreshTokenExpiration };
   }
   
