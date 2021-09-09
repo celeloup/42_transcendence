@@ -1,0 +1,28 @@
+{
+  "name": "transcendance",
+  "version": "1.0.0",
+  "description": "projet transcendance",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/CyberDuck79/Transcendance.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/CyberDuck79/Transcendance/issues"
+  },
+  "homepage": "https://github.com/CyberDuck79/Transcendance#readme",
+  "devDependencies": {
+    "ajv": "^6.12.6"
+  },
+  "dependencies": {
+    "@nestjs/cli": "^8.1.1"
+  }
+}

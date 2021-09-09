@@ -1,6 +1,6 @@
 const io = require("socket.io-client");
 
-const URL = "http://back:8080/test"
+const URL = "http://back:8080/channel"
 const connector = io(URL);
 
 // connector wait for successful connection and launch the tests
@@ -23,12 +23,15 @@ connector.on("connect", () => {
     client.on("connect", () => {
       console.log(`client ${i}: connected!`);
       setTimeout(() => {
-        client.emit("Hello_server", `Hello from client ${i}!`);
+		  const message = `Hello from client ${i}!`;
+		  const recipient = `toto`;
+
+		  client.emit('send_message', { content: message , recipient: recipient});
       }, Math.random() * (8000 - 3000) + 3000);
     
-      setTimeout(() => {
-        client.emit("send_to_all", `Hello from client ${i}!`);
-      }, Math.random() * (8000 - 3000) + 3000);
+//      setTimeout(() => {
+//        client.emit("send_to_all", `Hello from client ${i}!`);
+//      }, Math.random() * (8000 - 3000) + 3000);
   
       setTimeout(() => {
         console.log(`client ${i}: disconnection...`);
@@ -36,14 +39,14 @@ connector.on("connect", () => {
       }, 9000);
     });
     
-    client.on("receive_message", (data) => {
-      console.log(`client ${i}: ${data}`);
-    });
+//    client.on("receive_message", (data) => {
+//      console.log(`client ${i}: ${data}`);
+//    });
   }
 
-  setTimeout(() => {
-    console.log(`End of the test! send reset to the api...`);
-    connector.emit("reset_counter");
-    connector.disconnect();
-  }, 10000);
+//  setTimeout(() => {
+//    console.log(`End of the test! send reset to the api...`);
+//    connector.emit("reset_counter");
+//    connector.disconnect();
+//  }, 10000);
 });
