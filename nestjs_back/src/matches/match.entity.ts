@@ -1,4 +1,4 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, RelationId, CreateDateColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, ManyToMany, CreateDateColumn } from 'typeorm';
 import User from '../users/user.entity';
 import { Exclude } from 'class-transformer';
 
@@ -10,11 +10,8 @@ class Match {
   @Column()
   public friendly: boolean;
 
-  @ManyToOne(() => User, (user: User) => user.matches1)
-  public user1: User;
-
-  @ManyToOne(() => User, (user: User) => user.matches2)
-  public user2: User; 
+  @ManyToMany(() => User, (user: User) => user.matches)
+  public users: User[];
 
   // @RelationId((match: Match) => match.user1)
   @Column()
