@@ -181,33 +181,43 @@ describe('AppController (e2e)', () => {
     });
 
     describe('websocket test gateway with cookie', () => {
-      it('should connect and return the username', (done) => {
+      it('should connect and return the username', async () => {
         const URL = "http://localhost:9090/test"
         const CONFIG = {
           extraHeaders: {
             cookie: cookies[0]
-          }
+          },
+          autoConnect: false
         }
         const socket = io(URL, CONFIG);
+        try {
+          const message = await new Promise((resolve, reject) => {
+            socket.on("connect", () => {
+              socket.emit("whoami");
+            });
+  
+            socket.on("connect_error", (err) => {
+              socket.close();
+              reject(err);
+            });
+  
+            socket.on('receive_message', (recievedMessage: string) => {
+              socket.disconnect();
+              socket.close();
+              resolve(recievedMessage);
+            });
 
-        socket.on("connect", () => {
-          socket.emit("whoami");
-        });
-
-        socket.on("connect_error", (err) => {
-          expect(err).toBe("no error");
-        });
-
-        socket.on('receive_message', (recievedMessage: string) => {
-          expect(recievedMessage).toBe(user3.name);
-          socket.disconnect();
-          done();
-        });
+            socket.connect();
+          });
+          expect(message).toBe(user3.name);
+        } catch (err) {
+          throw err;
+        }
       });
     });
 
     describe('logout', () => {
-      const empty_cookies = 'Authentication=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0,Refresh=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0,Expired=; Path=\/; SameSite=Strict; Max-Age=0';
+      const empty_cookies = 'Authentication=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0,Refresh=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0';
       
       it('should return empty cookies', () => {
         return request(app.getHttpServer())
