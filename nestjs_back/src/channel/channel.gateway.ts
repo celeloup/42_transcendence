@@ -34,8 +34,10 @@ export default class SocketGateway implements OnGatewayInit, OnGatewayConnection
     const user = await this.channelService.getUserFromSocket(client);
     if (user) {
       //si id compris dans client pourquoi ne pas garder qu'une map socket user ?
-     this.connectedUser.set(client.id, user.name);
+      this.connectedUser.set(client.id, user.name);
       this.socketUsers.set(client.id, client);
+    } else {
+      this.connectedUser.set(client.id, `client test`);
     }
     this.logger.log(`Connection: ${this.connectedUser.get(client.id)}`);
   }
@@ -52,11 +54,9 @@ export default class SocketGateway implements OnGatewayInit, OnGatewayConnection
   
   @SubscribeMessage('send_message')
   async listenForMessages(
-    @MessageBody() content: string, recipient: string,
+    @MessageBody() data: {content: string, recipient: string},
     @ConnectedSocket() client: Socket,
   ) {
-    this.logger.log(`Message from ${this.connectedUser.get(client.id)}: ${content}`);
-    this.server.sockets.emit('receive_message', content);
+      this.logger.log(`Message from ${this.connectedUser.get(client.id)} to ${data.recipient}: ${data.content}`);
   }
-
 }

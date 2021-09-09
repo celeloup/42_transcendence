@@ -36,7 +36,7 @@ import ChannelModule from './channel/channel.module';
     DatabaseModule,
     UsersModule,
     AuthenticationModule,
-    SocketModule,
+//    SocketModule,
     ChannelModule
   ],
   controllers: [],
