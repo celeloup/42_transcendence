@@ -62,7 +62,6 @@ export default class SocketGateway implements OnGatewayInit, OnGatewayConnection
       const message = await this.channelService.saveMessage(data.content, author, data.recipient);
   }
 
-  //comment faire pour recuperer seulement les messages d'un destinataire ?
   @SubscribeMessage('request_messages')
   async requestMessagesByChannel(
     @ConnectedSocket() socket: Socket,

@@ -27,7 +27,6 @@ export default class ChannelService {
       return newMessage;
     }
 
-	//si j'ai bien compris : relations renvoi tout l'objet (utile qd recipient ne sera plus une simple string)
     async getMessageByChannel(channel: string) {
       return this.messagesRepository.find({
         where : {recipient: channel }
