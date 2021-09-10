@@ -365,6 +365,21 @@ describe('AppController (e2e)', () => {
       });
     });
 
+    describe('channel test gateway with cookie', () => {
+      it('should connect and return the message', (done) => {
+        const URL = "http://localhost:9090/channel"
+        const CONFIG = {
+          extraHeaders: {
+            cookie: cookies[0]
+          }
+        }
+        const socket = io(URL, CONFIG);
+
+        socket.on("connect", () => {
+          socket.emit('send_message', { content: 'Youhou', recipient: 'toto'});
+        });
+      });
+    });
     describe('logout', () => {
       const empty_cookies = 'Authentication=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0,Refresh=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0';
       
