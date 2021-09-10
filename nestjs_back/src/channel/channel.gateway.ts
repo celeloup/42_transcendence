@@ -64,13 +64,14 @@ export default class SocketGateway implements OnGatewayInit, OnGatewayConnection
 
   //comment faire pour recuperer seulement les messages d'un destinataire ?
   @SubscribeMessage('request_messages')
-  async requestAllMessages(
+  async requestMessagesByChannel(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() recipient: string,
+    @MessageBody() channel: string,
   )
   {
-    await this.channelService.getUserFromSocket(socket);
-    const messages = await this.channelService.getAllMessage();
-    socket.emit('send_messages, messages');
+    this.logger.log(`Request message of ${channel}`);
+    // await this.channelService.getUserFromSocket(socket);
+    const messages = await this.channelService.getMessageByChannel(channel);
+    socket.emit('messagesByChannel', messages);
   }
 }

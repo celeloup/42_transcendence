@@ -24,12 +24,13 @@ export default class ChannelService {
         recipient
       });
       await this.messagesRepository.save(newMessage);
-      return newMessage; 
+      return newMessage;
     }
 
-    async getAllMessage() {
+	//si j'ai bien compris : relations renvoi tout l'objet (utile qd recipient ne sera plus une simple string)
+    async getMessageByChannel(channel: string) {
       return this.messagesRepository.find({
-        relations: ['recipient']
+        where : {recipient: channel }
       });
     }
 
