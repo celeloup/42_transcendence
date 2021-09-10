@@ -29,7 +29,10 @@ export default class JwtRefreshTokenStrategy extends PassportStrategy(
   }
  
   async validate(request: Request, payload: TokenPayload) {
-    const refreshToken = request.cookies?.Refresh;
+    let refreshToken = request.cookies?.Refresh;
+    if (!refreshToken) {
+      refreshToken = request?.headers?.authorization?.split(' ')[1] as string
+    }
     const user = await this.userService.getUserIfRefreshTokenMatches(refreshToken, payload.userId)
     if (user) {
       if (!user.isTwoFactorAuthenticationEnabled) {

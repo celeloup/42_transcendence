@@ -88,6 +88,8 @@ describe('AppController (e2e)', () => {
   }
   
   let cookies: Array<string>;
+  let bearers: Array<string>;
+  const cookies_regex = /Authentication=.*; HttpOnly; Path=\/; SameSite=Strict; Expires=.*,Refresh=.*; HttpOnly; Path=\/; SameSite=Strict; Expires=.*/;
 
   describe('Authentication', () => {
     describe('registering users for tests', () => {
@@ -96,49 +98,75 @@ describe('AppController (e2e)', () => {
           .post('/api/authentication/register')
           .send(user1)
           .expect((res) =>  {
-            expect(res.body).toMatchObject({
+            expect(res.body).toEqual({
               id: 1,
-              name: user1.name
-            })
+              name: user1.name,
+              authentication: expect.any(String),
+              refresh: expect.any(String),
+              accessTokenExpiration: expect.any(String),
+              refreshTokenExpiration: expect.any(String)
+            });
+            expect(res.body.authentication).toHaveLength(191);
+            expect(res.body.refresh).toHaveLength(191);
+            expect(res.body.accessTokenExpiration).toHaveLength(24);
+            expect(res.body.refreshTokenExpiration).toHaveLength(24);
           })
-          .expect(201);
+          .expect(201)
+          .expect('set-cookie', cookies_regex);
       });
       it('user2', () => {
         return request(app.getHttpServer())
           .post('/api/authentication/register')
           .send(user2)
           .expect((res) =>  {
-            expect(res.body).toMatchObject({
+            expect(res.body).toEqual({
               id: 2,
-              name: user2.name
-            })
-          })
-          .expect(201);
-      });
-
-      const cookies_regex = /Authentication=.*; HttpOnly; Path=\/; SameSite=Strict; Expires=.*,Refresh=.*; HttpOnly; Path=\/; SameSite=Strict; Expires=.*/;
-      // cleloup is the testing user !
-      it('user3 -> check the cookie', async () => {
-        const res_1 = await request(app.getHttpServer())
-          .post('/api/authentication/register')
-          .send(user3)
-          .expect((res) => {
-            expect(res.body).toMatchObject({
-              id: 3,
-              name: user3.name
+              name: user2.name,
+              authentication: expect.any(String),
+              refresh: expect.any(String),
+              accessTokenExpiration: expect.any(String),
+              refreshTokenExpiration: expect.any(String)
             });
+            expect(res.body.authentication).toHaveLength(191);
+            expect(res.body.refresh).toHaveLength(191);
+            expect(res.body.accessTokenExpiration).toHaveLength(24);
+            expect(res.body.refreshTokenExpiration).toHaveLength(24);
           })
           .expect(201)
           .expect('set-cookie', cookies_regex);
-        cookies = res_1.headers['set-cookie'];
+      });
+
+      // cleloup is the testing user !
+      it('user3 -> get the cookie and bearer', async () => {
+        const response = await request(app.getHttpServer())
+          .post('/api/authentication/register')
+          .send(user3)
+          .expect((res) => {
+            expect(res.body).toEqual({
+              id: 3,
+              name: user3.name,
+              authentication: expect.any(String),
+              refresh: expect.any(String),
+              accessTokenExpiration: expect.any(String),
+              refreshTokenExpiration: expect.any(String)
+            });
+            expect(res.body.authentication).toHaveLength(191);
+            expect(res.body.refresh).toHaveLength(191);
+            expect(res.body.accessTokenExpiration).toHaveLength(24);
+            expect(res.body.refreshTokenExpiration).toHaveLength(24);
+          })
+          .expect(201)
+          .expect('set-cookie', cookies_regex);
+        cookies = response.headers['set-cookie'];
+        bearers = [response.body.authentication, response.body.refresh];
       })
     });
 
-    describe('authenticate without cookie', () => {
+    describe('authenticate without cookie or bearer', () => {
       it('should throw an error', () => {
         return request(app.getHttpServer())
           .get('/api/authentication')
-          .expect(401)
+          .expect(401);
       });
     });
 
@@ -148,35 +176,87 @@ describe('AppController (e2e)', () => {
           .get('/api/authentication')
           .set('cookie', cookies[0])
           .expect((res) =>  {
-            expect(res.body).toMatchObject({
+            expect(res.body).toEqual({
               id: 3,
-              name: user3.name
-            })
+              name: user3.name,
+              email: user3.email,
+              id42: user3.id42,
+              isTwoFactorAuthenticationEnabled: false
+            });
           })
-          .expect(200)
+          .expect(200);
       });
     });
 
-    describe('refresh the jwt token without cookie', () => {
+    describe('authenticate with bearer', () => {
+      it('should return user', () => {
+        return request(app.getHttpServer())
+          .get('/api/authentication')
+          .set('authorization', `bearer ${bearers[0]}`)
+          .expect((res) =>  {
+            expect(res.body).toEqual({
+              id: 3,
+              name: user3.name,
+              email: user3.email,
+              id42: user3.id42,
+              isTwoFactorAuthenticationEnabled: false
+            });
+          })
+          .expect(200);
+      });
+    });
+
+    describe('refresh the jwt token without cookie or bearer', () => {
       it('should throw an error', () => {
         return request(app.getHttpServer())
           .get('/api/authentication/refresh')
-          .expect(401)
+          .expect(401);
       });
     });
 
     describe('refresh the jwt token with cookie', () => {
-      it('should return user', () => {
+      it('should return auth infos', () => {
         return request(app.getHttpServer())
           .get('/api/authentication/refresh')
           .set('cookie', cookies[1])
-          .expect((res) =>  {
-            expect(res.body).toMatchObject({
+          .expect((res) => {
+            expect(res.body).toEqual({
               id: 3,
-              name: user3.name
-            })
+              name: user3.name,
+              authentication: expect.any(String),
+              refresh: expect.any(String),
+              accessTokenExpiration: expect.any(String),
+              refreshTokenExpiration: expect.any(String)
+            });
+            expect(res.body.authentication).toHaveLength(191);
+            expect(res.body.refresh).toHaveLength(191);
+            expect(res.body.accessTokenExpiration).toHaveLength(24);
+            expect(res.body.refreshTokenExpiration).toHaveLength(24);
           })
-          .expect(200)
+          .expect(200);
+      });
+    });
+
+    describe('refresh the jwt token with bearer', () => {
+      it('should return auth infos', () => {
+        return request(app.getHttpServer())
+          .get('/api/authentication/refresh')
+          .set('authorization', `bearer ${bearers[1]}`)
+          .expect((res) => {
+            expect(res.body).toEqual({
+              id: 3,
+              name: user3.name,
+              authentication: expect.any(String),
+              refresh: expect.any(String),
+              accessTokenExpiration: expect.any(String),
+              refreshTokenExpiration: expect.any(String)
+            });
+            expect(res.body.authentication).toHaveLength(191);
+            expect(res.body.refresh).toHaveLength(191);
+            expect(res.body.accessTokenExpiration).toHaveLength(24);
+            expect(res.body.refreshTokenExpiration).toHaveLength(24);
+          })
+          .expect(200);
       });
     });
 
