@@ -28,25 +28,24 @@ connector.on("connect", () => {
 
 		  client.emit('send_message', { content: message , recipient: recipient});
       }, Math.random() * (8000 - 3000) + 3000);
-    
-//      setTimeout(() => {
-//        client.emit("send_to_all", `Hello from client ${i}!`);
-//      }, Math.random() * (8000 - 3000) + 3000);
-  
+      
+      client.emit("request_messages", 'toto');
+
       setTimeout(() => {
         console.log(`client ${i}: disconnection...`);
         client.disconnect();
       }, 9000);
     });
     
-//    client.on("receive_message", (data) => {
-//      console.log(`client ${i}: ${data}`);
-//    });
+    client.on("messagesByChannel", (data) => {
+      console.log(`client ${i}: ${JSON.stringify(data)}`);
+    });
+
   }
 
-//  setTimeout(() => {
-//    console.log(`End of the test! send reset to the api...`);
-//    connector.emit("reset_counter");
-//    connector.disconnect();
-//  }, 10000);
+ setTimeout(() => {
+   console.log(`End of the test! send reset to the api...`);
+   connector.emit("reset_counter");
+   connector.disconnect();
+ }, 10000);
 });
