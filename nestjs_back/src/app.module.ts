@@ -8,7 +8,7 @@ import MatchesModule from './matches/matches.module'
 import AuthenticationModule from './authentication/authentication.module';
 import ExceptionsLoggerFilter from './utils/exceptionsLogger.filter';
 import SocketModule from './socket/socket.module';
-
+import AchievementsModule from './achievements/achievements.module';
  
 @Module({
   imports: [
@@ -35,6 +35,7 @@ import SocketModule from './socket/socket.module';
     DatabaseModule,
     UsersModule,
     MatchesModule,
+    AchievementsModule,
     AuthenticationModule,
     SocketModule
   ],

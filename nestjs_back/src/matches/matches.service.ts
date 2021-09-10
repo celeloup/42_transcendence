@@ -7,6 +7,7 @@ import CreateMatchDto from './dto/createMatch.dto';
 import UpdateMatchDto from './dto/updateMatch.dto';
 import UsersService from 'src/users/users.service';
 import User from 'src/users/user.entity';
+import AchievementsService from 'src/achievements/achievements.service';
  
 @Injectable()
 export default class MatchesService {
@@ -15,7 +16,8 @@ export default class MatchesService {
     private matchesRepository: Repository<Match>,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    private usersService: UsersService
+    private usersService: UsersService,
+    private achievementsService: AchievementsService
 
   ) {}
 
@@ -40,18 +42,31 @@ export default class MatchesService {
   }
 
   async weHaveAWinner(match: Match){
-    const user1 = await this.usersService.getById(match.user1_id);
-    const user2 = await this.usersService.getById(match.user2_id);
-
+    const user1 = await this.usersService.getAchievementsByUserId(match.user1_id);
+    const user2 = await this.usersService.getAchievementsByUserId(match.user2_id);
+    if (!user1.achievements)
+      user1.achievements = new Array;
+    if (!user2.achievements)
+      user2.achievements = new Array;
     if (!match.friendly){
+      const tenVictories = await this.achievementsService.getAchievementById(2);
+      const aHundredPoints = await this.achievementsService.getAchievementById(3);
       user1.points += match.score_user1;
+      if (user1.points >= 100 && user1.points < 110)
+        user1.achievements.push(aHundredPoints);
       user2.points += match.score_user2;
+      if (user2.points >= 100 && user2.points < 110)
+        user2.achievements.push(aHundredPoints);
       if (match.score_user1 === 10){
         user1.victories++;
+        if (user1.victories === 10)
+          user1.achievements.push(tenVictories);
         user2.defeats++;
       }
       else{
         user2.victories++;
+        if (user2.victories === 10)
+          user2.achievements.push(tenVictories);
         user1.defeats++;
       }
     }

@@ -6,10 +6,12 @@ import UsersService from './users.service';
 import User from './user.entity';
 import JwtStrategy from '../authentication/strategy/jwt.strategy';
 import UsersController from './users.controller';
+import AchievementsModule from 'src/achievements/achievements.module';
+import Achievement from 'src/achievements/achievement.entity';
  
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
+    TypeOrmModule.forFeature([User, Achievement]),
     ConfigModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],
@@ -20,7 +22,8 @@ import UsersController from './users.controller';
           expiresIn: `${configService.get('JWT_EXPIRATION_TIME')}s`,
         },
       }),
-    })
+    }),
+    AchievementsModule
   ],
   providers: [UsersService, JwtStrategy],
   controllers: [UsersController],

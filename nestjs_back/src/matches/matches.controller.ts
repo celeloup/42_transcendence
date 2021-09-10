@@ -15,12 +15,12 @@ export default class MatchesController {
     return this.matchesService.getMatchById(Number(id));
   }
 
-  @Post('create')
+  @Post()
   async createMatch(@Body() match: CreateMatchDto){
     return this.matchesService.createMatch(match);
   }
 
-  @Put('update/:id')
+  @Put(':id')
   async updateMatch(@Param() { id }: FindOneParams, @Body() match: UpdateMatchDto){
     return this.matchesService.updateMatch(Number(id), match);
   }

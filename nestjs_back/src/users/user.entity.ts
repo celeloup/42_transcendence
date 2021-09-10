@@ -1,6 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany, JoinTable, ManyToMany, Unique, JoinColumn, RelationId } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import Match from '../matches/match.entity';
+import Achievement from '../achievements/achievement.entity'
  
 @Entity()
 class User {
@@ -34,6 +35,10 @@ class User {
   @JoinTable()
   public matches: Match[];
 
+  @ManyToMany(() => Achievement, (achievement: Achievement) => achievement.users)
+  @JoinTable()
+  public achievements: Achievement[];
+
   @Column()
   public victories: number;
 
@@ -43,9 +48,11 @@ class User {
   @Column()
   public points: number;
 
-  // @ManyToMany(() => User, (user:User) => user.friends)
-  @Column("simple-array", {nullable: true})
-  public friends: string[];
+//  @Column("simple-array", {nullable: true})
+//  public friends: string[];
+
+  @Column("int", {array: true, nullable: true})
+  public friends: number[];
 }
  
 export default User;

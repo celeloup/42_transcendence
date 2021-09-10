@@ -1,4 +1,4 @@
-import { Body, Controller, Put, Req, Get, UseGuards, Param } from '@nestjs/common';
+import { Body, Controller, Put, Req, Get, UseGuards, Param, Delete } from '@nestjs/common';
 import FindOneParams from '../utils/findOneParams';
 import UsersService from './users.service';
 import UpdateUserDto from './dto/updateUser.dto';
@@ -28,14 +28,19 @@ export default class UsersController {
     return this.userService.getMatchesByUserId(Number(id));
   }
 
-  // @Get('friends/:id')
-  // getFriendsByUserId(@Param() { id }: FindOneParams) {
-  //   return this.userService.getFriendsByUserId(Number(id));
-  // } 
+  @Get('achievements/:id')
+  getFriendsByUserId(@Param() { id }: FindOneParams) {
+    return this.userService.getAchievementsByUserId(Number(id));
+  } 
 
-  @Put('newFriend/:id')
+  @Put('friend/:id')
   addAFriend(@Param() { id }: FindOneParams, @Body() friend: AddFriendDto) {
     return this.userService.addAFriend(Number(id), friend);
+  }
+
+  @Delete('friend/:id')
+  deleteAFriend(@Param() { id }: FindOneParams, @Body() friend: AddFriendDto) {
+    return this.userService.deleteAFriend(Number(id), friend);
   }
   /* ajouter des amis ? modifier des stats ? */
 
