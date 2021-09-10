@@ -1,0 +1,157 @@
+$background-color: #232323;
+$text-color: white;
+$accent_color: #FFCD27;
+
+.rotate_right
+{
+	transform: rotate(90deg);
+	-webkit-transform: rotate(90deg);
+	-moz-transform: rotate(90deg);
+	-ms-transform: rotate(90deg);
+	-o-transform: rotate(90deg);
+	filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+}
+
+// ************ BORDER WINDOW
+
+.window
+{
+	position: relative;
+	margin-right: 33px;
+}
+
+.window_header {
+	height: 50px;
+	background-color: white;
+	color: $background-color;
+	width: 100%;
+}
+
+.window div {
+	position: absolute;
+}
+
+.border_top, .border_bottom {
+	height: 4px;
+	width: 100%;
+	background-color: white;
+}
+
+.border_right, .border_left {
+	height: 100%;
+	width: 4px;
+	top: 8px;
+	background-color: white;
+}
+
+.border_bottom {
+	bottom: -16px;
+	left: 8px;
+}
+
+.border_right {
+	right: -16px;
+}
+
+.border_top{
+	left: 8px;
+}
+
+.border_top:after {
+	content: "";
+	position: absolute;
+	background-color: white;
+	width: 4px;
+	height: 4px;
+	left: -4px;
+	top: 4px;
+	z-index: 2;
+}
+
+.border_top:before {
+	content: "";
+	position: absolute;
+	background-color: white;
+	width: 4px;
+	height: 4px;
+	right: -4px;
+	top: 4px;
+	z-index: 2;
+}
+
+.border_bottom:after {
+	content: "";
+	position: absolute;
+	background-color: white;
+	width: 4px;
+	height: 4px;
+	left: -4px;
+	top: -4px;
+	z-index: 2;
+}
+
+.border_bottom:before {
+	content: "";
+	position: absolute;
+	background-color: white;
+	width: 4px;
+	height: 4px;
+	right: -4px;
+	top: -4px;
+	z-index: 2;
+}
+
+// ************ NAVBAR
+
+#navBar
+{
+	position: relative;
+	display:flex;
+	margin-left: 98.5%;
+	margin-top: -100px;
+}
+
+.navButton
+{
+	position: relative;
+	display: inline-block;
+	background-color: $text-color;
+	margin: 0;
+	padding: 40px 20px 15px 20px;
+	margin-right: 10px;
+}
+
+.navButton:hover {
+	top: 8px;
+}
+
+.navButton:before
+{
+	content: "";
+	position: absolute;
+	bottom: -1px;
+	right: -1px;
+	height: 6px;
+	width: 6px;
+	background-color: $background-color;
+}
+
+.navButton:after
+{
+	content: "";
+	position: absolute;
+	bottom: -1px;
+	left: -1px;
+	height: 6px;
+	width: 6px;
+	background-color: $background-color;
+}
+
+.navButton span
+{
+	color: $background-color;
+	font-family: "Dogica Pixel";
+	font-size: 14px;
+}
+
+

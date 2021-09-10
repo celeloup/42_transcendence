@@ -1,38 +1,35 @@
+$background-color: #232323;
+$text-color: white;
+$accent_color: #FFCD27;
+
 .App {
   text-align: center;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+#logo {
+	max-width: 200px;
+	margin: auto;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+#logo * {
+	color: $accent_color;
+	font-family: "Star Jedi";
+	font-size: 60px;
+	letter-spacing: 3px;
+	margin-top: 50px;
+	display: flex;
+	
+	flex-direction: column;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
-}
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+#logo p {
+	display: block;
+	// max-width: 100px;
+	padding: 0;
+	margin: 0;
+	margin-top: -40px;
+	-webkit-user-select: none; /* Safari */        
+	-moz-user-select: none; /* Firefox */
+	-ms-user-select: none; /* IE10+/Edge */
+	user-select: none; /* Standard */
 }
