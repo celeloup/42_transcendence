@@ -8,6 +8,7 @@ import MatchesModule from './matches/matches.module'
 import AuthenticationModule from './authentication/authentication.module';
 import ExceptionsLoggerFilter from './utils/exceptionsLogger.filter';
 import SocketModule from './socket/socket.module';
+import ChannelModule from './channel/channel.module';
 
  
 @Module({
@@ -35,7 +36,8 @@ import SocketModule from './socket/socket.module';
     DatabaseModule,
     UsersModule,
     AuthenticationModule,
-    SocketModule
+//    SocketModule,
+    ChannelModule
   ],
   controllers: [],
   providers: [
