@@ -296,6 +296,75 @@ describe('AppController (e2e)', () => {
       });
     });
 
+    describe('websocket test gateway with bearer', () => {
+      it('should connect and return the username', async () => {
+        const URL = "http://localhost:9090/test"
+        const CONFIG = {
+          extraHeaders: {
+            authorization: `bearer ${bearers[0]}`
+          },
+          autoConnect: false
+        }
+        const socket = io(URL, CONFIG);
+        try {
+          const message = await new Promise((resolve, reject) => {
+            socket.on("connect", () => {
+              socket.emit("whoami");
+            });
+  
+            socket.on("connect_error", (err) => {
+              socket.close();
+              reject(err);
+            });
+  
+            socket.on('receive_message', (recievedMessage: string) => {
+              socket.disconnect();
+              socket.close();
+              resolve(recievedMessage);
+            });
+
+            socket.connect();
+          });
+          expect(message).toBe(user3.name);
+        } catch (err) {
+          throw err;
+        }
+      });
+    });
+
+    describe('websocket test gateway without cookie or bearer', () => {
+      it('should connect and return connector username', async () => {
+        const URL = "http://localhost:9090/test"
+        const CONFIG = {
+          autoConnect: false
+        }
+        const socket = io(URL, CONFIG);
+        try {
+          const message = await new Promise((resolve, reject) => {
+            socket.on("connect", () => {
+              socket.emit("whoami");
+            });
+  
+            socket.on("connect_error", (err) => {
+              socket.close();
+              reject(err);
+            });
+  
+            socket.on('receive_message', (recievedMessage: string) => {
+              socket.disconnect();
+              socket.close();
+              resolve(recievedMessage);
+            });
+
+            socket.connect();
+          });
+          expect(message).toBe("connector");
+        } catch (err) {
+          throw err;
+        }
+      });
+    });
+
     describe('logout', () => {
       const empty_cookies = 'Authentication=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0,Refresh=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0';
       
