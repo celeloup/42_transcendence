@@ -6,14 +6,17 @@ import * as bcrypt from 'bcrypt';
 import CreateUserDto from './dto/createUser.dto';
 import UpdateUserDto from './dto/updateUser.dto';
 import AddFriendDto from './dto/addFriend.dto';
-import UpdateFriendsDto from './dto/updateFriends.dto';
-import { json } from 'express';
+import Achievement from 'src/achievements/achievement.entity';
+import AchievementsService from '../achievements/achievements.service';
 
 @Injectable()
 export default class UsersService {
   constructor(
     @InjectRepository(User)
-    private usersRepository: Repository<User>
+    private usersRepository: Repository<User>,
+    @InjectRepository(Achievement)
+    private achievementsRepository: Repository<Achievement>,
+    private achievementsService: AchievementsService
   ) { }
 
   public async getById(id: number) {
@@ -32,13 +35,13 @@ export default class UsersService {
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
-  // async getFriendsByUserId(id: number) {
-  //   const user = await this.usersRepository.findOne(id, { relations: ['friends'] });
-  //   if (user) {
-  //     return user;
-  //   }
-  //   throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
-  // }
+  async getAchievementsByUserId(id: number) {
+    const user = await this.usersRepository.findOne(id, { relations: ['achievements'] });
+    if (user) {
+      return user;
+    }
+    throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
+  }
 
   async getBy42Id(id42: number) {
     const user = await this.usersRepository.findOne({ id42 });
@@ -102,22 +105,56 @@ export default class UsersService {
   }
 
   async addAFriend(userId: number, friendData: AddFriendDto) {
-    const user = await this.getById(userId);
-    const friend = await this.getById(friendData.friendId);
+    const user = await this.getAchievementsByUserId(userId);
+    const friend = await this.getAchievementsByUserId(friendData.friendId);
     if (user && friend) {
-      if (!user.friends)
+      const firstFriend = await this.achievementsService.getAchievementById(1);
+      if (!user.friends){
         user.friends = new Array;
-      if (!friend.friends)
+      }
+      if (!friend.friends){
         friend.friends = new Array;
-      if (!(await user.friends.find(element => element === friend.name)))
+      }
+      if (user.friends.length === 0)
       {
-        user.friends.push(friend.name);
-        friend.friends.push(user.name);
-        await this.usersRepository.update(user.id, {friends: user.friends});
-        await this.usersRepository.update(friend.id, {friends: friend.friends});
+        if (!user.achievements)
+          user.achievements = new Array;
+        user.achievements.push(firstFriend);
+        await this.usersRepository.save(user);
+      }
+      if (friend.friends.length === 0)
+      {
+        if (!friend.achievements)
+          friend.achievements = new Array;
+        friend.achievements.push(firstFriend);
+        await this.usersRepository.save(friend);
+      }
+      if (!(await user.friends.find(element => element === friend.id))) {
+        user.friends.push(friend.id);
+        friend.friends.push(user.id);
+        await this.usersRepository.update(user.id, { friends: user.friends });
+        await this.usersRepository.update(friend.id, { friends: friend.friends });
         return user;
       }
       throw new HttpException('Users are already friends', HttpStatus.BAD_REQUEST);
+    }
+    throw new HttpException('User not found', HttpStatus.NOT_FOUND);
+  }
+
+  async deleteAFriend(userId: number, friendData: AddFriendDto) {
+    const user = await this.getById(userId);
+    const friend = await this.getById(friendData.friendId);
+    if (user && friend && user.friends && friend.friends) {
+      if ((await user.friends.find(element => element === friend.id))) {
+        let index = user.friends.indexOf(friend.id);
+        user.friends.splice(index, 1);
+        index = friend.friends.indexOf(user.id);
+        friend.friends.splice(index, 1);
+        await this.usersRepository.update(user.id, { friends: user.friends });
+        await this.usersRepository.update(friend.id, { friends: friend.friends });
+        return user;
+      }
+      throw new HttpException('Users are not friends', HttpStatus.BAD_REQUEST);
     }
     throw new HttpException('User not found', HttpStatus.NOT_FOUND);
   }
