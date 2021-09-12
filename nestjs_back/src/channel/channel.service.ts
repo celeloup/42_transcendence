@@ -29,16 +29,22 @@ export default class ChannelService {
 
     async getMessageByChannel(channel: string) {
       return this.messagesRepository.find({
-        where : {recipient: channel }
+        where : {recipient: channel },
+        relations: ["author"]
       });
     }
 
   async getUserFromSocket(socket: Socket) {
+    let authenticationToken: string;
     const cookie = socket.handshake.headers.cookie;
-    if (!cookie) {
-      return null
+    const bearer = socket.handshake.headers.authorization;
+    if (cookie) {
+      authenticationToken = parse(cookie).Authentication;
+    } else if (bearer) {
+      authenticationToken = bearer.split(" ")[1];
+    } else {
+      return null;
     }
-    const { Authentication: authenticationToken } = parse(cookie);
     const user = await this.authenticationService.getUserFromAuthenticationToken(authenticationToken);
     if (!user) {
       throw new WsException('Invalid credentials.');

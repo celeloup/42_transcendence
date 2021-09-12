@@ -71,6 +71,17 @@ export default class SocketGateway implements OnGatewayInit, OnGatewayConnection
     this.logger.log(`Request message of ${channel}`);
     // await this.channelService.getUserFromSocket(socket);
     const messages = await this.channelService.getMessageByChannel(channel);
+    for (const message of messages) {
+      if (message.author) {
+        message.author = {
+          ...message.author,
+          currentHashedRefreshToken: undefined,
+          id42: undefined,
+          isTwoFactorAuthenticationEnabled: undefined,
+          twoFactorAuthenticationSecret: undefined
+        }
+      }
+    }
     socket.emit('messagesByChannel', messages);
   }
 }

@@ -10,6 +10,8 @@ import UsersModule from '../src/users/users.module';
 import AuthenticationModule from '../src/authentication/authentication.module';
 import io from 'socket.io-client';
 import SocketModule from '../src/socket/socket.module';
+import ChannelModule from '../src/channel/channel.module';
+import Message from "../src/channel/message.entity";
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;
@@ -26,8 +28,8 @@ describe('AppController (e2e)', () => {
             POSTGRES_TEST_DB: Joi.string().required(),
             JWT_SECRET: Joi.string().required(),
             JWT_EXPIRATION_TIME: Joi.string().required(),
-            JWT_REFRESH_TOKEN_SECRET: Joi.string().required(),
-            JWT_REFRESH_TOKEN_EXPIRATION_TIME: Joi.string().required(),
+            JWT_REFRESH_SECRET: Joi.string().required(),
+            JWT_REFRESH_EXPIRATION_TIME: Joi.string().required(),
           })
         }),
         TypeOrmModule.forRootAsync({
@@ -47,7 +49,8 @@ describe('AppController (e2e)', () => {
         }),
         UsersModule,
         AuthenticationModule,
-        SocketModule
+        SocketModule,
+        ChannelModule
       ],
     }).compile();
     app = moduleFixture.createNestApplication();
@@ -71,80 +74,94 @@ describe('AppController (e2e)', () => {
   });
 
   // test users directly registered without oauth
-  const user1 = {
+  const fhenrion = {
     name: 'fhenrion',
     email: 'fhenrion@student.42.fr',
     id42: 1
   }
-  const user2 = {
+  let fhenrionCookies: Array<string>;
+  let fhenrionBearers: Array<string>;
+  const jgonfroy = {
     name: 'jgonfroy',
     email: 'jgonfroy@student.42.fr',
     id42: 2
   }
-  const user3 = {
+  let jgonfroyCookies: Array<string>;
+  let jgonfroyBearers: Array<string>;
+  const cleloup = {
     name: 'cleloup',
     email: 'cleloup@student.42.fr',
     id42: 3
   }
-  
-  let cookies: Array<string>;
-  let bearers: Array<string>;
-  const cookies_regex = /Authentication=.*; HttpOnly; Path=\/; SameSite=Strict; Expires=.*,Refresh=.*; HttpOnly; Path=\/; SameSite=Strict; Expires=.*/;
+  let cleloupCookies: Array<string>;
+  let cleloupBearers: Array<string>;
+  const amartin = {
+    name: 'amartin',
+    email: 'amartin@student.42.fr',
+    id42: 4
+  }
+  let amartinCookies: Array<string>;
+  let amartinBearers: Array<string>;
 
+  const cookies_regex = /Authentication=.*; HttpOnly; Path=\/; SameSite=Strict; Expires=.*,Refresh=.*; HttpOnly; Path=\/; SameSite=Strict; Expires=.*/;
   describe('Authentication', () => {
     describe('registering users for tests', () => {
-      it('user1', () => {
-        return request(app.getHttpServer())
-          .post('/api/authentication/register')
-          .send(user1)
-          .expect((res) =>  {
-            expect(res.body).toEqual({
-              id: 1,
-              name: user1.name,
-              authentication: expect.any(String),
-              refresh: expect.any(String),
-              accessTokenExpiration: expect.any(String),
-              refreshTokenExpiration: expect.any(String)
-            });
-            expect(res.body.authentication).toHaveLength(191);
-            expect(res.body.refresh).toHaveLength(191);
-            expect(res.body.accessTokenExpiration).toHaveLength(24);
-            expect(res.body.refreshTokenExpiration).toHaveLength(24);
-          })
-          .expect(201)
-          .expect('set-cookie', cookies_regex);
-      });
-      it('user2', () => {
-        return request(app.getHttpServer())
-          .post('/api/authentication/register')
-          .send(user2)
-          .expect((res) =>  {
-            expect(res.body).toEqual({
-              id: 2,
-              name: user2.name,
-              authentication: expect.any(String),
-              refresh: expect.any(String),
-              accessTokenExpiration: expect.any(String),
-              refreshTokenExpiration: expect.any(String)
-            });
-            expect(res.body.authentication).toHaveLength(191);
-            expect(res.body.refresh).toHaveLength(191);
-            expect(res.body.accessTokenExpiration).toHaveLength(24);
-            expect(res.body.refreshTokenExpiration).toHaveLength(24);
-          })
-          .expect(201)
-          .expect('set-cookie', cookies_regex);
-      });
-
-      // cleloup is the testing user !
-      it('user3 -> get the cookie and bearer', async () => {
+      it('fhenrion', async () => {
         const response = await request(app.getHttpServer())
           .post('/api/authentication/register')
-          .send(user3)
+          .send(fhenrion)
+          .expect((res) => {
+            expect(res.body).toEqual({
+              id: 1,
+              name: fhenrion.name,
+              authentication: expect.any(String),
+              refresh: expect.any(String),
+              accessTokenExpiration: expect.any(String),
+              refreshTokenExpiration: expect.any(String)
+            });
+            expect(res.body.authentication).toHaveLength(191);
+            expect(res.body.refresh).toHaveLength(191);
+            expect(res.body.accessTokenExpiration).toHaveLength(24);
+            expect(res.body.refreshTokenExpiration).toHaveLength(24);
+          })
+          .expect(201)
+          .expect('set-cookie', cookies_regex);
+        fhenrionCookies = response.headers['set-cookie'];
+        fhenrionBearers = [response.body.authentication, response.body.refresh];
+      });
+
+      it('jgonfroy', async () => {
+        const response = await request(app.getHttpServer())
+          .post('/api/authentication/register')
+          .send(jgonfroy)
+          .expect((res) => {
+            expect(res.body).toEqual({
+              id: 2,
+              name: jgonfroy.name,
+              authentication: expect.any(String),
+              refresh: expect.any(String),
+              accessTokenExpiration: expect.any(String),
+              refreshTokenExpiration: expect.any(String)
+            });
+            expect(res.body.authentication).toHaveLength(191);
+            expect(res.body.refresh).toHaveLength(191);
+            expect(res.body.accessTokenExpiration).toHaveLength(24);
+            expect(res.body.refreshTokenExpiration).toHaveLength(24);
+          })
+          .expect(201)
+          .expect('set-cookie', cookies_regex);
+        jgonfroyCookies = response.headers['set-cookie'];
+        jgonfroyBearers = [response.body.authentication, response.body.refresh];
+      });
+
+      it('cleloup', async () => {
+        const response = await request(app.getHttpServer())
+          .post('/api/authentication/register')
+          .send(cleloup)
           .expect((res) => {
             expect(res.body).toEqual({
               id: 3,
-              name: user3.name,
+              name: cleloup.name,
               authentication: expect.any(String),
               refresh: expect.any(String),
               accessTokenExpiration: expect.any(String),
@@ -157,9 +174,33 @@ describe('AppController (e2e)', () => {
           })
           .expect(201)
           .expect('set-cookie', cookies_regex);
-        cookies = response.headers['set-cookie'];
-        bearers = [response.body.authentication, response.body.refresh];
-      })
+        cleloupCookies = response.headers['set-cookie'];
+        cleloupBearers = [response.body.authentication, response.body.refresh];
+      });
+
+      it('amartin', async () => {
+        const response = await request(app.getHttpServer())
+          .post('/api/authentication/register')
+          .send(amartin)
+          .expect((res) => {
+            expect(res.body).toEqual({
+              id: 4,
+              name: amartin.name,
+              authentication: expect.any(String),
+              refresh: expect.any(String),
+              accessTokenExpiration: expect.any(String),
+              refreshTokenExpiration: expect.any(String)
+            });
+            expect(res.body.authentication).toHaveLength(191);
+            expect(res.body.refresh).toHaveLength(191);
+            expect(res.body.accessTokenExpiration).toHaveLength(24);
+            expect(res.body.refreshTokenExpiration).toHaveLength(24);
+          })
+          .expect(201)
+          .expect('set-cookie', cookies_regex);
+        amartinCookies = response.headers['set-cookie'];
+        amartinBearers = [response.body.authentication, response.body.refresh];
+      });
     });
 
     describe('authenticate without cookie or bearer', () => {
@@ -174,13 +215,13 @@ describe('AppController (e2e)', () => {
       it('should return user', () => {
         return request(app.getHttpServer())
           .get('/api/authentication')
-          .set('cookie', cookies[0])
+          .set('cookie', cleloupCookies[0])
           .expect((res) =>  {
             expect(res.body).toEqual({
               id: 3,
-              name: user3.name,
-              email: user3.email,
-              id42: user3.id42,
+              name: cleloup.name,
+              email: cleloup.email,
+              id42: cleloup.id42,
               isTwoFactorAuthenticationEnabled: false
             });
           })
@@ -192,13 +233,13 @@ describe('AppController (e2e)', () => {
       it('should return user', () => {
         return request(app.getHttpServer())
           .get('/api/authentication')
-          .set('authorization', `bearer ${bearers[0]}`)
+          .set('authorization', `bearer ${fhenrionBearers[0]}`)
           .expect((res) =>  {
             expect(res.body).toEqual({
-              id: 3,
-              name: user3.name,
-              email: user3.email,
-              id42: user3.id42,
+              id: 1,
+              name: fhenrion.name,
+              email: fhenrion.email,
+              id42: fhenrion.id42,
               isTwoFactorAuthenticationEnabled: false
             });
           })
@@ -215,14 +256,14 @@ describe('AppController (e2e)', () => {
     });
 
     describe('refresh the jwt token with cookie', () => {
-      it('should return auth infos', () => {
-        return request(app.getHttpServer())
+      it('should return auth infos', async () => {
+        const response = await request(app.getHttpServer())
           .get('/api/authentication/refresh')
-          .set('cookie', cookies[1])
+          .set('cookie', cleloupCookies[1])
           .expect((res) => {
             expect(res.body).toEqual({
               id: 3,
-              name: user3.name,
+              name: cleloup.name,
               authentication: expect.any(String),
               refresh: expect.any(String),
               accessTokenExpiration: expect.any(String),
@@ -233,19 +274,22 @@ describe('AppController (e2e)', () => {
             expect(res.body.accessTokenExpiration).toHaveLength(24);
             expect(res.body.refreshTokenExpiration).toHaveLength(24);
           })
-          .expect(200);
+          .expect(200)
+          .expect('set-cookie', cookies_regex);
+        cleloupCookies = response.headers['set-cookie'];
+        cleloupBearers = [response.body.authentication, response.body.refresh];
       });
     });
 
     describe('refresh the jwt token with bearer', () => {
-      it('should return auth infos', () => {
-        return request(app.getHttpServer())
+      it('should return auth infos', async () => {
+        const response = await request(app.getHttpServer())
           .get('/api/authentication/refresh')
-          .set('authorization', `bearer ${bearers[1]}`)
+          .set('authorization', `bearer ${jgonfroyBearers[1]}`)
           .expect((res) => {
             expect(res.body).toEqual({
-              id: 3,
-              name: user3.name,
+              id: 2,
+              name: jgonfroy.name,
               authentication: expect.any(String),
               refresh: expect.any(String),
               accessTokenExpiration: expect.any(String),
@@ -256,7 +300,10 @@ describe('AppController (e2e)', () => {
             expect(res.body.accessTokenExpiration).toHaveLength(24);
             expect(res.body.refreshTokenExpiration).toHaveLength(24);
           })
-          .expect(200);
+          .expect(200)
+          .expect('set-cookie', cookies_regex);
+        jgonfroyCookies = response.headers['set-cookie'];
+        jgonfroyBearers = [response.body.authentication, response.body.refresh];
       });
     });
 
@@ -265,7 +312,7 @@ describe('AppController (e2e)', () => {
         const URL = "http://localhost:9090/test"
         const CONFIG = {
           extraHeaders: {
-            cookie: cookies[0]
+            cookie: cleloupCookies[0]
           },
           autoConnect: false
         }
@@ -282,14 +329,13 @@ describe('AppController (e2e)', () => {
             });
   
             socket.on('receive_message', (recievedMessage: string) => {
-              socket.disconnect();
               socket.close();
               resolve(recievedMessage);
             });
 
             socket.connect();
           });
-          expect(message).toBe(user3.name);
+          expect(message).toBe(cleloup.name);
         } catch (err) {
           throw err;
         }
@@ -301,7 +347,7 @@ describe('AppController (e2e)', () => {
         const URL = "http://localhost:9090/test"
         const CONFIG = {
           extraHeaders: {
-            authorization: `bearer ${bearers[0]}`
+            authorization: `bearer ${amartinBearers[0]}`
           },
           autoConnect: false
         }
@@ -318,14 +364,13 @@ describe('AppController (e2e)', () => {
             });
   
             socket.on('receive_message', (recievedMessage: string) => {
-              socket.disconnect();
               socket.close();
               resolve(recievedMessage);
             });
 
             socket.connect();
           });
-          expect(message).toBe(user3.name);
+          expect(message).toBe(amartin.name);
         } catch (err) {
           throw err;
         }
@@ -351,7 +396,6 @@ describe('AppController (e2e)', () => {
             });
   
             socket.on('receive_message', (recievedMessage: string) => {
-              socket.disconnect();
               socket.close();
               resolve(recievedMessage);
             });
@@ -364,34 +408,95 @@ describe('AppController (e2e)', () => {
         }
       });
     });
+    
 
-    describe('channel test gateway with cookie', () => {
-      it('should connect and return the message', (done) => {
+    describe('channel test gateway users PM', () => {
+      it('cleloup should receive coucou from fhenrion', async () => {
         const URL = "http://localhost:9090/channel"
-        const CONFIG = {
-          extraHeaders: {
-            cookie: cookies[0]
-          }
-        }
-        const socket = io(URL, CONFIG);
+        const sockets = [
+          io(URL, {
+            autoConnect: false,
+            extraHeaders: {
+              authorization: '',
+              cookie: ''
+            },
+          }),
+          io(URL, {
+            autoConnect: false,
+            extraHeaders: {
+              authorization: '',
+              cookie: ''
+            },
+          })
+        ];
+        // extraHeaders need to be set manually because of a weird bug of socket.io-client with multiple clients
+        sockets[0].io.opts.extraHeaders.cookie = ''
+        sockets[0].io.opts.extraHeaders.authorization = `bearer ${fhenrionBearers[0]}`
+        sockets[1].io.opts.extraHeaders.cookie = cleloupCookies[0]
+        sockets[1].io.opts.extraHeaders.authorization = ''
+        try {
+          const messages = await new Promise(async (resolve, reject) => {
+            sockets[0].on("connect", () => {
+              sockets[0].emit('send_message', { content: 'coucou', recipient: 'cleloup' });
+              sockets[0].close();
+            });
 
-        socket.on("connect", () => {
-          socket.emit('send_message', { content: 'Youhou', recipient: 'toto'});
-        });
+            sockets[1].on("connect", () => {
+              sockets[1].emit('request_messages', 'cleloup');
+            });
+
+            sockets[1].on("messagesByChannel", (receivedMessages: Message[]) => {
+              sockets[1].close();
+              resolve(receivedMessages);
+            });
+            
+            sockets[1].on("connect_error", (err) => {
+              if (sockets[0].connected) {
+                sockets[0].close();
+              }
+              sockets[1].close();
+              reject(err);
+            });
+
+            sockets[0].on("connect_error", (err) => {
+              if (sockets[1].connected) {
+                sockets[1].close();
+              }
+              sockets[0].close();
+              reject(err);
+            });
+
+            sockets[0].connect();
+            setTimeout((socket) => {
+              socket.connect();
+            }, 3000, sockets[1])
+          });
+          expect(messages).toEqual([{
+            content: 'coucou',
+            id: 1,
+            recipient: 'cleloup',
+            author: {
+              email: "fhenrion@student.42.fr",
+              id: 1,
+              name: "fhenrion",
+            }
+          }]);
+        } catch (err) {
+          throw err;
+        }
       });
     });
+
     describe('logout', () => {
       const empty_cookies = 'Authentication=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0,Refresh=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0';
       
-      it('should return empty cookies', () => {
-        return request(app.getHttpServer())
+      it('should return empty cookies', async () => {
+        const res = await request(app.getHttpServer())
           .post('/api/authentication/log-out')
-          .set('cookie', cookies[0])
+          .set('cookie', cleloupCookies[0])
           .expect(200)
-          .expect('set-cookie', empty_cookies)
-          .then((res) => {
-            cookies = res.headers['set-cookie'];
-          });
+          .expect('set-cookie', empty_cookies);
+        cleloupCookies = res.headers['set-cookie'];
       })
     });
 
@@ -399,7 +504,7 @@ describe('AppController (e2e)', () => {
       it('should throw an error', () => {
         return request(app.getHttpServer())
           .get('/api/authentication')
-          .set('cookie', cookies[0])
+          .set('cookie', cleloupCookies[0])
           .expect(401)
       });
     });
