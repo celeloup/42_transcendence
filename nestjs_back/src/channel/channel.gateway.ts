@@ -12,6 +12,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import ChannelService from './channel.service'
+import Channel from './channel.entity';
  
 @WebSocketGateway({ serveClient: false, namespace: '/channel' })
 export default class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -54,11 +55,11 @@ export default class SocketGateway implements OnGatewayInit, OnGatewayConnection
   
   @SubscribeMessage('send_message')
   async listenForMessages(
-    @MessageBody() data: {content: string, recipient: string},
+    @MessageBody() data: {content: string, recipient: Channel},
     @ConnectedSocket() client: Socket,
   ) {
      const author = await this.channelService.getUserFromSocket(client);
-      this.logger.log(`Message from ${this.connectedUser.get(client.id)} to ${data.recipient}: ${data.content}`);
+      this.logger.log(`Message from ${this.connectedUser.get(client.id)} to ${data.recipient.name}: ${data.content}`);
       const message = await this.channelService.saveMessage(data.content, author, data.recipient);
   }
 
