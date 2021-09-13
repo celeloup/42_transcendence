@@ -23,7 +23,7 @@ export default class JwtRefreshTokenStrategy extends PassportStrategy(
         }
         return request?.cookies?.Refresh;
       }]),
-      secretOrKey: configService.get('JWT_REFRESH_TOKEN_SECRET'),
+      secretOrKey: configService.get('JWT_REFRESH_SECRET'),
       passReqToCallback: true,
     });
   }
