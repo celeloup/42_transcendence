@@ -22,7 +22,7 @@ export default class AuthenticationService {
 
   public async getUserFromAuthenticationToken(token: string): Promise<User> {
     const payload: TokenPayload = this.jwtService.verify(token, {
-      secret: this.configService.get('JWT_authentication_SECRET')
+      secret: this.configService.get('JWT_SECRET')
     });
     if (payload.userId) {
       return this.usersService.getById(payload.userId);
@@ -71,9 +71,9 @@ export default class AuthenticationService {
 
   public async getJwtRefreshToken(userId: number, isSecondFactorAuthenticated = false): Promise<jwt> {
     const payload: TokenPayload = { userId, isSecondFactorAuthenticated };
-    const expire_time = this.configService.get('JWT_REFRESH_TOKEN_EXPIRATION_TIME');
+    const expire_time = this.configService.get('JWT_REFRESH_EXPIRATION_TIME');
     const token = this.jwtService.sign(payload, {
-      secret: this.configService.get('JWT_REFRESH_TOKEN_SECRET'),
+      secret: this.configService.get('JWT_REFRESH_SECRET'),
       expiresIn: `${expire_time}s`
     });
     await this.usersService.setCurrentRefreshToken(token, userId);
