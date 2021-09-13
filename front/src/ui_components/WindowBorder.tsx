@@ -10,10 +10,10 @@ type Props = {
 function WindowBorder( { w, h, children}: Props) {
 	return (
 		<div style={{ height: h, width: w}} className="window">
-			<div className="border_top"></div>
-			<div className="border_bottom"></div>
-			<div className="border_right"></div>
-			<div className="border_left"></div>
+			<div className="border_div border_top"></div>
+			<div className="border_div border_bottom"></div>
+			<div className="border_div border_right"></div>
+			<div className="border_div border_left"></div>
 			<div>
 				{children}
 			</div>
