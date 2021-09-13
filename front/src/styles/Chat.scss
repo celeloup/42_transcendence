@@ -1,7 +1,158 @@
+$accent_color: #FFCD27;
+
 #chat
 {
 	width: 100%;
-	// border: 1px solid red;
+}
+
+// *********** HEADER
+
+.chat_header
+{
+	max-width: 100%;
+	display: flex;
+}
+
+.chat_header .header_button {
+	font-size: 25px;
+	cursor: pointer;
+	padding: 4px 10px;
+}
+
+.chat_header .header_title {
+	flex-grow: 2;
+	text-align: left;
+	padding-top: 8px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.chat_header .header_title i {
+	font-size: 20px;
+	margin: 0 10px 0 15px;
+}
+
+// ********** MESSAGES BOX
+
+#chat_messages {
+	height: 560px;
+    display: flex;
+    flex-direction: column-reverse;
+    overflow-y: scroll;
+	margin-top: 12px;
+}
+
+// ********* DATE
+
+.chat_date {
+	font-family: "Dogica Pixel";
+	font-size: 9px;
+	position: relative;
+	text-align: right;
+	margin: 10px 20px;
+	color: #e8e8e8;
+}
+
+.chat_date::before {
+	content: "";
+	width: 150px;
+	height: 1px;
+	background-color: #e8e8e8;
+	position: absolute;
+	left: 80px;
+	top: 4px;
+}
+
+// ********* MESSAGE
+
+.chat_message {
+	display: flex;
+	padding: 10px 10px 10px 15px;
+	justify-content: space-around;
+}
+
+.chat_profile_pic {
+	width: 40px;
+	height: 40px;
+	background-color: gray;
+	border: 2px solid white;
+	border-radius: 6px;
+	margin-right: 8px;
+}
+
+.chat_message_content {
+	width: 260px;
+	text-align: left;
+}
+
+.chat_message_username {
+	color: $accent_color;
+	font-family: "Dogica Pixel";
+	font-size: 12px;
+	margin-bottom: 8px;
+}
+
+.chat_message_text {
+	font-size: 14px;
+	line-height: 140%;
+}
+
+// ********** CHAT INPUT
+
+#chat_input {
+	width: 100%;
+	height: 46px;
+	position: absolute;
+	bottom: 0;
+	display: flex;
+}
+
+#chat_input:before {
+	content: "";
+	position: absolute;
+	height: 4px;
+	width: 103%;
+	background-color: white;
+	left: -4px;
+	top: -4px;
+}
+
+#chat_input i {
+	padding: 10px;
+	font-size: 22px;
+	margin-top: 2px;
+}
+
+#chat_input input {
+	flex-grow: 2;
+	font-size: 18px;
+	color: white;
+	background: none;
+	outline: none;
+	border:none;
+}
+
+// ********** SCROLL BAR
+
+#chat_messages {
+	scrollbar-width: 9px;
+	scrollbar-color: white;
+}
+
+#chat_messages::-webkit-scrollbar {
+	width: 9px;
+	background: none;
+}
+
+#chat_messages::-webkit-scrollbar-track {
+	background: none;
+	width: 9px;
+}
+
+#chat_messages::-webkit-scrollbar-thumb {
+	background-color: white;
+	border-radius: 4px;
 }
 
 #game
