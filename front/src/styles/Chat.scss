@@ -1,4 +1,8 @@
+$background-color: #232323;
+$text-color: white;
 $accent_color: #FFCD27;
+$light-gray: #E3E3E3;
+$dark-gray: #919191;
 
 #chat
 {
@@ -68,7 +72,7 @@ $accent_color: #FFCD27;
 
 .chat_message {
 	display: flex;
-	padding: 10px 10px 10px 15px;
+	padding: 10px 10px 15px 15px;
 	justify-content: space-around;
 }
 
@@ -90,7 +94,7 @@ $accent_color: #FFCD27;
 	color: $accent_color;
 	font-family: "Dogica Pixel";
 	font-size: 12px;
-	margin-bottom: 8px;
+	margin-bottom: 5px;
 }
 
 .chat_message_text {
@@ -131,29 +135,189 @@ $accent_color: #FFCD27;
 	background: none;
 	outline: none;
 	border:none;
+	font-family: "Fira Mono";
 }
 
-// ********** SCROLL BAR
 
-#chat_messages {
-	scrollbar-width: 9px;
-	scrollbar-color: white;
+// ***************************************** CHANNEL LIST
+
+#channelList {
+	height: 100%;
+	width:100%;
+	display: flex;
+	position: absolute;
 }
 
-#chat_messages::-webkit-scrollbar {
-	width: 9px;
-	background: none;
+.channelList {
+	// background-color: red;
+	height: calc(100% - 80px);
+	padding-top: 10px;
+	overflow-y: scroll;
 }
 
-#chat_messages::-webkit-scrollbar-track {
-	background: none;
-	width: 9px;
-}
-
-#chat_messages::-webkit-scrollbar-thumb {
+#channelList::after {
+	content: "";
+	z-index: 1;
+	width: 4px;
+	height: 686px;
 	background-color: white;
-	border-radius: 4px;
+	position: absolute;
+	left: 324px;
+	top: -8px;
 }
+
+.channelListWrapper {
+	height: 100%;
+	width: 320px;
+	background-color: $background-color;
+	outline: 4px solid $background-color;
+	color: $background-color;
+	z-index: 1;
+	text-align: left;
+	color: white;
+}
+
+.dummyModal {
+	flex-grow: 1;
+	z-index: 1;
+	height: 100%;
+	// margin-left: 4px;
+	// background-color: $background-color;
+	// opacity: 0.9;
+}
+
+.channelListWrapper .closeIcon {
+	font-size: 30px;
+	position: absolute;
+	left: 292px;
+	top: 11px;
+	cursor: pointer;
+	// color: $accent_color;
+}
+
+// .channelListWrapper .closeIcon:hover {
+// 	color: $accent_color;
+// }
+
+.channelListTitle {
+	color: $accent_color;
+	font-size: 20px;
+	font-family: "Dogica Pixel";
+	margin: 20px 0 20px 40px;
+	// text-align: center;
+}
+
+.channel {
+	display:flex;
+	align-items: center;
+	cursor: pointer;
+	border-radius: 5px;
+	margin: 5px 10px;
+}
+
+.channel.selected {
+	background-color: $light-gray;
+	color: $background-color;
+}
+
+.channel:not(.selected):hover {
+	background-color: $dark-gray;
+	// color: $background-color
+}
+
+.channelImg {
+	margin: 10px 15px 10px 10px;
+	width: 35px;
+	height: 35px;
+	background-color: $dark-gray;
+	border: 2px solid white;
+	border-radius: 5px;
+	position: relative;
+}
+
+.dm::after {
+	content:"";
+	width: 15px;
+	height:  15px;
+	background-color: green;
+	position: absolute;
+	bottom: -5px;
+	right: -5px;
+	border-radius: 50%;
+}
+
+// *************************************************** SEARCH BAR
+
+.channelSearchBar {
+	display: flex;
+	width: 240px;
+	height: 25px;
+	margin: 15px 10px 10px 10px;
+	background-color: $background-color;
+	border: 2px solid white;
+	border-radius: 5px;
+	padding: 5px 10px;
+}
+
+#channelSearch {
+	flex-grow: 2;
+	font-size: 14px;	
+	outline: none;
+	font-family: "Fira Mono";
+	color: white;
+	background-color: $background-color;
+	border: none;
+}
+
+#channelSearch::placeholder {
+	color: $light-gray;
+}
+
+#searchButton {
+	padding-top: 2px;
+	padding-left: 5px;
+	font-size: 20px;
+	color: $light-gray;
+}
+
+// ****************** SEPARATOR
+
+.separator {
+	font-size: 14px;
+	display: flex;
+	width: 90%;
+	margin-left: 10px;
+	margin-top: 5px;
+	padding-bottom: 10px;
+	cursor: pointer;
+}
+
+.separator div:first-child {
+	flex-grow: 2;
+}
+
+.add_channel_button {
+	font-size: 25px;
+	color: $background-color;
+	background-color: white;
+	width: 20px;
+	height: 20px;
+	text-align: center;
+	border-radius: 50%;
+	line-height: 85%;
+	margin-top: -2px;
+	cursor: pointer;background-color: $accent_color;
+}
+
+.separator div:first-child i {
+	width: 10px;
+	margin: 0 10px 0 0;
+}
+
+.publicChannels {
+	margin-bottom: 20px;
+}
+
 
 #game
 {

@@ -126,7 +126,7 @@ $accent_color: #FFCD27;
 {
 	position: relative;
 	display:flex;
-	margin-left: 98.5%;
+	margin-left: calc(100vw - 26px);
 	margin-top: -100px;
 }
 
@@ -179,6 +179,28 @@ $accent_color: #FFCD27;
 	color: $background-color;
 	font-family: "Dogica Pixel";
 	font-size: 14px;
+}
+
+// ********** SCROLL BAR
+
+* {
+	scrollbar-width: 9px;
+	scrollbar-color: white;
+}
+
+*::-webkit-scrollbar {
+	width: 9px;
+	background: none;
+}
+
+*::-webkit-scrollbar-track {
+	background: none;
+	width: 9px;
+}
+
+*::-webkit-scrollbar-thumb {
+	background-color: white;
+	border-radius: 4px;
 }
 
 
