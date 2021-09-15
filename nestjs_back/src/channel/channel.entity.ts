@@ -34,7 +34,7 @@ class Channel {
   @ManyToMany(() => User, (muted: User) => muted.mute)
   public muted: User[];
 
-  @OneToMany(() => Message, (message: Message) => message.channel)
+  @OneToMany(() => Message, (message: Message) => message.recipient)
   public historic: Message[];
 }
 

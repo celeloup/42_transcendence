@@ -22,11 +22,16 @@ connector.on("connect", () => {
   for (const [i, client] of clients.entries()) {
     client.on("connect", () => {
       console.log(`client ${i}: connected!`);
+      
+      client.on("getUsers", (data)=> {
+        console.log(`client ${i}: ${JSON.stringify(data)}`);
+      });
+      
       setTimeout(() => {
 		  const message = `Hello from client ${i}!`;
 		  const recipient = `toto`;
 
-		  client.emit('send_message', { content: message , recipient: recipient});
+		  client.emit('send_message', { content: message , recipient: null});
       }, Math.random() * (8000 - 3000) + 3000);
       
       client.emit("request_messages", 'toto');
@@ -41,8 +46,11 @@ connector.on("connect", () => {
       console.log(`client ${i}: ${JSON.stringify(data)}`);
     });
 
-  }
+    client.on("getUsers", (data)=> {
+      console.log(`client ${i}: ${JSON.stringify(data)}`);
+    });
 
+  }
  setTimeout(() => {
    console.log(`End of the test! send reset to the api...`);
    connector.emit("reset_counter");

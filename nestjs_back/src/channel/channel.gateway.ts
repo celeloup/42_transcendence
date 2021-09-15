@@ -20,7 +20,7 @@ export default class SocketGateway implements OnGatewayInit, OnGatewayConnection
   private server: Server;
   private logger: Logger = new Logger("ChannelGateway");
 
-  private connectedUser: Map<string, string> = new Map();
+  private connectedUsers: Map<string, string> = new Map();
   private socketUsers: Map<string, Socket> = new Map();
 
   constructor(
@@ -31,21 +31,22 @@ export default class SocketGateway implements OnGatewayInit, OnGatewayConnection
     this.logger.log("Initialized")
   }
 
+  //est-ce qu'il faut emit une notif au serveur des que quelqu'un se co/deco ?
   async handleConnection(client: Socket, ...args: any[]) {
     const user = await this.channelService.getUserFromSocket(client);
     if (user) {
       //si id compris dans client pourquoi ne pas garder qu'une map socket user ?
-      this.connectedUser.set(client.id, user.name);
+      this.connectedUsers.set(client.id, user.name);
       this.socketUsers.set(client.id, client);
     } else {
-      this.connectedUser.set(client.id, `client test`);
+      this.connectedUsers.set(client.id, `client test`);
     }
-    this.logger.log(`Connection: ${this.connectedUser.get(client.id)}`);
+    this.logger.log(`Connection: ${this.connectedUsers.get(client.id)}`);
   }
 
   handleDisconnect(client: Socket) {
-    this.logger.log(`Disconnect: ${this.connectedUser.get(client.id)}`);
-    this.connectedUser.delete(client.id);
+    this.logger.log(`Disconnect: ${this.connectedUsers.get(client.id)}`);
+    this.connectedUsers.delete(client.id);
     this.socketUsers.delete(client.id);
   }
 
@@ -59,19 +60,27 @@ export default class SocketGateway implements OnGatewayInit, OnGatewayConnection
     @ConnectedSocket() client: Socket,
   ) {
      const author = await this.channelService.getUserFromSocket(client);
-      this.logger.log(`Message from ${this.connectedUser.get(client.id)} to ${data.recipient.name}: ${data.content}`);
+      this.logger.log(`Message from ${this.connectedUsers.get(client.id)} to ${data.recipient.name}: ${data.content}`);
       const message = await this.channelService.saveMessage(data.content, author, data.recipient);
-  }
+      //est-ce que j'envoie directement aux membres du channel connecte ou c'est overkill ?
+      this.server.sockets.emit('receive_message', data);
+    }
 
   @SubscribeMessage('request_messages')
   async requestMessagesByChannel(
     @ConnectedSocket() socket: Socket,
-    @MessageBody() channel: string,
+    @MessageBody() channel: Channel,
   )
   {
-    this.logger.log(`Request message of ${channel}`);
-    // await this.channelService.getUserFromSocket(socket);
+    this.logger.log(`Request message of ${channel.name}`);
     const messages = await this.channelService.getMessageByChannel(channel);
     socket.emit('messagesByChannel', messages);
+  }
+
+  @SubscribeMessage('get_users')
+  async requestConnectedUsers(@ConnectedSocket() socket: Socket)
+  {
+    this.logger.log(`List of connected users`);
+    socket.emit('connectedUsers', Array.from(this.connectedUsers.values()));
   }
 }
