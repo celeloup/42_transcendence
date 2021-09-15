@@ -25,7 +25,7 @@ class Channel {
   @ManyToOne(() => User, (owner: User) => owner.owned)
   public owner: User;
 
-  @ManyToMany(() => User, (admin: User) => admin.admin)
+  @ManyToMany(() => User, (admin: User) => admin.chan_admin)
   public admin: User[];
 
   @ManyToMany(() => User, (banned: User) => banned.ban)
