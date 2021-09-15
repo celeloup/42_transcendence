@@ -20,8 +20,8 @@ export default class SocketGateway implements OnGatewayInit, OnGatewayConnection
   private server: Server;
   private logger: Logger = new Logger("ChannelGateway");
 
-  private connectedUsers: Map<string, string> = new Map();
-  private socketUsers: Map<string, Socket> = new Map();
+  private connectedUsers: Map<Socket, string> = new Map();
+  // private socketUsers: Map<string, Socket> = new Map();
 
   constructor(
     private readonly channelService: ChannelService
@@ -36,18 +36,26 @@ export default class SocketGateway implements OnGatewayInit, OnGatewayConnection
     const user = await this.channelService.getUserFromSocket(client);
     if (user) {
       //si id compris dans client pourquoi ne pas garder qu'une map socket user ?
-      this.connectedUsers.set(client.id, user.name);
-      this.socketUsers.set(client.id, client);
+      this.connectedUsers.set(client, user.name);
+      // this.socketUsers.set(client.id, client);
     } else {
-      this.connectedUsers.set(client.id, `client test`);
+      this.connectedUsers.set(client, `client test`);
     }
-    this.logger.log(`Connection: ${this.connectedUsers.get(client.id)}`);
+    this.logger.log(`Connection: ${this.connectedUsers.get(client)}`);
+    this.connectedUsers.forEach((value: string, key: Socket) => {
+      key.emit('connectedUsers', Array.from(this.connectedUsers.values()));
+  });
+    // client.emit('connectedUsers', Array.from(this.connectedUsers.values()));
   }
 
   handleDisconnect(client: Socket) {
-    this.logger.log(`Disconnect: ${this.connectedUsers.get(client.id)}`);
-    this.connectedUsers.delete(client.id);
-    this.socketUsers.delete(client.id);
+    this.logger.log(`Disconnect: ${this.connectedUsers.get(client)}`);
+    this.connectedUsers.delete(client);
+    // this.socketUsers.delete(client.id);
+    this.connectedUsers.forEach((value: string, key: Socket) => {
+      key.emit('connectedUsers', Array.from(this.connectedUsers.values()));
+  });
+    // client.emit('connectedUsers', Array.from(this.connectedUsers.values()));
   }
 
   /*remplacer recipient string par channel une fois cree
@@ -60,10 +68,12 @@ export default class SocketGateway implements OnGatewayInit, OnGatewayConnection
     @ConnectedSocket() client: Socket,
   ) {
      const author = await this.channelService.getUserFromSocket(client);
-      this.logger.log(`Message from ${this.connectedUsers.get(client.id)} to ${data.recipient.name}: ${data.content}`);
+      this.logger.log(`Message from ${this.connectedUsers.get(client)} to ${data.recipient.name}: ${data.content}`);
       const message = await this.channelService.saveMessage(data.content, author, data.recipient);
       //est-ce que j'envoie directement aux membres du channel connecte ou c'est overkill ?
-      this.server.sockets.emit('receive_message', data);
+      this.connectedUsers.forEach((value: string, key: Socket) => {
+        key.emit('receive_message', data);
+    });
     }
 
   @SubscribeMessage('request_messages')
@@ -74,7 +84,7 @@ export default class SocketGateway implements OnGatewayInit, OnGatewayConnection
   {
     this.logger.log(`Request message of ${channel.name}`);
     const messages = await this.channelService.getMessageByChannel(channel);
-    socket.emit('messagesByChannel', messages);
+    socket.emit('messages_channel', messages);
   }
 
   @SubscribeMessage('get_users')
