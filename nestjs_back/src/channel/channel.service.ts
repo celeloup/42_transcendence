@@ -7,8 +7,9 @@ import Message from './message.entity';
 import User from '../users/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import Channel from './channel.entity';
 
- 
+
 @Injectable()
 export default class ChannelService {
   constructor(
@@ -17,7 +18,7 @@ export default class ChannelService {
     private messagesRepository: Repository<Message>,
   ) {
   }
-    async saveMessage(content: string, author: User, recipient: string) {
+    async saveMessage(content: string, author: User, recipient: Channel) {
       const newMessage = await this.messagesRepository.create({
         content,
         author,
@@ -27,7 +28,7 @@ export default class ChannelService {
       return newMessage;
     }
 
-    async getMessageByChannel(channel: string) {
+    async getMessageByChannel(channel: Channel) {
       return this.messagesRepository.find({
         where : {recipient: channel },
         relations: ["author"]
