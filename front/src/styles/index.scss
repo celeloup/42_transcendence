@@ -1,0 +1,58 @@
+$background-color: #232323;
+$text-color: white;
+$accent_color: #FFCD27;
+
+@font-face {
+	font-family: "Dogica";
+	src: url("../assets/fonts/dogicapixel.ttf") format("truetype");
+	font-weight: normal;
+}
+
+@font-face {
+	font-family: "Dogica";
+	src: url("../assets/fonts/dogicapixelbold.ttf") format("truetype");
+	font-weight: bold;
+}
+
+@font-face {
+	font-family: "Fira Mono";
+	src: url("../assets/fonts/FiraMono-Regular.ttf") format("truetype");
+	font-weight: normal;
+}
+
+@font-face {
+	font-family: "Fira Mono";
+	src: url("../assets/fonts/FiraMono-Bold.ttf") format("truetype");
+	font-weight: bold;
+}
+
+@font-face {
+	font-family: "Star Jedi";
+	src: url("../assets/fonts/Starjedi.ttf") format("truetype");
+	font-weight: regular;
+}
+
+* {
+	margin: 0;
+	padding: 0;
+  }
+
+html {
+	background-color: $background-color;
+	color: $text-color;
+	font-family: "Fira Mono";
+	overflow-x: hidden
+}
+
+a {
+	// color: white;
+	text-decoration: none;
+}
+
+.body_wrapper {
+	display: flex;
+	width: 1215px;
+	margin: auto;
+	margin-top: 50px;
+	margin-bottom: 50px;
+}
