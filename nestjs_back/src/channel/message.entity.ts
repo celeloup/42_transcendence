@@ -1,6 +1,7 @@
 import { ExecSyncOptionsWithBufferEncoding } from 'child_process';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 import User from '../users/user.entity';
+import Channel from './channel.entity';
 
 @Entity()
 class Message {
@@ -13,11 +14,9 @@ class Message {
   @ManyToOne(() => User)
   public author: User;
 
-  //@ManyToOne(() => Channel)
-  // public recipient: string;
+  @ManyToOne(() => Channel, (channel: Channel) => channel.historic)
+  public recipient: Channel;
 
-  @Column()
-  public recipient: string;
   }
 
 export default Message;
