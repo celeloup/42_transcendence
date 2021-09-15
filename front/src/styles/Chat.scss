@@ -1,0 +1,375 @@
+$background-color: #232323;
+$text-color: white;
+$accent_color: #FFCD27;
+$light-gray: #E3E3E3;
+$dark-gray: #919191;
+
+#chat
+{
+	width: 100%;
+}
+
+// *********** HEADER
+
+.chat_header
+{
+	max-width: 100%;
+	display: flex;
+}
+
+.chat_header .header_button {
+	font-size: 25px;
+	cursor: pointer;
+	padding: 4px 10px;
+}
+
+.chat_header .header_title {
+	flex-grow: 2;
+	text-align: left;
+	padding-top: 8px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.chat_header .header_title i {
+	font-size: 20px;
+	margin: 0 10px 0 15px;
+}
+
+// ********** MESSAGES BOX
+
+#chat_messages {
+	height: 560px;
+    display: flex;
+    flex-direction: column-reverse;
+    overflow-y: scroll;
+	margin-top: 12px;
+}
+
+// ********* DATE
+
+.chat_date {
+	font-family: "Dogica Pixel";
+	font-size: 9px;
+	position: relative;
+	text-align: right;
+	margin: 10px 20px;
+	color: #e8e8e8;
+}
+
+.chat_date::before {
+	content: "";
+	width: 150px;
+	height: 1px;
+	background-color: #e8e8e8;
+	position: absolute;
+	left: 80px;
+	top: 4px;
+}
+
+// ********* MESSAGE
+
+.chat_message {
+	display: flex;
+	padding: 10px 10px 15px 15px;
+	justify-content: space-around;
+}
+
+.chat_profile_pic {
+	width: 40px;
+	height: 40px;
+	background-color: gray;
+	border: 2px solid white;
+	border-radius: 6px;
+	margin-right: 8px;
+}
+
+.chat_message_content {
+	width: 260px;
+	text-align: left;
+}
+
+.chat_message_username {
+	color: $accent_color;
+	font-family: "Dogica Pixel";
+	font-size: 12px;
+	margin-bottom: 5px;
+}
+
+.chat_message_text {
+	font-size: 14px;
+	line-height: 140%;
+}
+
+// ********** CHAT INPUT
+
+#chat_input {
+	width: 100%;
+	height: 46px;
+	position: absolute;
+	bottom: 0;
+	display: flex;
+}
+
+#chat_input:before {
+	content: "";
+	position: absolute;
+	height: 4px;
+	width: 103%;
+	background-color: white;
+	left: -4px;
+	top: -4px;
+}
+
+#chat_input i {
+	padding: 10px;
+	font-size: 22px;
+	margin-top: 2px;
+}
+
+#chat_input input {
+	flex-grow: 2;
+	font-size: 18px;
+	color: white;
+	background: none;
+	outline: none;
+	border:none;
+	font-family: "Fira Mono";
+}
+
+
+// ***************************************** CHANNEL LIST
+
+#channelList {
+	height: 100%;
+	width:100%;
+	display: flex;
+	position: absolute;
+}
+
+.channelList {
+	// background-color: red;
+	height: calc(100% - 80px);
+	padding-top: 10px;
+	overflow-y: scroll;
+	position: relative;
+}
+
+#channelList::after {
+	content: "";
+	z-index: 1;
+	width: 4px;
+	height: 686px;
+	background-color: white;
+	position: absolute;
+	left: 324px;
+	top: -8px;
+	z-index: 0;
+}
+
+.channelListWrapper {
+	height: 100%;
+	width: 320px;
+	background-color: $background-color;
+	outline: 4px solid $background-color;
+	color: $background-color;
+	z-index: 1;
+	text-align: left;
+	color: white;
+}
+
+.dummyModal {
+	flex-grow: 1;
+	z-index: 1;
+	height: 100%;
+	// margin-left: 4px;
+	// background-color: $background-color;
+	// opacity: 0.9;
+}
+
+.channelListWrapper .closeIcon {
+	font-size: 30px;
+	position: absolute;
+	left: 292px;
+	top: 11px;
+	cursor: pointer;
+	// color: $accent_color;
+}
+
+// .channelListWrapper .closeIcon:hover {
+// 	color: $accent_color;
+// }
+
+.channelListTitle {
+	color: $accent_color;
+	font-size: 20px;
+	font-family: "Dogica Pixel";
+	margin: 20px 0 20px 40px;
+	// text-align: center;
+}
+
+.channel {
+	display:flex;
+	align-items: center;
+	cursor: pointer;
+	border-radius: 5px;
+	margin: 5px 10px;
+}
+
+.channel.selected {
+	background-color: $light-gray;
+	color: $background-color;
+}
+
+.channel:not(.selected):hover {
+	background-color: $dark-gray;
+	// color: $background-color
+}
+
+.channelImg {
+	margin: 10px 15px 10px 10px;
+	width: 35px;
+	height: 35px;
+	background-color: $dark-gray;
+	border: 2px solid white;
+	border-radius: 5px;
+	position: relative;
+}
+
+.dm::after {
+	content:"";
+	width: 15px;
+	height:  15px;
+	background-color: green;
+	position: absolute;
+	bottom: -5px;
+	right: -5px;
+	border-radius: 50%;
+}
+
+// *************************************************** SEARCH BAR
+
+.channelSearchBar {
+	display: flex;
+	width: 240px;
+	height: 25px;
+	margin: 15px 10px 10px 10px;
+	background-color: $background-color;
+	border: 2px solid white;
+	border-radius: 5px;
+	padding: 5px 10px;
+}
+
+#channelSearch {
+	flex-grow: 2;
+	font-size: 14px;	
+	outline: none;
+	font-family: "Fira Mono";
+	color: white;
+	background-color: $background-color;
+	border: none;
+}
+
+#channelSearch::placeholder {
+	color: $light-gray;
+}
+
+#searchButton {
+	padding-top: 2px;
+	padding-left: 5px;
+	font-size: 20px;
+	color: #ababab;
+}
+
+// ****************** SEPARATOR
+
+.separator {
+	font-size: 14px;
+	display: flex;
+	width: 90%;
+	margin-left: 10px;
+	margin-top: 5px;
+	padding-bottom: 10px;
+	cursor: pointer;
+	-webkit-user-select: none; /* Safari */        
+	-moz-user-select: none; /* Firefox */
+	-ms-user-select: none; /* IE10+/Edge */
+	user-select: none; /* Standard */
+	// overflow: visible;
+}
+
+.separator div:first-child {
+	flex-grow: 2;
+	color: $light-gray;
+}
+
+.separator div:first-child:hover {
+	color: white;
+}
+
+.add_channel_button {
+	font-size: 25px;
+	color: $background-color;
+	background-color: white;
+	width: 20px;
+	height: 20px;
+	text-align: center;
+	border-radius: 50%;
+	line-height: 85%;
+	margin-top: -2px;
+	cursor: pointer;
+	background-color: $accent_color;
+	display: inline-block;
+}
+
+.add_channel_button .tooltiptop {
+	position: absolute;
+	display: inline-block;
+	visibility: hidden;
+	width: 140px;
+	height: 20px;
+	padding: 3px 0;
+	background-color: $accent_color;
+	border-radius: 5px;
+	text-align: center;
+	font-size: 14px;
+	margin-left: -165px;
+	margin-top: -5px;
+	z-index: 2;
+	pointer-events: none;
+}
+
+.add_channel_button .tooltiptop::after {
+	content: " ";
+	position: absolute;
+	top: 50%; /* At the bottom of the tooltip */
+	left: 100%;
+	margin-top: -5px;
+  	border-width: 5px;
+	border-style: solid;
+	border-color: transparent transparent transparent $accent_color;
+}
+
+
+.add_channel_button:hover .tooltiptop {
+	visibility: visible;
+}
+
+.separator div:first-child i {
+	width: 10px;
+	margin: 0 10px 0 0;
+}
+
+.publicChannels {
+	margin-bottom: 20px;
+}
+
+
+#game
+{
+	width: 100%;
+	// height: 670px;
+	margin-right: 17px;
+	// border: 1px solid red;
+}
