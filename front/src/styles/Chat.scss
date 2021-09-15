@@ -153,6 +153,7 @@ $dark-gray: #919191;
 	height: calc(100% - 80px);
 	padding-top: 10px;
 	overflow-y: scroll;
+	position: relative;
 }
 
 #channelList::after {
@@ -164,6 +165,7 @@ $dark-gray: #919191;
 	position: absolute;
 	left: 324px;
 	top: -8px;
+	z-index: 0;
 }
 
 .channelListWrapper {
@@ -277,7 +279,7 @@ $dark-gray: #919191;
 	padding-top: 2px;
 	padding-left: 5px;
 	font-size: 20px;
-	color: $light-gray;
+	color: #ababab;
 }
 
 // ****************** SEPARATOR
@@ -290,10 +292,20 @@ $dark-gray: #919191;
 	margin-top: 5px;
 	padding-bottom: 10px;
 	cursor: pointer;
+	-webkit-user-select: none; /* Safari */        
+	-moz-user-select: none; /* Firefox */
+	-ms-user-select: none; /* IE10+/Edge */
+	user-select: none; /* Standard */
+	// overflow: visible;
 }
 
 .separator div:first-child {
 	flex-grow: 2;
+	color: $light-gray;
+}
+
+.separator div:first-child:hover {
+	color: white;
 }
 
 .add_channel_button {
@@ -306,7 +318,42 @@ $dark-gray: #919191;
 	border-radius: 50%;
 	line-height: 85%;
 	margin-top: -2px;
-	cursor: pointer;background-color: $accent_color;
+	cursor: pointer;
+	background-color: $accent_color;
+	display: inline-block;
+}
+
+.add_channel_button .tooltiptop {
+	position: absolute;
+	display: inline-block;
+	visibility: hidden;
+	width: 140px;
+	height: 20px;
+	padding: 3px 0;
+	background-color: $accent_color;
+	border-radius: 5px;
+	text-align: center;
+	font-size: 14px;
+	margin-left: -165px;
+	margin-top: -5px;
+	z-index: 2;
+	pointer-events: none;
+}
+
+.add_channel_button .tooltiptop::after {
+	content: " ";
+	position: absolute;
+	top: 50%; /* At the bottom of the tooltip */
+	left: 100%;
+	margin-top: -5px;
+  	border-width: 5px;
+	border-style: solid;
+	border-color: transparent transparent transparent $accent_color;
+}
+
+
+.add_channel_button:hover .tooltiptop {
+	visibility: visible;
 }
 
 .separator div:first-child i {

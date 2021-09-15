@@ -95,30 +95,34 @@ function ChannelList ({ toggleDisplayList, selected } : ChannelListProps) {
 					<i id="searchButton"className="fas fa-search"></i>
 				</div>
 				<div className="channelList">
-				<div className="separator">
+					<div className="separator">
 						<div onClick={ toggleDisplayPublicChan }>
 							<i className={ displayPublicChan ? "fas fa-chevron-down" : "fas fa-chevron-right" } ></i>
 							public_
 						</div>
-						<div className="add_channel_button">+</div>
+						<div className="add_channel_button">+
+							<span className="tooltiptop">Create channel</span>
+						</div>
 					</div>
 					{ displayPublicChan && <div className="publicChannels">
 						<Channel name="General" image="" type="group" selected={ true }/>
 						<Channel name="Random" image="" type="group" selected={ false }/>
-	</div> }
+					</div> }
 					<div className="separator">
 						<div onClick={ toggleDisplayPrivateChan }>
 							<i className={ displayPrivateChan ? "fas fa-chevron-down" : "fas fa-chevron-right" } ></i>
 							private_
 						</div>
-						<div className="add_channel_button">+</div>
+						<div className="add_channel_button">+
+							<span className="tooltiptop">Create channel</span>
+						</div>
 					</div>
 					{ displayPrivateChan && <div className="privateChannels">
 						<Channel name="Jeanne" image="" type="dm" selected={false} />
 						<Channel name="Flavien" image="" type="dm" selected={false}/>
 						<Channel name="Les boss" image="" type="group" selected={false}/>
-						{/* <Channel name="Anthony" image="" type="dm" selected={false}/>
-						<Channel name="Jeanne" image="" type="dm" selected={false} />
+						<Channel name="Anthony" image="" type="dm" selected={false}/>
+						{/* <Channel name="Jeanne" image="" type="dm" selected={false} />
 						<Channel name="Flavien" image="" type="dm" selected={false}/>
 						<Channel name="Les boss" image="" type="group" selected={false}/>
 						<Channel name="Anthony" image="" type="dm" selected={false}/> */}
