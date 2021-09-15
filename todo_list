@@ -1,4 +1,0 @@
-send_messages_by_recipient ?
-	Ne renvoyer que smessages qui concernent un channel pour que ce soit plus facile pour le front
-set channel objets
-	Faire l'entite channel si Antho ne l'a pas fait et remplace toutes les string recipient par des Channel recipient
