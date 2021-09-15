@@ -3,8 +3,6 @@ import { Column, Entity, ManyToOne, ManyToMany, PrimaryGeneratedColumn, OneToMan
 import User from '../users/user.entity';
 import Message from './message.entity';
 
-
-//add channl dans users
 @Entity()
 class Channel {
   @PrimaryGeneratedColumn()
