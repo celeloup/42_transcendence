@@ -17,7 +17,7 @@ import Match from 'src/matches/match.entity';
 import { match } from 'assert';
  
 @WebSocketGateway({ serveClient: false, namespace: '/channel' })
-export default class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export default class ChannelGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   private server: Server;
   private logger: Logger = new Logger("ChannelGateway");
