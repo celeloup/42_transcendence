@@ -28,6 +28,11 @@ export default class UsersController {
     return this.userService.changeName(req.user.id, user);
   }
 
+  @Get()
+  GetAllUsers(){
+    return this.userService.getAllUsers();
+  }
+
   @Get(':id')
   getById(@Param() { id }: FindOneParams) {
     return this.userService.getById(Number(id));

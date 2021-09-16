@@ -37,9 +37,9 @@ import AchievementsModule from './achievements/achievements.module';
     UsersModule,
     MatchesModule,
     AchievementsModule,
-    AuthenticationModule,
+    ChannelModule,
+    AuthenticationModule
 //    SocketModule,
-    ChannelModule
   ],
   controllers: [],
   providers: [

@@ -12,6 +12,7 @@ class User {
   public id: number;
 
   @Column({nullable: true})
+  @ApiProperty()
   public admin: boolean;
 
   @Column({ unique: true })
@@ -62,12 +63,15 @@ class User {
   public achievements: Achievement[];
 
   @Column()
+  @ApiProperty()
   public victories: number;
 
   @Column()
+  @ApiProperty()
   public defeats: number;
 
   @Column()
+  @ApiProperty()
   public points: number;
 
 //  @Column("simple-array", {nullable: true})

@@ -1,11 +1,11 @@
 import { IsString, IsNotEmpty } from 'class-validator';
 
-export class UpdateUserDto {
+export class UpdateChannelDto {
 
   @IsString()
   @IsNotEmpty()
-	name: string;
-
+  name: string;
+  
 }
    
-export default UpdateUserDto;
+export default UpdateChannelDto;
