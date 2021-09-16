@@ -2,7 +2,7 @@ import { IsString, IsNotEmpty, IsNumber } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class UpdateMatchDto {
-
+/* 
   @ApiProperty()
 	@IsNumber()
   public id: number;
@@ -13,7 +13,7 @@ export class UpdateMatchDto {
 
   @ApiProperty()
   @IsNumber()
-  public user2: number;
+  public user2: number; */
   
   @ApiProperty()
   @IsNumber()
@@ -22,11 +22,11 @@ export class UpdateMatchDto {
   @ApiProperty()
   @IsNumber()
   public score_user2: number;
-  
+/*   
   @ApiPropertyOptional()
   @IsNumber()
   public winner?: number;
-
+ */
 }
    
 export default UpdateMatchDto;
