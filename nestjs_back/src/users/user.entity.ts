@@ -1,13 +1,18 @@
-import { Column, Entity, ManyToMany, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Exclude } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import Channel from 'src/channel/channel.entity';
-
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany, JoinTable, ManyToMany, Unique, JoinColumn, RelationId } from 'typeorm';
+import Match from '../matches/match.entity';
+import Achievement from '../achievements/achievement.entity'
+ 
 @Entity()
 class User {
   @PrimaryGeneratedColumn()
   @ApiProperty()
   public id: number;
+
+  @Column({nullable: true})
+  public admin: boolean;
 
   @Column({ unique: true })
   @ApiProperty()
@@ -47,6 +52,29 @@ class User {
 
   @ManyToMany(() => Channel, (channel: Channel) => channel.muted)
   public mute: Channel[];
+  
+  @ManyToMany(() => Match, (match: Match) => match.users)
+  @JoinTable()
+  public matches: Match[];
+
+  @ManyToMany(() => Achievement, (achievement: Achievement) => achievement.users)
+  @JoinTable()
+  public achievements: Achievement[];
+
+  @Column()
+  public victories: number;
+
+  @Column()
+  public defeats: number;
+
+  @Column()
+  public points: number;
+
+//  @Column("simple-array", {nullable: true})
+//  public friends: string[];
+
+  @Column("int", {array: true, nullable: true})
+  public friends: number[];
 }
 
 export default User;

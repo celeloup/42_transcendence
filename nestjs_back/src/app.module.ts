@@ -9,7 +9,7 @@ import AuthenticationModule from './authentication/authentication.module';
 import ExceptionsLoggerFilter from './utils/exceptionsLogger.filter';
 import SocketModule from './socket/socket.module';
 import ChannelModule from './channel/channel.module';
-
+import AchievementsModule from './achievements/achievements.module';
  
 @Module({
   imports: [
@@ -35,6 +35,8 @@ import ChannelModule from './channel/channel.module';
     }),
     DatabaseModule,
     UsersModule,
+    MatchesModule,
+    AchievementsModule,
     AuthenticationModule,
 //    SocketModule,
     ChannelModule

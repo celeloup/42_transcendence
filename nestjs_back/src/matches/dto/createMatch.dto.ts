@@ -1,4 +1,4 @@
-import { IsEmail, IsString, IsNotEmpty, IsNumber } from 'class-validator';
+import { IsEmail, IsString, IsNotEmpty, IsNumber, IsBoolean} from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export default class CreateMatchDto {
@@ -6,21 +6,25 @@ export default class CreateMatchDto {
 	@IsNumber()
   public id: number;
   
-  @ApiProperty()
-  @IsNumber()
-  public user1: number;
-
-  @ApiProperty()
-  @IsNumber()
-  public user2: number;
+  @IsBoolean()
+  friendly: boolean;
   
   @ApiProperty()
   @IsNumber()
-  public score_user1: number;
-
+  user1_id: number;
+  
   @ApiProperty()
   @IsNumber()
-  public score_user2: number;
+  user2_id: number;
+
+  /* 
+  @IsNumber()
+  @ApiProperty()
+  score_user1: number;
+
+  @IsNumber()
+  @ApiProperty()
+  score_user2: number; 
   
   @ApiPropertyOptional()
   @IsNumber()
@@ -29,5 +33,6 @@ export default class CreateMatchDto {
   //@IsString()
   //@IsNotEmpty()
   //@MinLength(7)
-	//password: string;
+  //password: string;
+  */
 }
