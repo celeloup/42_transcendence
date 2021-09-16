@@ -3,6 +3,7 @@ import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export default class CreateMatchDto {
   @IsBoolean()
+  @ApiProperty()
   friendly: boolean;
   
   @ApiProperty()
