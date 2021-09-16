@@ -13,6 +13,8 @@ import {
 import { Server, Socket } from 'socket.io';
 import ChannelService from './channel.service'
 import Channel from './channel.entity';
+import Match from 'src/matches/match.entity';
+import { match } from 'assert';
  
 @WebSocketGateway({ serveClient: false, namespace: '/channel' })
 export default class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -103,5 +105,19 @@ export default class SocketGateway implements OnGatewayInit, OnGatewayConnection
   {
     this.logger.log(`List of connected users`);
     socket.emit('connectedUsers', Array.from(this.connectedUsers.values()));
+  }
+
+  @SubscribeMessage('send_invit')
+  async sendGameInvit(
+    @MessageBody() data: {guest: string, match: Match},
+  )
+  {
+    for (let [key, value] of this.connectedUsers.entries()) {
+      if (value === data.guest)
+        var socket = key;
+    }
+    this.logger.log(`Game invitation for ${data.guest}`);
+    if (socket)
+      socket.emit('game_invit', data.match);
   }
 }
