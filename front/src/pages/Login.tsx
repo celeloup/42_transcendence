@@ -1,12 +1,7 @@
-import axios from 'axios';
+// import axios from 'axios';
 import { RouteComponentProps } from 'react-router';
 
-// async function loginUser()
-
-type TParams = { code: string };
-
-function Login({match} : RouteComponentProps<TParams>) {
-	console.log(match.url); 
+function Login(){
   return (
     <div className="Login">
         <p>Pong Wars is an amazing game where you can challenge your friends to a match of Pong in Space ! <br></br>Login to play</p>
