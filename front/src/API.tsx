@@ -9,10 +9,10 @@ export async function oauth(code:string) {
 }
 
 export function isAuth() : boolean {
-	let ret:boolean = false;
+	// let ret:boolean = false;
 	axios.get(`${API_BASE_URL}/authentication`, { withCredentials: true })
-		.then(response => { console.log("YES IS AUTH", response.data); ret = true; })
-		.catch(error => { console.log(error.response); ret = false; })
+		.then(response => { console.log("YES IS AUTH", response.data); })
+		.catch(error => { console.log(error.response); })
 	return (true);
 }
 

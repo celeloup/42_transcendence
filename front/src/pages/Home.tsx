@@ -11,6 +11,9 @@ function Game() {
 			<div className="window_header">
 				MACHIN VS TRUC
 			</div>
+			<div id="game_window">
+				hello
+			</div>
 		</div>
 	</WindowBorder>
 )}
@@ -145,7 +148,9 @@ function Chat() {
 	return (
 		<WindowBorder w='382px' h='670px'>
 			<div id="chat">
-				{ displayList && <ChannelList toggleDisplayList={ toggleDisplayList } selected="General"/> }
+				{ displayList && 
+					<ChannelList toggleDisplayList={ toggleDisplayList } selected="General"/>
+				}
 				<ChatHeader toggleDisplayList={toggleDisplayList} type="0" name="General"/>
 				<div id="chat_messages">
 					<div>

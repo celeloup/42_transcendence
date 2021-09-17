@@ -7,7 +7,9 @@ import Home from './pages/Home';
 import Profile from './pages/Profile';
 import Parameters from './pages/Parameters';
 import { RouteComponentProps, RouteProps } from 'react-router';
-import * as api from './API';
+// import * as api from './API';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 
 const Logo = () => (
 	<div id="logo">
@@ -18,12 +20,25 @@ const Logo = () => (
 	</div>
 )
 
-type TParams = { code: string };
-
-function OAuth({ match, location, history } : RouteComponentProps<TParams>) {
+function OAuth({ location } : RouteComponentProps) {
 	let code:string = location.search;
 	console.log(code);
-	api.oauth(code);
+	// api.oauth(code);
+	// const [isAuth, setIsAuth] = useState(false);
+
+	useEffect(() => {
+		axios.get(`${API_BASE_URL}/authentication/oauth${code}`, { withCredentials: true })
+		.then(response => 
+			{
+				console.log(response.data);
+				// setIsAuth(true);
+			})
+		.catch(error => 
+			{
+				console.log(error.reponse);
+				// setIsAuth(false);
+			});
+	}, []);
 	return <Redirect to={{ pathname: '/' }} />;
 }
 
@@ -40,13 +55,33 @@ export function ProtectedRoute({isAuthenticated, authenticationPath, ...routePro
 	}
   };
 
+// interface User {
+// 	id: number,
+// 	name: string
+// };
+
+const API_BASE_URL:string = "http://localhost:8080/api";
+
 function App() {
-	let user:boolean = api.isAuth();
-	console.log("hello");
+	const [isAuth, setIsAuth] = useState(false);
+
+	useEffect(() => {
+		const fetchAuth = () => {
+			axios.get(`${API_BASE_URL}/authentication`, { withCredentials: true })
+			.then(response => { console.log(response.data); setIsAuth(true); })
+			.catch(error => { console.log(error.reponse); setIsAuth(false); });
+		};
+		fetchAuth();
+		console.log(isAuth);
+	}, []);
+
+
+	// let user:boolean = api.isAuth();
+	// console.log("hello");
 	// console.log(user);
 	// api.authRefresh();
 	const defaultProtectedRouteProps: ProtectedRouteProps = {
-		isAuthenticated: user,
+		isAuthenticated: isAuth,
 		authenticationPath: '/login',
 	};
 	return (
@@ -63,13 +98,13 @@ function App() {
 						component={Admin}
 					/>
 					{/* <Route path='/admin' component={Admin} /> */}
-					<ProtectedRoute
+					{/* <ProtectedRoute
 						{...defaultProtectedRouteProps}
 						exact={true}
 						path='/parameters'
 						component={Parameters}
-					/>
-					{/* <Route path='/parameters' component={Parameters} /> */}
+					/> */}
+					<Route path='/parameters' component={Parameters} />
 					<ProtectedRoute
 						{...defaultProtectedRouteProps}
 						exact={true}
