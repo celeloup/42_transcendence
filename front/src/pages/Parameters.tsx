@@ -1,6 +1,7 @@
 import * as api from './../API';
 
 function Parameters() {
+	console.log("params");
 	// api.isAuth();
 	return (
 	  <div className="Parameters">
