@@ -43,16 +43,16 @@ class User {
   public channels: Channel[];
 
   @OneToMany(() => Channel, (channel: Channel) => channel.owner)
-  public owned: Channel[];
+  public ownedChannels: Channel[];
 
-  @ManyToMany(() => Channel, (channel: Channel) => channel.admin)
+  @ManyToMany(() => Channel, (channel: Channel) => channel.admins)
   public chan_admin: Channel[];
 
-  @ManyToMany(() => Channel, (channel: Channel) => channel.banned)
-  public ban: Channel[];
+  // @ManyToMany(() => Channel, (channel: Channel) => channel.banned)
+  // public ban: Channel[];
 
-  @ManyToMany(() => Channel, (channel: Channel) => channel.muted)
-  public mute: Channel[];
+  // @ManyToMany(() => Channel, (channel: Channel) => channel.muted)
+  // public mute: Channel[];
   
   @ManyToMany(() => Match, (match: Match) => match.users)
   @JoinTable()
@@ -62,16 +62,16 @@ class User {
   @JoinTable()
   public achievements: Achievement[];
 
-  @Column()
+  @Column({ default: 0 })
   @ApiProperty()
   public victories: number;
 
-  @Column()
+  @Column({ default: 0 })
   @ApiProperty()
   public defeats: number;
 
   @Column()
-  @ApiProperty()
+  @ApiProperty({ default: 0 })
   public points: number;
 
 //  @Column("simple-array", {nullable: true})

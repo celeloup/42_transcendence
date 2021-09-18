@@ -8,6 +8,7 @@ import UpdateUserDto from './dto/updateUser.dto';
 import AddFriendDto from './dto/addFriend.dto';
 import Achievement from '../achievements/achievement.entity';
 import AchievementsService from '../achievements/achievements.service';
+import Channel from 'src/channel/channel.entity';
 
 @Injectable()
 export default class UsersService {
@@ -38,7 +39,15 @@ export default class UsersService {
   async getMatchesByUserId(id: number) {
     const user = await this.usersRepository.findOne(id, { relations: ['matches'] });
     if (user) {
-      return user;
+      return user.matches;
+    }
+    throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
+  }
+
+  async getChannelsByUserId(id: number): Promise<Channel[]> {
+    const user = await this.usersRepository.findOne(id, { relations: ['channels'] });
+    if (user) {
+      return user.channels;
     }
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
@@ -46,9 +55,23 @@ export default class UsersService {
   async getAchievementsByUserId(id: number) {
     const user = await this.usersRepository.findOne(id, { relations: ['achievements'] });
     if (user) {
-      return user;
+      return user.achievements;
     }
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
+  }
+
+  async getFriendsByUserId(id: number) {
+    const user = await this.usersRepository.findOne(id);
+    if (user) {
+      return user.friends;
+    }
+    throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
+  }
+
+  async getAllInfosByUserId(id: number) {
+    const user = await this.usersRepository.findOne(id, { relations: ['achievements', 'channels', 'matches']})
+    if (user)
+      return user;
   }
 
   async getBy42Id(id42: number): Promise<User>  {
@@ -113,8 +136,8 @@ export default class UsersService {
   }
 
   async addAFriend(userId: number, friendData: AddFriendDto) {
-    const user = await this.getAchievementsByUserId(userId);
-    const friend = await this.getAchievementsByUserId(friendData.friendId);
+    const user = await this.getAllInfosByUserId(userId);
+    const friend = await this.getAllInfosByUserId(friendData.friendId);
     if (user && friend) {
       const firstFriend = await this.achievementsService.getAchievementById(1);
       if (!user.friends){
