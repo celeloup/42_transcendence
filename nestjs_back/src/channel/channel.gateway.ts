@@ -44,20 +44,17 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
       this.connectedUsers.set(client, `client test`);
     }
     this.logger.log(`Connection: ${this.connectedUsers.get(client)}`);
-    this.connectedUsers.forEach((value: string, key: Socket) => {
-      key.emit('connectedUsers', Array.from(this.connectedUsers.values()));
-  });
-    // client.emit('connectedUsers', Array.from(this.connectedUsers.values()));
+  //   this.connectedUsers.forEach((value: string, key: Socket) => {
+  //     key.emit('connectedUsers', Array.from(this.connectedUsers.values()));
+  // });
+    this.server.emit('connectedUsers', Array.from(this.connectedUsers.values()));
   }
 
   handleDisconnect(client: Socket) {
     this.logger.log(`Disconnect: ${this.connectedUsers.get(client)}`);
     this.connectedUsers.delete(client);
     // this.socketUsers.delete(client.id);
-    this.connectedUsers.forEach((value: string, key: Socket) => {
-      key.emit('connectedUsers', Array.from(this.connectedUsers.values()));
-  });
-    // client.emit('connectedUsers', Array.from(this.connectedUsers.values()));
+    this.server.emit('connectedUsers', Array.from(this.connectedUsers.values()));
   }
 
   /*remplacer recipient string par channel une fois cree
@@ -73,9 +70,7 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
       this.logger.log(`Message from ${this.connectedUsers.get(client)} to ${data.recipient.name}: ${data.content}`);
       const message = await this.channelService.saveMessage(data.content, author, data.recipient);
       //est-ce que j'envoie directement aux membres du channel connecte ou c'est overkill ?
-      this.connectedUsers.forEach((value: string, key: Socket) => {
-        key.emit('receive_message', data);
-    });
+      this.server.emit('receive_message', data);
     }
 
   @SubscribeMessage('request_messages')
