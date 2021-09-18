@@ -7,6 +7,9 @@ import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import TokenPayload from './interface/tokenPayload.interface';
 import jwt from './interface/jwt.interface';
+import { Socket } from 'socket.io';
+import { WsException } from '@nestjs/websockets';
+import { parse } from 'cookie';
 
 @Injectable()
 export default class AuthenticationService {
@@ -27,6 +30,24 @@ export default class AuthenticationService {
     if (payload.userId) {
       return this.usersService.getById(payload.userId);
     }
+  }
+
+  async getUserFromSocket(socket: Socket) {
+    let authenticationToken: string;
+    const cookie = socket.handshake.headers.cookie;
+    const bearer = socket.handshake.headers.authorization;
+    if (cookie) {
+      authenticationToken = parse(cookie).Authentication;
+    } else if (bearer) {
+      authenticationToken = bearer.split(" ")[1];
+    } else {
+      return null;
+    }
+    const user = await this.getUserFromAuthenticationToken(authenticationToken);
+    if (!user) {
+      throw new WsException('Invalid credentials.');
+    }
+    return user;
   }
 
   public async register(registrationData: RegisterDto): Promise<User> {

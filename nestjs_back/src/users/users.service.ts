@@ -6,7 +6,7 @@ import * as bcrypt from 'bcrypt';
 import CreateUserDto from './dto/createUser.dto';
 import UpdateUserDto from './dto/updateUser.dto';
 import AddFriendDto from './dto/addFriend.dto';
-import Achievement from 'src/achievements/achievement.entity';
+import Achievement from '../achievements/achievement.entity';
 import AchievementsService from '../achievements/achievements.service';
 
 @Injectable()

@@ -1,6 +1,6 @@
 import { Exclude } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import Channel from 'src/channel/channel.entity';
+import Channel from '../channel/channel.entity';
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany, JoinTable, ManyToMany, Unique, JoinColumn, RelationId } from 'typeorm';
 import Match from '../matches/match.entity';
 import Achievement from '../achievements/achievement.entity'
