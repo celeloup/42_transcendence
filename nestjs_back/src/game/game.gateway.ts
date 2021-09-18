@@ -1,5 +1,6 @@
 import { Logger } from '@nestjs/common';
 import {
+  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
   OnGatewayInit,
@@ -9,7 +10,11 @@ import {
   WsResponse,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import GameService from './game.service';
+import  ChannelService from '../channel/channel.service';
+import Match from '../matches/match.entity';
+import Round from './interface/round.interface';
+import GameService from "./game.service";
+
  
 @WebSocketGateway({ serveClient: false, namespace: '/game' })
 export default class GameGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -17,11 +22,12 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
   private server: Server;
   private logger: Logger = new Logger("GameGateway");
 
-  private connectedUser: Map<string, string> = new Map();
+  private connectedUsers: Map<Socket, string> = new Map();
   private counter: number = -1;
 
   constructor(
-    private readonly socketService: GameService
+    private readonly authenticationService: ChannelService,
+    private readonly gameService: GameService
   ) {}
   
   afterInit(server: Server) {
@@ -29,44 +35,26 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
   }
 
   async handleConnection(client: Socket, ...args: any[]) {
-    const user = await this.socketService.getUserFromSocket(client);
+    const user = await this.authenticationService.getUserFromSocket(client);
     if (user) {
-      this.connectedUser.set(client.id, user.name);
+      this.connectedUsers.set(client, user.name);
     } else {
-      this.connectedUser.set(client.id, this.counter == -1 ? "connector" : `client ${this.counter}`);
-      this.counter++;
+      this.connectedUsers.set(client, `client test`);
     }
-    this.logger.log(`Connection: ${this.connectedUser.get(client.id)}`);
   }
 
   handleDisconnect(client: Socket) {
-    this.logger.log(`Disconnect: ${this.connectedUser.get(client.id)}`);
-    this.connectedUser.delete(client.id);
+    this.connectedUsers.delete(client);
   }
-
-  @SubscribeMessage("whoami")
-  handleWhoami(client: Socket): WsResponse<string> {
-    const user = this.connectedUser.get(client.id);
-    this.logger.log(`Whoami from ${user}`);
-    return { event: "receive_message", data: user };
-  }
-
-  @SubscribeMessage("Hello_server")
-  handleHello(client: Socket, text: string): WsResponse<string> {
-    this.logger.log(`Hello from ${this.connectedUser.get(client.id)}: ${text}`);
-    return { event: "receive_message", data: `Hello from server!` };
-  }
-
-  @SubscribeMessage("send_to_all")
-  handleBroadcast(client: Socket, text: string): void {
-    this.logger.log(`Message from ${this.connectedUser.get(client.id)}: ${text}`);
-    this.server.emit("receive_message", text);
-  }
-
-  @SubscribeMessage("reset_counter")
-  handleReset(): void {
-    this.logger.log('Client counter reset');
-    this.counter = -1;
+  
+  @SubscribeMessage('launch_game')
+  async launchGame(
+    @MessageBody() match: Match,
+  )
+  {
+    var param: Round;
+    
+    param = this.gameService.initGame(match);
   }
 }
   
