@@ -43,10 +43,25 @@ export default class UsersController {
     return this.userService.getMatchesByUserId(Number(id));
   }
 
+  @Get('channels/:id')
+  getChannelsByUserId(@Param() { id }: FindOneParams) {
+    return this.userService.getChannelsByUserId(Number(id));
+  }
+
   @Get('achievements/:id')
-  getFriendsByUserId(@Param() { id }: FindOneParams) {
+  getAchievementsByUserId(@Param() { id }: FindOneParams) {
     return this.userService.getAchievementsByUserId(Number(id));
   } 
+
+  @Get('friends/:id')
+  getFriendsByUserId(@Param() { id }: FindOneParams) {
+    return this.userService.getFriendsByUserId(Number(id));
+  } 
+
+  @Get('infos/:id')
+  getAllInfosByUserId(@Param() { id }:FindOneParams) {
+    return this.userService.getAllInfosByUserId(Number(id));
+  }
 
   @Put('friend/:id')
   addAFriend(@Param() { id }: FindOneParams, @Body() friend: AddFriendDto) {

@@ -8,6 +8,7 @@ import Channel from './channel.entity';
 import UpdateChannelDto from './dto/updateChannel.dto';
 import CreateChannelDto from './dto/createChannel.dto';
 import UsersService from '../users/users.service';
+import { ArrayContains } from 'class-validator';
 
 @Injectable()
 export default class ChannelService {
@@ -16,6 +17,8 @@ export default class ChannelService {
     private messagesRepository: Repository<Message>,
     @InjectRepository(Channel)
     private channelRepository: Repository<Channel>,
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
     private usersService: UsersService,
     private readonly authenticationService: AuthenticationService,
   ) {
@@ -37,8 +40,48 @@ export default class ChannelService {
     });
   }
 
+  async getAllChannels() {
+    const channels = await this.channelRepository.find();
+    if (channels) {
+      return channels;
+    }
+    throw new HttpException('No channel has been created yet', HttpStatus.NOT_FOUND);
+  }
+
   async getChannelById(id: number) {
     const channel = await this.channelRepository.findOne(id);
+    if (channel) {
+      return channel;
+    }
+    throw new HttpException('Channel with this id does not exist', HttpStatus.NOT_FOUND);
+  }
+
+  async getOwnerByChannelId(id: number) {
+    const channel = await this.channelRepository.findOne(id, { relations: ['owner'] });
+    if (channel) {
+      return channel.owner;
+    }
+    throw new HttpException('Channel with this id does not exist', HttpStatus.NOT_FOUND);
+  }
+
+  async getMembersByChannelId(id: number) {
+    const channel = await this.channelRepository.findOne(id, { relations: ['members'] });
+    if (channel) {
+      return channel.members;
+    }
+    throw new HttpException('Channel with this id does not exist', HttpStatus.NOT_FOUND);
+  }
+
+  async getAdminsByChannelId(id: number) {
+    const channel = await this.channelRepository.findOne(id, { relations: ['admins'] });
+    if (channel) {
+      return channel.admins;
+    }
+    throw new HttpException('Channel with this id does not exist', HttpStatus.NOT_FOUND);
+  }
+
+  async getAllInfosByChannelId(id: number) {
+    const channel = await this.channelRepository.findOne(id, { relations: ['members', 'owner', 'admin'] });
     if (channel) {
       return channel;
     }
@@ -58,28 +101,24 @@ export default class ChannelService {
     } */
 
   async addAMember(channel_id: number, member_id: number) {
-    const channel = await this.getChannelById(channel_id);
+    let channel = await this.getChannelById(channel_id);
+    let newMember = await this.usersService.getById(member_id);
+    await channel.members.fill(newMember, 0, 0);//  push(newMember);
+    await this.channelRepository.save(channel);
+  return channel;
   }
 
   async createChannel(channelData: CreateChannelDto) {
-    const owner = await this.usersService.getById(channelData.owner_id);
-    if (owner) {
-      const newChannel = await this.channelRepository.create({
+    let channelOwner = await this.usersService.getById(channelData.owner_id);
+    if (channelOwner) {
+      let newChannel = await this.channelRepository.create({
         name: channelData.name,
-        owner: owner,
-        members: new Array,
-        admin: new Array
+        owner: channelOwner,
+        members: [channelOwner],
+        admins: [channelOwner],
       });
-
-    //  newChannel.members.push(owner);
       await this.channelRepository.save(newChannel);
-      // if (owner)
-      //  await this.channelRepository.update(newChannel.id, {members:[owner]});
-      // await this.channelRepository.save(newChannel);
-      // await newChannel.members.push(owner);
-      // await newChannel.admin.push(owner);
       return newChannel;
-
     }
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
