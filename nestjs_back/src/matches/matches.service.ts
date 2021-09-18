@@ -42,8 +42,8 @@ export default class MatchesService {
   }
 
   async weHaveAWinner(match: Match){
-    const user1 = await this.usersService.getAchievementsByUserId(match.user1_id);
-    const user2 = await this.usersService.getAchievementsByUserId(match.user2_id);
+    const user1 = await this.usersService.getAllInfosByUserId(match.user1_id);
+    const user2 = await this.usersService.getAllInfosByUserId(match.user2_id);
     if (!user1.achievements)
       user1.achievements = new Array;
     if (!user2.achievements)
