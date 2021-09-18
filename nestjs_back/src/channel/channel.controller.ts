@@ -16,8 +16,8 @@ export default class ChannelController {
   }
 
   @Post()
-  async createChannel(@Body() match: CreateChannelDto){
-    return this.channelService.createChannel(match);
+  async createChannel(@Body() channel: CreateChannelDto){
+    return this.channelService.createChannel(channel);
   }
 
 /*   @Put(':id')
