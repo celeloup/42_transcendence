@@ -176,7 +176,7 @@ export default class UsersService {
     const user = await this.getById(userId);
     const friend = await this.getById(friendData.friendId);
     if (user && friend && user.friends && friend.friends) {
-      if ((await user.friends.find(element => element === friend.id))) {
+      if (await user.friends.find(element => element === friend.id)) {
         let index = user.friends.indexOf(friend.id);
         user.friends.splice(index, 1);
         index = friend.friends.indexOf(user.id);

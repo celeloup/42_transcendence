@@ -11,10 +11,6 @@ class Channel {
   @Column()
   public name: string;
 
-  @ManyToMany(() => User, (member: User) => member.channels)
-  @JoinTable()
-  public members: User[];
-
   @Column({ default: false })
   public private: boolean;
   
@@ -28,8 +24,12 @@ class Channel {
   @JoinTable()
   public admins: User[];
 
-  // @ManyToMany(() => User, (banned: User) => banned.ban)
-  // public banned: User[];
+  @ManyToMany(() => User, (member: User) => member.channels)
+  @JoinTable()
+  public members: User[];
+
+  @ManyToMany(() => User, (banned: User) => banned.ban)
+  public banned: User[];
 
   // @ManyToMany(() => User, (muted: User) => muted.mute)
   // public muted: User[];
