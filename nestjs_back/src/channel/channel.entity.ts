@@ -29,10 +29,12 @@ class Channel {
   public members: User[];
 
   @ManyToMany(() => User, (banned: User) => banned.ban)
+  @JoinTable()
   public banned: User[];
 
-  // @ManyToMany(() => User, (muted: User) => muted.mute)
-  // public muted: User[];
+  @ManyToMany(() => User, (muted: User) => muted.mute)
+  @JoinTable()
+  public muted: User[];
 
   @OneToMany(() => Message, (message: Message) => message.recipient)
   public historic: Message[];

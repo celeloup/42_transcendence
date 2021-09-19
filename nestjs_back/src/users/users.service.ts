@@ -61,7 +61,7 @@ export default class UsersService {
   }
 
   async getFriendsByUserId(id: number) {
-    const user = await this.usersRepository.findOne(id);
+    const user = await this.usersRepository.findOne(id, { relations: ['friends'] });
     if (user) {
       return user.friends;
     }
@@ -69,18 +69,18 @@ export default class UsersService {
   }
 
   async getAllInfosByUserId(id: number) {
-    const user = await this.usersRepository.findOne(id, { relations: ['achievements', 'channels', 'matches']})
+    const user = await this.usersRepository.findOne(id, { relations: ['achievements', 'channels', 'matches', 'ownedChannels', 'chan_admin', 'ban', 'mute', 'friends', 'friendOf', 'blocked', 'blockedBy'] })
     if (user)
       return user;
   }
 
-  async getBy42Id(id42: number): Promise<User>  {
+  async getBy42Id(id42: number): Promise<User> {
     const user = await this.usersRepository.findOne({ id42 });
     if (user) {
       return user;
     }
   }
-  
+
   async create(userData: CreateUserDto): Promise<User> {
     const newUser = await this.usersRepository.create(userData);
     newUser.defeats = 0;
@@ -135,58 +135,97 @@ export default class UsersService {
     });
   }
 
-  async addAFriend(userId: number, friendData: AddFriendDto) {
+  async isAFriend(userId: number, friendId: number) {
     const user = await this.getAllInfosByUserId(userId);
-    const friend = await this.getAllInfosByUserId(friendData.friendId);
-    if (user && friend) {
-      const firstFriend = await this.achievementsService.getAchievementById(1);
-      if (!user.friends){
-        user.friends = new Array;
+    if (user) {
+      const friend = await this.getById(friendId)
+      if (friend) {
+        if ((user.friends && (user.friends.findIndex(element => element.id === friendId))) !== -1)
+          return true;
+        return false;
       }
-      if (!friend.friends){
-        friend.friends = new Array;
-      }
-      if (user.friends.length === 0)
-      {
-        if (!user.achievements)
-          user.achievements = new Array;
-        user.achievements.push(firstFriend);
-        await this.usersRepository.save(user);
-      }
-      if (friend.friends.length === 0)
-      {
-        if (!friend.achievements)
-          friend.achievements = new Array;
-        friend.achievements.push(firstFriend);
-        await this.usersRepository.save(friend);
-      }
-      if (!(await user.friends.find(element => element === friend.id))) {
-        user.friends.push(friend.id);
-        friend.friends.push(user.id);
-        await this.usersRepository.update(user.id, { friends: user.friends });
-        await this.usersRepository.update(friend.id, { friends: friend.friends });
-        return user;
-      }
-      throw new HttpException('Users are already friends', HttpStatus.BAD_REQUEST);
+      throw new HttpException('Friend not found', HttpStatus.NOT_FOUND);
     }
     throw new HttpException('User not found', HttpStatus.NOT_FOUND);
   }
 
-  async deleteAFriend(userId: number, friendData: AddFriendDto) {
-    const user = await this.getById(userId);
-    const friend = await this.getById(friendData.friendId);
-    if (user && friend && user.friends && friend.friends) {
-      if (await user.friends.find(element => element === friend.id)) {
-        let index = user.friends.indexOf(friend.id);
-        user.friends.splice(index, 1);
-        index = friend.friends.indexOf(user.id);
-        friend.friends.splice(index, 1);
-        await this.usersRepository.update(user.id, { friends: user.friends });
-        await this.usersRepository.update(friend.id, { friends: friend.friends });
-        return user;
+  async addAFriend(userId: number, friendId: number): Promise<User[]> {
+    if (userId !== friendId) {
+      if (!(await this.isAFriend(userId, friendId))) {
+        if (!(await this.isBlocked(userId, friendId))) {
+          if (!(await this.isBlocked(friendId, userId))) {
+            const user = await this.getAllInfosByUserId(userId);
+            const friend = await this.getById(friendId);
+            const firstFriend = await this.achievementsService.getAchievementById(1);
+            if (user.friends.length === 0)
+              user.achievements.push(firstFriend);
+            user.friends.push(friend);
+            await this.usersRepository.save(user);
+            return user.friends;
+          }
+          throw new HttpException('User blocked', HttpStatus.FORBIDDEN);
+        }
+        throw new HttpException('Friend blocked', HttpStatus.FORBIDDEN);
       }
-      throw new HttpException('Users are not friends', HttpStatus.BAD_REQUEST);
+      throw new HttpException('Users are already friends', HttpStatus.BAD_REQUEST);
+    }
+    throw new HttpException('Although your inner thoughts might be broad, you cannot be friend with yourself', HttpStatus.BAD_REQUEST);
+  }
+
+  async deleteAFriend(userId: number, friendId: number) {
+    if ((await this.isAFriend(userId, friendId))) {
+      const user = await this.getAllInfosByUserId(userId);
+      const friend = await this.getById(friendId);
+      let index = user.friends.indexOf(friend);
+      user.friends.splice(index, 1);
+      await this.usersRepository.save(user);
+      return user.friends;
+    }
+    throw new HttpException('Users are not friends', HttpStatus.BAD_REQUEST);
+  }
+
+  async isBlocked(userId: number, otherId: number) {
+    const user = await this.getAllInfosByUserId(userId);
+    if (user) {
+      const other = await this.getById(otherId)
+      if (other) {
+        if ((user.blocked && (user.blocked.findIndex(element => element.id === otherId))) !== -1)
+          return true;
+        return false;
+      }
+      throw new HttpException('Friend not found', HttpStatus.NOT_FOUND);
     }
     throw new HttpException('User not found', HttpStatus.NOT_FOUND);
   }
+
+  async blockAUser(userId: number, otherId: number): Promise<User[]> {
+    if (userId !== otherId) {
+      if (!(await this.isBlocked(userId, otherId))) {
+        const user = await this.getAllInfosByUserId(userId);
+        const other = await this.getById(otherId);
+        if ((await this.isAFriend(userId, otherId)))
+          await this.deleteAFriend(userId, otherId);
+        if ((await this.isAFriend(otherId, userId)))
+          await this.deleteAFriend(otherId, userId);
+        user.blocked.push(other);
+        await this.usersRepository.save(user);
+        return user.blocked;
+      }
+      throw new HttpException('User is already blocked', HttpStatus.BAD_REQUEST);
+    }
+    throw new HttpException('Although your inner thoughts might be unbearable, you cannot block yourself', HttpStatus.BAD_REQUEST);
+  }
+
+  async unblockAUser(userId: number, otherId: number) {
+    if ((await this.isBlocked(userId, otherId))) {
+      const user = await this.getAllInfosByUserId(userId);
+      const other = await this.getById(otherId);
+      let index = user.blocked.indexOf(other);
+      user.blocked.splice(index, 1);
+      await this.usersRepository.save(user);
+      return user.blocked;
+    }
+    throw new HttpException('User has not been blocked before', HttpStatus.BAD_REQUEST);
+  }
+
 }

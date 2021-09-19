@@ -65,13 +65,21 @@ export default class UsersController {
 
   @Put('friend/:id')
   addAFriend(@Param() { id }: FindOneParams, @Body() friend: AddFriendDto) {
-    return this.userService.addAFriend(Number(id), friend);
+    return this.userService.addAFriend(Number(id), friend.friendId);
   }
 
   @Delete('friend/:id')
   deleteAFriend(@Param() { id }: FindOneParams, @Body() friend: AddFriendDto) {
-    return this.userService.deleteAFriend(Number(id), friend);
+    return this.userService.deleteAFriend(Number(id), friend.friendId);
   }
-  /* ajouter des amis ? modifier des stats ? */
 
+  @Put('block/:id')
+  blockAUser(@Param() { id }: FindOneParams, @Body() friend: AddFriendDto) {
+    return this.userService.blockAUser(Number(id), friend.friendId);
+  }
+
+  @Delete('block/:id')
+  unblockAUser(@Param() { id }: FindOneParams, @Body() friend: AddFriendDto) {
+    return this.userService.unblockAUser(Number(id), friend.friendId);
+  }
 }
