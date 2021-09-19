@@ -1,41 +1,46 @@
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import Channel from '../channel/channel.entity';
-import { Column, Entity, PrimaryGeneratedColumn, OneToMany, JoinTable, ManyToMany, Unique, JoinColumn, RelationId } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany, JoinTable, ManyToMany } from 'typeorm';
 import Match from '../matches/match.entity';
 import Achievement from '../achievements/achievement.entity'
  
 @Entity()
+@Exclude()
 class User {
   @PrimaryGeneratedColumn()
+  @Expose({ groups: ['me'] })
   @ApiProperty()
   public id: number;
 
   @Column({nullable: true})
+  @Expose({ groups: ['me'] })
   @ApiProperty()
   public admin: boolean;
 
   @Column({ unique: true })
+  @Expose({ groups: ['me'] })
   @ApiProperty()
   public id42: number;
 
   @Column({ unique: true })
+  @Expose({ groups: ['me'] })
   @ApiProperty()
   public email: string;
 
   @Column({ unique: true })
+  @Expose()
   @ApiProperty()
   public name: string;
 
   @Column({ nullable: true })
-  @Exclude()
   public currentHashedRefreshToken?: string;
 
   @Column({ nullable: true })
-  @Exclude()
   public twoFactorAuthenticationSecret?: string;
 
   @Column({ default: false })
+  @Expose({ groups: ['me'] })
   @ApiProperty()
   public isTwoFactorAuthenticationEnabled: boolean;
 
@@ -55,22 +60,27 @@ class User {
   public mute: Channel[];
   
   @ManyToMany(() => Match, (match: Match) => match.users)
+  @Expose()
   @JoinTable()
   public matches: Match[];
 
   @ManyToMany(() => Achievement, (achievement: Achievement) => achievement.users)
+  @Expose()
   @JoinTable()
   public achievements: Achievement[];
 
   @Column()
+  @Expose()
   @ApiProperty()
   public victories: number;
 
   @Column()
+  @Expose()
   @ApiProperty()
   public defeats: number;
 
   @Column()
+  @Expose()
   @ApiProperty()
   public points: number;
 
@@ -78,6 +88,8 @@ class User {
 //  public friends: string[];
 
   @Column("int", {array: true, nullable: true})
+  @Expose()
+  @ApiProperty()
   public friends: number[];
 }
 
