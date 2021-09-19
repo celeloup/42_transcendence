@@ -3,7 +3,9 @@ import MatchesService from './matches.service';
 import CreateMatchDto from './dto/createMatch.dto'
 import FindOneParams from '../utils/findOneParams';
 import UpdateMatchDto from './dto/updateMatch.dto';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
  
+@ApiTags('matches')
 @Controller('matches')
 export default class MatchesController {
   constructor(
@@ -11,16 +13,19 @@ export default class MatchesController {
   ) {}
 
   @Get(':id')
+  @ApiOperation({summary: "Get a match by id"})
   getMatchById(@Param() { id }: FindOneParams) {
     return this.matchesService.getMatchById(Number(id));
   }
 
   @Post()
+  @ApiOperation({summary: "Create a new match"})
   async createMatch(@Body() match: CreateMatchDto){
     return this.matchesService.createMatch(match);
   }
 
   @Put(':id')
+  @ApiOperation({summary: "Update a match by id"})
   async updateMatch(@Param() { id }: FindOneParams, @Body() match: UpdateMatchDto){
     return this.matchesService.updateMatch(Number(id), match);
   }
