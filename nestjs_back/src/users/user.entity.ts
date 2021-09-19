@@ -51,8 +51,8 @@ class User {
   @ManyToMany(() => Channel, (channel: Channel) => channel.banned)
   public ban: Channel[];
 
-  // @ManyToMany(() => Channel, (channel: Channel) => channel.muted)
-  // public mute: Channel[];
+  @ManyToMany(() => Channel, (channel: Channel) => channel.muted)
+  public mute: Channel[];
   
   @ManyToMany(() => Match, (match: Match) => match.users)
   @JoinTable()
@@ -77,8 +77,23 @@ class User {
 //  @Column("simple-array", {nullable: true})
 //  public friends: string[];
 
-  @Column("int", {array: true, nullable: true})
-  public friends: number[];
+  // @Column("int", {array: true, nullable: true})
+  // public friends: number[];
+
+  @ManyToMany(() => User, (user: User) => user.friendOf)
+  @JoinTable()
+  public friends: User[];
+
+  @ManyToMany(() => User, (user: User) => user.friends)
+  public friendOf: User[];
+
+  @ManyToMany(() => User, (user: User) => user.blockedBy)
+  @JoinTable()
+  public blocked: User[];
+
+  @ManyToMany(() => User, (user: User) => user.blocked)
+  public blockedBy: User[];
+
 }
 
 export default User;

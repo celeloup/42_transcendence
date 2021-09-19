@@ -64,5 +64,24 @@ export default class ChannelController {
   revokeAdmin(@Param() { id }: FindOneParams, @Body() admin: UserDto){
     return this.channelService.revokeAdmin(Number(id), admin.userId)
   }
-  
+
+  @Put('ban/:id')
+  banAMember(@Param() { id }: FindOneParams, @Body() admin: UserDto) {
+    return this.channelService.banAMember(Number(id), admin.userId);
+  }
+
+  @Delete('ban/:id')
+  unbanAMember(@Param() { id }: FindOneParams, @Body() admin: UserDto){
+    return this.channelService.unbanAMember(Number(id), admin.userId)
+  }
+
+  @Put('mute/:id')
+  muteAMember(@Param() { id }: FindOneParams, @Body() admin: UserDto) {
+    return this.channelService.muteAMember(Number(id), admin.userId);
+  }
+
+  @Delete('mute/:id')
+  unmuteAMember(@Param() { id }: FindOneParams, @Body() admin: UserDto){
+    return this.channelService.unmuteAMember(Number(id), admin.userId)
+  }
 }
