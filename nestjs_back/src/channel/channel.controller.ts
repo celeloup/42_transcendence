@@ -1,8 +1,8 @@
-import { Body, Controller, HttpCode, Param, Put, Req, UseGuards, Post, Get } from '@nestjs/common';
+import { Body, Controller, HttpCode, Param, Put, Delete, Req, UseGuards, Post, Get } from '@nestjs/common';
 import ChannelService from './channel.service';
 import CreateChannelDto from './dto/createChannel.dto'
 import FindOneParams from '../utils/findOneParams';
-// import UpdateChannelDto from './dto/updateChannel.dto.ts';
+import UserDto from './dto/User.dto';
  
 @Controller('channel')
 export default class ChannelController {
@@ -40,16 +40,29 @@ export default class ChannelController {
     return this.channelService.getAllInfosByChannelId(Number(id));
   }
 
-
   @Post()
   async createChannel(@Body() channel: CreateChannelDto){
     return this.channelService.createChannel(channel);
   }
 
+  @Put('members/:id')
+  addMember(@Param() { id }: FindOneParams, @Body() member: UserDto) {
+    return this.channelService.addMember(Number(id), member.userId);
+  }
 
+  @Delete('members/:id')
+  deleteMember(@Param() { id }: FindOneParams, @Body() member: UserDto){
+    return this.channelService.deleteMember(Number(id), member.userId)
+  }
 
-/*   @Put(':id')
-  async updateChannel(@Param() { id }: FindOneParams, @Body() match: UpdateChannelDto){
-    return this.channelService.updateChannel(Number(id), match);
-  } */
+  @Put('admins/:id')
+  addAdmin(@Param() { id }: FindOneParams, @Body() admin: UserDto) {
+    return this.channelService.addAdmin(Number(id), admin.userId);
+  }
+
+  @Delete('admins/:id')
+  revokeAdmin(@Param() { id }: FindOneParams, @Body() admin: UserDto){
+    return this.channelService.revokeAdmin(Number(id), admin.userId)
+  }
+  
 }

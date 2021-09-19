@@ -48,8 +48,8 @@ class User {
   @ManyToMany(() => Channel, (channel: Channel) => channel.admins)
   public chan_admin: Channel[];
 
-  // @ManyToMany(() => Channel, (channel: Channel) => channel.banned)
-  // public ban: Channel[];
+  @ManyToMany(() => Channel, (channel: Channel) => channel.banned)
+  public ban: Channel[];
 
   // @ManyToMany(() => Channel, (channel: Channel) => channel.muted)
   // public mute: Channel[];
