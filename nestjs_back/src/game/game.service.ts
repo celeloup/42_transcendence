@@ -11,8 +11,9 @@ import Element from './interface/element.interface';
 export default class GameService {
   constructor(
     private readonly authenticationService: AuthenticationService,
-    private readonly height: 10,
-    private readonly width: 10,
+    private readonly height: 360,
+    private readonly width: 782,
+    private readonly paddle_margin: 20,
   ) {
   }
 
@@ -45,8 +46,8 @@ export default class GameService {
     boost_available : false,
     score_player1 : 0,
     score_player2 : 0,
-    paddle_player1 : {x : 0, y : this.height / 2 },
-    paddle_player2 : {x : 0, y : this.height / 2 },
+    paddle_player1 : {x : this.paddle_margin, y : this.height / 2 },
+    paddle_player2 : {x : this.width - this.paddle_margin, y : this.height / 2 },
     puck: {x : this.width / 2, y : this.height / 2 },
   };
 	return param;
