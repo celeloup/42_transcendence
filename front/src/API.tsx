@@ -16,8 +16,8 @@ export function isAuth() : boolean {
 	return (true);
 }
 
-export function logout() : void {
-	axios.post(`${API_BASE_URL}/authentication/log-out`, { withCredentials: true })
+export async function logout() {
+	await axios.post(`${API_BASE_URL}/authentication/log-out`, { withCredentials: true })
 		.then(response => { console.log("YES LOGOUT", response.data) })
 		.catch(error => { console.log(error.response) })
 }
