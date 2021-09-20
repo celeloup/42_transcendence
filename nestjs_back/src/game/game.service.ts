@@ -30,4 +30,22 @@ export default class GameService {
     }
     return user;
   }
+
+  initGame(match: Match) {
+    var param: Round = {
+
+    id_player1 : match.user1_id,
+    id_player2 : match.user2_id,
+    speed : 10,
+    goal : 10,
+    boost_available : false,
+    score_player1 : 0,
+    score_player2 : 0,
+    paddle_player1 : {x : 0, y : this.height / 2 },
+    paddle_player2 : {x : 0, y : this.height / 2 },
+    puck: {x : this.width / 2, y : this.height / 2 },
+  };
+	return param;
+  }
 }
+
