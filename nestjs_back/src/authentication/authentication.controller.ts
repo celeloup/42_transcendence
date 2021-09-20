@@ -6,7 +6,8 @@ import {
   HttpCode,
   Post,
   UseGuards,
-  UnauthorizedException
+  UnauthorizedException,
+  SerializeOptions
 } from '@nestjs/common';
 import { Request } from 'express';
 import AuthenticationService from './authentication.service';
@@ -16,9 +17,12 @@ import FortyTwoAuthenticationGuard from './guard/42Authentication.guard';
 import JwtRefreshGuard from './guard/jwtRefresh.guard';
 import JwtTwoFactorGuard from './guard/jwtTwoFactor.guard';
 import AuthInfos from './interface/authInfos.interface';
-import { ApiResponse, ApiBearerAuth, ApiTags, ApiCookieAuth } from '@nestjs/swagger';
+import { ApiResponse, ApiBearerAuth, ApiTags, ApiCookieAuth, ApiOperation, ApiParam } from '@nestjs/swagger';
 import User from '../users/user.entity';
 
+@SerializeOptions({
+  groups: ['me']
+})
 @ApiTags('authentication')
 @Controller('authentication')
 export default class AuthenticationController {
@@ -28,6 +32,8 @@ export default class AuthenticationController {
   
   @UseGuards(FortyTwoAuthenticationGuard)
   @Get('oauth')
+  @ApiOperation({summary: "Create and authenticate user with 42 oauth code"})
+  @ApiParam({name: 'code', type: String, description: '42 oauth code'})
   @ApiResponse({
     status: 200,
     description: 'The user has been successfully authenticated.',
@@ -53,6 +59,7 @@ export default class AuthenticationController {
 
   @UseGuards(JwtRefreshGuard)
   @Get('refresh')
+  @ApiOperation({summary: "Refresh the tokens"})
   @ApiBearerAuth('bearer-refresh')
   @ApiCookieAuth('cookie-refresh')
   @ApiResponse({
@@ -83,6 +90,7 @@ export default class AuthenticationController {
 
   @UseGuards(JwtTwoFactorGuard)
   @Get()
+  @ApiOperation({summary: "return user associated with the authentication token"})
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')
   @ApiResponse({ status: 200, description: 'The user has been successfully authenticated.'})
@@ -96,6 +104,7 @@ export default class AuthenticationController {
 
   // for testing
   @Post('register')
+  @ApiOperation({summary: "register user without 42 oauth for testing purpose"})
   @ApiResponse({
     status: 201,
     description: 'The user has been successfully registered.',
@@ -121,6 +130,7 @@ export default class AuthenticationController {
 
   @UseGuards(JwtTwoFactorGuard)
   @Post('log-out')
+  @ApiOperation({summary: "delete the token cookies and delete the refresh token from database"})
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')
   @ApiResponse({ status: 200, description: 'The user has been successfully logout.'})

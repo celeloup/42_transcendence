@@ -2,7 +2,7 @@ import { HttpException, HttpStatus, Injectable, Inject } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import CreateAchievementDto from './dto/createAchievement.dto';
-import Achievement from 'src/achievements/achievement.entity';
+import Achievement from '../achievements/achievement.entity';
  
 @Injectable()
 export default class AchievementsService {

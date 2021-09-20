@@ -1,5 +1,5 @@
-import { IsEmail, IsString, IsNotEmpty, IsNumber, IsBoolean} from 'class-validator';
-import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsNumber, IsBoolean} from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
 
 export default class CreateMatchDto {
   @IsBoolean()
