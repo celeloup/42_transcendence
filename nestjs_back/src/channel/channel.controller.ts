@@ -1,9 +1,11 @@
-import { Body, Controller, HttpCode, Param, Put, Delete, Req, UseGuards, Post, Get } from '@nestjs/common';
+import { Body, Controller, Param, Put, Delete, Req, UseGuards, Post, Get } from '@nestjs/common';
 import ChannelService from './channel.service';
 import CreateChannelDto from './dto/createChannel.dto'
 import FindOneParams from '../utils/findOneParams';
 import UserDto from './dto/User.dto';
+import { ApiOperation, ApiTags } from '@nestjs/swagger';
  
+@ApiTags('channel')
 @Controller('channel')
 export default class ChannelController {
   constructor(
@@ -16,6 +18,7 @@ export default class ChannelController {
   }
 
   @Get(':id')
+  @ApiOperation({summary: "Get a channel by id"})
   getChannelById(@Param() { id }: FindOneParams) {
     return this.channelService.getChannelById(Number(id));
   }
@@ -41,6 +44,7 @@ export default class ChannelController {
   }
 
   @Post()
+  @ApiOperation({summary: "Create a new channel"})
   async createChannel(@Body() channel: CreateChannelDto){
     return this.channelService.createChannel(channel);
   }

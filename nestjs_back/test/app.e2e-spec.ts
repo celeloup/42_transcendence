@@ -9,7 +9,6 @@ import * as cookieParser from 'cookie-parser';
 import UsersModule from '../src/users/users.module';
 import AuthenticationModule from '../src/authentication/authentication.module';
 import io from 'socket.io-client';
-import SocketModule from '../src/socket/socket.module';
 import ChannelModule from '../src/channel/channel.module';
 import Message from "../src/channel/message.entity";
 
@@ -49,7 +48,6 @@ describe('AppController (e2e)', () => {
         }),
         UsersModule,
         AuthenticationModule,
-        SocketModule,
         ChannelModule
       ],
     }).compile();
@@ -441,6 +439,13 @@ describe('AppController (e2e)', () => {
             owner: expect.any(Object),
             password: null,
             private: false
+          });
+          expect(res.body.owner).toEqual({
+            defeats: 0,
+            friends: null,
+            name: "jgonfroy",
+            points: 0,
+            victories: 0
           });
         })
         .expect(201);

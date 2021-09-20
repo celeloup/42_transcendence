@@ -7,7 +7,6 @@ import { Repository } from 'typeorm';
 import Channel from './channel.entity';
 import CreateChannelDto from './dto/createChannel.dto';
 import UsersService from '../users/users.service';
-import UserDto from './dto/User.dto';
 
 @Injectable()
 export default class ChannelService {
@@ -155,7 +154,7 @@ export default class ChannelService {
       if (!(await this.isBanned(channel_id, member_id))) {
         let channel = await this.getAllInfosByChannelId(channel_id);
         let newMember = await this.usersService.getById(member_id);
-        await channel.members.push(newMember);
+        channel.members.push(newMember);
         await this.channelRepository.save(channel);
         return channel;
       }
