@@ -1,41 +1,46 @@
-import { Exclude } from 'class-transformer';
+import { Exclude, Expose } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
 import Channel from '../channel/channel.entity';
-import { Column, Entity, PrimaryGeneratedColumn, OneToMany, JoinTable, ManyToMany, Unique, JoinColumn, RelationId } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, OneToMany, JoinTable, ManyToMany } from 'typeorm';
 import Match from '../matches/match.entity';
 import Achievement from '../achievements/achievement.entity'
  
 @Entity()
+@Exclude()
 class User {
   @PrimaryGeneratedColumn()
+  @Expose({ groups: ['me'] })
   @ApiProperty()
   public id: number;
 
   @Column({nullable: true})
+  @Expose({ groups: ['me'] })
   @ApiProperty()
   public admin: boolean;
 
   @Column({ unique: true })
+  @Expose({ groups: ['me'] })
   @ApiProperty()
   public id42: number;
 
   @Column({ unique: true })
+  @Expose({ groups: ['me'] })
   @ApiProperty()
   public email: string;
 
   @Column({ unique: true })
+  @Expose()
   @ApiProperty()
   public name: string;
 
   @Column({ nullable: true })
-  @Exclude()
   public currentHashedRefreshToken?: string;
 
   @Column({ nullable: true })
-  @Exclude()
   public twoFactorAuthenticationSecret?: string;
 
   @Column({ default: false })
+  @Expose({ groups: ['me'] })
   @ApiProperty()
   public isTwoFactorAuthenticationEnabled: boolean;
 
@@ -55,33 +60,34 @@ class User {
   public mute: Channel[];
   
   @ManyToMany(() => Match, (match: Match) => match.users)
+  @Expose()
   @JoinTable()
   public matches: Match[];
 
   @ManyToMany(() => Achievement, (achievement: Achievement) => achievement.users)
+  @Expose()
   @JoinTable()
   public achievements: Achievement[];
 
   @Column({ default: 0 })
+  @Expose()
   @ApiProperty()
   public victories: number;
 
-  @Column({ default: 0 })
+  @Column()
+  @Expose()
   @ApiProperty()
   public defeats: number;
 
   @Column()
   @ApiProperty({ default: 0 })
+  @Expose()
   public points: number;
 
-//  @Column("simple-array", {nullable: true})
-//  public friends: string[];
-
-  // @Column("int", {array: true, nullable: true})
-  // public friends: number[];
-
   @ManyToMany(() => User, (user: User) => user.friendOf)
+  @ApiProperty()
   @JoinTable()
+  @Expose()
   public friends: User[];
 
   @ManyToMany(() => User, (user: User) => user.friends)
@@ -93,6 +99,12 @@ class User {
 
   @ManyToMany(() => User, (user: User) => user.blocked)
   public blockedBy: User[];
+
+  //  @Column("simple-array", {nullable: true})
+  //  public friends: string[];
+
+  // @Column("int", {array: true, nullable: true})
+  // public friends: number[];
 
 }
 
