@@ -14,6 +14,7 @@ import { Server, Socket } from 'socket.io';
 import AuthenticationService from '../authentication/authentication.service'
 import Channel from './channel.entity';
 import Match from 'src/matches/match.entity';
+import ChannelService from './channel.service';
  
 @WebSocketGateway({ serveClient: false, namespace: '/channel' })
 export default class ChannelGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -24,6 +25,7 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
   private connectedUsers: Map<Socket, string> = new Map();
 
   constructor(
+    private readonly channelService: ChannelService,
     private readonly authenticationService: AuthenticationService
   ) {}
 
@@ -55,7 +57,7 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
   ) {
      const author = await this.authenticationService.getUserFromSocket(client);
       this.logger.log(`Message from ${this.connectedUsers.get(client)} to ${data.recipient.name}: ${data.content}`);
-      const message = await this.authenticationService.saveMessage(data.content, author, data.recipient);
+      const message = await this.channelService.saveMessage(data.content, author, data.recipient);
       //est-ce que j'envoie directement aux membres du channel connecte ou c'est overkill par rapport au front ?
       this.server.emit('receive_message', data);
     }
@@ -67,18 +69,7 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
   )
   {
     this.logger.log(`Request message of ${channel.name}`);
-    const messages = await this.authenticationService.getMessageByChannel(channel);
-    for (const message of messages) {
-      if (message.author) {
-        message.author = {
-          ...message.author,
-          currentHashedRefreshToken: undefined,
-          id42: undefined,
-          isTwoFactorAuthenticationEnabled: undefined,
-          twoFactorAuthenticationSecret: undefined
-        }
-      }
-    }
+    const messages = await this.channelService.getMessageByChannel(channel);
     socket.emit('messages_channel', messages);
   }
 

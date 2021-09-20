@@ -3,7 +3,7 @@ import Element from './element.interface';
 export default interface Round {
   
   id_player1: number;
-  id_player2: number
+  id_player2: number;
   
   speed: number;
   goal: number;
