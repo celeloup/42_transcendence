@@ -11,10 +11,9 @@ import {
   WsResponse,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import ChannelService from './channel.service'
+import AuthenticationService from '../authentication/authentication.service'
 import Channel from './channel.entity';
 import Match from 'src/matches/match.entity';
-import { match } from 'assert';
  
 @WebSocketGateway({ serveClient: false, namespace: '/channel' })
 export default class ChannelGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -23,10 +22,9 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
   private logger: Logger = new Logger("ChannelGateway");
 
   private connectedUsers: Map<Socket, string> = new Map();
-  // private socketUsers: Map<string, Socket> = new Map();
 
   constructor(
-    private readonly channelService: ChannelService
+    private readonly authenticationService: AuthenticationService
   ) {}
 
   afterInit(server: Server) {
@@ -35,7 +33,7 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
 
   //est-ce qu'il faut emit une notif au serveur des que quelqu'un se co/deco ?
   async handleConnection(client: Socket, ...args: any[]) {
-    const user = await this.channelService.getUserFromSocket(client);
+    const user = await this.authenticationService.getUserFromSocket(client);
     if (user) {
       //si id compris dans client pourquoi ne pas garder qu'une map socket user ?
       this.connectedUsers.set(client, user.name);
