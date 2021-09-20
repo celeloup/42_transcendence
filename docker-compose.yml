@@ -1,16 +1,16 @@
 version: '3'
 
 services:
-  # front:
-  #   image: node:15.14.0-alpine3.12
-  #   command: sh -c "npm install && npm start"
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     HOST: 0.0.0.0
-  #   volumes:
-  #     - ./front/.:/usr/src/app
-  #   working_dir: /usr/src/app
+  front:
+    image: node:15.14.0-alpine3.12
+    command: sh -c "npm install && npm start"
+    ports:
+      - "3000:3000"
+    environment:
+      HOST: 0.0.0.0
+    volumes:
+      - ./front/.:/usr/src/app
+    working_dir: /usr/src/app
 
   back:
     image: node:15.14.0-alpine3.12
