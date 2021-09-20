@@ -9,7 +9,6 @@ import * as cookieParser from 'cookie-parser';
 import UsersModule from '../src/users/users.module';
 import AuthenticationModule from '../src/authentication/authentication.module';
 import io from 'socket.io-client';
-import SocketModule from '../src/socket/socket.module';
 import ChannelModule from '../src/channel/channel.module';
 import Message from "../src/channel/message.entity";
 
@@ -49,7 +48,6 @@ describe('AppController (e2e)', () => {
         }),
         UsersModule,
         AuthenticationModule,
-        SocketModule,
         ChannelModule
       ],
     }).compile();
@@ -222,7 +220,12 @@ describe('AppController (e2e)', () => {
               name: cleloup.name,
               email: cleloup.email,
               id42: cleloup.id42,
-              isTwoFactorAuthenticationEnabled: false
+              isTwoFactorAuthenticationEnabled: false,
+              admin: null,
+              defeats: 0,
+              friends: null,
+              points: 0,
+              victories: 0
             });
           })
           .expect(200);
@@ -240,7 +243,12 @@ describe('AppController (e2e)', () => {
               name: fhenrion.name,
               email: fhenrion.email,
               id42: fhenrion.id42,
-              isTwoFactorAuthenticationEnabled: false
+              isTwoFactorAuthenticationEnabled: false,
+              admin: null,
+              defeats: 0,
+              friends: null,
+              points: 0,
+              victories: 0
             });
           })
           .expect(200);
@@ -307,6 +315,7 @@ describe('AppController (e2e)', () => {
       });
     });
 
+    /*
     describe('websocket test gateway with cookie', () => {
       it('should connect and return the username', async () => {
         const URL = "http://localhost:9090/test"
@@ -408,8 +417,63 @@ describe('AppController (e2e)', () => {
         }
       });
     });
-    
+    */
 
+    // routes for creating channels
+    // keep them for testing
+    describe('Channel creation', () => {
+      it('should create and return the channel', () => {
+        return request(app.getHttpServer())
+        .post('/api/channel/')
+        .set('authorization', `bearer ${jgonfroyBearers[1]}`)
+        .send({
+          name: 'transcendance team',
+          owner_id: jgonfroy.id42
+        })
+        .expect((res) => {
+          expect(res.body).toEqual({
+            id: 1,
+            name: 'transcendance team',
+            admin: [],
+            members: [],
+            owner: expect.any(Object),
+            password: null,
+            private: false
+          });
+          expect(res.body.owner).toEqual({
+            defeats: 0,
+            friends: null,
+            name: "jgonfroy",
+            points: 0,
+            victories: 0
+          });
+        })
+        .expect(201);
+      });
+    });
+
+    describe('get a channel', () => {
+      it('should return the channel', () => {
+        return request(app.getHttpServer())
+        .get('/api/channel/1')
+        .set('authorization', `bearer ${jgonfroyBearers[1]}`)
+        .expect((res) => {
+          expect(res.body).toEqual({
+            id: 1,
+            name: 'transcendance team',
+            password: null,
+            private: false
+          });
+        })
+        .expect(200);
+      });
+    });
+    
+    // test with 3 users
+    // 1) two users send messages
+    // 2) one user get messages
+
+    /*
     describe('channel test gateway users PM', () => {
       it('cleloup should receive coucou from fhenrion', async () => {
         const URL = "http://localhost:9090/channel"
@@ -437,7 +501,7 @@ describe('AppController (e2e)', () => {
         try {
           const messages = await new Promise(async (resolve, reject) => {
             sockets[0].on("connect", () => {
-              sockets[0].emit('send_message', { content: 'coucou', recipient: 'cleloup' });
+              sockets[0].emit('send_message', { content: 'coucou', recipient: {name: 'transcendance team'} });
               sockets[0].close();
             });
 
@@ -469,7 +533,7 @@ describe('AppController (e2e)', () => {
             sockets[0].connect();
             setTimeout((socket) => {
               socket.connect();
-            }, 3000, sockets[1])
+            }, 2000, sockets[1]);
           });
           expect(messages).toEqual([{
             content: 'coucou',
@@ -486,6 +550,7 @@ describe('AppController (e2e)', () => {
         }
       });
     });
+    */
 
     describe('logout', () => {
       const empty_cookies = 'Authentication=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0,Refresh=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0';

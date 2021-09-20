@@ -16,26 +16,7 @@ export default class GameService {
     private readonly paddle_margin: 20,
   ) {
   }
-
-  async getUserFromSocket(socket: Socket) {
-    let authenticationToken: string
-
-    const cookie = socket.handshake.headers?.cookie;
-    const bearer = socket.handshake.headers?.authorization;
-    if (cookie) {
-      authenticationToken = parse(cookie).Authentication;
-    } else if (bearer) {
-      authenticationToken = bearer.split(" ")[1];
-    } else {
-      return null;
-    }
-    const user = await this.authenticationService.getUserFromAuthenticationToken(authenticationToken);
-    if (!user) {
-      throw new WsException('Invalid credentials.');
-    }
-    return user;
-  }
-
+  
   initGame(match: Match) {
     var param: Round = {
 
@@ -51,5 +32,17 @@ export default class GameService {
     puck: {x : this.width / 2, y : this.height / 2 },
   };
 	return param;
+  }
+
+  gameLoop(param: Round) {
+    while (1) {
+      if (this.checkWinner(param))
+        return param;
+
+    }
+  }
+
+  checkWinner(param: Round) {
+    return false;
   }
 }

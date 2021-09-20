@@ -1,6 +1,6 @@
 const io = require("socket.io-client");
 
-const URL = "http://back:8080/channel"
+const URL = "http://back:8080/game"
 const connector = io(URL);
 
 // connector wait for successful connection and launch the tests
@@ -23,29 +23,19 @@ connector.on("connect", () => {
     client.on("connect", () => {
       console.log(`client ${i}: connected!`);
 
-    connector.on("connectedUsers", (data)=> {
-        console.log(`new connection: ${JSON.stringify(data)}`);
-      });
-      
       setTimeout(() => {
 		  const message = `Hello from client ${i}!`;
-
-		  // client.emit('send_message', { content: message , recipient: null});
       }, Math.random() * (8000 - 3000) + 3000);
       
-      // client.emit("request_messages", recipient);
+      if (i == 1)
+		    client.emit('launch_game', { friendly: true , user1_id: 1, user2_id: 2 });
 
       setTimeout(() => {
         console.log(`client ${i}: disconnection...`);
         client.disconnect();
-        
-        connector.on("connectedUsers", (data)=> {
-          console.log(`new connection: ${JSON.stringify(data)}`);
         });
 
       }, 9000); 
-    });
-    
     // client.on("messagesByChannel", (data) => {
     //   console.log(`client ${i}: ${JSON.stringify(data)}`);
     // });

@@ -6,8 +6,8 @@ import UsersService from './users.service';
 import User from './user.entity';
 import JwtStrategy from '../authentication/strategy/jwt.strategy';
 import UsersController from './users.controller';
-import AchievementsModule from 'src/achievements/achievements.module';
-import Achievement from 'src/achievements/achievement.entity';
+import AchievementsModule from '../achievements/achievements.module';
+import Achievement from '../achievements/achievement.entity';
  
 @Module({
   imports: [

@@ -14,7 +14,7 @@ import UsersService from '../../users/users.service';
 import TwoFactorAuthenticationCodeDto from './dto/twoFactorAuthenticationCode.dto';
 import AuthenticationService from '../authentication.service';
 import AuthInfos from '../interface/authInfos.interface';
-import { ApiResponse, ApiTags, ApiBearerAuth, ApiCookieAuth } from '@nestjs/swagger';
+import { ApiResponse, ApiTags, ApiBearerAuth, ApiCookieAuth, ApiOperation } from '@nestjs/swagger';
 
 @ApiTags('2 Factors authentication')
 @Controller('2fa')
@@ -27,6 +27,7 @@ export default class TwoFactorAuthenticationController {
 
   @UseGuards(JwtAuthenticationGuard)
 	@Post('generate')
+  @ApiOperation({summary: "Return the 2fa configuration QRcode"})
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')
   @ApiResponse({
@@ -42,6 +43,7 @@ export default class TwoFactorAuthenticationController {
   
   @UseGuards(JwtAuthenticationGuard)
   @Post('turn-on')
+  @ApiOperation({summary: "Enable the 2fa with the 2fa code"})
   @HttpCode(200)
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')
@@ -65,6 +67,7 @@ export default class TwoFactorAuthenticationController {
 
   @UseGuards(JwtAuthenticationGuard)
   @Post('authenticate')
+  @ApiOperation({summary: "return user associated with the authentication token"})
   @HttpCode(200)
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')

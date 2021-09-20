@@ -6,7 +6,7 @@ import * as bcrypt from 'bcrypt';
 import CreateUserDto from './dto/createUser.dto';
 import UpdateUserDto from './dto/updateUser.dto';
 import AddFriendDto from './dto/addFriend.dto';
-import Achievement from 'src/achievements/achievement.entity';
+import Achievement from '../achievements/achievement.entity';
 import AchievementsService from '../achievements/achievements.service';
 
 @Injectable()
@@ -25,6 +25,14 @@ export default class UsersService {
       return user;
     }
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
+  }
+
+  async getAllUsers(): Promise<User[]> {
+    const users = await this.usersRepository.find();
+    if (users) {
+      return users;
+    }
+    throw new HttpException('No user registered yet', HttpStatus.NOT_FOUND);
   }
 
   async getMatchesByUserId(id: number) {
