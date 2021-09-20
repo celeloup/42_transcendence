@@ -3,14 +3,19 @@ import AuthenticationService from '../authentication/authentication.service';
 import { Socket } from 'socket.io';
 import { parse } from 'cookie';
 import { WsException } from '@nestjs/websockets';
- 
+import Match from '../matches/match.entity';
+import Round from './interface/round.interface';
+import Element from './interface/element.interface';
+
 @Injectable()
 export default class GameService {
   constructor(
     private readonly authenticationService: AuthenticationService,
+    private readonly height: 10,
+    private readonly width: 10,
   ) {
   }
- 
+
   async getUserFromSocket(socket: Socket) {
     let authenticationToken: string
 
@@ -23,7 +28,6 @@ export default class GameService {
     } else {
       return null;
     }
-    
     const user = await this.authenticationService.getUserFromAuthenticationToken(authenticationToken);
     if (!user) {
       throw new WsException('Invalid credentials.');
@@ -48,4 +52,3 @@ export default class GameService {
 	return param;
   }
 }
-
