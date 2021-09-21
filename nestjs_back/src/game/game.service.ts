@@ -1,22 +1,30 @@
 import { Injectable } from '@nestjs/common';
-import AuthenticationService from '../authentication/authentication.service';
-import { Socket } from 'socket.io';
-import { parse } from 'cookie';
-import { WsException } from '@nestjs/websockets';
 import Match from '../matches/match.entity';
-import Round from './interface/round.interface';
-import Element from './interface/element.interface';
+import Round from './class/round.class';
+import Paddle from './class/paddle.class';
+import Puck from './class/puck.class';
 
 @Injectable()
 export default class GameService {
   constructor(
-    private readonly authenticationService: AuthenticationService,
-    private readonly height: 360,
-    private readonly width: 782,
-    private readonly paddle_margin: 20,
+    private readonly height: number = 360,
+    private readonly width: number = 782,
+    private readonly paddle_margin: number = 20,
   ) {
   }
   
+  getHeight() {
+    return this.height;
+  }
+
+  getWidth() {
+    return this.width;
+  }
+  
+  getPaddleMargin() {
+    return this.paddle_margin;
+  }
+
   initGame(match: Match) {
     var param: Round = {
 
@@ -27,22 +35,10 @@ export default class GameService {
     boost_available : false,
     score_player1 : 0,
     score_player2 : 0,
-    paddle_player1 : {x : this.paddle_margin, y : this.height / 2 },
-    paddle_player2 : {x : this.width - this.paddle_margin, y : this.height / 2 },
-    puck: {x : this.width / 2, y : this.height / 2 },
+    paddle_player1 : new Paddle (this.paddle_margin, this.height / 2),
+    paddle_player2 : new Paddle (this.width - this.paddle_margin, this.height / 2),
+    puck: new Puck (),
   };
 	return param;
-  }
-
-  gameLoop(param: Round) {
-    while (1) {
-      if (this.checkWinner(param))
-        return param;
-
-    }
-  }
-
-  checkWinner(param: Round) {
-    return false;
   }
 }
