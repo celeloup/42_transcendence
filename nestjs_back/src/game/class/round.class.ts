@@ -1,6 +1,7 @@
-import Element from './element.interface';
+import Paddle from './paddle.class';
+import Puck from './puck.class';
 
-export default interface Round {
+export default class Round {
   
   id_player1: number;
   id_player2: number;
@@ -12,8 +13,8 @@ export default interface Round {
   score_player1: number;
   score_player2: number;
   
-  paddle_player1: Element;
-  paddle_player2: Element;
-  puck: Element;
+  paddle_player1: Paddle;
+  paddle_player2: Paddle;
+  puck: Puck;
 
 }

@@ -12,8 +12,8 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import Match from '../matches/match.entity';
-import Round from './interface/round.interface';
-import Element from './interface/element.interface';
+import Round from './class/round.class';
+import Paddle from './class/paddle.class';
 import GameService from "./game.service";
 import AuthenticationService from '../authentication/authentication.service';
 
@@ -51,6 +51,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 
 
   updateFrame() {
+    // this.param.puck.update();
     //ici on fait les nouveaux calculs
     //verifier la victoire seulement lorsqu'il y a un changement de points
     this.hasVictory();
@@ -105,7 +106,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
   
   @SubscribeMessage('paddle_movement')
   async setNewPosition(
-    @MessageBody() paddle: Element,
+    @MessageBody() paddle: Paddle,
     @ConnectedSocket() client: Socket,
   )
   {
