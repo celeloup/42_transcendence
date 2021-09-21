@@ -1,9 +1,17 @@
 import * as React from "react";
 
+export type User = {
+	id: number,
+	id42: number,
+	isTwoFactorAuth: boolean,
+	name: string
+}
+
 export type ContextType = {
 	isAuth: boolean,
-	login: () => void,
+	login: (user:User) => void,
 	logout: () => void,
+	user: User | null
   }
 
 interface Props {
@@ -15,13 +23,16 @@ export const AuthContext = React.createContext<Partial<ContextType>>({});
 export const AuthProvider= ({ children } : Props) => {
 	
 	const [isAuth, setIsAuth] = React.useState<boolean>(false);
-	const loginContext = () => {
-		// do stuff here ?
+	const [user, setUser] = React.useState<User | null>();
+
+	const loginContext = (user:User) => {
 		setIsAuth(true);
+		setUser(user);
 	};
 	const logoutContext = () => {
-		// do stuff here ? 
 		setIsAuth(false);
-	}
-	return ( <AuthContext.Provider value={{isAuth: isAuth, login: loginContext, logout: logoutContext}}>{ children }</AuthContext.Provider> );
+		setUser(null);
+	};
+	
+	return ( <AuthContext.Provider value={{isAuth: isAuth, login: loginContext, logout: logoutContext, user: user}}>{ children }</AuthContext.Provider> );
 }
