@@ -1,29 +1,35 @@
 import axios from 'axios';
 
-const API_BASE_URL:string = "http://localhost:8080/api";
+axios.defaults.withCredentials = true;
+axios.defaults.baseURL = "http://localhost:8080/api";
 
-export async function oauth(code:string) {
-	await axios.get(`${API_BASE_URL}/authentication/oauth${code}`, { withCredentials: true })
+export function oauth(code:string) {
+	  axios.get(`/authentication/oauth${code}`)
 		.then(response => { console.log("RESPONSE GOOD : ", response) })
 		.catch(error => { console.log("Error catch :", error.response) })
 }
 
-export function isAuth() : boolean {
-	// let ret:boolean = false;
-	axios.get(`${API_BASE_URL}/authentication`, { withCredentials: true })
-		.then(response => { console.log("YES IS AUTH", response.data); })
-		.catch(error => { console.log(error.response); })
-	return (true);
-}
+// export async function isAuth(login:() => void, logout:() => void) {
+// 	return axios.get(`/authentication`)
+// 		.then(response => { 
+// 			console.log("YES IS AUTH", response.data);
+// 			login();
+// 			// return response; 
+// 		})
+// 		.catch(error => {
+// 			console.log(error.response);
+// 			logout();
+// 		})
+// }
 
 export async function logout() {
-	await axios.post(`${API_BASE_URL}/authentication/log-out`, { withCredentials: true })
-		.then(response => { console.log("YES LOGOUT", response.data) })
+	await axios.post(`/authentication/log-out`)
+		.then(response => { console.log("user logged out"); })
 		.catch(error => { console.log(error.response) })
 }
 
 export function authRefresh() : void {
-	axios.get(`${API_BASE_URL}/authentication/refresh`, { withCredentials: true })
+	axios.get(`/authentication/refresh`)
 	.then(response => { console.log(response.data) })
 	.catch(error => { console.log(error.response) })
 }
