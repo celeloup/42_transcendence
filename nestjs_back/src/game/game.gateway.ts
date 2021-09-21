@@ -32,7 +32,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
   constructor(
     private readonly authenticationService: AuthenticationService,
     private readonly gameService: GameService,
-  ) {}
+  ) {}  
 
   //a deplacer dans service ?
   getPlayer(id: number){
@@ -48,21 +48,9 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
       this.victory == true;
   }
 
-  setNewPosition(player :number, data :Element) {
-    if (player == 0)
-      return false;
-    if (player == 1) {
-      this.param.paddle_player1.x = data.x;
-      this.param.paddle_player1.y = data.y;
-    }
-    else {
-      this.param.paddle_player2.x = data.x;
-      this.param.paddle_player2.y = data.y;
-    }
-    return true;
-  }
 
-  getNewFrame() {
+
+  updateFrame() {
     //ici on fait les nouveaux calculs
     //verifier la victoire seulement lorsqu'il y a un changement de points
     this.hasVictory();
@@ -97,25 +85,16 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
     @ConnectedSocket() client: Socket,
   )
   {
-    let is_from_player : boolean = false;
-
     //on initialise la game avec les parametres de jeu envoye par le front
     this.param = this.gameService.initGame(match);
     this.logger.log("Start game");
+
     while (this.nbPlayer == 2 && !this.victory)
-    {
-      //on verifie que les nouvelles positions viennent bien des players et on actualise leur position dans les infos de la partie  
-      this.server.on('new_position', async (data :Element) => {
-        const user = await this.authenticationService.getUserFromSocket(client);
-        is_from_player = this.setNewPosition(this.getPlayer(user.id), data);
-        });
-      
-      //si un joueur a envoye une nouvelle position on recalcule les positions du jeu et on envoie les nouvelles infos
-      if (is_from_player) {
-        this.getNewFrame();
-        this.server.emit('new_frame', this.param);
-        is_from_player == false;
-      }
+    { 
+      //timer (ms)
+      await new Promise(f => setTimeout(f, 60));
+      this.updateFrame();
+      this.server.emit('new_frame', this.param);
     }
 
     if (this.victory)
@@ -123,5 +102,27 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
     if (this.nbPlayer < 2)
       this.server.emit('interrupted_game');
   }
+  
+  @SubscribeMessage('paddle_movement')
+  async setNewPosition(
+    @MessageBody() paddle: Element,
+    @ConnectedSocket() client: Socket,
+  )
+  {
+    let player: number;
+
+    //on verifie que les nouvelles positions viennent bien des players et on actualise leur position dans les infos de la partie  
+    const user = await this.authenticationService.getUserFromSocket(client);
+    player = this.getPlayer(user.id); 
+    
+    if (player == 1) {
+      this.param.paddle_player1.x = paddle.x;
+      this.param.paddle_player1.y = paddle.y;
+    }
+    else if (player == 2) {
+      this.param.paddle_player2.x = paddle.x;
+      this.param.paddle_player2.y = paddle.y;
+    }
+  } 
 }
   
