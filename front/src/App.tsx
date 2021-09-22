@@ -3,12 +3,12 @@ import React, { useEffect } from 'react';
 import { AuthContext, AuthProvider, ContextType }  from './AuthContext';
 import { BrowserRouter as Router, Switch, RouteComponentProps, Redirect } from 'react-router-dom';
 import { Route } from './Route';
-import Logo from './ui_components/Logo';
+import Logo from './components/ui_components/Logo';
 
-import Admin from './pages/Admin';
-import Home from './pages/Home';
-import Profile from './pages/Profile';
-import Parameters from './pages/Parameters';
+import Admin from './components/Admin';
+import Home from './components/Home';
+import Profile from './components/Profile';
+import Parameters from './components/Parameters';
 
 import axios from 'axios';
 
