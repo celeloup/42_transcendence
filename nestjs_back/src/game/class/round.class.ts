@@ -1,10 +1,9 @@
 import GameService from '../game.service';
+import {height, width, paddle_margin} from '../game.settings'
 import Paddle from './paddle.class';
 import Puck from './puck.class';
 
 export default class Round {
-  private readonly game: GameService;
-  
   id_player1: number;
   id_player2: number;
   
@@ -26,8 +25,8 @@ export default class Round {
     this.goal = goal;
     this.boost_available = boost;
 
-    this.paddle_player1 = new Paddle (this.game.paddle_margin, this.game.height / 2),
-    this.paddle_player2 = new Paddle (this.game.width - this.game.paddle_margin, this.game.height / 2),
+    this.paddle_player1 = new Paddle (paddle_margin, height / 2),
+    this.paddle_player2 = new Paddle (width - paddle_margin, height / 2),
     this.puck = new Puck;
   }
 }
