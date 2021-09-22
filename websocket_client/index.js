@@ -28,7 +28,7 @@ connector.on("connect", () => {
       }, Math.random() * (8000 - 3000) + 3000);
       
       if (i == 1)
-		    client.emit('launch_game', { friendly: true , user1_id: 1, user2_id: 2 });
+		    client.emit('launch_game', { friendly: true , player1_id: 1, player2_id: 2 });
 
       setTimeout(() => {
         console.log(`client ${i}: disconnection...`);
@@ -36,10 +36,6 @@ connector.on("connect", () => {
         });
 
       }, 9000); 
-    // client.on("messagesByChannel", (data) => {
-    //   console.log(`client ${i}: ${JSON.stringify(data)}`);
-    // });
-
     
   }
  setTimeout(() => {

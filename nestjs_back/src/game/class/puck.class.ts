@@ -1,8 +1,6 @@
 import { timeStamp } from 'console';
 import GameService from '../game.service'
 
-game: GameService;
-
 export default class Puck {
     private readonly game: GameService;
 
@@ -13,8 +11,8 @@ export default class Puck {
     indice: number = 1;
 
     constructor() {
-      this.x = this.game.getWidth() / 2;
-      this.y = this.game.getHeight() / 2;
+      this.x = this.game.width / 2;
+      this.y = this.game.height / 2;
     }
 
     update() {
@@ -29,12 +27,12 @@ export default class Puck {
             return 2;
         }
 
-        if (this.x > this.game.getWidth()) {
+        if (this.x > this.game.width) {
             this.reset();
             return 1;
         }
         
-        if (this.y < 0 || this.y > this.game.getHeight())
+        if (this.y < 0 || this.y > this.game.height)
         {
          this.y_speed *= -1;   
         }
@@ -43,8 +41,8 @@ export default class Puck {
 
     reset()
     {
-      this.x = this.game.getWidth() / 2;
-      this.y = this.game.getHeight() / 2;
+      this.x = this.game.width / 2;
+      this.y = this.game.height / 2;
       this.x_speed = 2;
       this.y_speed = 3;
     }
