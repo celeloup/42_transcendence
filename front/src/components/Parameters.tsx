@@ -1,4 +1,4 @@
-import * as api from './../API';
+import * as api from '../API';
 import React from 'react';
 import { AuthContext, ContextType} from '../AuthContext';
 import { useHistory } from "react-router-dom";
