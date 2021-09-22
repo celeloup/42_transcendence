@@ -29,6 +29,8 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
   private nbPlayer: number = 0; 
   private victory: boolean = false;
 
+  private i: number = 0;
+
   constructor(
     private readonly authenticationService: AuthenticationService,
     private readonly gameService: GameService,
@@ -36,9 +38,11 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 
   //a deplacer dans service ?
   getPlayer(id: number){
-    if (id == this.param.id_player1)
+    if (!this.param)
+      return 0;
+    if (id === this.param.id_player1)
       return 1;
-    if (id == this.param.id_player1)
+    if (id === this.param.id_player2)
       return 2;
     return 0;
   }
@@ -51,7 +55,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 
 
   updateFrame() {
-    // this.param.puck.update();
+    this.param.puck.update();
     //ici on fait les nouveaux calculs
     //verifier la victoire seulement lorsqu'il y a un changement de points
     this.hasVictory();
@@ -63,20 +67,40 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 
   async handleConnection(client: Socket, ...args: any[]) {
     const user = await this.authenticationService.getUserFromSocket(client);
-    if (user) {
-      this.connectedUsers.set(user.id, client);
+    if (user)
+    {
+      this.connectedUsers.set(user.id, client); 
       if (this.getPlayer(user.id))
         this.nbPlayer++;
-    } else {
-      this.connectedUsers.set(Math.random(), client);
+
+    }
+    else
+    {
+      this.connectedUsers.set(this.i, client);
+      if (this.getPlayer(this.i))
+        this.nbPlayer++;
+      this.i++;
     }
   }
 
   async handleDisconnect(client: Socket) {
     const user = await this.authenticationService.getUserFromSocket(client);
-    this.connectedUsers.delete(user.id);
-    if (this.getPlayer(user.id))
-      this.nbPlayer--;
+    if (user)
+    {  
+      this.connectedUsers.delete(user.id);
+      if (this.getPlayer(user.id))
+        this.nbPlayer--;
+    }
+    else {
+      for (let [key, value] of this.connectedUsers.entries()) {
+        if (value === client) {
+          this.connectedUsers.delete(key);
+          if (this.getPlayer(key))
+           this.nbPlayer--;
+          break;
+        }
+      }
+    }
   }
 
   //est-ce qu'on revient ici si le jeux a ete interrompu ?
@@ -87,7 +111,17 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
   )
   {
     //on initialise la game avec les parametres de jeu envoye par le front
-    this.param = this.gameService.initGame(match);
+    // TEST this.param = new Round(match.user1_id, match.user2_id, 10, 10, false);
+    this.param = new Round(0, 1, 10, 10, false);
+
+    //on verifie si les joueurs sont deja co pour lancer la partie, sinon on attend
+    for (let [key, value] of this.connectedUsers.entries()) {
+        if (value === client) {
+          if (this.getPlayer(key))
+           this.nbPlayer++;
+        }
+      }
+    
     this.logger.log("Start game");
 
     while (this.nbPlayer == 2 && !this.victory)
@@ -115,7 +149,8 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
     //on verifie que les nouvelles positions viennent bien des players et on actualise leur position dans les infos de la partie  
     const user = await this.authenticationService.getUserFromSocket(client);
     player = this.getPlayer(user.id); 
-    
+   
+
     if (player == 1) {
       this.param.paddle_player1.x = paddle.x;
       this.param.paddle_player1.y = paddle.y;
