@@ -48,9 +48,9 @@ class User {
   public channels: Channel[];
 
   @OneToMany(() => Channel, (channel: Channel) => channel.owner)
-  public owned: Channel[];
+  public ownedChannels: Channel[];
 
-  @ManyToMany(() => Channel, (channel: Channel) => channel.admin)
+  @ManyToMany(() => Channel, (channel: Channel) => channel.admins)
   public chan_admin: Channel[];
 
   @ManyToMany(() => Channel, (channel: Channel) => channel.banned)
@@ -69,7 +69,7 @@ class User {
   @JoinTable()
   public achievements: Achievement[];
 
-  @Column()
+  @Column({ default: 0 })
   @Expose()
   @ApiProperty()
   public victories: number;
@@ -80,17 +80,32 @@ class User {
   public defeats: number;
 
   @Column()
+  @ApiProperty({ default: 0 })
   @Expose()
-  @ApiProperty()
   public points: number;
 
-//  @Column("simple-array", {nullable: true})
-//  public friends: string[];
-
-  @Column("int", {array: true, nullable: true})
-  @Expose()
+  @ManyToMany(() => User, (user: User) => user.friendOf)
   @ApiProperty()
-  public friends: number[];
+  @JoinTable()
+  @Expose()
+  public friends: User[];
+
+  @ManyToMany(() => User, (user: User) => user.friends)
+  public friendOf: User[];
+
+  @ManyToMany(() => User, (user: User) => user.blockedBy)
+  @JoinTable()
+  public blocked: User[];
+
+  @ManyToMany(() => User, (user: User) => user.blocked)
+  public blockedBy: User[];
+
+  //  @Column("simple-array", {nullable: true})
+  //  public friends: string[];
+
+  // @Column("int", {array: true, nullable: true})
+  // public friends: number[];
+
 }
 
 export default User;

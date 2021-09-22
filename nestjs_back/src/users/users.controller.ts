@@ -47,23 +47,47 @@ export default class UsersController {
     return this.userService.getMatchesByUserId(Number(id));
   }
 
+  @Get('channels/:id')
+  getChannelsByUserId(@Param() { id }: FindOneParams) {
+    return this.userService.getChannelsByUserId(Number(id));
+  }
+
   @Get('achievements/:id')
   @ApiOperation({summary: "Get achievements by id"})
-  getFriendsByUserId(@Param() { id }: FindOneParams) {
+  getAchievementsByUserId(@Param() { id }: FindOneParams) {
     return this.userService.getAchievementsByUserId(Number(id));
   } 
+
+  @Get('friends/:id')
+  @ApiOperation({summary: "Get friends by id"})
+  getFriendsByUserId(@Param() { id }: FindOneParams) {
+    return this.userService.getFriendsByUserId(Number(id));
+  } 
+
+  @Get('infos/:id')
+  getAllInfosByUserId(@Param() { id }:FindOneParams) {
+    return this.userService.getAllInfosByUserId(Number(id));
+  }
 
   @Put('friend/:id')
   @ApiOperation({summary: "Add a fiend to user by id"})
   addAFriend(@Param() { id }: FindOneParams, @Body() friend: AddFriendDto) {
-    return this.userService.addAFriend(Number(id), friend);
+    return this.userService.addAFriend(Number(id), friend.friendId);
   }
 
   @Delete('friend/:id')
   @ApiOperation({summary: "Delete a fiend to user by id"})
   deleteAFriend(@Param() { id }: FindOneParams, @Body() friend: AddFriendDto) {
-    return this.userService.deleteAFriend(Number(id), friend);
+    return this.userService.deleteAFriend(Number(id), friend.friendId);
   }
-  /* ajouter des amis ? modifier des stats ? */
 
+  @Put('block/:id')
+  blockAUser(@Param() { id }: FindOneParams, @Body() friend: AddFriendDto) {
+    return this.userService.blockAUser(Number(id), friend.friendId);
+  }
+
+  @Delete('block/:id')
+  unblockAUser(@Param() { id }: FindOneParams, @Body() friend: AddFriendDto) {
+    return this.userService.unblockAUser(Number(id), friend.friendId);
+  }
 }
