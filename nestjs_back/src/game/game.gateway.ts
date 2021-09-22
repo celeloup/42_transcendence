@@ -52,8 +52,6 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
       this.victory == true;
   }
 
-
-
   updateFrame() {
     this.param.puck.update();
     //ici on fait les nouveaux calculs
@@ -111,8 +109,8 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
   )
   {
     //on initialise la game avec les parametres de jeu envoye par le front
-    // TEST this.param = new Round(match.user1_id, match.user2_id, 10, 10, false);
-    this.param = new Round(0, 1, 10, 10, false);
+   this.param = new Round(match.user1_id, match.user2_id, 10, 10, false);
+    // this.param = new Round(0, 1, 10, 10, false);
 
     //on verifie si les joueurs sont deja co pour lancer la partie, sinon on attend
     for (let [key, value] of this.connectedUsers.entries()) {
