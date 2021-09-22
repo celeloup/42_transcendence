@@ -6,13 +6,11 @@ import Puck from './class/puck.class';
 
 @Injectable()
 export default class GameService {
-  constructor(
-    private readonly height: number = 360,
-    private readonly width: number = 782,
-    private readonly paddle_margin: number = 20,
-  ) {
-  }
-  
+
+  private readonly height: number = 360;
+  private readonly width: number = 782;
+  private readonly paddle_margin: number = 20;
+
   getHeight() {
     return this.height;
   }
