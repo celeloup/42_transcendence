@@ -22,7 +22,7 @@ connector.on("connect", () => {
       console.log(`client ${i}: connected!`);
 
       if (i == 1) {
-        client.emit('launch_game', { friendly: true, player1_id: 1, player2_id: 0 });
+        client.emit('launch_game', {friendly: false, user1_id: 0, user2_id: 1, user1_score: 10, user2_score: 10});
         client.emit('paddle_movement', {x: 1, y: 9})
       }
     });
@@ -39,7 +39,6 @@ connector.on("connect", () => {
   setTimeout(() => {
     connector.emit('paddle_movement', {x: 4, y: 5})
   }, 2000);
-
 
   for (const [i, client] of clients.entries()) {
     setTimeout(() => {
