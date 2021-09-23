@@ -2,7 +2,7 @@ import { Body, Controller, HttpCode, Param, Put, Req, UseGuards, Post, Get } fro
 import AchievementsService from './achievements.service';
 import CreateAchievementDto from './dto/createAchievement.dto'
 import FindOneParams from '../utils/findOneParams';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
 
 @ApiTags('achievements')
 @Controller('achievements')
@@ -11,8 +11,9 @@ export default class AchievementsController {
     private readonly achievementsService: AchievementsService
   ) { }
 
+  @ApiParam({name: 'id', type: Number, description: 'achievement id'})
   @Get(':id')
-  @ApiOperation({summary: "Get an achievement by id"})
+  @ApiOperation({summary: "Get an achievement"})
   getAchievementById(@Param() { id }: FindOneParams) {
     return this.achievementsService.getAchievementById(Number(id));
   }

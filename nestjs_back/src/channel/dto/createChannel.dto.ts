@@ -1,15 +1,22 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsNumber } from 'class-validator';
+import { IsString, IsNotEmpty, IsNumber, IsArray, ArrayMinSize } from 'class-validator';
 
 export default class CreateChannelDto {
 
   @IsString()
-  @IsNotEmpty()
   @ApiProperty()
-  name: string;
+  name : string;
 
   @IsNumber()
-  @IsNotEmpty()
-  @ApiProperty()
-  owner_id: number;
+  type : number;//(1 = public, 2 = private, 3 = mp)
+
+  @IsString()
+  password: string;
+
+  @IsArray()
+  members: number[];
+
+  @IsNumber()
+  owner_id: number; //TEMPORARY
+
 }
