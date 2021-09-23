@@ -9,6 +9,7 @@ import AuthenticationModule from './authentication/authentication.module';
 import ExceptionsLoggerFilter from './utils/exceptionsLogger.filter';
 import ChannelModule from './channel/channel.module';
 import AchievementsModule from './achievements/achievements.module';
+import GameModule from './game/game.module';
  
 @Module({
   imports: [
@@ -37,7 +38,8 @@ import AchievementsModule from './achievements/achievements.module';
     MatchesModule,
     AchievementsModule,
     ChannelModule,
-    AuthenticationModule
+    AuthenticationModule,
+    GameModule,
   ],
   controllers: [],
   providers: [
