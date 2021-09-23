@@ -41,13 +41,13 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
       this.connectedUsers.set(client, `client test`);
     }
     this.logger.log(`Connection: ${this.connectedUsers.get(client)}`);
-    this.server.emit('connectedUsers', Array.from(this.connectedUsers.values()));
+    this.server.emit('connected_users', Array.from(this.connectedUsers.values()));
   }
 
   handleDisconnect(client: Socket) {
     this.logger.log(`Disconnect: ${this.connectedUsers.get(client)}`);
     this.connectedUsers.delete(client);
-    this.server.emit('connectedUsers', Array.from(this.connectedUsers.values()));
+    this.server.emit('connected_users', Array.from(this.connectedUsers.values()));
   }
  
   @SubscribeMessage('send_message')
@@ -77,7 +77,7 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
   async requestConnectedUsers(@ConnectedSocket() socket: Socket)
   {
     this.logger.log(`List of connected users`);
-    socket.emit('connectedUsers', Array.from(this.connectedUsers.values()));
+    socket.emit('connected_users', Array.from(this.connectedUsers.values()));
   }
 
   @SubscribeMessage('send_invit')

@@ -153,10 +153,20 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
   {
     let player: number;
 
+    this.logger.log('Change paddle position');
+    
     //on verifie que les nouvelles positions viennent bien des players et on actualise leur position dans les infos de la partie  
     const user = await this.authenticationService.getUserFromSocket(client);
-    player = this.getPlayer(user.id); 
-   
+    if (user)
+      player = this.getPlayer(user.id); 
+    else {
+      for (let [key, value] of this.connectedUsers.entries()) {
+            if (value === client){
+              player = this.getPlayer(key);
+              break;
+            }
+        }
+    } 
 
     if (player == 1) {
       this.param.paddle_player1.x = paddle.x;
