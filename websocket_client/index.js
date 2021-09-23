@@ -16,37 +16,48 @@ connector.on("connect", () => {
     io(URL),
     io(URL),
   ]
-  
+
   for (const [i, client] of clients.entries()) {
     client.on("connect", () => {
       console.log(`client ${i}: connected!`);
 
-      setTimeout(() => {
-		  const message = `Hello from client ${i}!`;
-      }, Math.random() * (8000 - 3000) + 3000);
-      
-      if (i == 1)
-		    client.emit('launch_game', { friendly: true , player1_id: 0, player2_id: 1 });
+      if (i == 1) {
+        client.emit('launch_game', { friendly: true, player1_id: 1, player2_id: 0 });
+        client.emit('paddle_movement', {x: 1, y: 9})
+      }
     });
   }
 
-for (const [i, client] of clients.entries()) {      
   setTimeout(() => {
-      console.log(`client ${i}: disconnection...`);
-      client.disconnect();
-    }, 9000);
-}
+    connector.on('new_frame', (data) => {
+      console.log(`Puck    position = x :${data.puck.x}, y : ${data.puck.y}`);
+      console.log(`Player1 position = x :${data.paddle_player1.x}, y : ${data.paddle_player1.y}`);
+      console.log(`Player2 position = x :${data.paddle_player2.x}, y : ${data.paddle_player2.y}`);
+    });
+  }, 1000);
+  
+  setTimeout(() => {
+    connector.emit('paddle_movement', {x: 4, y: 5})
+  }, 2000);
 
-setTimeout(() => {
+
+  for (const [i, client] of clients.entries()) {
+    setTimeout(() => {
+      setTimeout(() => {
+        console.log(`client ${i}: disconnection...`);
+        client.disconnect();
+      }, 500);
+    }, 4000);
+  }
+
   connector.on('interrupted_game', () => {
-    console.log("Game interrompu");
+    console.log("Interrupted game");
   });
- }, 10000);
- 
- setTimeout(() => {
-  console.log(`End of the test! send reset to the api...`);
-  connector.emit("reset_counter");
-  connector.disconnect();
- }, 15000);
+
+  setTimeout(() => {
+    console.log(`End of the test! send reset to the api...`);
+    connector.emit("reset_counter");
+    connector.disconnect();
+  }, 5000);
 
 });
