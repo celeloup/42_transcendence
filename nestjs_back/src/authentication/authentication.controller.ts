@@ -17,7 +17,7 @@ import FortyTwoAuthenticationGuard from './guard/42Authentication.guard';
 import JwtRefreshGuard from './guard/jwtRefresh.guard';
 import JwtTwoFactorGuard from './guard/jwtTwoFactor.guard';
 import AuthInfos from './interface/authInfos.interface';
-import { ApiResponse, ApiBearerAuth, ApiTags, ApiCookieAuth, ApiOperation, ApiParam } from '@nestjs/swagger';
+import { ApiResponse, ApiBearerAuth, ApiTags, ApiCookieAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
 import User from '../users/user.entity';
 
 @SerializeOptions({
@@ -33,7 +33,7 @@ export default class AuthenticationController {
   @UseGuards(FortyTwoAuthenticationGuard)
   @Get('oauth')
   @ApiOperation({summary: "Create and authenticate user with 42 oauth code"})
-  @ApiParam({name: 'code', type: String, description: '42 oauth code'})
+  @ApiQuery({name: 'code', type: String, description: '42 oauth code'})
   @ApiResponse({
     status: 200,
     description: 'The user has been successfully authenticated.',
