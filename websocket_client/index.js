@@ -15,8 +15,6 @@ connector.on("connect", () => {
   const clients = [
     io(URL),
     io(URL),
-    io(URL),
-    io(URL),
   ]
   
   for (const [i, client] of clients.entries()) {
@@ -28,19 +26,27 @@ connector.on("connect", () => {
       }, Math.random() * (8000 - 3000) + 3000);
       
       if (i == 1)
-		    client.emit('launch_game', { friendly: true , player1_id: 1, player2_id: 2 });
-
-      setTimeout(() => {
-        console.log(`client ${i}: disconnection...`);
-        client.disconnect();
-        });
-
-      }, 9000); 
-  
+		    client.emit('launch_game', { friendly: true , player1_id: 0, player2_id: 1 });
+    });
   }
- setTimeout(() => {
-   console.log(`End of the test! send reset to the api...`);
-   connector.emit("reset_counter");
-   connector.disconnect();
+
+for (const [i, client] of clients.entries()) {      
+  setTimeout(() => {
+      console.log(`client ${i}: disconnection...`);
+      client.disconnect();
+    }, 9000);
+}
+
+setTimeout(() => {
+  connector.on('interrupted_game', () => {
+    console.log("Game interrompu");
+  });
  }, 10000);
+ 
+ setTimeout(() => {
+  console.log(`End of the test! send reset to the api...`);
+  connector.emit("reset_counter");
+  connector.disconnect();
+ }, 15000);
+
 });

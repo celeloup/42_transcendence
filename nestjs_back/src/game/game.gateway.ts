@@ -38,12 +38,16 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 
   //a deplacer dans service ?
   getPlayer(id: number){
-    if (!this.param)
-      return 0;
     if (id === this.param.id_player1)
+    {
+      this.logger.log("Found player 1");
       return 1;
+    }
     if (id === this.param.id_player2)
+    { 
+      this.logger.log("Found player 2");
       return 2;
+    }
     return 0;
   }
 
@@ -66,17 +70,10 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
   async handleConnection(client: Socket, ...args: any[]) {
     const user = await this.authenticationService.getUserFromSocket(client);
     if (user)
-    {
       this.connectedUsers.set(user.id, client); 
-      if (this.getPlayer(user.id))
-        this.nbPlayer++;
-
-    }
     else
     {
       this.connectedUsers.set(this.i, client);
-      if (this.getPlayer(this.i))
-        this.nbPlayer++;
       this.i++;
     }
   }
@@ -86,19 +83,37 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
     if (user)
     {  
       this.connectedUsers.delete(user.id);
-      if (this.getPlayer(user.id))
+      if (this.nbPlayer > 0 && this.getPlayer(user.id))
         this.nbPlayer--;
     }
     else {
       for (let [key, value] of this.connectedUsers.entries()) {
         if (value === client) {
           this.connectedUsers.delete(key);
-          if (this.getPlayer(key))
+          if (this.nbPlayer > 0 && this.getPlayer(key))
            this.nbPlayer--;
           break;
         }
       }
     }
+  }
+
+  async waitPlayer() 
+  {
+    this.logger.log(`Waiting for the player`);
+    return new Promise (resolve => {
+      let waitingPlayer = setInterval(() => {
+       this.nbPlayer = 0;
+        for (let [key, value] of this.connectedUsers.entries()) {
+            if (this.getPlayer(key) > 0)
+             this.nbPlayer++; 
+       } 
+       if (this.nbPlayer === 2) {
+         clearInterval(waitingPlayer);
+         resolve(0);
+       }
+      }, 60);
+    });
   }
 
   //est-ce qu'on revient ici si le jeux a ete interrompu ?
@@ -109,18 +124,10 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
   )
   {
     //on initialise la game avec les parametres de jeu envoye par le front
-   this.param = new Round(match.user1_id, match.user2_id, 10, 10, false);
-    // this.param = new Round(0, 1, 10, 10, false);
-
-    //on verifie si les joueurs sont deja co pour lancer la partie, sinon on attend
-    for (let [key, value] of this.connectedUsers.entries()) {
-        if (value === client) {
-          if (this.getPlayer(key))
-           this.nbPlayer++;
-        }
-      }
-    
-    this.logger.log("Start game");
+  //  this.param = new Round(match.user1_id, match.user2_id, 10, 10, false);
+  this.param = new Round(0, 1, 10, 10, false);
+  await this.waitPlayer();
+  this.logger.log("Start game");
 
     while (this.nbPlayer == 2 && !this.victory)
     { 
@@ -132,8 +139,10 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 
     if (this.victory)
       this.server.emit('finish_game', this.param);
-    if (this.nbPlayer < 2)
+    if (this.nbPlayer < 2) {
       this.server.emit('interrupted_game');
+    }
+      this.i = 0;
   }
   
   @SubscribeMessage('paddle_movement')
@@ -158,5 +167,8 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
       this.param.paddle_player2.y = paddle.y;
     }
   } 
+
+@SubscribeMessage('reset_counter')
+  async reset()
+  { this.i = 0; } 
 }
-  

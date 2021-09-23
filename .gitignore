@@ -1,9 +1,6 @@
 nestjs_back/dist
 nestjs_back/node_modules
-vuejs_front/dist
-vuejs_front/node_modules
-nuxt_front_test/.nuxt
-nuxt_front_test/node_modules
+front/node_modules
 websocket_client/node_modules
 postgres_data
 .DS_Store
