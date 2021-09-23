@@ -2,9 +2,9 @@ import * as React from "react";
 
 export type User = {
 	id: number,
+	admin: boolean,
 	id42: number,
 	isTwoFactorAuth: boolean,
-	name: string
 }
 
 export type ContextType = {

@@ -20,10 +20,10 @@ export function Route({ typeOfRoute, ...routeProps}: RouteProps) {
 			.then(response => { 
 				// console.log("YES IS AUTH", response.data);
 				const user = { 
-					id: response.data.id, 
+					id: response.data.id,
+					admin: response.data.admin,
 					id42: response.data.id42,
 					isTwoFactorAuth: response.data.isTwoFactorAuthenticationEnabled,
-					name: response.data.name
 				}
 				login(user);
 				setLoading(false);
