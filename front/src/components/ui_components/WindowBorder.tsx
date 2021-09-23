@@ -1,5 +1,5 @@
 // import React from 'react';
-import '../styles/UI.scss';
+import '../../styles/UI.scss';
 
 type Props = {
 	w: string;

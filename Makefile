@@ -28,7 +28,7 @@ clean:
 	$(DC) --project-name $(NAME) down --rmi all --volumes
 	rm -fr ./nestjs_back/dist
 	rm -fr ./nestjs_back/node_modules
-	rm -fr ./nuxt_front_test/dist
-	rm -fr ./nuxt_front_test/.nuxt
+	rm -fr ./front/dist
+	rm -fr ./front/node_modules
 	rm -fr ./websocket_client/node_modules
 	rm -fr ./postgres_data
