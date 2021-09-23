@@ -1,8 +1,8 @@
 import './styles/App.scss';
 import React, { useEffect } from 'react';
-import { AuthContext, AuthProvider, ContextType }  from './AuthContext';
+import { AuthContext, AuthProvider, ContextType }  from './contexts/AuthContext';
 import { BrowserRouter as Router, Switch, RouteComponentProps, Redirect } from 'react-router-dom';
-import { Route } from './Route';
+import { Route } from './components/Route';
 import Logo from './components/ui_components/Logo';
 
 import Admin from './components/Admin';
