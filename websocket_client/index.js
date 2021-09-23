@@ -1,6 +1,6 @@
 const io = require("socket.io-client");
 
-const URL = "http://back:8080/channel"
+const URL = "http://back:8080/game"
 const connector = io(URL);
 
 // connector wait for successful connection and launch the tests
@@ -15,46 +15,49 @@ connector.on("connect", () => {
   const clients = [
     io(URL),
     io(URL),
-    io(URL),
-    io(URL),
   ]
-  
+
   for (const [i, client] of clients.entries()) {
     client.on("connect", () => {
       console.log(`client ${i}: connected!`);
 
-    connector.on("connectedUsers", (data)=> {
-        console.log(`new connection: ${JSON.stringify(data)}`);
-      });
-      
-      setTimeout(() => {
-		  const message = `Hello from client ${i}!`;
+      if (i == 1) {
+        client.emit('launch_game', { friendly: true, player1_id: 1, player2_id: 0 });
+        client.emit('paddle_movement', {x: 1, y: 9})
+      }
+    });
+  }
 
-		  // client.emit('send_message', { content: message , recipient: null});
-      }, Math.random() * (8000 - 3000) + 3000);
-      
-      // client.emit("request_messages", recipient);
+  setTimeout(() => {
+    connector.on('new_frame', (data) => {
+      console.log(`Puck    position = x :${data.puck.x}, y : ${data.puck.y}`);
+      console.log(`Player1 position = x :${data.paddle_player1.x}, y : ${data.paddle_player1.y}`);
+      console.log(`Player2 position = x :${data.paddle_player2.x}, y : ${data.paddle_player2.y}`);
+    });
+  }, 1000);
+  
+  setTimeout(() => {
+    connector.emit('paddle_movement', {x: 4, y: 5})
+  }, 2000);
 
+
+  for (const [i, client] of clients.entries()) {
+    setTimeout(() => {
       setTimeout(() => {
         console.log(`client ${i}: disconnection...`);
         client.disconnect();
-        
-        connector.on("connectedUsers", (data)=> {
-          console.log(`new connection: ${JSON.stringify(data)}`);
-        });
-
-      }, 9000); 
-    });
-    
-    // client.on("messagesByChannel", (data) => {
-    //   console.log(`client ${i}: ${JSON.stringify(data)}`);
-    // });
-
-    
+      }, 500);
+    }, 4000);
   }
- setTimeout(() => {
-   console.log(`End of the test! send reset to the api...`);
-   connector.emit("reset_counter");
-   connector.disconnect();
- }, 10000);
+
+  connector.on('interrupted_game', () => {
+    console.log("Interrupted game");
+  });
+
+  setTimeout(() => {
+    console.log(`End of the test! send reset to the api...`);
+    connector.emit("reset_counter");
+    connector.disconnect();
+  }, 5000);
+
 });

@@ -9,7 +9,7 @@ import Achievement from '../achievements/achievement.entity'
 @Exclude()
 class User {
   @PrimaryGeneratedColumn()
-  @Expose({ groups: ['me'] })
+  @Expose({ groups: ['me', 'channel'] })
   @ApiProperty()
   public id: number;
 
@@ -29,7 +29,7 @@ class User {
   public email: string;
 
   @Column({ unique: true })
-  @Expose()
+  @Expose({ groups: ['channel'] })
   @ApiProperty()
   public name: string;
 
@@ -70,18 +70,18 @@ class User {
   public achievements: Achievement[];
 
   @Column({ default: 0 })
-  @Expose()
+  @Expose({ groups: ['matches'] })
   @ApiProperty()
   public victories: number;
 
   @Column()
-  @Expose()
+  @Expose({ groups: ['matches'] })
   @ApiProperty()
   public defeats: number;
 
   @Column()
   @ApiProperty({ default: 0 })
-  @Expose()
+  @Expose({ groups: ['matches'] })
   public points: number;
 
   @ManyToMany(() => User, (user: User) => user.friendOf)
