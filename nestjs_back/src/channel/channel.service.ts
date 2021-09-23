@@ -268,9 +268,17 @@ export default class ChannelService {
       let newChannel = await this.channelRepository.create({
         name: channelData.name,
         owner: channelOwner,
+        type: channelData.type,
+        password: channelData.password,
         members: [channelOwner],
         admins: [channelOwner],
+        // banned: [],
+        // muted: []
       });
+      for (var member_id of channelData.members){
+        let newMember = await this.usersService.getById(member_id);
+        newChannel.members.push(newMember);
+      }
       await this.channelRepository.save(newChannel);
       return newChannel;
     }

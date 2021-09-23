@@ -1,5 +1,5 @@
 import { ExecSyncOptionsWithBufferEncoding } from 'child_process';
-import { Column, Entity, ManyToOne, ManyToMany, PrimaryGeneratedColumn, OneToMany, JoinTable } from 'typeorm';
+import { Column, Entity, ManyToOne, ManyToMany, PrimaryGeneratedColumn, OneToMany, JoinTable, ObjectID, ObjectIdColumn, Index, UpdateDateColumn } from 'typeorm';
 import { Type } from 'class-transformer';
 import User from '../users/user.entity';
 import Message from './message.entity';
@@ -12,8 +12,8 @@ class Channel {
   @Column()
   public name: string;
 
-  @Column({ default: false })
-  public private: boolean;
+  @Column({ default: 1 })
+  public type: number;//  (1 = public, 2 = private, 3 = mp)
   
   @Column({ default: null , nullable: true})
   public password: string;
@@ -31,6 +31,9 @@ class Channel {
   @JoinTable()
   public members: User[];
 
+  // @Column("int", {array: true, nullable: true})
+  // public members_id: number[];
+
   @Type(() => User)
   @ManyToMany(() => User, (banned: User) => banned.ban)
   @JoinTable()
@@ -43,6 +46,9 @@ class Channel {
 
   @OneToMany(() => Message, (message: Message) => message.recipient)
   public historic: Message[];
+
+  @UpdateDateColumn()
+  public lastupdate: Date;
 }
 
 export default Channel;

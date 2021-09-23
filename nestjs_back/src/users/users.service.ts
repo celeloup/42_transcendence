@@ -21,7 +21,8 @@ export default class UsersService {
   ) { }
 
   async getById(id: number): Promise<User> {
-    const user = await this.usersRepository.findOne({ id });
+    const user = await this.usersRepository.findOne({id});
+  //  const user = await this.usersRepository.findOne({id}, {loadRelationIds: true});
     if (user) {
       return user;
     }

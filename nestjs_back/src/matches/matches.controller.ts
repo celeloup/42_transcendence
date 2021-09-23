@@ -1,10 +1,14 @@
-import { Body, Controller, HttpCode, Param, Put, Req, UseGuards, Post, Get } from '@nestjs/common';
+import { Body, Controller, HttpCode, Param, Put, Req, UseGuards, Post, Get, SerializeOptions } from '@nestjs/common';
 import MatchesService from './matches.service';
 import CreateMatchDto from './dto/createMatch.dto'
 import FindOneParams from '../utils/findOneParams';
 import UpdateMatchDto from './dto/updateMatch.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
- 
+
+
+@SerializeOptions({
+  groups: ['matches']
+})
 @ApiTags('matches')
 @Controller('matches')
 export default class MatchesController {

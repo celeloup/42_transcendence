@@ -1,10 +1,13 @@
-import { Body, Controller, Param, Put, Delete, Req, UseGuards, Post, Get } from '@nestjs/common';
+import { Body, Controller, Param, Put, Delete, Req, UseGuards, Post, Get, SerializeOptions } from '@nestjs/common';
 import ChannelService from './channel.service';
 import CreateChannelDto from './dto/createChannel.dto'
 import FindOneParams from '../utils/findOneParams';
 import UserDto from './dto/User.dto';
 import { ApiOperation, ApiTags } from '@nestjs/swagger';
  
+@SerializeOptions({
+  groups: ['channel']
+})
 @ApiTags('channel')
 @Controller('channel')
 export default class ChannelController {
