@@ -91,7 +91,16 @@ export default class UsersService {
     return newUser;
   }
 
+  async nameAlreadyInUse(name: string){
+    const user = this.usersRepository.findOne({name});
+    if (user)
+      return true;
+    return false;
+  }
+
   async changeName(id: number, userData: UpdateUserDto): Promise<User> {
+    if ((await this.nameAlreadyInUse(userData.name)))
+      throw new HttpException('Name already in use', HttpStatus.FORBIDDEN);
     await this.usersRepository.update(id, userData);
     const updatedUser = await this.getById(id);
     if (updatedUser) {
@@ -229,4 +238,9 @@ export default class UsersService {
     throw new HttpException('User has not been blocked before', HttpStatus.BAD_REQUEST);
   }
 
+  async deleteUser(user_id: number){
+    await this.getById(user_id);
+    await this.usersRepository.delete(user_id);
+    //Ne rien renvoyer si success ?
+  }
 }
