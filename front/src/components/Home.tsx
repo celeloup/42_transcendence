@@ -2,9 +2,10 @@ import NavButton from './ui_components/NavButton';
 import '../styles/Chat.scss';
 import '../styles/UI.scss';
 import WindowBorder from './ui_components/WindowBorder';
-import { useState } from 'react';
+import { useContext } from 'react';
 import ChannelList from './chat/ChannelList';
 import { Message } from './chat/ChannelConversation';
+import { ChannelProvider, ChannelContext, ContextType } from '../contexts/ChannelContext';
 
 function Game() {
 	return (
@@ -23,16 +24,15 @@ function Game() {
 type PropsFunction = () => void;
 
 type ChatHeaderProps = {
-	toggleDisplayList: PropsFunction,
-	type: string,
-	name: string
-	// ADD PROFILE PIC
+	toggleDisplayList: PropsFunction
 }
 // props = type conv(string), name conv(string), notif ?
-function ChatHeader({toggleDisplayList, type, name} : ChatHeaderProps) {
+function ChatHeader() {
+	var { channel, toggleDisplayList } = useContext(ChannelContext) as ContextType;
+	var name = channel ? channel.name : "chat_";
 	return (
 		<div className="window_header chat_header">
-			<i className="fas fa-bars header_button" onClick={toggleDisplayList}></i>
+			<i className="fas fa-bars header_button" onClick={ toggleDisplayList }></i>
 			<div className="header_title">
 				<i className="fas fa-user-friends"></i>{ name }
 			</div>
@@ -42,21 +42,16 @@ function ChatHeader({toggleDisplayList, type, name} : ChatHeaderProps) {
 	)
 }
 
-
-
 // state : notif, current channel, messageInput
 function Chat() {
-	const [displayList, setDisplayList] = useState(false);
-	const toggleDisplayList = (): void => {
-		setDisplayList(!displayList);
-	}
+
+	var { displayList } = useContext(ChannelContext) as ContextType;
+
 	return (
-		<WindowBorder w='382px' h='670px'>
+		<WindowBorder w='382px' h='670px'>		
 			<div id="chat">
-				{ displayList && 
-					<ChannelList toggleDisplayList={ toggleDisplayList } selected="General"/>
-				}
-				<ChatHeader toggleDisplayList={toggleDisplayList} type="0" name="General"/>
+				{ displayList && <ChannelList/> }
+				<ChatHeader/>
 				<div id="chat_messages">
 					<div>
 						<div className="chat_date">13/09/2021</div>
@@ -75,6 +70,7 @@ function Chat() {
 					<i className="fas fa-paper-plane"></i>
 				</div>
 			</div>
+			
 		</WindowBorder>
 	)
 }
@@ -90,7 +86,9 @@ function Home() {
 			</div>
 			<div className="body_wrapper">
 				<Game></Game>
-				<Chat></Chat>
+				<ChannelProvider>
+					<Chat></Chat>
+				</ChannelProvider>
 			</div>
 	  </div>
 	);

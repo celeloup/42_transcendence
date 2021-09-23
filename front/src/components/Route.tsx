@@ -1,7 +1,7 @@
 import { RouteProps as RouterRouteProps, Route as RouterRoute } from 'react-router-dom';
 import React from 'react';
-import { AuthContext, ContextType } from './AuthContext';
-import Login from './components/Login';
+import { AuthContext, ContextType } from '../contexts/AuthContext';
+import Login from './Login';
 import axios from 'axios';
 
 export type RouteProps = {
