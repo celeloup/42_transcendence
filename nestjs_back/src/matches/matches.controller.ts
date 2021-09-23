@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, Param, Put, Req, UseGuards, Post, Get, SerializeOptions } from '@nestjs/common';
+import { Body, Controller, HttpCode, Param, Put, Req, UseGuards, Post, Get, SerializeOptions, Delete } from '@nestjs/common';
 import MatchesService from './matches.service';
 import CreateMatchDto from './dto/createMatch.dto'
 import FindOneParams from '../utils/findOneParams';
@@ -32,5 +32,11 @@ export default class MatchesController {
   @ApiOperation({summary: "Update a match by id"})
   async updateMatch(@Param() { id }: FindOneParams, @Body() match: UpdateMatchDto){
     return this.matchesService.updateMatch(Number(id), match);
+  }
+
+  @Delete('/:id')
+  @ApiOperation({summary: "Delete a match"})
+  async deleteMatch(@Param() { id }: FindOneParams){
+    return this.matchesService.deleteMatch(Number(id));
   }
 }

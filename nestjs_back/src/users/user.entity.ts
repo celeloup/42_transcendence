@@ -9,7 +9,7 @@ import Achievement from '../achievements/achievement.entity'
 @Exclude()
 class User {
   @PrimaryGeneratedColumn()
-  @Expose({ groups: ['me', 'channel'] })
+  @Expose({ groups: ['me', 'channel', 'users'] })
   @ApiProperty()
   public id: number;
 
@@ -29,7 +29,7 @@ class User {
   public email: string;
 
   @Column({ unique: true })
-  @Expose({ groups: ['channel'] })
+  @Expose({ groups: ['channel', 'users'] })
   @ApiProperty()
   public name: string;
 
@@ -95,6 +95,7 @@ class User {
 
   @ManyToMany(() => User, (user: User) => user.blockedBy)
   @JoinTable()
+  @Expose({ groups: ['users'] })
   public blocked: User[];
 
   @ManyToMany(() => User, (user: User) => user.blocked)

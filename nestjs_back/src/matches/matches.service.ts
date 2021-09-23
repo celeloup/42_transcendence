@@ -92,4 +92,10 @@ export default class MatchesService {
     throw new HttpException('Match not found', HttpStatus.NOT_FOUND);
   }
   
+  async deleteMatch(match_id: number){
+    await this.getMatchById(match_id);
+    await this.matchesRepository.delete(match_id);
+    //Ne rien renvoyer si success ?
+  }
+
 }

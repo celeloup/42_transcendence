@@ -57,6 +57,12 @@ export default class ChannelController {
     return this.channelService.createChannel(channel);
   }
 
+  @Delete('/:id')
+  @ApiOperation({summary: "Delete a channel"})
+  async deleteChannel(@Param() { id }: FindOneParams){
+    return this.channelService.deleteChannel(Number(id));
+  }
+
   @Put('members/:id')
   @ApiOperation({summary: "Add new member to a channel by channel id"})
   addMember(@Param() { id }: FindOneParams, @Body() member: UserDto) {
