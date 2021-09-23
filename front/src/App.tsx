@@ -23,10 +23,10 @@ function OAuth({ location } : RouteComponentProps) {
 			.then(response => {
 				// console.log("RESPONSE GOOD : ", response);
 				const user = { 
-					id: response.data.id, 
+					id: response.data.id,
+					admin: response.data.admin,
 					id42: response.data.id42,
 					isTwoFactorAuth: response.data.isTwoFactorAuthenticationEnabled,
-					name: response.data.name
 				}
 				login(user);
 				setLoading(false);

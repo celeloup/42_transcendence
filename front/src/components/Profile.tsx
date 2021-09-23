@@ -8,7 +8,7 @@ function Profile() {
 		  <p>
 			this is the Profile page
 		  </p>
-		  { user && <p>{ user.name }</p> }
+		  { user && <p>id42 = { user.id42 }</p> }
 		  <p><br/>[HERE SEE USERNAME, PROFILE PIC, LIST OF FRIENDS, MATCH HISTORY]</p>
 	  </div>
 	);

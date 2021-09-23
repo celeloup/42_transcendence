@@ -77,16 +77,17 @@ function ChannelList () {
 
 	useEffect(() => {
 		const filterPubChan = () => {
-			var res = channels.filter((chan:any) => chan.private === false);
+			var res = channels.filter((chan:any) => chan.type === 1);
 			setChannelsPub(res);
 		};
 		const filterPrivChan = () => {
-			var res = channels.filter((chan:any) => chan.private === true);
+			var res = channels.filter((chan:any) => chan.type === 2);
 			setChannelsPriv(res);
 		};
 		const getChannels = async () => {
 			try {
 				const res = await axios.get(`/channel`);
+				console.log(res);
 				setChannels(res.data);
 				filterPubChan();
 				filterPrivChan();

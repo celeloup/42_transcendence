@@ -21,11 +21,6 @@ function Game() {
 	</WindowBorder>
 )}
 
-type PropsFunction = () => void;
-
-type ChatHeaderProps = {
-	toggleDisplayList: PropsFunction
-}
 // props = type conv(string), name conv(string), notif ?
 function ChatHeader() {
 	var { channel, toggleDisplayList } = useContext(ChannelContext) as ContextType;
