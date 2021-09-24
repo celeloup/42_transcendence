@@ -5,6 +5,7 @@ import {height, width, paddle_margin} from '../game.settings'
 export default class Puck {
     x: number = width / 2;
     y: number = height / 2;
+	r: number = 12;
     x_speed: number = 2;
     y_speed: number = 3;
     indice: number = 1;
@@ -25,10 +26,10 @@ export default class Puck {
             this.reset();
             return 1;
         }
-        
-        if (this.y < 0 || this.y > height)
+
+        if (this.y - this.r < 0 || this.y + this.r > height)
         {
-         this.y_speed *= -1;   
+         this.y_speed *= -1;
         }
         return 0;
     }
