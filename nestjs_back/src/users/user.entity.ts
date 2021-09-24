@@ -101,6 +101,9 @@ class User {
   @ManyToMany(() => User, (user: User) => user.blocked)
   public blockedBy: User[];
 
+  @Column({nullable: true, default: ''})
+  public avatar: string;
+
   //  @Column("simple-array", {nullable: true})
   //  public friends: string[];
 

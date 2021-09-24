@@ -238,6 +238,10 @@ export default class UsersService {
     throw new HttpException('User has not been blocked before', HttpStatus.BAD_REQUEST);
   }
 
+public async setAvatar(userId: number, avatarUrl: string){
+        this.usersRepository.update(userId, {avatar: avatarUrl});
+    }
+
   async deleteUser(user_id: number){
     await this.getById(user_id);
     await this.usersRepository.delete(user_id);
