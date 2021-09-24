@@ -14,6 +14,6 @@ export default class Paddle {
 			this.x = paddle_margin + this.w / 2;
 		}
 		else
-			this.x = width - paddle_margin - this.w / 2; 
+			this.x = width - paddle_margin - this.w / 2;
 	}
 }

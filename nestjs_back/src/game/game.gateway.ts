@@ -27,8 +27,8 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
   private connectedUsers: Map<number, Socket> = new Map();
   private param: Round;
   private nbPlayer: number = 0;
-  private victory: boolean = false;
 
+  //pour tester avec des users non 42
   private i: number = 0;
 
   constructor(
@@ -39,12 +39,6 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
   //a deplacer dans service ?
   
 
-  updateFrame() {
-    this.param.puck.update();
-    //ici on fait les nouveaux calculs
-    //verifier la victoire seulement lorsqu'il y a un changement de points
-    this.victory = this.gameService.hasVictory(this.param);
-  }
 
   afterInit(server: Server) {
     this.logger.log("Initialized")
@@ -107,14 +101,14 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
     await this.waitPlayer();
     this.logger.log("Start game");
 
-    while (this.nbPlayer == 2 && !this.victory) {
+    while (this.nbPlayer == 2 && !this.param.victory) {
       //timer (ms)
       await new Promise(f => setTimeout(f, 60));
       this.updateFrame();
       this.server.emit('new_frame', this.param);
     }
 
-    if (this.victory)
+    if (this.param.victory)
       this.server.emit('finish_game', this.param);
     if (this.nbPlayer < 2) {
       this.server.emit('interrupted_game');
@@ -124,14 +118,14 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 
   @SubscribeMessage('paddle_movement')
   async setNewPosition(
-    @MessageBody() paddle: Paddle,
+    @MessageBody() y: number,
     @ConnectedSocket() client: Socket,
   ) {
     let player: number;
 
     this.logger.log('Change paddle position');
 
-    //on verifie que les nouvelles positions viennent bien des players et on actualise leur position dans les infos de la partie  
+    //on verifie que les nouvelles positions viennent bien des players et on actualise leur position dans les infos de la partie
     const user = await this.authenticationService.getUserFromSocket(client);
     if (user)
       player = this.gameService.getPlayer(this.param, user.id);
@@ -145,12 +139,10 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
     }
 
     if (player == 1) {
-      this.param.paddle_player1.x = paddle.x;
-      this.param.paddle_player1.y = paddle.y;
+      this.param.paddle_player1.y = y;
     }
     else if (player == 2) {
-      this.param.paddle_player2.x = paddle.x;
-      this.param.paddle_player2.y = paddle.y;
+      this.param.paddle_player2.y = y;
     }
   }
 
