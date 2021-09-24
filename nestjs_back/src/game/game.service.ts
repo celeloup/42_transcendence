@@ -17,4 +17,11 @@ export default class GameService {
         }
         return 0;
     }
+
+    hasVictory(param: Round) {
+        if (param.score_player1 === param.goal || param.score_player2 == param.goal) {
+            return true;
+        }
+        return false;
+    }
 }

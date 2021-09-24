@@ -38,16 +38,12 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 
   //a deplacer dans service ?
   
-  hasVictory() {
-    if (this.param.score_player1 == this.param.goal || this.param.score_player2 == this.param.goal)
-      this.victory == true;
-  }
 
   updateFrame() {
     this.param.puck.update();
     //ici on fait les nouveaux calculs
     //verifier la victoire seulement lorsqu'il y a un changement de points
-    this.hasVictory();
+    this.victory = this.gameService.hasVictory(this.param);
   }
 
   afterInit(server: Server) {

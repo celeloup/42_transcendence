@@ -25,8 +25,8 @@ export default class Round {
     this.goal = goal;
     this.boost_available = boost;
 
-    this.paddle_player1 = new Paddle (paddle_margin, height / 2),
-    this.paddle_player2 = new Paddle (width - paddle_margin, height / 2),
+    this.paddle_player1 = new Paddle (true),
+    this.paddle_player2 = new Paddle (false),
     this.puck = new Puck;
   }
 }

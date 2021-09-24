@@ -35,7 +35,7 @@ connector.on("connect", () => {
       console.log(`Player2 position = x :${data.paddle_player2.x}, y : ${data.paddle_player2.y}`);
     });
   }, 1000);
-  
+ 
   setTimeout(() => {
     connector.emit('paddle_movement', {x: 4, y: 5})
   }, 2000);
