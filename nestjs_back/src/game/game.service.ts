@@ -20,8 +20,14 @@ export default class GameService {
 
     hasVictory(param: Round) {
         if (param.score_player1 === param.goal || param.score_player2 == param.goal) {
-            return true;
+            param.victory = true;
         }
-        return false;
     }
+
+	updateFrame(param: Round) {
+    	param.puck.update();
+    	//ici on fait les nouveaux calculs
+    	//verifier la victoire seulement lorsqu'il y a un changement de points
+		this.hasVictory(param);
+  }
 }

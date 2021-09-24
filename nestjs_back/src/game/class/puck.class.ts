@@ -16,7 +16,15 @@ export default class Puck {
         this.edges();
     }
 
-    edges() {
+	paddle() {
+		if ()
+	}
+
+    edges(param) {
+		if (this.y - this.r < 0 || this.y + this.r > height) {
+         this.y_speed *= -1;
+        }
+
         if (this.x < 0) {
             this.reset();
             return 2;
@@ -24,14 +32,8 @@ export default class Puck {
 
         if (this.x > width) {
             this.reset();
-            return 1;
         }
 
-        if (this.y - this.r < 0 || this.y + this.r > height)
-        {
-         this.y_speed *= -1;
-        }
-        return 0;
     }
 
     reset()
