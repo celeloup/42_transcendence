@@ -99,7 +99,7 @@ export default class AuthenticationController {
   })
   @UseGuards(JwtTwoFactorGuard)
   @Get()
-  async authenticate(@Req() request: RequestWithUser): Promise<myUserInfos> {
+  async authenticate(@Req() request: RequestWithUser) {
     const { user } = request;
     if (!user) {
       throw new UnauthorizedException();

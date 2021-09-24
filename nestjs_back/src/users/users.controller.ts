@@ -34,7 +34,7 @@ export default class UsersController {
     groups: ['me']
   })
   @Put('me')
-  async replacePost(@Req() req: RequestWithUser, @Body() userData: UpdateUserDto): Promise<myUserInfos> {
+  async replacePost(@Req() req: RequestWithUser, @Body() userData: UpdateUserDto) {
     const { user } = req;
     return this.userService.changeName(user.id, userData);
   }
@@ -45,7 +45,7 @@ export default class UsersController {
     type: [userInfos]
   })
   @Get()
-  GetAllUsers(): Promise<userInfos[]> {
+  GetAllUsers() {
     return this.userService.getAllUsers();
   }
 
@@ -60,7 +60,7 @@ export default class UsersController {
     description: 'User not found for this id'
   })
   @Get(':id')
-  getById(@Param() { id }: FindOneParams): Promise<userInfos> {
+  getById(@Param() { id }: FindOneParams) {
     return this.userService.getById(Number(id));
   }
 
@@ -113,7 +113,7 @@ export default class UsersController {
   @ApiParam({ name: 'id', type: Number, description: 'user id' })
   @ApiResponse({
     status: 200,
-    type: [User]
+    type: [userInfos]
   })
   @ApiResponse({
     status: 404,
@@ -136,7 +136,7 @@ export default class UsersController {
     groups: ['infos']
   })
   @Get('infos/me')
-  getAllInfos(@Req() req: RequestWithUser): Promise<extendedUserInfos> {
+  getAllInfos(@Req() req: RequestWithUser) {
     const { user } = req;
     return this.userService.getAllInfosByUserId(user.id);
   }
@@ -151,7 +151,7 @@ export default class UsersController {
     groups: ['infos']
   })
   @Get('infos/:id')
-  getAllInfosByUserId(@Param() { id }: FindOneParams): Promise<extendedUserInfos> {
+  getAllInfosByUserId(@Param() { id }: FindOneParams) {
     return this.userService.getAllInfosByUserId(Number(id));
   }
 
