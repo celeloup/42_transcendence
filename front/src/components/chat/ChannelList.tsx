@@ -87,7 +87,7 @@ function ChannelList () {
 		const getChannels = async () => {
 			try {
 				const res = await axios.get(`/channel`);
-				console.log(res);
+				// console.log(res);
 				setChannels(res.data);
 				filterPubChan();
 				filterPrivChan();
