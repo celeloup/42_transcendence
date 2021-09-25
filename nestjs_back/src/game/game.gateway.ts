@@ -36,10 +36,6 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
     private readonly gameService: GameService,
   ) { }
 
-  //a deplacer dans service ?
-  
-
-
   afterInit(server: Server) {
     this.logger.log("Initialized")
   }
