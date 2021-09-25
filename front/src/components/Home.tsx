@@ -7,24 +7,11 @@ import ChannelList from './chat/ChannelList';
 import { Message } from './chat/ChannelConversation';
 import { ChannelProvider, ChannelContext, ContextType , Channel } from '../contexts/ChannelContext';
 import { io } from "socket.io-client";
-import { emit } from 'process';
-import { AuthContext, ContextType as AuthContextType} from '../contexts/AuthContext';
-import CreateChan from "./chat/CreateChan";
+// import { emit } from 'process';
+// import { AuthContext, ContextType as AuthContextType} from '../contexts/AuthContext';
+// import CreateChan from "./chat/CreateChan";
+import Game from './game/Game';
 
-
-function Game() {
-	return (
-		<WindowBorder w='816px' h='670px'>
-		<div id="game">
-			<div className="window_header">
-				MACHIN VS TRUC
-			</div>
-			<div id="game_window">
-
-			</div>
-		</div>
-	</WindowBorder>
-)}
 
 // props = type conv(string), name conv(string), notif ?
 function ChatHeader() {
@@ -42,15 +29,15 @@ function ChatHeader() {
 	)
 }
 
-type messageType = {
-	content: string,
-	recipient: any
-}
+// type messageType = {
+// 	content: string,
+// 	recipient: any
+// }
 
 // state : notif, current channel, messageInput
 function Chat() {
 
-	var { user } = useContext(AuthContext) as AuthContextType;
+	// var { user } = useContext(AuthContext) as AuthContextType;
 
 	// ---- DISPLAY
 	var { displayList, channel } = useContext(ChannelContext) as ContextType;
@@ -90,7 +77,7 @@ function Chat() {
 				setMessages(data);
 			});
 		}
-	}, [channel])
+	}, [channel, socket])
 
 	const handleSubmit = (e:any) => {
 		e.preventDefault();
@@ -105,7 +92,7 @@ function Chat() {
 
 	var messageList;
 	// console.log(messages);
-	if (messages)
+	if (messages.length !== 0)
 		messageList = messages.map((mes:any) => <Message key={ mes.id } username={ mes.author ? mes.author.name : "empty" } message={ mes.content }/>)
 	else
 		messageList = <p className="no_chan">No message yet.</p>
@@ -117,7 +104,7 @@ function Chat() {
 				<ChatHeader/>
 				<div id="chat_messages">
 					<div>
-						<div className="chat_date">13/09/2021</div>
+						{/* <div className="chat_date">13/09/2021</div> */}
 						{ messageList }
 						{/* <Message username="celia" message="helloooo"/>
 						<Message username="flavien" message="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."/>
