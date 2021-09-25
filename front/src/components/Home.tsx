@@ -9,6 +9,8 @@ import { ChannelProvider, ChannelContext, ContextType , Channel } from '../conte
 import { io } from "socket.io-client";
 import { emit } from 'process';
 import { AuthContext, ContextType as AuthContextType} from '../contexts/AuthContext';
+import CreateChan from "./chat/CreateChan";
+
 
 function Game() {
 	return (
@@ -18,7 +20,7 @@ function Game() {
 				MACHIN VS TRUC
 			</div>
 			<div id="game_window">
-				hello
+
 			</div>
 		</div>
 	</WindowBorder>
