@@ -3,10 +3,12 @@ import { useState, useEffect, useContext } from 'react';
 // import { AuthContext } from '../../contexts/AuthContext';
 import '../../styles/ChatList.scss';
 import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
+import CreateChan from './CreateChan';
 
 type ChannelCategoryProps = {
 	channelList: any,
-	type: string
+	type: string,
+	setDisplayCreateChan: (type:number) => void;
 }
 
 type ChannelProps = {
@@ -36,11 +38,20 @@ function Channel({ channelObj} : ChannelProps) {
 }
 
 
-function ChannelCategory({ channelList, type } : ChannelCategoryProps) {
+function ChannelCategory({ channelList, type, setDisplayCreateChan } : ChannelCategoryProps) {
 	const [displayCategory, setDisplayCategory] = useState(true);
 	const toggleDisplayCategory = (): void => {
 		setDisplayCategory(!displayCategory);
 	};
+
+	const toggleDisplayCreateChan = (): void => {
+		if (type === "public")
+			setDisplayCreateChan(1);
+		else if (type === "private")
+			setDisplayCreateChan(2);
+		else if (type === "DM")
+			setDisplayCreateChan(3);
+	}
 
 	var chans;
 	if (channelList.length !== 0)
@@ -55,7 +66,7 @@ function ChannelCategory({ channelList, type } : ChannelCategoryProps) {
 					<i className={ displayCategory ? "fas fa-chevron-down" : "fas fa-chevron-right" } ></i>
 					{type}_
 				</div>
-				<div className="add_channel_button">+
+				<div className="add_channel_button" onClick={ toggleDisplayCreateChan }>+
 					<span className="tooltiptop">Create channel</span>
 				</div>
 			</div>
@@ -68,10 +79,12 @@ function ChannelCategory({ channelList, type } : ChannelCategoryProps) {
 
 
 function ChannelList () {
-	const [channels, setChannels] = useState([]);
-	const [channelsPriv, setChannelsPriv] = useState([]);
-	const [channelsPub, setChannelsPub] = useState([]);
-	const [isLoading, setIsLoading] = useState(true);
+	const [ channels, setChannels ] = useState([]);
+	const [ channelsPriv, setChannelsPriv ] = useState([]);
+	const [ channelsPub, setChannelsPub ] = useState([]);
+	const [ isLoading, setIsLoading ] = useState(true);
+	const [ displayCreateChan, setDisplayCreateChan ] = useState<number>(0);
+
 	// const { user } = useContext(AuthContext);
 	var { toggleDisplayList } = useContext(ChannelContext) as ContextType;
 
@@ -97,12 +110,12 @@ function ChannelList () {
 			}
 		};
 		getChannels();
-	}, [isLoading]);
+	}, [isLoading, channels]);
 	
 	return (
 	<div id="channelList" >
+		{ displayCreateChan !== 0 && <CreateChan type={ displayCreateChan } hide={ setDisplayCreateChan } /> }
 		<div className="channelListWrapper">
-			
 			<i className="fas fa-times closeIcon" onClick={ toggleDisplayList }></i>
 			<div className="channelSearchBar">
 				<input type="text" placeholder="Search" id="channelSearch"></input>
@@ -110,8 +123,8 @@ function ChannelList () {
 			</div>
 
 			<div className="channelList">
-				<ChannelCategory channelList={channelsPub} type="public"/>
-				<ChannelCategory channelList={channelsPriv} type="private"/>
+				<ChannelCategory channelList={ channelsPub } type="public" setDisplayCreateChan={ setDisplayCreateChan }/>
+				<ChannelCategory channelList={ channelsPriv } type="private" setDisplayCreateChan={ setDisplayCreateChan }/>
 			</div>
 		</div>
 		{/* <div className="dummyModal" onClick={ toggleDisplayList }></div> */}
