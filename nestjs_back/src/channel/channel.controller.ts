@@ -4,10 +4,7 @@ import CreateChannelDto from './dto/createChannel.dto'
 import FindOneParams from '../utils/findOneParams';
 import UserDto from './dto/User.dto';
 import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
- 
-@SerializeOptions({
-  groups: ['channel']
-})
+
 @ApiTags('channel')
 @Controller('channel')
 export default class ChannelController {

@@ -18,11 +18,8 @@ import JwtRefreshGuard from './guard/jwtRefresh.guard';
 import JwtTwoFactorGuard from './guard/jwtTwoFactor.guard';
 import AuthInfos from './interface/authInfos.interface';
 import { ApiResponse, ApiBearerAuth, ApiTags, ApiCookieAuth, ApiOperation, ApiQuery } from '@nestjs/swagger';
-import User from '../users/user.entity';
+import myUserInfos from './interface/myUserInfos.interface';
 
-@SerializeOptions({
-  groups: ['me']
-})
 @ApiTags('authentication')
 @Controller('authentication')
 export default class AuthenticationController {
@@ -88,18 +85,26 @@ export default class AuthenticationController {
     };
   }
 
-  @UseGuards(JwtTwoFactorGuard)
-  @Get()
-  @ApiOperation({summary: "return user associated with the authentication token"})
+  @ApiOperation({summary: "return the private infos of the authenticated user"})
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')
-  @ApiResponse({ status: 200, description: 'The user has been successfully authenticated.'})
+  @ApiResponse({
+    status: 200,
+    description: 'The user has been successfully authenticated',
+    type: myUserInfos
+  })
   @ApiResponse({ status: 401, description: 'Authentication token invalid.'})
-  authenticate(@Req() request: RequestWithUser): User {
-    if (!request.user) {
+  @SerializeOptions({
+    groups: ['me']
+  })
+  @UseGuards(JwtTwoFactorGuard)
+  @Get()
+  async authenticate(@Req() request: RequestWithUser) {
+    const { user } = request;
+    if (!user) {
       throw new UnauthorizedException();
     }
-    return request.user;
+    return await this.authenticationService.getPrivateInfos(user);
   }
 
   // for testing
