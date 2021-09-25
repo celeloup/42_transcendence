@@ -25,9 +25,7 @@ export default class GameService {
     }
 
 	updateFrame(param: Round) {
-    	param.puck.update();
-    	//ici on fait les nouveaux calculs
-    	//verifier la victoire seulement lorsqu'il y a un changement de points
+    	param.puck.update(param);
 		this.hasVictory(param);
   }
 }

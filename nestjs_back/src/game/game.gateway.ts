@@ -104,7 +104,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
     while (this.nbPlayer == 2 && !this.param.victory) {
       //timer (ms)
       await new Promise(f => setTimeout(f, 60));
-      this.updateFrame();
+      this.gameService.updateFrame(this.param);
       this.server.emit('new_frame', this.param);
     }
 
