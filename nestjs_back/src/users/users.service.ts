@@ -37,6 +37,27 @@ export default class UsersService {
     throw new HttpException('No user registered yet', HttpStatus.NOT_FOUND);
   }
 
+  async getPrivateInfosById(id: number): Promise<User> {
+    const user = await this.usersRepository.findOne(
+      id,
+      {
+        relations: [
+          'channels',
+          'ownedChannels',
+          'chan_admin',
+          'blocked',
+          'blockedBy'
+        ],
+        loadRelationIds: true
+      }
+    );
+  //  const user = await this.usersRepository.findOne({id}, {loadRelationIds: true});
+    if (user) {
+      return user;
+    }
+    throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
+  }
+
   async getMatchesByUserId(id: number) {
     const user = await this.usersRepository.findOne(id, { relations: ['matches'] });
     if (user) {

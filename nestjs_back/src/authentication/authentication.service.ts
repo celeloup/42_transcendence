@@ -32,6 +32,10 @@ export default class AuthenticationService {
     }
   }
 
+  async getPrivateInfos(user: User) {
+    return await this.usersService.getPrivateInfosById(user.id);
+  }
+
   async getUserFromSocket(socket: Socket) {
     let authenticationToken: string;
     const cookie = socket.handshake.headers.cookie;
