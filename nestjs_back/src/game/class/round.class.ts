@@ -6,14 +6,15 @@ import Puck from './puck.class';
 export default class Round {
   id_player1: number;
   id_player2: number;
-  
+
   speed: number;
   goal: number;
   boost_available: boolean;
 
   score_player1: number = 0;
   score_player2: number = 0;
-  
+  victory: boolean = false;
+
   paddle_player1: Paddle;
   paddle_player2: Paddle;
   puck: Puck;
@@ -25,8 +26,8 @@ export default class Round {
     this.goal = goal;
     this.boost_available = boost;
 
-    this.paddle_player1 = new Paddle (paddle_margin, height / 2),
-    this.paddle_player2 = new Paddle (width - paddle_margin, height / 2),
+    this.paddle_player1 = new Paddle (true),
+    this.paddle_player2 = new Paddle (false),
     this.puck = new Puck;
   }
 }
