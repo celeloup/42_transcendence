@@ -40,7 +40,8 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
     this.logger.log("Initialized")
   }
 
-  async handleConnection(client: Socket, ...args: any[]) {
+  async handleConnection(client: Socket, id_game: number[]) 
+  {
     const user = await this.authenticationService.getUserFromSocket(client);
     if (user) {
       this.connectedUsers.set(user.id, client);
@@ -51,10 +52,11 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
       this.logger.log(`Connection : invite ${this.i}`);
       this.i++;
     }
-    
+    this.server.in(client.id).socketsJoin(id_game.toString()); //seulement si c'est pas fait dans le front
   }
 
   async handleDisconnect(client: Socket) {
+    // this.server.in(client.id).socketsLeave(id_game);
     const user = await this.authenticationService.getUserFromSocket(client);
     if (user) {
       this.connectedUsers.delete(user.id);
@@ -99,7 +101,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
     @ConnectedSocket() client: Socket,
   ) {
     //on initialise la game avec les parametres de jeu envoye par le front
-    this.param = new Round(match.user1_id, match.user2_id, 10, 10, false);
+    this.param = new Round(match.id.toString(), match.user1_id, match.user2_id, 10, 10, false);
     await this.waitPlayer();
     this.logger.log("Start game");
 
@@ -110,7 +112,8 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
       //update every 60 fps
       await new Promise(f => setTimeout(f, 16)); //timer
       this.gameService.updateFrame(this.param);
-      this.server.emit('new_frame', this.param);
+      // this.server.emit('new_frame', this.param);
+      this.server.to(this.param.id_game).emit('new_frame', this.param);
     }
 
     if (this.param.victory)
