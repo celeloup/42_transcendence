@@ -37,7 +37,7 @@ connector.on("connect", () => {
   }, 1000);
  
   setTimeout(() => {
-    connector.emit('paddle_movement', {x: 4, y: 5})
+    connector.emit('paddle_movement', 5)
   }, 2000);
 
   for (const [i, client] of clients.entries()) {
