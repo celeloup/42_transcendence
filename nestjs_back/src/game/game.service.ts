@@ -1,23 +1,42 @@
 import { Injectable, Logger } from '@nestjs/common';
 import Round from './class/round.class';
+import { Server, Socket } from 'socket.io';
 
 @Injectable()
 export default class GameService {
 
     private logger: Logger = new Logger("GameService");
 
-    async startGame(param: Round, users: number[]) {
-        await this.waitPlayer(param, users);
-        this.logger.log("Start game");
+    async startGame(server: Server, param: Round, users: Map<number, Socket>) {
+        await this.waitPlayer(server, param, users);
+        this.logger.log(`Start game ${param.id_game}`);
+
+        await new Promise(f => setTimeout(f, 1000));
+
+        while (!param.victory) {
+            //update every 60 fps
+            await new Promise(f => setTimeout(f, 16)); //timer
+            this.updateFrame(param);
+            server.in(param.id_game).emit('new_frame', param);
+        }
+
+        // if (param.victory)
+        server.emit('finish_game', param);
+        
+        //est-ce qu'on garde cette option ?
+        // if (nbPlayer < 2) {
+        //     server.emit('interrupted_game');
+        // }
+
     }
 
     getPlayer(param: Round, id: number) {
         if (id === param.id_player1) {
-            this.logger.log("Found player 1");
+            this.logger.log(`Found player 1 game ${param.id_game}`);
             return 1;
         }
         if (id === param.id_player2) {
-            this.logger.log("Found player 2");
+            this.logger.log(`Found player 2 game ${param.id_game}`);
             return 2;
         }
         return 0;
@@ -34,16 +53,18 @@ export default class GameService {
         this.hasVictory(param);
     }
 
-    //ajouter check pour etre sur qu'il est co dans la bonne room;
-    async waitPlayer(param: Round, users: number[]) {
-        this.logger.log(`Waiting for the player`);
+    async waitPlayer(server: Server, param: Round, users: Map<number, Socket>) {
+        this.logger.log(`Waiting for the player game ${param.id_game}`);
         return new Promise(resolve => {
             let nbPlayer: number;
+            let users_id = Array.from(users.keys())
             let waitingPlayer = setInterval(() => {
                 nbPlayer = 0;
-                users.forEach(user => {
+                users_id.forEach(user => {
                     if (this.getPlayer(param, user) > 0) {
-                        nbPlayer++; //le connecter sur la bonne room a cet endroit ?
+                        nbPlayer++;
+                        let client = users.get(user);
+                        server.in(client.id).socketsJoin(param.id_game);
                     }
                 });
                 if (nbPlayer === 2) {
