@@ -23,7 +23,7 @@ connector.on("connect", () => {
       client.emit('join_game', "test");
       if (i == 1) {
         client.emit('launch_game', {id: 666, friendly: false, user1_id: 0, user2_id: 1, user1_score: 10, user2_score: 10});
-        client.emit('paddle_movement', {x: 1, y: 9})
+        client.emit('paddle_movement', {id_game: 666, y: 9})
       }
     });
   }
@@ -37,7 +37,7 @@ connector.on("connect", () => {
   }, 1000);
  
   setTimeout(() => {
-    connector.emit('paddle_movement', 5)
+    connector.emit('paddle_movement', {id_game: 666, y: 5})
   }, 2000);
 
   for (const [i, client] of clients.entries()) {
