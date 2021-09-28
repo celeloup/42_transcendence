@@ -40,7 +40,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
     this.logger.log("Initialized")
   }
 
-  async handleConnection(client: Socket, id_game: number[]) 
+  async handleConnection(client: Socket) 
   {
     const user = await this.authenticationService.getUserFromSocket(client);
     if (user) {
@@ -52,11 +52,9 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
       this.logger.log(`Connection : invite ${this.i}`);
       this.i++;
     }
-    this.server.in(client.id).socketsJoin(id_game.toString()); //seulement si c'est pas fait dans le front
   }
 
   async handleDisconnect(client: Socket) {
-    // this.server.in(client.id).socketsLeave(id_game);
     const user = await this.authenticationService.getUserFromSocket(client);
     if (user) {
       this.connectedUsers.delete(user.id);
@@ -77,23 +75,25 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
     }
   }
 
-  async waitPlayer() {
-    this.logger.log(`Waiting for the player`);
-    return new Promise(resolve => {
-      let waitingPlayer = setInterval(() => {
-        this.nbPlayer = 0;
-        for (let [key, value] of this.connectedUsers.entries()) {
-          if (this.gameService.getPlayer(this.param, key) > 0)
-            this.nbPlayer++;
-        }
-        if (this.nbPlayer === 2) {
-          clearInterval(waitingPlayer);
-          resolve(0);
-        }
-      }, 60);
-    });
+  @SubscribeMessage('join_game')
+  async joinRoom(
+    @MessageBody() room: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+      this.server.in(client.id).socketsJoin(room);
+      this.logger.log(`Room ${room} joined`);
   }
 
+  @SubscribeMessage('leave_game')
+  async leaveRoom(
+    @MessageBody() room: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+      client.leave(room);    
+      this.logger.log(`Room ${room} left`);
+  }
+
+  
   //est-ce qu'on revient ici si le jeux a ete interrompu ?
   @SubscribeMessage('launch_game')
   async launchGame(
@@ -112,8 +112,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
       //update every 60 fps
       await new Promise(f => setTimeout(f, 16)); //timer
       this.gameService.updateFrame(this.param);
-      // this.server.emit('new_frame', this.param);
-      this.server.to(this.param.id_game).emit('new_frame', this.param);
+      this.server.in(this.param.id_game).emit('new_frame', this.param);
     }
 
     if (this.param.victory)
@@ -154,6 +153,23 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
     }
   }
 
-  @SubscribeMessage('reset_counter')
-  async reset() { this.i = 0; }
+   
+  //a deplacer dans service
+  async waitPlayer() {
+    this.logger.log(`Waiting for the player`);
+    return new Promise(resolve => {
+      let waitingPlayer = setInterval(() => {
+        this.nbPlayer = 0;
+        for (let [key, value] of this.connectedUsers.entries()) {
+          if (this.gameService.getPlayer(this.param, key) > 0)
+            this.nbPlayer++;
+        }
+        if (this.nbPlayer === 2) {
+          clearInterval(waitingPlayer);
+          resolve(0);
+        }
+      }, 60);
+    });
+  }
+
 }
