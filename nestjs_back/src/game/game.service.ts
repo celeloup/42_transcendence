@@ -6,6 +6,11 @@ export default class GameService {
 
     private logger: Logger = new Logger("GameService");
 
+    async startGame(param: Round, users: number[]) {
+        await this.waitPlayer(param, users);
+        this.logger.log("Start game");
+    }
+
     getPlayer(param: Round, id: number) {
         if (id === param.id_player1) {
             this.logger.log("Found player 1");
@@ -24,8 +29,29 @@ export default class GameService {
         }
     }
 
-	updateFrame(param: Round) {
-    	param.puck.update(param);
-		this.hasVictory(param);
-  }
+    updateFrame(param: Round) {
+        param.puck.update(param);
+        this.hasVictory(param);
+    }
+
+    //ajouter check pour etre sur qu'il est co dans la bonne room;
+    async waitPlayer(param: Round, users: number[]) {
+        this.logger.log(`Waiting for the player`);
+        return new Promise(resolve => {
+            let nbPlayer: number;
+            let waitingPlayer = setInterval(() => {
+                nbPlayer = 0;
+                users.forEach(user => {
+                    if (this.getPlayer(param, user) > 0) {
+                        nbPlayer++; //le connecter sur la bonne room a cet endroit ?
+                    }
+                });
+                if (nbPlayer === 2) {
+                    clearInterval(waitingPlayer);
+                    resolve(0);
+                }
+            }, 60);
+        });
+    }
+
 }
