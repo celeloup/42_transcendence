@@ -3,7 +3,7 @@ const io = require("socket.io-client");
 const URL = "http://back:8080/game"
 const connector = io(URL);
 
-connector wait for successful connection and launch the tests
+// connector wait for successful connection and launch the tests
 connector.on("connect_error", (err) => {
   console.error(`Connection error: ${err.message}, restart in 15 secondes...`);
   setTimeout(() => {
@@ -11,15 +11,16 @@ connector.on("connect_error", (err) => {
   }, 15000);
 });
 
-connector.on("connect", {id_game: 666}, () => {
+connector.on("connect", () => {
+  connector.emit('join_game', "666");
   const clients = [
     io(URL),
     io(URL),
   ]
   for (const [i, client] of clients.entries()) {
-    client.on("connect", {id_game: 666}, () => {
+    client.on("connect", () => {
       console.log(`client ${i}: connected!`);
-
+      client.emit('join_game', "test");
       if (i == 1) {
         client.emit('launch_game', {id: 666, friendly: false, user1_id: 0, user2_id: 1, user1_score: 10, user2_score: 10});
         client.emit('paddle_movement', {x: 1, y: 9})
@@ -42,6 +43,7 @@ connector.on("connect", {id_game: 666}, () => {
   for (const [i, client] of clients.entries()) {
     setTimeout(() => {
       setTimeout(() => {
+        client.emit('leave_game', "test");
         console.log(`client ${i}: disconnection...`);
         client.disconnect();
       }, 500);
@@ -55,7 +57,7 @@ connector.on("connect", {id_game: 666}, () => {
   setTimeout(() => {
     console.log(`End of the test! send reset to the api...`);
     connector.emit("reset_counter");
+    connector.emit('leave_game', "666");
     connector.disconnect();
   }, 5000);
-
 });
