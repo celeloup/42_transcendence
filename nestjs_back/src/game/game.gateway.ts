@@ -36,20 +36,20 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
     private readonly gameService: GameService,
   ) { }
 
-  //a deplacer dans service ?
-  
-
-
   afterInit(server: Server) {
     this.logger.log("Initialized")
   }
 
-  async handleConnection(client: Socket, ...args: any[]) {
+  async handleConnection(client: Socket) 
+  {
     const user = await this.authenticationService.getUserFromSocket(client);
-    if (user)
+    if (user) {
       this.connectedUsers.set(user.id, client);
+      this.logger.log(`Connection : ${user.name}`);
+    }
     else {
       this.connectedUsers.set(this.i, client);
+      this.logger.log(`Connection : invite ${this.i}`);
       this.i++;
     }
   }
@@ -58,6 +58,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
     const user = await this.authenticationService.getUserFromSocket(client);
     if (user) {
       this.connectedUsers.delete(user.id);
+      this.logger.log(`Deconnection : ${user.name}`);
       if (this.nbPlayer > 0 && this.gameService.getPlayer(this.param, user.id))
         this.nbPlayer--;
     }
@@ -65,6 +66,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
       for (let [key, value] of this.connectedUsers.entries()) {
         if (value === client) {
           this.connectedUsers.delete(key);
+          this.logger.log(`Deconnection : invite ${key}`);
           if (this.nbPlayer > 0 && this.gameService.getPlayer(this.param, key))
             this.nbPlayer--;
           break;
@@ -73,23 +75,25 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
     }
   }
 
-  async waitPlayer() {
-    this.logger.log(`Waiting for the player`);
-    return new Promise(resolve => {
-      let waitingPlayer = setInterval(() => {
-        this.nbPlayer = 0;
-        for (let [key, value] of this.connectedUsers.entries()) {
-          if (this.gameService.getPlayer(this.param, key) > 0)
-            this.nbPlayer++;
-        }
-        if (this.nbPlayer === 2) {
-          clearInterval(waitingPlayer);
-          resolve(0);
-        }
-      }, 60);
-    });
+  @SubscribeMessage('join_game')
+  async joinRoom(
+    @MessageBody() room: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+      this.server.in(client.id).socketsJoin(room);
+      this.logger.log(`Room ${room} joined`);
   }
 
+  @SubscribeMessage('leave_game')
+  async leaveRoom(
+    @MessageBody() room: string,
+    @ConnectedSocket() client: Socket,
+  ) {
+      client.leave(room);    
+      this.logger.log(`Room ${room} left`);
+  }
+
+  
   //est-ce qu'on revient ici si le jeux a ete interrompu ?
   @SubscribeMessage('launch_game')
   async launchGame(
@@ -97,15 +101,18 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
     @ConnectedSocket() client: Socket,
   ) {
     //on initialise la game avec les parametres de jeu envoye par le front
-    this.param = new Round(match.user1_id, match.user2_id, 10, 10, false);
+    this.param = new Round(match.id.toString(), match.user1_id, match.user2_id, 10, 10, false);
     await this.waitPlayer();
     this.logger.log("Start game");
 
+    //temporiser le depart du jeu depuis le back ou le front ?
+    await new Promise(f => setTimeout(f, 1000));
+
     while (this.nbPlayer == 2 && !this.param.victory) {
-      //timer (ms)
-      await new Promise(f => setTimeout(f, 60));
+      //update every 60 fps
+      await new Promise(f => setTimeout(f, 16)); //timer
       this.gameService.updateFrame(this.param);
-      this.server.emit('new_frame', this.param);
+      this.server.in(this.param.id_game).emit('new_frame', this.param);
     }
 
     if (this.param.victory)
@@ -146,6 +153,23 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
     }
   }
 
-  @SubscribeMessage('reset_counter')
-  async reset() { this.i = 0; }
+   
+  //a deplacer dans service
+  async waitPlayer() {
+    this.logger.log(`Waiting for the player`);
+    return new Promise(resolve => {
+      let waitingPlayer = setInterval(() => {
+        this.nbPlayer = 0;
+        for (let [key, value] of this.connectedUsers.entries()) {
+          if (this.gameService.getPlayer(this.param, key) > 0)
+            this.nbPlayer++;
+        }
+        if (this.nbPlayer === 2) {
+          clearInterval(waitingPlayer);
+          resolve(0);
+        }
+      }, 60);
+    });
+  }
+
 }
