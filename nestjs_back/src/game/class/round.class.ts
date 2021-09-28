@@ -4,6 +4,8 @@ import Paddle from './paddle.class';
 import Puck from './puck.class';
 
 export default class Round {
+  id_game: string;
+
   id_player1: number;
   id_player2: number;
 
@@ -19,7 +21,8 @@ export default class Round {
   paddle_player2: Paddle;
   puck: Puck;
 
-  constructor(id1: number, id2: number, speed: number, goal: number, boost: boolean) {
+  constructor(id: string, id1: number, id2: number, speed: number, goal: number, boost: boolean) {
+    this.id_game = id;
     this.id_player1 = id1;
     this.id_player2 = id2;
     this.speed = speed;
