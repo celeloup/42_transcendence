@@ -1,16 +1,13 @@
 import WindowBorder from '../ui_components/WindowBorder';
-import { useContext, useState, useEffect } from 'react';
+import { useContext, useState, useEffect, EffectCallback } from 'react';
 import ChannelList from '../chat/ChannelList';
 import { Message } from '../chat/ChannelConversation';
 import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
+import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
 import { io } from "socket.io-client";
 import '../../styles/Chat.scss';
+import axios from 'axios';
 
-// import { emit } from 'process';
-// import { AuthContext, ContextType as AuthContextType} from '../contexts/AuthContext';
-// import CreateChan from "./chat/CreateChan";
-
-// props = type conv(string), name conv(string), notif ?
 function ChatHeader() {
 	var { channel, toggleDisplayList } = useContext(ChannelContext) as ContextType;
 	var name = channel ? channel.name : "chat_";
@@ -26,44 +23,63 @@ function ChatHeader() {
 	)
 }
 
-// type messageType = {
-// 	content: string,
-// 	recipient: any
-// }
-
-// state : notif, current channel, messageInput
 export function Chat() {
-
-	// var { user } = useContext(AuthContext) as AuthContextType;
+	const { user } = useContext(AuthContext) as AuthContextType;
+	const [ messages, setMessages ] = useState<any[]>([]);
+	const [ newMessage, setNewMessage ] = useState("");
 
 	// ---- DISPLAY
 	var { displayList, channel } = useContext(ChannelContext) as ContextType;
-
+	
 	// ---- SOCKETS
-	// const [socket, setSocket] = useState<any>(null);
+	var [socket, setSocket] = useState<any>(null);
 	// useEffect(() => {
 	// 	setSocket(io("http://localhost:8080/channel", { transports: ["websocket"] }));
 	// }, [])
+	useEffect(() : ReturnType<EffectCallback> => {
+		const newSocket:any = io(`http://localhost:8080/channel`, { transports: ["websocket"] });
+		setSocket(newSocket);
+		return () => newSocket.close();
+	}, [setSocket]);
 
-	// // - Handle error socket
-	// useEffect(() => {
-	// 	socket?.on("connect_error", (err:any) => {
-	// 		console.error(`Connection error: ${err.message}, restart in 15 secondes...`);
-	// 		setTimeout(() => {
-	// 		  socket.connect();
-	// 		}, 15000);
-	// 	  });
-	// }, [socket])
+	useEffect(() => {
+		// socket?.connect();
+		socket?.on('receive_message', (data:any) => {
+			console.log("RECEIVED :", data);
+			// if (data.recipient.id !== user?.id)
+			// {
+				// console.log("added to messages");
+				setMessages(messages.concat(data));
+			// }
+			
+		})
+	}, [socket])
+	
+	// ---------- GET MESSAGES
+	useEffect(() => {
+		console.log("CURRENT CHANNEL: ", channel);
+		const getMessages = async () => {
+			if (channel)
+			{
+				try {
+					const res = await axios.get(`/channel/messages/${channel.id}`);
+					console.log("GET MESSAGES", res);
+					setMessages(res.data);
+				} catch (err) {
+					console.log(err);
+				}
+			}
+		};
+		getMessages();
+		socket?.emit('join_chan', channel?.id);
+	}, [channel])
 
 	// useEffect(() => {
-	// 	socket?.on('receive_message', (data:any) => {
-	// 		setMessages(messages.concat(data));
-	// 	})
+		
 	// })
 
 	// ---- CONVERSATION
-	const [ messages, setMessages ] = useState<any[]>([]);
-	const [ newMessage, setNewMessage ] = useState("");
+	
 	// useEffect(() => {
 	// 	if (channel)
 	// 	{
@@ -84,7 +100,8 @@ export function Chat() {
 		};
 		// setMessages(messages.concat(message));
 		setNewMessage("");
-		// socket.emit('send_message', message);
+		socket.emit('send_message', message);
+		console.log("SENT :", message);
 	}
 
 	var messageList;
@@ -97,7 +114,7 @@ export function Chat() {
 	return (
 		<WindowBorder w='382px' h='670px'>		
 			<div id="chat">
-				{ displayList && <ChannelList/> }
+				{ displayList && <ChannelList socket={socket}/> }
 				<ChatHeader/>
 				<div id="chat_messages">
 					<div>
