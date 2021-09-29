@@ -79,7 +79,7 @@ export default class ChannelService {
   }
 
   async getAllInfosByChannelId(id: number) {
-    const channel = await this.channelRepository.findOne(id, { relations: ['members', 'owner', 'admins', 'banned', 'muted'] });
+    const channel = await this.channelRepository.findOne(id, { relations: ['members', 'owner', 'admins', 'banned', 'muted', 'historic'] });
     if (channel) {
       return channel;
     }
@@ -263,6 +263,11 @@ export default class ChannelService {
       throw new HttpException('A private chat is only between two members', HttpStatus.FORBIDDEN);
     await this.channelRepository.save(newChannel);
     return newChannel;
+  }
+
+  async getMessages(channel_id: number){
+    const channel = await this.getAllInfosByChannelId(channel_id);
+    return channel.historic;
   }
 
   async deleteChannel(channel_id: number) {

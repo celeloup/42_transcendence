@@ -9,7 +9,7 @@ class Channel {
   @PrimaryGeneratedColumn()
   public id: number;
 
-  @Column({ unique: true })
+  @Column()
   public name: string;
 
   @Column({ default: 1 })
