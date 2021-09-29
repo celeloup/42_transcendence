@@ -7,6 +7,7 @@ $dark-gray: #919191;
 #chat
 {
 	width: 100%;
+	
 }
 
 // *********** HEADER
@@ -369,7 +370,14 @@ $dark-gray: #919191;
 #game
 {
 	width: 100%;
-	// height: 670px;
+	height: 100%;
 	margin-right: 17px;
 	// border: 1px solid red;
+}
+
+#game_window
+{
+	display: inline-block;
+	height: 100%;
+	width: 100%;
 }

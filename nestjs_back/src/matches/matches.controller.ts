@@ -1,10 +1,14 @@
-import { Body, Controller, HttpCode, Param, Put, Req, UseGuards, Post, Get } from '@nestjs/common';
+import { Body, Controller, HttpCode, Param, Put, Req, UseGuards, Post, Get, SerializeOptions } from '@nestjs/common';
 import MatchesService from './matches.service';
 import CreateMatchDto from './dto/createMatch.dto'
 import FindOneParams from '../utils/findOneParams';
 import UpdateMatchDto from './dto/updateMatch.dto';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
- 
+import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+
+
+@SerializeOptions({
+  groups: ['matches']
+})
 @ApiTags('matches')
 @Controller('matches')
 export default class MatchesController {
@@ -12,8 +16,9 @@ export default class MatchesController {
     private readonly matchesService: MatchesService
   ) {}
 
+  @ApiParam({name: 'id', type: Number, description: 'match id'})
   @Get(':id')
-  @ApiOperation({summary: "Get a match by id"})
+  @ApiOperation({summary: "Get a match"})
   getMatchById(@Param() { id }: FindOneParams) {
     return this.matchesService.getMatchById(Number(id));
   }
@@ -24,8 +29,9 @@ export default class MatchesController {
     return this.matchesService.createMatch(match);
   }
 
+  @ApiParam({name: 'id', type: Number, description: 'match id'})
   @Put(':id')
-  @ApiOperation({summary: "Update a match by id"})
+  @ApiOperation({summary: "Update a match"})
   async updateMatch(@Param() { id }: FindOneParams, @Body() match: UpdateMatchDto){
     return this.matchesService.updateMatch(Number(id), match);
   }
