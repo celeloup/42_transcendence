@@ -11,9 +11,9 @@ import {
   WsResponse,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import AuthenticationService from '../authentication/authentication.service'
 import Channel from './channel.entity';
 import Match from 'src/matches/match.entity';
+import AuthenticationService from '../authentication/authentication.service';
 import ChannelService from './channel.service';
  
 @WebSocketGateway({ serveClient: false, namespace: '/channel' })
@@ -50,6 +50,25 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     this.server.emit('connected_users', Array.from(this.connectedUsers.values()));
   }
  
+  @SubscribeMessage('join_chan')
+  async joinRoom(
+    @MessageBody() room: number,
+    @ConnectedSocket() client: Socket,
+  ) {
+      this.server.in(client.id).socketsJoin(room.toString());
+      this.logger.log(`Room ${room} joined`);
+  }
+
+  @SubscribeMessage('leave_chan')
+  async leaveRoom(
+    @MessageBody() room: number,
+    @ConnectedSocket() client: Socket,
+  ) {
+      client.leave(room.toString());    
+      this.logger.log(`Room ${room} left`);
+  }
+
+
   @SubscribeMessage('send_message')
   async listenForMessages(
     @MessageBody() data: {content: string, recipient: Channel},
@@ -58,8 +77,7 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
      const author = await this.authenticationService.getUserFromSocket(client);
       this.logger.log(`Message from ${this.connectedUsers.get(client)} to ${data.recipient.name}: ${data.content}`);
       const message = await this.channelService.saveMessage(data.content, author, data.recipient);
-      //est-ce que j'envoie directement aux membres du channel connecte ou c'est overkill par rapport au front ?
-      this.server.emit('receive_message', data);
+      this.server.in(data.recipient.id.toString()).emit('receive_message', data);
     }
 
   @SubscribeMessage('request_messages')

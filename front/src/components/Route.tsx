@@ -1,7 +1,7 @@
 import { RouteProps as RouterRouteProps, Route as RouterRoute } from 'react-router-dom';
 import React from 'react';
-import { AuthContext, ContextType } from './AuthContext';
-import Login from './components/Login';
+import { AuthContext, ContextType } from '../contexts/AuthContext';
+import Login from './Login';
 import axios from 'axios';
 
 export type RouteProps = {
@@ -20,10 +20,10 @@ export function Route({ typeOfRoute, ...routeProps}: RouteProps) {
 			.then(response => { 
 				// console.log("YES IS AUTH", response.data);
 				const user = { 
-					id: response.data.id, 
+					id: response.data.id,
+					admin: response.data.admin,
 					id42: response.data.id42,
 					isTwoFactorAuth: response.data.isTwoFactorAuthenticationEnabled,
-					name: response.data.name
 				}
 				login(user);
 				setLoading(false);

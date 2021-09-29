@@ -12,33 +12,49 @@ connector.on("connect_error", (err) => {
 });
 
 connector.on("connect", () => {
+  // connector.emit("reset_counter");
   const clients = [
     io(URL),
     io(URL),
+    io(URL),
+    io(URL),
+    io(URL),
   ]
-
   for (const [i, client] of clients.entries()) {
     client.on("connect", () => {
       console.log(`client ${i}: connected!`);
-
-      if (i == 1) {
-        client.emit('launch_game', {friendly: false, user1_id: 0, user2_id: 1, user1_score: 10, user2_score: 10});
-        client.emit('paddle_movement', {x: 1, y: 9})
+      if (i == 2) {
+        client.emit('launch_game', { id: 444, friendly: false, user1_id: 1, user2_id: 2, user1_score: 10, user2_score: 10 });
+        client.emit('paddle_movement', { id_game: 444, y: 9 })
       }
+      if (i == 4) {
+        client.emit('launch_game', { id: 789, friendly: false, user1_id: 3, user2_id: 4, user1_score: 10, user2_score: 10 });
+        client.emit('paddle_movement', { id_game: 789, y: 28 })
+      }
+      if (i == 5)
+        connector.emit("reset_counter");
     });
+    setTimeout(() => {
+      client.on('new_frame', (data) => {
+        console.log(`CLIENT ${i} RECEIVING:`)
+        console.log(`Puck    position = x :${data.puck.x}, y : ${data.puck.y}`);
+        console.log(`Player1 position = x :${data.paddle_player1.x}, y : ${data.paddle_player1.y}`);
+        console.log(`Player2 position = x :${data.paddle_player2.x}, y : ${data.paddle_player2.y}`);
+      });
+    }, 500);
   }
 
+  // setTimeout(() => {
+  //   connector.on('new_frame', (data) => {
+  //     console.log(`Puck    position = x :${data.puck.x}, y : ${data.puck.y}`);
+  //     console.log(`Player1 position = x :${data.paddle_player1.x}, y : ${data.paddle_player1.y}`);
+  //     console.log(`Player2 position = x :${data.paddle_player2.x}, y : ${data.paddle_player2.y}`);
+  //   });
+  // }, 1000);
+
   setTimeout(() => {
-    connector.on('new_frame', (data) => {
-      console.log(`Puck    position = x :${data.puck.x}, y : ${data.puck.y}`);
-      console.log(`Player1 position = x :${data.paddle_player1.x}, y : ${data.paddle_player1.y}`);
-      console.log(`Player2 position = x :${data.paddle_player2.x}, y : ${data.paddle_player2.y}`);
-    });
-  }, 1000);
- 
-  setTimeout(() => {
-    connector.emit('paddle_movement', {x: 4, y: 5})
-  }, 2000);
+    connector.emit('paddle_movement', { id_game: 444, y: 5 })
+  }, 100);
 
   for (const [i, client] of clients.entries()) {
     setTimeout(() => {
@@ -46,17 +62,17 @@ connector.on("connect", () => {
         console.log(`client ${i}: disconnection...`);
         client.disconnect();
       }, 500);
-    }, 4000);
+    }, 1000);
   }
-
-  connector.on('interrupted_game', () => {
-    console.log("Interrupted game");
-  });
 
   setTimeout(() => {
     console.log(`End of the test! send reset to the api...`);
-    connector.emit("reset_counter");
+    connector.emit('leave_game', "444");
+    connector.emit('leave_game', "789");
     connector.disconnect();
-  }, 5000);
+  }, 2000);
 
+  setTimeout(() => {
+    console.log("Ending test");
+  }, 7000);
 });
