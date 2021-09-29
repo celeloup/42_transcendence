@@ -120,4 +120,11 @@ export default class ChannelController {
   unmuteAMember(@Param() { id }: FindOneParams, @Body() admin: UserDto){
     return this.channelService.unmuteAMember(Number(id), admin.userId)
   }
+
+  @ApiParam({name: 'id', type: Number, description: 'channel id'})
+  @Get('messages/:id')
+  @ApiOperation({summary: "Get messages of a channel"})
+  getMessages(@Param() { id }: FindOneParams) {
+    return this.channelService.getMessages(Number(id));
+  }
 }

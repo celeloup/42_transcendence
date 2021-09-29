@@ -8,6 +8,7 @@ import UpdateUserDto from './dto/updateUser.dto';
 import Achievement from '../achievements/achievement.entity';
 import AchievementsService from '../achievements/achievements.service';
 import Channel from 'src/channel/channel.entity';
+import { CallbackObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 
 @Injectable()
 export default class UsersService {
@@ -279,7 +280,12 @@ export default class UsersService {
     const oldUrl = (await this.getById(userId)).avatar;
     const fs = require('fs');
     if (oldUrl)
-      fs.unlink(oldUrl);
+      fs.unlink(oldUrl, (err: any) => {
+        if (err) {
+          console.error(err)
+          return
+        }
+      })
     this.usersRepository.update(userId, { avatar: avatarUrl });
   }
 
