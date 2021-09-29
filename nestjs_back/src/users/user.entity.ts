@@ -1,5 +1,4 @@
 import { Exclude, Expose } from 'class-transformer';
-import { ApiProperty } from '@nestjs/swagger';
 import Channel from '../channel/channel.entity';
 import { Column, Entity, PrimaryGeneratedColumn, OneToMany, JoinTable, ManyToMany } from 'typeorm';
 import Match from '../matches/match.entity';
@@ -9,88 +8,98 @@ import Achievement from '../achievements/achievement.entity'
 @Exclude()
 class User {
   @PrimaryGeneratedColumn()
-  @Expose({ groups: ['me'] })
-  @ApiProperty()
-  public id: number;
+  @Expose()
+  id: number;
 
   @Column({nullable: true})
   @Expose({ groups: ['me'] })
-  @ApiProperty()
-  public admin: boolean;
+  admin: boolean;
 
   @Column({ unique: true })
   @Expose({ groups: ['me'] })
-  @ApiProperty()
-  public id42: number;
+  id42: number;
 
   @Column({ unique: true })
   @Expose({ groups: ['me'] })
-  @ApiProperty()
-  public email: string;
+  email: string;
 
   @Column({ unique: true })
   @Expose()
-  @ApiProperty()
-  public name: string;
+  name: string;
 
   @Column({ nullable: true })
-  public currentHashedRefreshToken?: string;
+  currentHashedRefreshToken?: string;
 
   @Column({ nullable: true })
-  public twoFactorAuthenticationSecret?: string;
+  twoFactorAuthenticationSecret?: string;
 
   @Column({ default: false })
   @Expose({ groups: ['me'] })
-  @ApiProperty()
-  public isTwoFactorAuthenticationEnabled: boolean;
+  isTwoFactorAuthenticationEnabled: boolean;
 
+  @Expose({ groups: ['me'] })
   @ManyToMany(() => Channel, (channel: Channel) => channel.members)
-  public channels: Channel[];
+  channels: Channel[];
 
+  @Expose({ groups: ['me'] })
   @OneToMany(() => Channel, (channel: Channel) => channel.owner)
-  public owned: Channel[];
+  ownedChannels: Channel[];
 
-  @ManyToMany(() => Channel, (channel: Channel) => channel.admin)
-  public chan_admin: Channel[];
+  @Expose({ groups: ['me'] })
+  @ManyToMany(() => Channel, (channel: Channel) => channel.admins)
+  chan_admin: Channel[];
 
   @ManyToMany(() => Channel, (channel: Channel) => channel.banned)
-  public ban: Channel[];
+  ban: Channel[];
 
   @ManyToMany(() => Channel, (channel: Channel) => channel.muted)
-  public mute: Channel[];
+  mute: Channel[];
   
+  @Expose({ groups: ['infos'] })
   @ManyToMany(() => Match, (match: Match) => match.users)
-  @Expose()
   @JoinTable()
-  public matches: Match[];
+  matches: Match[];
 
   @ManyToMany(() => Achievement, (achievement: Achievement) => achievement.users)
-  @Expose()
+  @Expose({ groups: ['infos'] })
   @JoinTable()
-  public achievements: Achievement[];
+  achievements: Achievement[];
 
-  @Column()
-  @Expose()
-  @ApiProperty()
-  public victories: number;
+  @Column({ default: 0 })
+  @Expose({ groups: ['infos'] })
+  victories: number;
 
-  @Column()
-  @Expose()
-  @ApiProperty()
-  public defeats: number;
+  @Column({ default: 0 })
+  @Expose({ groups: ['infos'] })
+  defeats: number;
 
-  @Column()
-  @Expose()
-  @ApiProperty()
-  public points: number;
+  @Column({ default: 0 })
+  @Expose({ groups: ['infos'] })
+  points: number;
 
-//  @Column("simple-array", {nullable: true})
-//  public friends: string[];
+  @ManyToMany(() => User, (user: User) => user.friendOf)
+  @JoinTable()
+  @Expose({ groups: ['infos'] })
+  friends: User[];
 
-  @Column("int", {array: true, nullable: true})
-  @Expose()
-  @ApiProperty()
-  public friends: number[];
+  @ManyToMany(() => User, (user: User) => user.friends)
+  friendOf: User[];
+
+  @Expose({ groups: ['me'] })
+  @ManyToMany(() => User, (user: User) => user.blockedBy)
+  @JoinTable()
+  blocked: User[];
+
+  @Expose({ groups: ['me'] })
+  @ManyToMany(() => User, (user: User) => user.blocked)
+  blockedBy: User[];
+
+  //  @Column("simple-array", {nullable: true})
+  //  friends: string[];
+
+  // @Column("int", {array: true, nullable: true})
+  // friends: number[];
+
 }
 
 export default User;

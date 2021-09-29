@@ -11,13 +11,13 @@ import {
   WsResponse,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
-import ChannelService from './channel.service'
 import Channel from './channel.entity';
 import Match from 'src/matches/match.entity';
 import AuthenticationService from '../authentication/authentication.service';
+import ChannelService from './channel.service';
  
 @WebSocketGateway({ serveClient: false, namespace: '/channel' })
-export default class SocketGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
+export default class ChannelGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   private server: Server;
   private logger: Logger = new Logger("ChannelGateway");
@@ -33,30 +33,42 @@ export default class SocketGateway implements OnGatewayInit, OnGatewayConnection
     this.logger.log("Initialized")
   }
 
-  //est-ce qu'il faut emit une notif au serveur des que quelqu'un se co/deco ?
   async handleConnection(client: Socket, ...args: any[]) {
     const user = await this.authenticationService.getUserFromSocket(client);
     if (user) {
-        this.connectedUsers.set(client, user.name);
+      this.connectedUsers.set(client, user.name);
     } else {
       this.connectedUsers.set(client, `client test`);
     }
     this.logger.log(`Connection: ${this.connectedUsers.get(client)}`);
-    // this.connectedUsers.forEach((value: string, key: Socket) => {
-    //   key.emit('connectedUsers', Array.from(this.connectedUsers.values()));
-    // });
-    this.server.emit('connectedUsers', Array.from(this.connectedUsers.values()));
+    this.server.emit('connected_users', Array.from(this.connectedUsers.values()));
   }
 
   handleDisconnect(client: Socket) {
     this.logger.log(`Disconnect: ${this.connectedUsers.get(client)}`);
     this.connectedUsers.delete(client);
-    // this.connectedUsers.forEach((value: string, key: Socket) => {
-    //   key.emit('connectedUsers', Array.from(this.connectedUsers.values()));
-    // });
-    this.server.emit('connectedUsers', Array.from(this.connectedUsers.values()));
+    this.server.emit('connected_users', Array.from(this.connectedUsers.values()));
   }
-  
+ 
+  @SubscribeMessage('join_chan')
+  async joinRoom(
+    @MessageBody() room: number,
+    @ConnectedSocket() client: Socket,
+  ) {
+      this.server.in(client.id).socketsJoin(room.toString());
+      this.logger.log(`Room ${room} joined`);
+  }
+
+  @SubscribeMessage('leave_chan')
+  async leaveRoom(
+    @MessageBody() room: number,
+    @ConnectedSocket() client: Socket,
+  ) {
+      client.leave(room.toString());    
+      this.logger.log(`Room ${room} left`);
+  }
+
+
   @SubscribeMessage('send_message')
   async listenForMessages(
     @MessageBody() data: {content: string, recipient: Channel},
@@ -65,11 +77,7 @@ export default class SocketGateway implements OnGatewayInit, OnGatewayConnection
      const author = await this.authenticationService.getUserFromSocket(client);
       this.logger.log(`Message from ${this.connectedUsers.get(client)} to ${data.recipient.name}: ${data.content}`);
       const message = await this.channelService.saveMessage(data.content, author, data.recipient);
-      //est-ce que j'envoie directement aux membres du channel connecte ou c'est overkill par rapport au front?
-    //   this.connectedUsers.forEach((value: string, key: Socket) => {
-    //     key.emit('receive_message', data);
-    // });
-      this.server.emit('receive_message', data);
+      this.server.in(data.recipient.id.toString()).emit('receive_message', data);
     }
 
   @SubscribeMessage('request_messages')
@@ -87,7 +95,7 @@ export default class SocketGateway implements OnGatewayInit, OnGatewayConnection
   async requestConnectedUsers(@ConnectedSocket() socket: Socket)
   {
     this.logger.log(`List of connected users`);
-    socket.emit('connectedUsers', Array.from(this.connectedUsers.values()));
+    socket.emit('connected_users', Array.from(this.connectedUsers.values()));
   }
 
   @SubscribeMessage('send_invit')
