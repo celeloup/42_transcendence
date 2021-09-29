@@ -10,7 +10,8 @@ import ExceptionsLoggerFilter from './utils/exceptionsLogger.filter';
 import ChannelModule from './channel/channel.module';
 import AchievementsModule from './achievements/achievements.module';
 import GameModule from './game/game.module';
- 
+import { MulterModule } from '@nestjs/platform-express';
+
 @Module({
   imports: [
     ConfigModule.forRoot({
@@ -40,6 +41,9 @@ import GameModule from './game/game.module';
     ChannelModule,
     AuthenticationModule,
     GameModule,
+    MulterModule.registerAsync({
+      useFactory: () => ({dest: './files',})
+    })
   ],
   controllers: [],
   providers: [
@@ -49,4 +53,4 @@ import GameModule from './game/game.module';
     }
   ],
 })
-export class AppModule {}
+export class AppModule { }
