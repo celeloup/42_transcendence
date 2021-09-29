@@ -79,7 +79,7 @@ export default class ChannelService {
   }
 
   async getAllInfosByChannelId(id: number) {
-    const channel = await this.channelRepository.findOne(id, { relations: ['members', 'owner', 'admins', 'banned', 'muted'] });
+    const channel = await this.channelRepository.findOne(id, { relations: ['members', 'owner', 'admins', 'banned', 'muted', 'historic'] });
     if (channel) {
       return channel;
     }
@@ -88,64 +88,37 @@ export default class ChannelService {
 
   async isAMember(channel_id: number, user_id: number) {
     const channel = await this.getAllInfosByChannelId(channel_id);
-    if (channel) {
-      let user = await this.usersService.getById(user_id);
-      if (user) {
-        if ((await channel.members.findIndex(element => element.id === user_id)) !== -1) {
-          return true;
-        }
-        return false;
-      }
-      throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
-    }
-    throw new HttpException('Channel with this id does not exist', HttpStatus.NOT_FOUND);
+    if ((await channel.members.findIndex(element => element.id === user_id)) !== -1)
+      return true;
+    return false;
   }
 
   async isAnAdmin(channel_id: number, user_id: number) {
     const channel = await this.getAllInfosByChannelId(channel_id);
-    if (channel) {
-      let user = await this.usersService.getById(user_id);
-      if (user) {
-        if ((await channel.admins.findIndex(element => element.id === user_id)) !== -1) {
-          return true;
-        }
-      }
-    }
+    if ((await channel.admins.findIndex(element => element.id === user_id)) !== -1)
+      return true;
     return false;
   }
 
   async isOwner(channel_id: number, user_id: number) {
     const channel = await this.getAllInfosByChannelId(channel_id);
-    if (channel) {
-      if (user_id == channel.owner.id)
-        return true;
-    }
+    if (user_id == channel.owner.id)
+      return true;
     return false;
   }
 
   async isBanned(channel_id: number, user_id: number) {
     const channel = await this.getAllInfosByChannelId(channel_id);
-    if (channel && channel.banned) {
-      let user = await this.usersService.getById(user_id);
-      if (user) {
-        if ((await channel.banned.findIndex(element => element.id === user_id)) !== -1) {
-          return true;
-        }
-      }
-    }
+    if ((await channel.banned.findIndex(element => element.id === user_id)) !== -1)
+      return true;
     return false;
   }
 
   async isMuted(channel_id: number, user_id: number) {
     const channel = await this.getAllInfosByChannelId(channel_id);
-    if (channel) {
-      let user = await this.usersService.getById(user_id);
-      if (user) {
-        if ((await channel.muted.findIndex(element => element.id === user_id)) !== -1) {
-          return true;
-        }
-      }
-    }
+    let user = await this.usersService.getById(user_id);
+    if ((await channel.muted.findIndex(element => element.id === user_id)) !== -1)
+      return true;
     return false;
   }
 
@@ -153,12 +126,15 @@ export default class ChannelService {
     if (!(await this.isAMember(channel_id, member_id))) {
       if (!(await this.isBanned(channel_id, member_id))) {
         let channel = await this.getAllInfosByChannelId(channel_id);
-        let newMember = await this.usersService.getById(member_id);
-        channel.members.push(newMember);
-        await this.channelRepository.save(channel);
-        return channel;
+        if (channel.type !== 3) {
+          let newMember = await this.usersService.getById(member_id);
+          channel.members.push(newMember);
+          await this.channelRepository.save(channel);
+          return channel;
+        }
+        throw new HttpException('A private chat is only between two users', HttpStatus.FORBIDDEN);
       }
-      throw new HttpException('Banned users cannot be added to members', HttpStatus.FORBIDDEN)
+      throw new HttpException('Banned users cannot be added to members', HttpStatus.FORBIDDEN);
     }
     throw new HttpException('User is already a member of this channel', HttpStatus.OK);
   }
@@ -264,24 +240,39 @@ export default class ChannelService {
 
   async createChannel(channelData: CreateChannelDto) {
     let channelOwner = await this.usersService.getById(channelData.owner_id);
-    if (channelOwner) {
-      let newChannel = await this.channelRepository.create({
-        name: channelData.name,
-        owner: channelOwner,
-        type: channelData.type,
-        password: channelData.password,
-        members: [channelOwner],
-        admins: [channelOwner],
-        // banned: [],
-        // muted: []
-      });
-      for (var member_id of channelData.members){
-        let newMember = await this.usersService.getById(member_id);
-        newChannel.members.push(newMember);
+    let newChannel = await this.channelRepository.create({
+      name: channelData.name,
+      owner: channelOwner,
+      type: channelData.type,
+      password: channelData.password,
+      members: [channelOwner],
+      admins: [channelOwner],
+      banned: [],
+      muted: []
+    });
+    for (var member_id of channelData.members) {
+      if (!(await this.usersService.isBlocked(member_id, channelData.owner_id))) {
+        if (member_id !== channelData.owner_id) {
+          let newMember = await this.usersService.getById(member_id);
+          newChannel.members.push(newMember);
+        }
       }
-      await this.channelRepository.save(newChannel);
-      return newChannel;
+      throw new HttpException('Owner of the channel is blocked by one of the members', HttpStatus.FORBIDDEN);
     }
-    throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
+    if (newChannel.type === 3 && newChannel.members.length !== 2)
+      throw new HttpException('A private chat is only between two members', HttpStatus.FORBIDDEN);
+    await this.channelRepository.save(newChannel);
+    return newChannel;
+  }
+
+  async getMessages(channel_id: number){
+    const channel = await this.getAllInfosByChannelId(channel_id);
+    return channel.historic;
+  }
+
+  async deleteChannel(channel_id: number) {
+    await this.getChannelById(channel_id);
+    await this.channelRepository.delete(channel_id);
+    //Ne rien renvoyer si success ?
   }
 }
