@@ -37,7 +37,6 @@ function Channel({ channelObj} : ChannelProps) {
 	)
 }
 
-
 function ChannelCategory({ channelList, type, setDisplayCreateChan } : ChannelCategoryProps) {
 	const [displayCategory, setDisplayCategory] = useState(true);
 	const toggleDisplayCategory = (): void => {

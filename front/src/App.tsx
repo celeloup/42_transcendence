@@ -9,6 +9,7 @@ import Admin from './components/Admin';
 import Home from './components/Home';
 import Profile from './components/Profile';
 import Parameters from './components/Parameters';
+import NavButton from './components/ui_components/NavButton';
 
 import axios from 'axios';
 
@@ -51,6 +52,11 @@ const App = () => {
 					<header className="App-header">
 						<Logo />
 					</header>
+					<div id="navBar" className="rotate_right">
+						<NavButton name="Parameters" icon="fa-cog" link="/parameters"></NavButton>
+						<NavButton name="Profile" icon="fa-user-circle" link="/profile"></NavButton>
+						<NavButton name="Admin" icon="fa-cog" link="/admin"></NavButton>
+					</div>
 					<Switch>
 						<Route
 							typeOfRoute="protected"
