@@ -268,13 +268,25 @@ export default class UsersService {
     throw new HttpException('User has not been blocked before', HttpStatus.BAD_REQUEST);
   }
 
+  public async serveAvatar(userId: number, res: any){
+    const avatar = (await this.getById(userId)).avatar;
+    if (avatar)
+      res.sendFile(avatar, {root: './'});
+    throw new HttpException('No avatar set yet', HttpStatus.BAD_REQUEST);
+  }
+
   public async setAvatar(userId: number, avatarUrl: string) {
+    const oldUrl = (await this.getById(userId)).avatar;
+    const fs = require('fs');
+    if (oldUrl)
+      fs.unlink(oldUrl);
     this.usersRepository.update(userId, { avatar: avatarUrl });
   }
 
-  async deleteUser(user_id: number) {
-    await this.getById(user_id);
-    await this.usersRepository.delete(user_id);
-    //Ne rien renvoyer si success ?
-  }
+  // Off topic
+  // async deleteUser(user_id: number) {
+  //   await this.getById(user_id);
+  //   await this.usersRepository.delete(user_id);
+  //   //Ne rien renvoyer si success ?
+  // }
 }
