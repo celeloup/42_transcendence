@@ -5,7 +5,6 @@ import User from './user.entity';
 import * as bcrypt from 'bcrypt';
 import CreateUserDto from './dto/createUser.dto';
 import UpdateUserDto from './dto/updateUser.dto';
-import AddFriendDto from './dto/addFriend.dto';
 import Achievement from '../achievements/achievement.entity';
 import AchievementsService from '../achievements/achievements.service';
 import Channel from 'src/channel/channel.entity';
@@ -21,8 +20,8 @@ export default class UsersService {
   ) { }
 
   async getById(id: number): Promise<User> {
-    const user = await this.usersRepository.findOne({id});
-  //  const user = await this.usersRepository.findOne({id}, {loadRelationIds: true});
+    const user = await this.usersRepository.findOne({ id });
+    //  const user = await this.usersRepository.findOne({id}, {loadRelationIds: true});
     if (user) {
       return user;
     }
@@ -51,49 +50,59 @@ export default class UsersService {
         loadRelationIds: true
       }
     );
-  //  const user = await this.usersRepository.findOne({id}, {loadRelationIds: true});
-    if (user) {
+    //  const user = await this.usersRepository.findOne({id}, {loadRelationIds: true});
+    if (user)
       return user;
-    }
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
   async getMatchesByUserId(id: number) {
     const user = await this.usersRepository.findOne(id, { relations: ['matches'] });
-    if (user) {
+    if (user)
       return user.matches;
-    }
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
   async getChannelsByUserId(id: number): Promise<Channel[]> {
     const user = await this.usersRepository.findOne(id, { relations: ['channels'] });
-    if (user) {
+    if (user)
       return user.channels;
-    }
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
   async getAchievementsByUserId(id: number) {
     const user = await this.usersRepository.findOne(id, { relations: ['achievements'] });
-    if (user) {
+    if (user)
       return user.achievements;
-    }
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
   async getFriendsByUserId(id: number) {
     const user = await this.usersRepository.findOne(id, { relations: ['friends'] });
-    if (user) {
+    if (user)
       return user.friends;
-    }
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
   async getAllInfosByUserId(id: number) {
-    const user = await this.usersRepository.findOne(id, { relations: ['achievements', 'channels', 'matches', 'ownedChannels', 'chan_admin', 'ban', 'mute', 'friends', 'friendOf', 'blocked', 'blockedBy'] })
+    const user = await this.usersRepository.findOne(
+      id, {
+      relations: [
+        'achievements',
+        'channels',
+        'matches',
+        'ownedChannels',
+        'chan_admin',
+        'ban',
+        'mute',
+        'friends',
+        'friendOf',
+        'blocked',
+        'blockedBy']
+    })
     if (user)
       return user;
+    throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
   async getBy42Id(id42: number): Promise<User> {
@@ -112,8 +121,8 @@ export default class UsersService {
     return newUser;
   }
 
-  async nameAlreadyInUse(name: string){
-    const user = this.usersRepository.findOne({name});
+  async nameAlreadyInUse(name: string) {
+    const user = this.usersRepository.findOne({ name });
     if (user)
       return true;
     return false;
@@ -259,11 +268,11 @@ export default class UsersService {
     throw new HttpException('User has not been blocked before', HttpStatus.BAD_REQUEST);
   }
 
-public async setAvatar(userId: number, avatarUrl: string){
-        this.usersRepository.update(userId, {avatar: avatarUrl});
-    }
+  public async setAvatar(userId: number, avatarUrl: string) {
+    this.usersRepository.update(userId, { avatar: avatarUrl });
+  }
 
-  async deleteUser(user_id: number){
+  async deleteUser(user_id: number) {
     await this.getById(user_id);
     await this.usersRepository.delete(user_id);
     //Ne rien renvoyer si success ?

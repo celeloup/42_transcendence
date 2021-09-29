@@ -47,16 +47,11 @@ export default class UsersController {
   }
 
 @Post('avatar/:id')
-   @UseInterceptors(FileInterceptor('file',
+   @UseInterceptors(FileInterceptor('avatar',
       {
         storage: diskStorage({
-          destination: './files',
-        filename: editFileName,
-        // , 
-        //   filename: (req, file, cb) => {
-        //   const randomName = Array(32).fill(null).map(() => (Math.round(Math.random() * 16)).toString(16)).join('')
-        //   return cb(null, `${randomName}${extname(file.originalname)}`)
-        //}
+          destination: './avatars',
+        filename: editFileName
         }),
         fileFilter: imageFileFilter,
       }
@@ -68,18 +63,10 @@ export default class UsersController {
 
    @Get('avatar/:id')
   async serveAvatar(@Param() { id }:FindOneParams, @Res() res: any): Promise<any> {
-    res.sendFile(id, { root: './files' });
+    const user = 
+    res.sendFile(id, { root: './avatars' });
     //(id, { root: '/home/user42/Transcendance/nestjs_back/files'});
   }
-
-  // async uploadedFile(@Param() id: FindOneParams, @UploadedFile() file: Express.Multer.File) {
-    
-  //   const response = {
-  //     originalname: file.originalname,
-  //     filename: file.filename,
-  //   };
-  //   return response;
-  // }
 
   @Delete('/:id')
   @ApiOperation({ summary: "Delete a user//Not working so far" })
@@ -90,7 +77,7 @@ export default class UsersController {
   @Get()
   @ApiOperation({ summary: "Get all the users" })
   async replacePost(@Req() req: RequestWithUser, @Body() userData: UpdateUserDto) {
-    const { user } = req;
+    const { user } = req; //ask why {}
     return this.userService.changeName(user.id, userData);
   }
 
