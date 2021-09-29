@@ -3,7 +3,10 @@ import ChannelService from './channel.service';
 import CreateChannelDto from './dto/createChannel.dto'
 import FindOneParams from '../utils/findOneParams';
 import UserDto from './dto/User.dto';
-import { ApiOperation, ApiParam, ApiTags } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiTags, ApiResponse, ApiBearerAuth, ApiCookieAuth, ApiBody } from '@nestjs/swagger';
+import JwtTwoFactorGuard from 'src/authentication/guard/jwtTwoFactor.guard';
+import User from 'src/users/user.entity';
+import RequestWithUser from 'src/authentication/interface/requestWithUser.interface';
 
 @ApiTags('channel')
 @Controller('channel')
@@ -53,16 +56,40 @@ export default class ChannelController {
     return this.channelService.getAllInfosByChannelId(Number(id));
   }
 
+  @ApiOperation({ summary: "Create a channel with the authenticated user" })
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
   @Post()
   @ApiOperation({summary: "Create a new channel"})
-  async createChannel(@Body() channel: CreateChannelDto){
-    return this.channelService.createChannel(channel);
+  async createChannel(@Req() req: RequestWithUser, @Body() channel: CreateChannelDto){
+    const { user } = req;
+    return this.channelService.createChannel(channel, user.id);
   }
 
+  // Out of scope
+  // @ApiOperation({ summary: "Delete a channel with the authenticated user" })
+  // @ApiParam({name: 'id', type: Number, description: 'channel id'})
+  // @ApiBearerAuth('bearer-authentication')
+  // @ApiCookieAuth('cookie-authentication')
+  // @UseGuards(JwtTwoFactorGuard)
+  // @Delete('/:id')
+  // @ApiOperation({summary: "Delete a channel"})
+  // async deleteChannel(@Req() req: RequestWithUser, @Param() { id }: FindOneParams){
+  //   const { user } = req;
+  //   return this.channelService.deleteChannel(Number(id), user.id);
+  // }
+
+  @ApiOperation({ summary: "Leave a channel with the authenticated user" })
+  @ApiParam({name: 'id', type: Number, description: 'channel id'})
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
   @Delete('/:id')
   @ApiOperation({summary: "Delete a channel"})
-  async deleteChannel(@Param() { id }: FindOneParams){
-    return this.channelService.deleteChannel(Number(id));
+  async leaveChannel(@Req() req: RequestWithUser, @Param() { id }: FindOneParams){
+    const { user } = req;
+    return this.channelService.leaveChannel(Number(id), user.id);
   }
 
   @ApiParam({name: 'id', type: Number, description: 'channel id'})
@@ -75,8 +102,8 @@ export default class ChannelController {
   @ApiParam({name: 'id', type: Number, description: 'channel id'})
   @Delete('members/:id')
   @ApiOperation({summary: "Delete member of a channel"})
-  deleteMember(@Param() { id }: FindOneParams, @Body() member: UserDto){
-    return this.channelService.deleteMember(Number(id), member.userId)
+  removeMember(@Param() { id }: FindOneParams, @Body() member: UserDto){
+    return this.channelService.removeMember(Number(id), member.userId)
   }
 
   @ApiParam({name: 'id', type: Number, description: 'channel id'})

@@ -139,7 +139,7 @@ export default class ChannelService {
     throw new HttpException('User is already a member of this channel', HttpStatus.OK);
   }
 
-  async deleteMember(channel_id: number, member_id: number) {
+  async removeMember(channel_id: number, member_id: number) {
     if ((await this.isAMember(channel_id, member_id))) {
       if (!(await this.isAnAdmin(channel_id, member_id))) {
         let channel = await this.getAllInfosByChannelId(channel_id);
@@ -149,6 +149,39 @@ export default class ChannelService {
         return channel;
       }
       throw new HttpException('This user is an admin', HttpStatus.FORBIDDEN);
+    }
+    throw new HttpException('User with this id is not a member of this channel', HttpStatus.NOT_FOUND);
+  }
+
+  async removeAdmin(channel_id: number, member_id: number) {
+    let channel = await this.getAllInfosByChannelId(channel_id);
+    let index = channel.admins.findIndex(element => element.id === member_id);
+    await channel.admins.splice(index, 1);
+    await this.channelRepository.save(channel);
+    return channel;
+  }
+
+  async removeOwner(channel_id: number, owner_id: number) {
+    await this.removeAdmin(channel_id, owner_id);
+    await this.removeMember(channel_id, owner_id);
+    let channel = await this.getAllInfosByChannelId(channel_id);
+    if (channel.members && channel.members[0])
+      channel.owner = channel.members[0];
+    else
+      return (await this.deleteChannel(channel_id, owner_id));
+    await this.channelRepository.save(channel);
+    return channel;
+  }
+
+  async leaveChannel(channel_id: number, member_id: number) {
+    if ((await this.isAMember(channel_id, member_id))) {
+      if ((await this.isAnAdmin(channel_id, member_id))) {
+        if ((await this.isOwner(channel_id, member_id))) {
+          return (await this.removeOwner(channel_id, member_id));
+        }
+        await this.removeAdmin(channel_id, member_id);
+      }
+      return (await this.removeMember(channel_id, member_id));
     }
     throw new HttpException('User with this id is not a member of this channel', HttpStatus.NOT_FOUND);
   }
@@ -187,7 +220,7 @@ export default class ChannelService {
   async banAMember(channel_id: number, member_id: number) {
     if ((await this.isAMember(channel_id, member_id))) {
       if (!(await this.isAnAdmin(channel_id, member_id))) {
-        await this.deleteMember(channel_id, member_id);
+        await this.removeMember(channel_id, member_id);
         let channel = await this.getAllInfosByChannelId(channel_id);
         let newBanned = await this.usersService.getById(member_id);
         await channel.banned.push(newBanned);
@@ -238,8 +271,8 @@ export default class ChannelService {
     throw new HttpException('User with this id has not been muted', HttpStatus.NOT_FOUND);
   }
 
-  async createChannel(channelData: CreateChannelDto) {
-    let channelOwner = await this.usersService.getById(channelData.owner_id);
+  async createChannel(channelData: CreateChannelDto, owner_id: number) {
+    let channelOwner = await this.usersService.getById(owner_id);
     let newChannel = await this.channelRepository.create({
       name: channelData.name,
       owner: channelOwner,
@@ -251,8 +284,8 @@ export default class ChannelService {
       muted: []
     });
     for (var member_id of channelData.members) {
-      if (!(await this.usersService.isBlocked(member_id, channelData.owner_id))) {
-        if (member_id !== channelData.owner_id) {
+      if (!(await this.usersService.isBlocked(member_id, owner_id))) {
+        if (member_id !== owner_id) {
           let newMember = await this.usersService.getById(member_id);
           newChannel.members.push(newMember);
         }
@@ -265,14 +298,16 @@ export default class ChannelService {
     return newChannel;
   }
 
-  async getMessages(channel_id: number){
+  async getMessages(channel_id: number) {
     const channel = await this.getAllInfosByChannelId(channel_id);
     return channel.historic;
   }
 
-  async deleteChannel(channel_id: number) {
-    await this.getChannelById(channel_id);
-    await this.channelRepository.delete(channel_id);
-    //Ne rien renvoyer si success ?
+  async deleteChannel(channel_id: number, user_id: number) {
+    await this.getChannelById(channel_id);//checking if channel exists
+    if ((await this.isOwner(channel_id, user_id))) {
+      return (await this.channelRepository.delete(channel_id));
+    }
+    throw new HttpException('A channel can only be deleted by its owner', HttpStatus.FORBIDDEN);
   }
 }
