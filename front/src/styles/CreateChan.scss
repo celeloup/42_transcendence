@@ -112,6 +112,31 @@ $dark-gray: #919191;
 			cursor: not-allowed;
 		}
 
+		.errorChanCreation {
+			font-size: 12px;
+			background-color: #d9534a;
+			margin: 15px 15px 0 15px;
+			padding: 10px 5px;
+			border-radius: 5px;
+			position: relative;
+
+			i {
+				display: inline-block;
+				position: absolute;
+				top: -25px;
+				left: 10px;
+				background-color: #d9534a;
+				padding: 6px 8px;
+				font-size: 18px;
+				border-radius: 5px 5px 0 0;
+
+				span {
+					font-family: "Fira Mono";
+					margin-left: 5px;
+					margin-right: 2px;
+				}
+			}
+		}
 	}
 }
 
