@@ -11,7 +11,7 @@ class User {
   @Expose()
   id: number;
 
-  @Column({nullable: true})
+  @Column({nullable: true, default: false})
   @Expose({ groups: ['me'] })
   admin: boolean;
 
@@ -94,7 +94,7 @@ class User {
   @ManyToMany(() => User, (user: User) => user.blocked)
   blockedBy: User[];
 
-  @Column({nullable: true, default: ''})
+  @Column({nullable: true, default: null})
   public avatar: string;
 
   //  @Column("simple-array", {nullable: true})
