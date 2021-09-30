@@ -158,6 +158,9 @@ export default class ChannelController {
   @Put('unmute/:id')
   @ApiOperation({summary: "Unmute member of a channel"})
   @ApiParam({name: 'id', type: Number, description: 'channel id'})
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
   unmuteAMember(@Req() req: RequestWithUser, @Param() { id }: FindOneParams, @Body() admin: UserDto){
     const {user} = req;
     return this.channelService.unmuteAMember(Number(id), admin.userId, user.id)
