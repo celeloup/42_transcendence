@@ -56,7 +56,7 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     @ConnectedSocket() client: Socket,
   ) {
       this.server.in(client.id).socketsJoin(room.toString());
-      this.logger.log(`Room ${room} joined`);
+      this.logger.log(`Client ${this.connectedUsers.get(client)} joined room ${room}`);
   }
 
   @SubscribeMessage('leave_chan')
@@ -65,7 +65,7 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     @ConnectedSocket() client: Socket,
   ) {
       client.leave(room.toString());    
-      this.logger.log(`Room ${room} left`);
+      this.logger.log(`Client ${this.connectedUsers.get(client)} left room ${room}`);
   }
 
 

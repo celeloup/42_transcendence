@@ -76,8 +76,7 @@ function ChannelCategory({ channelList, type, setDisplayCreateChan } : ChannelCa
 	)
 }
 
-
-function ChannelList () {
+function ChannelList (socket:any) {
 	const [ channels, setChannels ] = useState([]);
 	const [ channelsPriv, setChannelsPriv ] = useState([]);
 	const [ channelsPub, setChannelsPub ] = useState([]);
@@ -113,7 +112,7 @@ function ChannelList () {
 	
 	return (
 	<div id="channelList" >
-		{ displayCreateChan !== 0 && <CreateChan type={ displayCreateChan } hide={ setDisplayCreateChan } /> }
+		{ displayCreateChan !== 0 && <CreateChan type={ displayCreateChan } hide={ setDisplayCreateChan } socket={socket}/> }
 		<div className="channelListWrapper">
 			<i className="fas fa-times closeIcon" onClick={ toggleDisplayList }></i>
 			<div className="channelSearchBar">
