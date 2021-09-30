@@ -47,3 +47,4 @@ services:
     volumes:
       - ./websocket_client/.:/usr/src/app
     working_dir: /usr/src/app
+

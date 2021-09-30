@@ -59,6 +59,12 @@ export default class ChannelController {
     return this.channelService.createChannel(channel);
   }
 
+  @Delete('/:id')
+  @ApiOperation({summary: "Delete a channel"})
+  async deleteChannel(@Param() { id }: FindOneParams){
+    return this.channelService.deleteChannel(Number(id));
+  }
+
   @ApiParam({name: 'id', type: Number, description: 'channel id'})
   @Put('members/:id')
   @ApiOperation({summary: "Add new member to a channel"})
@@ -113,5 +119,12 @@ export default class ChannelController {
   @ApiOperation({summary: "Unmute member of a channel"})
   unmuteAMember(@Param() { id }: FindOneParams, @Body() admin: UserDto){
     return this.channelService.unmuteAMember(Number(id), admin.userId)
+  }
+
+  @ApiParam({name: 'id', type: Number, description: 'channel id'})
+  @Get('messages/:id')
+  @ApiOperation({summary: "Get messages of a channel"})
+  getMessages(@Param() { id }: FindOneParams) {
+    return this.channelService.getMessages(Number(id));
   }
 }
