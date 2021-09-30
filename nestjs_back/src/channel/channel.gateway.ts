@@ -77,7 +77,7 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
      const author = await this.authenticationService.getUserFromSocket(client);
       this.logger.log(`Message from ${this.connectedUsers.get(client)} to ${data.recipient.name}: ${data.content}`);
       const message = await this.channelService.saveMessage(data.content, author, data.recipient);
-      this.server.in(data.recipient.id.toString()).emit('receive_message', data);
+      this.server.in(data.recipient.id.toString()).emit('receive_message', message);
     }
 
   @SubscribeMessage('request_messages')
