@@ -95,6 +95,7 @@ class User {
   blockedBy: User[];
 
   @Column({nullable: true, default: null})
+  @Expose({ groups: ['infos'] })
   public avatar: string;
 
   //  @Column("simple-array", {nullable: true})

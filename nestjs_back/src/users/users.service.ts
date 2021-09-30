@@ -270,9 +270,10 @@ export default class UsersService {
   }
 
   public async serveAvatar(userId: number, res: any){
-    const avatar = (await this.getById(userId)).avatar;
+    const avatar = (await this.getAllInfosByUserId(userId)).avatar;
+  //  return avatar;
     if (avatar)
-      res.sendFile(avatar, {root: './'});
+      return res.sendFile(avatar, {root: './'});
     throw new HttpException('No avatar set yet', HttpStatus.BAD_REQUEST);
   }
 

@@ -62,35 +62,20 @@ export default class ChannelController {
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')
   @UseGuards(JwtTwoFactorGuard)
-  @ApiOperation({summary: "Create a new channel"})
   async createChannel(@Req() req: RequestWithUser, @Body() channel: CreateChannelDto){
     const { user } = req;
     return this.channelService.createChannel(channel, user.id);
   }
 
-  // Out of scope
-  // @ApiOperation({ summary: "Delete a channel with the authenticated user" })
-  // @ApiParam({name: 'id', type: Number, description: 'channel id'})
-  // @ApiBearerAuth('bearer-authentication')
-  // @ApiCookieAuth('cookie-authentication')
-  // @UseGuards(JwtTwoFactorGuard)
-  // @Delete('/:id')
-  // @ApiOperation({summary: "Delete a channel"})
-  // async deleteChannel(@Req() req: RequestWithUser, @Param() { id }: FindOneParams){
-  //   const { user } = req;
-  //   return this.channelService.deleteChannel(Number(id), user.id);
-  // }
-
-  @Delete('/:id')
+  @Put('leave/:id')
   @ApiOperation({ summary: "Leave a channel with the authenticated user" })
   @ApiParam({name: 'id', type: Number, description: 'channel id'})
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')
   @UseGuards(JwtTwoFactorGuard)
-  @ApiOperation({summary: "Delete a channel"})
   async leaveChannel(@Req() req: RequestWithUser, @Param() { id }: FindOneParams){
     const { user } = req;
-    return this.channelService.leaveChannel(Number(id), user.id);
+    return this.channelService.removeFromChannel(Number(id), user.id, user.id);
   }
 
   @Put('password/:id')
@@ -99,66 +84,83 @@ export default class ChannelController {
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')
   @UseGuards(JwtTwoFactorGuard)
-  @ApiOperation({summary: "Delete a channel"})
   async changePassword(@Req() req: RequestWithUser, @Param() { id }: FindOneParams, @Body() password: NewPasswordDto){
     const { user } = req;
     return this.channelService.changePassword(Number(id), user.id, password);
   }
 
   @Put('members/:id')
-  @ApiOperation({summary: "Add new member to a channel"})
+  @ApiOperation({summary: "Join channel/Add new member to a channel"})
   @ApiParam({name: 'id', type: Number, description: 'channel id'})
-  addMember(@Param() { id }: FindOneParams, @Body() member: UserDto) {
-    return this.channelService.addMember(Number(id), member.userId);
-  }
-
-  @Delete('members/:id')
-  @ApiOperation({summary: "Delete member of a channel"})
-  @ApiParam({name: 'id', type: Number, description: 'channel id'})
-  removeMember(@Param() { id }: FindOneParams, @Body() member: UserDto){
-    return this.channelService.removeMember(Number(id), member.userId)
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  addMember(@Req() req: RequestWithUser, @Param() { id }: FindOneParams, @Body() member: UserDto) {
+    const { user } = req;
+    return this.channelService.addMember(Number(id), member.userId, user.id);
   }
 
   @Put('admins/:id')
   @ApiOperation({summary: "Add new admin to a channel"})
   @ApiParam({name: 'id', type: Number, description: 'channel id'})
-  addAdmin(@Param() { id }: FindOneParams, @Body() admin: UserDto) {
-    return this.channelService.addAdmin(Number(id), admin.userId);
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  addAdmin(@Req() req: RequestWithUser, @Param() { id }: FindOneParams, @Body() admin: UserDto) {
+    const {user} = req;
+    return this.channelService.addAdmin(Number(id), admin.userId, user.id);
   }
 
   @Delete('admins/:id')
   @ApiOperation({summary: "Delete admin to a channel"})
   @ApiParam({name: 'id', type: Number, description: 'channel id'})
-  revokeAdmin(@Param() { id }: FindOneParams, @Body() admin: UserDto){
-    return this.channelService.revokeAdmin(Number(id), admin.userId)
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  revokeAdmin(@Req() req: RequestWithUser, @Param() { id }: FindOneParams, @Body() admin: UserDto){
+    const {user} = req;
+    return this.channelService.revokeAdmin(Number(id), admin.userId, user.id)
   }
 
   @Put('ban/:id')
-  @ApiOperation({summary: "Ban member of a channel"})
+  @ApiOperation({summary: "Ban a member from a channel"})
   @ApiParam({name: 'id', type: Number, description: 'channel id'})
-  banAMember(@Param() { id }: FindOneParams, @Body() admin: UserDto) {
-    return this.channelService.banAMember(Number(id), admin.userId);
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  BanMember(@Req() req: RequestWithUser, @Param() { id }: FindOneParams, @Body() member: UserDto){
+    const { user } = req;
+    return this.channelService.banAMember(Number(id), member.userId, user.id)
   }
 
-  @Delete('ban/:id')
+  @Put('unban/:id')
   @ApiOperation({summary: "Unban member of a channel"})
   @ApiParam({name: 'id', type: Number, description: 'channel id'})
-  unbanAMember(@Param() { id }: FindOneParams, @Body() admin: UserDto){
-    return this.channelService.unbanAMember(Number(id), admin.userId)
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  unbanAMember(@Req() req: RequestWithUser, @Param() { id }: FindOneParams, @Body() admin: UserDto){
+    const {user} = req;
+    return this.channelService.unbanAMember(Number(id), admin.userId, user.id)
   }
 
   @Put('mute/:id')
   @ApiOperation({summary: "Mute member of a channel"})
   @ApiParam({name: 'id', type: Number, description: 'channel id'})
-  muteAMember(@Param() { id }: FindOneParams, @Body() admin: UserDto) {
-    return this.channelService.muteAMember(Number(id), admin.userId);
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  muteAMember(@Req() req: RequestWithUser, @Param() { id }: FindOneParams, @Body() admin: UserDto) {
+    const {user} = req;
+    return this.channelService.muteAMember(Number(id), admin.userId, user.id);
   }
 
-  @Delete('mute/:id')
+  @Put('unmute/:id')
   @ApiOperation({summary: "Unmute member of a channel"})
   @ApiParam({name: 'id', type: Number, description: 'channel id'})
-  unmuteAMember(@Param() { id }: FindOneParams, @Body() admin: UserDto){
-    return this.channelService.unmuteAMember(Number(id), admin.userId)
+  unmuteAMember(@Req() req: RequestWithUser, @Param() { id }: FindOneParams, @Body() admin: UserDto){
+    const {user} = req;
+    return this.channelService.unmuteAMember(Number(id), admin.userId, user.id)
   }
 
   @Get('messages/:id')
