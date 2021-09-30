@@ -5,7 +5,7 @@ import User from './user.entity';
 import UpdateUserDto from './dto/updateUser.dto';
 import RequestWithUser from '../authentication/interface/requestWithUser.interface';
 import JwtTwoFactorGuard from '../authentication/guard/jwtTwoFactor.guard';
-import { ApiBearerAuth, ApiCookieAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiCookieAuth, ApiOperation, ApiParam, ApiResponse, ApiTags, ApiBody, ApiConsumes } from '@nestjs/swagger';
 import AddFriendDto from './dto/addFriend.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
@@ -259,29 +259,28 @@ export default class UsersController {
   // 	return this.userService.uploadImage(file, user);
   // }
 
-  // @ApiBody({
-  //   schema: {
-  //     type: 'object',
-  //     properties: {
-  //       comment: { type: 'string' },
-  //       outletId: { type: 'integer' },
-  //       file: {
-  //         type: 'string',
-  //         format: 'binary',
-  //       },
-  //     },
-  //   },
-  // })
-  // @ApiBearerAuth('bearer-authentication')
-  // @ApiCookieAuth('cookie-authentication')
-  // @ApiResponse({
-  //   status: 200,
-  //   description: 'The avatar has been successfully uploaded to the server',
-  //   type: [User]
-  // })
-  //  @UseGuards(JwtTwoFactorGuard)
-  @ApiOperation({ summary: "Upload an avatar /!\\ For now uploads for user with id 1" })
   @Post('avatar/me')
+  @ApiOperation({ summary: "Upload an avatar /!\\ For now uploads for user with id 1" })
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @ApiResponse({
+    status: 200,
+    description: 'The avatar has been successfully uploaded to the server',
+    type: [User]
+  })
+  @UseGuards(JwtTwoFactorGuard)
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        avatar: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
   @UseInterceptors(
     FileInterceptor(
       'avatar',
@@ -296,20 +295,12 @@ export default class UsersController {
   )
   async uploadAvatar(@Req() req: RequestWithUser, @UploadedFile() file: Express.Multer.File) {
     const { user } = req;
-    return this.userService.setAvatar(1, file.path); // change 1
+    return this.userService.setAvatar(user.id, file.path); 
   }
 
-
-  // @ApiOperation({summary: 'User Get Profile Picture'})
-  // @ApiOkResponse({description: 'Picture File'})
-  // @ApiParam({name: 'profilePicture', required: true, description: 'Profile Picture'})
-  // /*******/
-  // @UseGuards(AuthGuard('jwt'), UserAuth)
-  // @Get('/avatar/:profilePicture')
-  // getProfilePicture(@Res() res, @Param('profilePicture') profilePicture: string): Promise<Observable<object>> {
-  // 	return this.userService.getProfilePicture(res, profilePicture);
-  // }
   @Get('avatar/:id')
+  @ApiOperation({ summary: "Get avatar of a user" })
+  @ApiParam({ name: 'id', type: Number, description: 'user id' })
   async serveAvatar(@Param() { id }: FindOneParams, @Res() res: any): Promise<any> {
     return this.userService.serveAvatar(Number(id), res);
   }
