@@ -1,5 +1,5 @@
 import WindowBorder from '../ui_components/WindowBorder';
-import { useContext, useState, useEffect, EffectCallback } from 'react';
+import { useRef, useContext, useState, useEffect, EffectCallback } from 'react';
 import ChannelList from '../chat/ChannelList';
 import { Message } from '../chat/ChannelConversation';
 import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
@@ -55,26 +55,34 @@ export function Chat() {
 				try {
 					const res = await axios.get(`/channel/messages/${channel.id}`);
 					console.log("GET MESSAGES", res);
-					setMessages(res.data);
+					setMessages(res.data.reverse());
 				} catch (err) {
 					console.log(err);
 				}
 			}
 		};
 		getMessages();
-		// if (channel)
-		// 	socket.emit('join_chan', channel?.id);
 	}, [channel])
+
+	const messagesEndRef = useRef<any>(null);
+	const scrollToBottom = () => {
+		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+	  }
 
 	const handleSubmit = (e:any) => {
 		e.preventDefault();
-		const message : any = {
-			content: newMessage,
-			recipient: channel
-		};
-		setNewMessage("");
-		socket.emit('send_message', message);
-		console.log("SENT :", message);
+		if (newMessage != "")
+		{
+
+			const message : any = {
+				content: newMessage,
+				recipient: channel
+			};
+			setNewMessage("");
+			socket.emit('send_message', message);
+			console.log("SENT :", message);
+			scrollToBottom();
+		}
 	}
 
 	var messageList;
@@ -84,6 +92,7 @@ export function Chat() {
 	else
 		messageList = <p className="no_chan">No message yet.</p>
 
+	
 	return (
 		<WindowBorder w='382px' h='670px'>		
 			<div id="chat">
@@ -93,17 +102,20 @@ export function Chat() {
 					<div>
 						{/* <div className="chat_date">13/09/2021</div> */}
 						{ messageList }
+						<div ref={messagesEndRef} />
 					</div>
 				</div>
 				<div id="chat_input">
 					<i className="fas fa-chevron-right"></i>
-					<input 
+					<form onSubmit={ handleSubmit }>
+						<input 
 						type="text"
 						id="message_input"
 						autoComplete="off"
 						onChange={ (e) => setNewMessage(e.target.value) }
 						value={ newMessage }></input>
 					<i className="fas fa-paper-plane" onClick={ handleSubmit }></i>
+					</form>
 				</div>
 			</div>
 			
