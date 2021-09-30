@@ -277,9 +277,9 @@ export default class UsersController {
     return this.userService.setAvatar(1, file.path); // change 1
   }
 
-  @Get('avatar/:id')
-  async serveAvatar(@Param() { id }: FindOneParams, @Res() res: any): Promise<any> {
-    return this.userService.serveAvatar(Number(id), res);
+  @Get('avatar')
+  async serveAvatar(@Res() res: any): Promise<any> {
+    return this.userService.serveAvatar(1, res);
   }
 
 }

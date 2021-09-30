@@ -61,6 +61,7 @@ export default class ChannelController {
 
   @Delete('/:id')
   @ApiOperation({summary: "Delete a channel"})
+  @ApiParam({ name: 'id', type: Number, description: 'channel id' })
   async deleteChannel(@Param() { id }: FindOneParams){
     return this.channelService.deleteChannel(Number(id));
   }

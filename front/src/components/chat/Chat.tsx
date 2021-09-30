@@ -29,13 +29,10 @@ export function Chat() {
 	const [ newMessage, setNewMessage ] = useState("");
 
 	// ---- DISPLAY
-	var { displayList, channel } = useContext(ChannelContext) as ContextType;
+	var { displayList, channel, socket, setSocket } = useContext(ChannelContext) as ContextType;
 	
 	// ---- SOCKETS
-	var [socket, setSocket] = useState<any>(null);
-	// useEffect(() => {
-	// 	setSocket(io("http://localhost:8080/channel", { transports: ["websocket"] }));
-	// }, [])
+	// var [socket, setSocket] = useState<any>(null);
 	useEffect(() : ReturnType<EffectCallback> => {
 		const newSocket:any = io(`http://localhost:8080/channel`, { transports: ["websocket"] });
 		setSocket(newSocket);
@@ -43,15 +40,9 @@ export function Chat() {
 	}, [setSocket]);
 
 	useEffect(() => {
-		// socket?.connect();
 		socket?.on('receive_message', (data:any) => {
 			console.log("RECEIVED :", data);
-			// if (data.recipient.id !== user?.id)
-			// {
-				// console.log("added to messages");
-				setMessages(messages.concat(data));
-			// }
-			
+			setMessages(oldArray => [...oldArray, data]);
 		})
 	}, [socket])
 	
@@ -71,26 +62,9 @@ export function Chat() {
 			}
 		};
 		getMessages();
-		socket?.emit('join_chan', channel?.id);
+		// if (channel)
+		// 	socket.emit('join_chan', channel?.id);
 	}, [channel])
-
-	// useEffect(() => {
-		
-	// })
-
-	// ---- CONVERSATION
-	
-	// useEffect(() => {
-	// 	if (channel)
-	// 	{
-	// 		socket?.emit('request_messages', channel);
-	// 		console.log("requested channel");
-	// 		socket?.on('messages_channel', (data:any) => {
-	// 			// console.log(data);
-	// 			setMessages(data);
-	// 		});
-	// 	}
-	// }, [channel, socket])
 
 	const handleSubmit = (e:any) => {
 		e.preventDefault();
@@ -98,7 +72,6 @@ export function Chat() {
 			content: newMessage,
 			recipient: channel
 		};
-		// setMessages(messages.concat(message));
 		setNewMessage("");
 		socket.emit('send_message', message);
 		console.log("SENT :", message);

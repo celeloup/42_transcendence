@@ -22,7 +22,8 @@ export default class ChannelService {
   ) {
   }
   async saveMessage(content: string, author: User, recipient: Channel) {
-    const newMessage = await this.messagesRepository.create({
+	await this.getChannelById(recipient.id);
+	const newMessage = await this.messagesRepository.create({
       content,
       author,
       recipient
@@ -266,8 +267,11 @@ export default class ChannelService {
   }
 
   async getMessages(channel_id: number){
-    const channel = await this.getAllInfosByChannelId(channel_id);
-    return channel.historic;
+
+	const channel = await this.channelRepository.findOne({id: channel_id});
+	return this.getMessageByChannel(channel);
+  //  const channel = await this.getAllInfosByChannelId(channel_id);
+   // return channel.historic;
   }
 
   async deleteChannel(channel_id: number) {

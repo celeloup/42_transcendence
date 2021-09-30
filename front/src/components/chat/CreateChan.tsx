@@ -25,7 +25,7 @@ type CreateChanProps = {
 
 function CreateChan({ type, hide, socket } : CreateChanProps) {
 	const { user } = useContext(AuthContext) as AuthContextType; // might remove once create chan change
-	var { setChannel, toggleDisplayList, channel } = useContext(ChannelContext) as ContextType;
+	var { changeChannel, toggleDisplayList, channel } = useContext(ChannelContext) as ContextType;
 
 	// -------- List users
 	const [users, setUsers] = useState<User[]>([]);
@@ -80,9 +80,9 @@ function CreateChan({ type, hide, socket } : CreateChanProps) {
 				try {
 					const res = await axios.post('/channel', chanSettings);
 					// console.log(res);
-					if (channel)
-						socket.emit('leave_chan', channel.id);
-					setChannel(res.data);
+					// if (channel)
+					// 	socket.emit('leave_chan', channel.id);
+					changeChannel(res.data);
 					// if (channel)
 					// 	socket.emit('join_chan', channel.id);
 					hide(0);

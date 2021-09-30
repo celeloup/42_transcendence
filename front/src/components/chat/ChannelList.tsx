@@ -15,11 +15,11 @@ type ChannelProps = {
 	channelObj: any,
 }
 
-function Channel({ channelObj} : ChannelProps) {
-	var { channel, setChannel, toggleDisplayList } = useContext(ChannelContext) as ContextType;
+function Channel({ channelObj } : ChannelProps) {
+	var { channel, changeChannel, toggleDisplayList } = useContext(ChannelContext) as ContextType;
 	
 	const selectChannel = () => {
-		setChannel(channelObj);
+		changeChannel(channelObj);
 		toggleDisplayList();
 	}
 	
