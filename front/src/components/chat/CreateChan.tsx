@@ -14,17 +14,18 @@ type channelSettings = {
 	name: string,
 	password: string,
 	members: [],
-	owner_id: number
+//	owner_id: number
 };
 
 type CreateChanProps = {
 	type : number,
-	hide : (type: number) => void
+	hide : (type: number) => void,
+	socket: any
 };
 
-function CreateChan({ type, hide } : CreateChanProps) {
+function CreateChan({ type, hide, socket } : CreateChanProps) {
 	const { user } = useContext(AuthContext) as AuthContextType; // might remove once create chan change
-	var { setChannel, toggleDisplayList } = useContext(ChannelContext) as ContextType;
+	var { setChannel, toggleDisplayList, channel } = useContext(ChannelContext) as ContextType;
 
 	// -------- List users
 	const [users, setUsers] = useState<User[]>([]);
@@ -66,20 +67,24 @@ function CreateChan({ type, hide } : CreateChanProps) {
 			errors.push({key:"password", value:"The password cannot contain non printable characters."});
 		if (errors.length === 0)
 		{
-			console.log(errors);
+			// console.log(errors);
 			var chanSettings:channelSettings = {
 				type: chanType,
 				name: (chanType === 1 || chanType === 2) ? chanName : "", 
 				password: chanType === 2 ? chanPassword : "", 
 				members: [],
-				owner_id: user? user.id : 1 // TO CHANGE LATER OR TO REMOVE
+			//	owner_id: user? user.id : 1 // TO CHANGE LATER OR TO REMOVE
 			};
 			// console.log(chanSettings);
 			const submitNewChannel = async () => {
 				try {
 					const res = await axios.post('/channel', chanSettings);
 					// console.log(res);
+					if (channel)
+						socket.emit('leave_chan', channel.id);
 					setChannel(res.data);
+					// if (channel)
+					// 	socket.emit('join_chan', channel.id);
 					hide(0);
 					toggleDisplayList();
 				} catch (err) { console.log(err); }
