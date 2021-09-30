@@ -237,6 +237,28 @@ export default class UsersController {
   //   return this.userService.deleteUser(Number(id));
   // }
 
+  // @ApiOperation({summary: 'Upload profil picture'})
+  // @ApiOkResponse({description: 'Picture File'})
+  // @ApiConsumes('multipart/form-data')
+  // @ApiBody({
+  // 	schema: {
+  // 		properties: {
+  // 			file: {
+  // 				type : 'string',
+  // 				format: 'binary',
+  // 			},
+  // 		},
+  // 	}
+  // })
+  // /*******/
+  // @UseGuards(AuthGuard('jwt'), UserAuth)
+  // @Post('/upload/avatar')
+  // @UseInterceptors(FileInterceptor('file', storage))
+  // uploadImage(@UploadedFile() file, @Req() req): Promise<string> {
+  // 	const user: User = req.user;
+  // 	return this.userService.uploadImage(file, user);
+  // }
+
   // @ApiBody({
   //   schema: {
   //     type: 'object',
@@ -277,6 +299,16 @@ export default class UsersController {
     return this.userService.setAvatar(1, file.path); // change 1
   }
 
+
+  // @ApiOperation({summary: 'User Get Profile Picture'})
+  // @ApiOkResponse({description: 'Picture File'})
+  // @ApiParam({name: 'profilePicture', required: true, description: 'Profile Picture'})
+  // /*******/
+  // @UseGuards(AuthGuard('jwt'), UserAuth)
+  // @Get('/avatar/:profilePicture')
+  // getProfilePicture(@Res() res, @Param('profilePicture') profilePicture: string): Promise<Observable<object>> {
+  // 	return this.userService.getProfilePicture(res, profilePicture);
+  // }
   @Get('avatar/:id')
   async serveAvatar(@Param() { id }: FindOneParams, @Res() res: any): Promise<any> {
     return this.userService.serveAvatar(Number(id), res);

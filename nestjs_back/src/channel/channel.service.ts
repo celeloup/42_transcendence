@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import Channel from './channel.entity';
 import CreateChannelDto from './dto/createChannel.dto';
 import UsersService from '../users/users.service';
+import NewPasswordDto from './dto/newPassword.dto';
 
 @Injectable()
 export default class ChannelService {
@@ -22,6 +23,7 @@ export default class ChannelService {
   ) {
   }
   async saveMessage(content: string, author: User, recipient: Channel) {
+    await this.getChannelById(recipient.id);
     const newMessage = await this.messagesRepository.create({
       content,
       author,
@@ -37,6 +39,11 @@ export default class ChannelService {
       relations: ["author"]
     });
   }
+
+  async getMessagesByChannelId(channel_id: number){
+    const channel = await this.channelRepository.findOne({id: channel_id});
+    return this.getMessageByChannel(channel);
+    }
 
   async getAllChannels() {
     const channels = await this.channelRepository.find();
@@ -84,6 +91,14 @@ export default class ChannelService {
       return channel;
     }
     throw new HttpException('Channel with this id does not exist', HttpStatus.NOT_FOUND);
+  }
+
+  async changePassword(channel_id: number, owner_id: number, password: NewPasswordDto){
+    const channel = await this.getAllInfosByChannelId(channel_id);
+    if ((await this.isOwner(channel_id, owner_id))){
+      return (await this.channelRepository.update(channel_id, password));
+    }
+    throw new HttpException('Only the owner of a channel can change its password', HttpStatus.NOT_FOUND);
   }
 
   async isAMember(channel_id: number, user_id: number) {
@@ -296,11 +311,6 @@ export default class ChannelService {
       throw new HttpException('A private chat is only between two members', HttpStatus.FORBIDDEN);
     await this.channelRepository.save(newChannel);
     return newChannel;
-  }
-
-  async getMessages(channel_id: number) {
-    const channel = await this.getAllInfosByChannelId(channel_id);
-    return channel.historic;
   }
 
   async deleteChannel(channel_id: number, user_id: number) {

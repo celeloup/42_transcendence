@@ -14,7 +14,7 @@ type channelSettings = {
 	name: string,
 	password: string,
 	members: [],
-	owner_id: number
+//	owner_id: number
 };
 
 type CreateChanProps = {
@@ -72,7 +72,7 @@ function CreateChan({ type, hide } : CreateChanProps) {
 				name: (chanType === 1 || chanType === 2) ? chanName : "", 
 				password: chanType === 2 ? chanPassword : "", 
 				members: [],
-				owner_id: user? user.id : 1 // TO CHANGE LATER OR TO REMOVE
+			//	owner_id: user? user.id : 1 // TO CHANGE LATER OR TO REMOVE
 			};
 			// console.log(chanSettings);
 			const submitNewChannel = async () => {
