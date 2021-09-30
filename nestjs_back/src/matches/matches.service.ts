@@ -8,6 +8,7 @@ import UpdateMatchDto from './dto/updateMatch.dto';
 import UsersService from 'src/users/users.service';
 import User from 'src/users/user.entity';
 import AchievementsService from 'src/achievements/achievements.service';
+import { match } from 'assert';
  
 @Injectable()
 export default class MatchesService {
@@ -52,25 +53,25 @@ export default class MatchesService {
       const tenVictories = await this.achievementsService.getAchievementById(2);
       const aHundredPoints = await this.achievementsService.getAchievementById(3);
       user1.points += match.score_user1;
-      if (user1.points >= 100 && user1.points < 110)
+      if (user1.points >= 100 && user1.points < ( 100 + match.goal))
         user1.achievements.push(aHundredPoints);
       user2.points += match.score_user2;
-      if (user2.points >= 100 && user2.points < 110)
+      if (user2.points >= 100 && user2.points < ( 100 + match.goal))
         user2.achievements.push(aHundredPoints);
-      if (match.score_user1 === 10){
+      if (match.score_user1 === match.goal){
         user1.victories++;
-        if (user1.victories === 10)
+        if (user1.victories === match.goal)
           user1.achievements.push(tenVictories);
         user2.defeats++;
       }
       else{
         user2.victories++;
-        if (user2.victories === 10)
+        if (user2.victories === match.goal)
           user2.achievements.push(tenVictories);
         user1.defeats++;
       }
     }
-    if (match.score_user1 === 10)
+    if (match.score_user1 === match.goal)
       match.winner = match.user1_id;
     else
       match.winner = match.user2_id;
@@ -81,10 +82,10 @@ export default class MatchesService {
   }
 
   async updateMatch(id: number, matchData: UpdateMatchDto) {
-    await this.matchesRepository.update(id, matchData);
+    //await this.matchesRepository.update(id, matchData);
     const updatedMatch = await this.getMatchById(id);
     if (updatedMatch) {
-      if (updatedMatch.score_user1 === 10 || updatedMatch.score_user2 === 10)
+      if (updatedMatch.score_user1 === updatedMatch.goal || updatedMatch.score_user2 === updatedMatch.goal)
         return await this.weHaveAWinner(updatedMatch);
       else
         return updatedMatch;
@@ -92,4 +93,10 @@ export default class MatchesService {
     throw new HttpException('Match not found', HttpStatus.NOT_FOUND);
   }
   
+  async deleteMatch(match_id: number){
+    await this.getMatchById(match_id);
+    await this.matchesRepository.delete(match_id);
+    //Ne rien renvoyer si success ?
+  }
+
 }
