@@ -29,17 +29,17 @@ services:
     env_file:
       - docker.env
 
-  pgadmin:
-    links:
-      - postgres:postgres
-    container_name: pgadmin
-    image: dpage/pgadmin4
-    ports:
-      - "8081:80"
-    volumes:
-      - ./pgadmin/_data:/root/.pgadmin
-    env_file:
-      - docker.env
+  # pgadmin:
+  #   links:
+  #     - postgres:postgres
+  #   container_name: pgadmin
+  #   image: dpage/pgadmin4
+  #   ports:
+  #     - "8081:80"
+  #   volumes:
+  #     - ./pgadmin/_data:/root/.pgadmin
+  #   env_file:
+  #     - docker.env
 
   # websocket_client:
   #   image: node:15.14.0-alpine3.12

@@ -3,7 +3,7 @@ import { useRef, useContext, useState, useEffect, EffectCallback } from 'react';
 import ChannelList from '../chat/ChannelList';
 import { Message } from '../chat/ChannelConversation';
 import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
-import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
+// import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
 import { io } from "socket.io-client";
 import '../../styles/Chat.scss';
 import axios from 'axios';
@@ -24,14 +24,14 @@ function ChatHeader() {
 }
 
 export function Chat() {
-	const { user } = useContext(AuthContext) as AuthContextType;
+	// const { user } = useContext(AuthContext) as AuthContextType;
 	const [ messages, setMessages ] = useState<any[]>([]);
 	const [ newMessage, setNewMessage ] = useState("");
 
-	// ---- DISPLAY
+	// ---------- DISPLAY
 	var { displayList, channel, socket, setSocket } = useContext(ChannelContext) as ContextType;
 	
-	// ---- SOCKETS
+	// ---------- SOCKETS
 	// var [socket, setSocket] = useState<any>(null);
 	useEffect(() : ReturnType<EffectCallback> => {
 		const newSocket:any = io(`http://localhost:8080/channel`, { transports: ["websocket"] });
@@ -48,14 +48,14 @@ export function Chat() {
 	
 	// ---------- GET MESSAGES
 	useEffect(() => {
-		console.log("CURRENT CHANNEL: ", channel);
+		// console.log("CURRENT CHANNEL: ", channel);
 		const getMessages = async () => {
 			if (channel)
 			{
 				try {
 					const res = await axios.get(`/channel/messages/${channel.id}`);
 					console.log("GET MESSAGES", res);
-					setMessages(res.data.reverse());
+					setMessages(res.data);
 				} catch (err) {
 					console.log(err);
 				}
@@ -64,24 +64,28 @@ export function Chat() {
 		getMessages();
 	}, [channel])
 
+	// ---------- SCROLL
 	const messagesEndRef = useRef<any>(null);
 	const scrollToBottom = () => {
 		messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-	  }
+	}
+	useEffect(() => {
+		scrollToBottom();
+	}, [messages])
 
+	const inputRef = useRef<any>(null);
 	const handleSubmit = (e:any) => {
 		e.preventDefault();
-		if (newMessage != "")
+		if (newMessage !== "")
 		{
-
 			const message : any = {
 				content: newMessage,
 				recipient: channel
 			};
 			setNewMessage("");
 			socket.emit('send_message', message);
-			console.log("SENT :", message);
-			scrollToBottom();
+			// console.log("SENT :", message);
+			inputRef.current?.focus();
 		}
 	}
 
@@ -94,10 +98,10 @@ export function Chat() {
 
 	
 	return (
-		<WindowBorder w='382px' h='670px'>		
+		<WindowBorder w='382px' h='670px'>
 			<div id="chat">
 				{ displayList && <ChannelList socket={socket}/> }
-				<ChatHeader/>
+				<ChatHeader />
 				<div id="chat_messages">
 					<div>
 						{/* <div className="chat_date">13/09/2021</div> */}
@@ -109,16 +113,18 @@ export function Chat() {
 					<i className="fas fa-chevron-right"></i>
 					<form onSubmit={ handleSubmit }>
 						<input 
-						type="text"
-						id="message_input"
-						autoComplete="off"
-						onChange={ (e) => setNewMessage(e.target.value) }
-						value={ newMessage }></input>
+							type="text"
+							autoFocus={true}
+							id="message_input"
+							autoComplete="off"
+							onChange={ (e) => setNewMessage(e.target.value) }
+							value={ newMessage }
+							ref={inputRef}>
+						</input>
 					<i className="fas fa-paper-plane" onClick={ handleSubmit }></i>
 					</form>
 				</div>
 			</div>
-			
 		</WindowBorder>
 	)
 }
