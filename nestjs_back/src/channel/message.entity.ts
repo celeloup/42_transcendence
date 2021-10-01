@@ -1,5 +1,5 @@
 import { ExecSyncOptionsWithBufferEncoding } from 'child_process';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Type } from 'class-transformer';
 import User from '../users/user.entity';
 import Channel from './channel.entity';
@@ -18,6 +18,9 @@ class Message {
 
   @ManyToOne(() => Channel, (channel: Channel) => channel.historic)
   public recipient: Channel;
+
+  @UpdateDateColumn()
+  public lastupdate: Date;
 }
 
 export default Message;

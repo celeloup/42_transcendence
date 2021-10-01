@@ -8,7 +8,6 @@ import UpdateUserDto from './dto/updateUser.dto';
 import Achievement from '../achievements/achievement.entity';
 import AchievementsService from '../achievements/achievements.service';
 import Channel from 'src/channel/channel.entity';
-import { CallbackObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 
 @Injectable()
 export default class UsersService {
@@ -94,8 +93,8 @@ export default class UsersService {
         'matches',
         'ownedChannels',
         'chan_admin',
-        'ban',
-        'mute',
+        'chan_banned',
+        'chan_muted',
         'friends',
         'friendOf',
         'blocked',
@@ -331,7 +330,7 @@ export default class UsersService {
       leper.site_banned = true;
       return await this.usersRepository.save(leper);
     }
-    throw new HttpException('User has not the rights to ban this member', HttpStatus.FORBIDDEN);
+    throw new HttpException('User does not have the rights to ban this member', HttpStatus.FORBIDDEN);
   }
   
   // Off topic
