@@ -14,7 +14,7 @@ services:
 
   back:
     image: node:15.14.0-alpine3.12
-    command: sh -c "npm install && npm run start:dev"
+    command: sh -c "npm install && npm install -g npm@7.24.1 && npm run start:dev"
     ports:
       - "8080:8080"
     volumes:
