@@ -8,6 +8,7 @@ import Channel from './channel.entity';
 import CreateChannelDto from './dto/createChannel.dto';
 import UsersService from '../users/users.service';
 import NewPasswordDto from './dto/newPassword.dto';
+import { IsAscii } from 'class-validator';
 
 @Injectable()
 export default class ChannelService {
@@ -34,30 +35,34 @@ export default class ChannelService {
   }
 
   async deleteMessages(recipient: Channel) {
-    await this.getChannelById(recipient.id);
-    const messages = await this.getMessageByChannel(recipient);
-    for (var id of messages) {
-      this.messagesRepository.delete(id);
-    }
+    recipient.historic = []
+    await this.channelRepository.save(recipient)
   }
 
   async getMessageByChannel(channel: Channel) {
     return this.messagesRepository.find({
       where: { recipient: channel },
-      relations: ["author"]
+      relations: ["author"],
+      order: {
+        lastupdate: "ASC"
+      }
     });
   }
 
   async getMessagesByChannelId(channel_id: number, userId: number) {
     const channel = await this.channelRepository.findOne({ id: channel_id });
-    if ((await this.isAMember(channel_id, userId) || (await this.usersService.isSiteAdmin(userId)))) {
-      return this.getMessageByChannel(channel);
-    }
-    throw new HttpException('Only members and site admins can see messages of a channel', HttpStatus.NOT_FOUND);
+   // if ((await this.isAMember(channel_id, userId) || (await this.usersService.isSiteAdmin(userId)))) {
+      return await this.getMessageByChannel(channel);
+  //  }//COMMENTED WHILE JOINING A CHANNEL VIA WEBSOCKET DOES NOT ADD ONESELF TO MEMBERS OF THE CHANNEL
+    throw new HttpException('Only members and site admins can see messages of a channel', HttpStatus.FORBIDDEN);
+  }
+
+  async getAllMessages() {
+    return await this.messagesRepository.find();
   }
 
   async getAllChannels() {
-    const channels = await this.channelRepository.find();
+    const channels = await this.channelRepository.find({ relations: ["historic"] });
     if (channels) {
       return channels;
     }

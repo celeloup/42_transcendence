@@ -1,6 +1,6 @@
 import { ExecSyncOptionsWithBufferEncoding } from 'child_process';
 import { Column, Entity, ManyToOne, ManyToMany, PrimaryGeneratedColumn, OneToMany, JoinTable, UpdateDateColumn } from 'typeorm';
-import { Type } from 'class-transformer';
+import { Type, Expose } from 'class-transformer';
 import User from '../users/user.entity';
 import Message from './message.entity';
 

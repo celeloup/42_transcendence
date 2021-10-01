@@ -57,6 +57,12 @@ export default class ChannelController {
     return this.channelService.getAllInfosByChannelId(Number(id));
   }
 
+  @Get('messages')
+  @ApiOperation({summary: "Get all messages // debug purpose"})
+  getAllMessages() {
+    return this.channelService.getAllMessages();
+  }
+
   @Post()
   @ApiOperation({ summary: "Create a channel with the authenticated user" })
   @ApiBearerAuth('bearer-authentication')
@@ -178,7 +184,7 @@ export default class ChannelController {
   }
 
   @Delete('delete/:id')
-  @ApiOperation({summary: "Unmute member of a channel"})
+  @ApiOperation({summary: "Delete a channel"})
   @ApiParam({name: 'id', type: Number, description: 'channel id'})
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')
