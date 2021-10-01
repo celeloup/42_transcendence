@@ -27,7 +27,9 @@ $accent_color: #FFCD27;
 .window
 {
 	position: relative;
-	margin-right: 33px;
+	margin: 15px;
+    flex-grow: 0;
+    flex-shrink: 0;
 }
 
 .border_div {

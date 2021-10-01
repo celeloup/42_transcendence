@@ -3,12 +3,32 @@ $text-color: white;
 $accent_color: #FFCD27;
 
 .App {
-  text-align: center;
+	text-align: center;
+	height: 975px;
+	position: absolute;
+	top:0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+    margin: auto;
+//   border: 1px solid red;
 }
 
-#logo {
-	max-width: 200px;
+header, footer {
+	display: flex;
+	max-width: 1150px;
 	margin: auto;
+	justify-content: space-between;
+	align-items: center;
+	
+	img {
+		margin: 5px;
+		user-select: none;
+	}
+}
+
+#logo_wrapper {
+	width: 320px;
 }
 
 #logo * {
@@ -16,9 +36,8 @@ $accent_color: #FFCD27;
 	font-family: "Star Jedi";
 	font-size: 60px;
 	letter-spacing: 3px;
-	margin-top: 50px;
+	// margin-top: 50px;
 	display: flex;
-	
 	flex-direction: column;
 }
 
@@ -32,4 +51,50 @@ $accent_color: #FFCD27;
 	-moz-user-select: none; /* Firefox */
 	-ms-user-select: none; /* IE10+/Edge */
 	user-select: none; /* Standard */
+}
+
+.square {
+	width: 195px;
+}
+
+.temp {
+	width: 145px;
+}
+
+.radar {
+	width: 143px;
+}
+
+.viseur {
+	width: 256px;
+}
+
+.arrows {
+	width: 215px;
+}
+
+.fusibles {
+	width: 140px;
+}
+
+.histogram {
+	width: 505px;
+}
+
+.flip {
+	transform: translate(0,200);
+	transform: scale(-1,1);
+}
+
+.body_wrapper{
+	margin-top: 30px;
+	margin-bottom: 20px;
+	height: 700px;
+}
+
+#home {
+	// border: 1px solid red;
+	display: flex;
+	justify-content: center;
+	
 }

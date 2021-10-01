@@ -115,11 +115,11 @@ $dark-gray: #919191;
 	border-radius: 50%;
 }
 
-// *************************************************** SEARCH BAR
+// ************************* SEARCH BAR
 
 .channelSearchBar {
 	display: flex;
-	width: 240px;
+	width: calc(100% - 90px);
 	height: 25px;
 	margin: 15px 10px 10px 10px;
 	background-color: $background-color;

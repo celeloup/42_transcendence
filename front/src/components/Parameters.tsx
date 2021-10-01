@@ -14,13 +14,13 @@ function Parameters() {
 	}
 
 	return (
-	  <div className="Parameters">
-		  <p>
-			this is the Parameters page
-		  </p>
-		  <button onClick={paramLogout}>LOGOUT</button>
-		  <p><br/>[HERE CHANGE USERNAME, PROFILE PIC, ENABLE DOUBLE AUTH AND LOGOUT]</p>
-	  </div>
+			<div className="Parameters">
+				<p>
+					this is the Parameters page
+				</p>
+				<button onClick={paramLogout}>LOGOUT</button>
+				<p><br/>[HERE CHANGE USERNAME, PROFILE PIC, ENABLE DOUBLE AUTH AND LOGOUT]</p>
+			</div>
 	);
   }
   
