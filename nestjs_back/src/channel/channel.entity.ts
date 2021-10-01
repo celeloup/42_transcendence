@@ -35,12 +35,12 @@ class Channel {
   // public members_id: number[];
 
   @Type(() => User)
-  @ManyToMany(() => User, (banned: User) => banned.ban)
+  @ManyToMany(() => User, (banned: User) => banned.chan_banned)
   @JoinTable()
   public banned: User[];
 
   @Type(() => User)
-  @ManyToMany(() => User, (muted: User) => muted.mute)
+  @ManyToMany(() => User, (muted: User) => muted.chan_muted)
   @JoinTable()
   public muted: User[];
 

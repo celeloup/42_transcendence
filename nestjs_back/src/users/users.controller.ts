@@ -6,7 +6,7 @@ import UpdateUserDto from './dto/updateUser.dto';
 import RequestWithUser from '../authentication/interface/requestWithUser.interface';
 import JwtTwoFactorGuard from '../authentication/guard/jwtTwoFactor.guard';
 import { ApiBearerAuth, ApiCookieAuth, ApiOperation, ApiParam, ApiResponse, ApiTags, ApiBody, ApiConsumes } from '@nestjs/swagger';
-import AddFriendDto from './dto/addFriend.dto';
+import AddUserDto from './dto/addUser.dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { editFileName, imageFileFilter } from 'src/utils/file-uploading.utils';
@@ -170,9 +170,9 @@ export default class UsersController {
   })
   @UseGuards(JwtTwoFactorGuard)
   @Put('friend/me')
-  addAFriend(@Req() req: RequestWithUser, @Body() friend: AddFriendDto) {
+  addAFriend(@Req() req: RequestWithUser, @Body() friend: AddUserDto) {
     const { user } = req;
-    return this.userService.addAFriend(user.id, friend.friendId);
+    return this.userService.addAFriend(user.id, friend.userId);
   }
 
   @ApiOperation({ summary: "Delete a friend of the authenticated user" })
@@ -189,9 +189,9 @@ export default class UsersController {
   })
   @UseGuards(JwtTwoFactorGuard)
   @Delete('friend/me')
-  deleteAFriend(@Req() req: RequestWithUser, @Body() friend: AddFriendDto) {
+  deleteAFriend(@Req() req: RequestWithUser, @Body() friend: AddUserDto) {
     const { user } = req;
-    return this.userService.deleteAFriend(user.id, friend.friendId);
+    return this.userService.deleteAFriend(user.id, friend.userId);
   }
 
   @ApiOperation({ summary: "Block a user for the authenticated user" })
@@ -207,9 +207,9 @@ export default class UsersController {
   })
   @UseGuards(JwtTwoFactorGuard)
   @Put('block/me')
-  blockAUser(@Req() req: RequestWithUser, @Body() friend: AddFriendDto) {
+  blockAUser(@Req() req: RequestWithUser, @Body() friend: AddUserDto) {
     const { user } = req;
-    return this.userService.blockAUser(user.id, friend.friendId);
+    return this.userService.blockAUser(user.id, friend.userId);
   }
 
   @ApiOperation({ summary: "Unblock a user for the authenticated user" })
@@ -225,9 +225,63 @@ export default class UsersController {
   })
   @UseGuards(JwtTwoFactorGuard)
   @Delete('block/me')
-  unblockAUser(@Req() req: RequestWithUser, @Body() friend: AddFriendDto) {
+  unblockAUser(@Req() req: RequestWithUser, @Body() friend: AddUserDto) {
     const { user } = req;
-    return this.userService.unblockAUser(user.id, friend.friendId);
+    return this.userService.unblockAUser(user.id, friend.userId);
+  }
+
+  @ApiOperation({ summary: "Appoint moderator" })
+  @ApiParam({ name: 'id', type: Number, description: 'user id' })
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully promoted moderator',
+    type: [User]
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found for this id'
+  })
+  @UseGuards(JwtTwoFactorGuard)
+  @Put('moderator/me')
+  appointModerator(@Req() req: RequestWithUser, @Body() newModerator: AddUserDto) {
+    const { user } = req;
+    return this.userService.appointModerator(user.id, newModerator.userId);
+  }
+
+  @ApiOperation({ summary: "Revoke a moderator" })
+  @ApiParam({ name: 'id', type: Number, description: 'user id' })
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully promoted moderator',
+    type: [User]
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found for this id'
+  })
+  @UseGuards(JwtTwoFactorGuard)
+  @Delete('moderator/me')
+  revokeModerator(@Req() req: RequestWithUser, @Body() newModerator: AddUserDto) {
+    const { user } = req;
+    return this.userService.revokeModerator(user.id, newModerator.userId);
+  }
+
+  @ApiOperation({ summary: "Ban a user from website" })
+  @ApiParam({ name: 'id', type: Number, description: 'user id' })
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully promoted moderator',
+    type: [User]
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found for this id'
+  })
+  @UseGuards(JwtTwoFactorGuard)
+  @Delete('block/me')
+  banUser(@Req() req: RequestWithUser, @Body() otherUser: AddUserDto) {
+    const { user } = req;
+    return this.userService.banUser(user.id, otherUser.userId);
   }
 
   // Delete account not in subject? 
@@ -235,28 +289,6 @@ export default class UsersController {
   // @ApiOperation({ summary: "Delete a user//Not working so far" })
   // async deleteUser(@Param() { id }: FindOneParams) {
   //   return this.userService.deleteUser(Number(id));
-  // }
-
-  // @ApiOperation({summary: 'Upload profil picture'})
-  // @ApiOkResponse({description: 'Picture File'})
-  // @ApiConsumes('multipart/form-data')
-  // @ApiBody({
-  // 	schema: {
-  // 		properties: {
-  // 			file: {
-  // 				type : 'string',
-  // 				format: 'binary',
-  // 			},
-  // 		},
-  // 	}
-  // })
-  // /*******/
-  // @UseGuards(AuthGuard('jwt'), UserAuth)
-  // @Post('/upload/avatar')
-  // @UseInterceptors(FileInterceptor('file', storage))
-  // uploadImage(@UploadedFile() file, @Req() req): Promise<string> {
-  // 	const user: User = req.user;
-  // 	return this.userService.uploadImage(file, user);
   // }
 
   @Post('avatar/me')
