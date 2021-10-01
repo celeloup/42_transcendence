@@ -139,9 +139,9 @@ export default class ChannelController {
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')
   @UseGuards(JwtTwoFactorGuard)
-  unbanAMember(@Req() req: RequestWithUser, @Param() { id }: FindOneParams, @Body() admin: UserDto){
+  unbanAMember(@Req() req: RequestWithUser, @Param() { id }: FindOneParams, @Body() member: UserDto){
     const {user} = req;
-    return this.channelService.unbanAMember(Number(id), admin.userId, user.id)
+    return this.channelService.unbanAMember(Number(id), member.userId, user.id)
   }
 
   @Put('mute/:id')
@@ -150,9 +150,9 @@ export default class ChannelController {
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')
   @UseGuards(JwtTwoFactorGuard)
-  muteAMember(@Req() req: RequestWithUser, @Param() { id }: FindOneParams, @Body() admin: UserDto) {
+  muteAMember(@Req() req: RequestWithUser, @Param() { id }: FindOneParams, @Body() member: UserDto) {
     const {user} = req;
-    return this.channelService.muteAMember(Number(id), admin.userId, user.id);
+    return this.channelService.muteAMember(Number(id), member.userId, user.id);
   }
 
   @Put('unmute/:id')
@@ -161,15 +161,31 @@ export default class ChannelController {
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')
   @UseGuards(JwtTwoFactorGuard)
-  unmuteAMember(@Req() req: RequestWithUser, @Param() { id }: FindOneParams, @Body() admin: UserDto){
+  unmuteAMember(@Req() req: RequestWithUser, @Param() { id }: FindOneParams, @Body() member: UserDto){
     const {user} = req;
-    return this.channelService.unmuteAMember(Number(id), admin.userId, user.id)
+    return this.channelService.unmuteAMember(Number(id), member.userId, user.id)
   }
 
   @Get('messages/:id')
   @ApiOperation({summary: "Get messages of a channel"})
   @ApiParam({name: 'id', type: Number, description: 'channel id'})
-  getMessages(@Param() { id }: FindOneParams) {
-    return this.channelService.getMessagesByChannelId(Number(id));
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  getMessages(@Req() req: RequestWithUser, @Param() { id }: FindOneParams){
+    const {user} = req;
+    return this.channelService.getMessagesByChannelId(Number(id), user.id);
   }
+
+  @Delete('delete/:id')
+  @ApiOperation({summary: "Unmute member of a channel"})
+  @ApiParam({name: 'id', type: Number, description: 'channel id'})
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  deleteChannel(@Req() req: RequestWithUser, @Param() { id }: FindOneParams){
+    const {user} = req;
+    return this.channelService.deleteChannel(Number(id), user.id)
+  }
+
 }

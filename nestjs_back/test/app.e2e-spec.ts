@@ -176,7 +176,7 @@ describe('AppController (e2e)', () => {
         cleloupBearers = [response.body.authentication, response.body.refresh];
       });
 
-      it('amartin', async () => {
+      it('amartin-', async () => {
         const response = await request(app.getHttpServer())
           .post('/api/authentication/register')
           .send(amartin)

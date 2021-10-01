@@ -1,5 +1,5 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsNumber, IsArray } from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { IsString, IsNotEmpty, IsNumber, IsArray, IsOptional } from 'class-validator';
 
 export default class CreateChannelDto {
 
@@ -13,10 +13,11 @@ export default class CreateChannelDto {
   @ApiProperty()
   type: number;//(1 = public, 2 = private, 3 = mp)
 
-  @ApiProperty()
+  @ApiPropertyOptional()
   @IsString()
+  @IsOptional()
   password?: string;
-
+ 
   @IsNumber({},{each: true})
   @IsArray()
   @ApiProperty()
