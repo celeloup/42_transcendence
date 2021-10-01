@@ -15,7 +15,7 @@ class Channel {
   @Column({ default: 1 })
   public type: number;//  (1 = public, 2 = private, 3 = mp)
   
-  @Column({ default: null , nullable: true})
+  @Column({ default: "" , nullable: true})
   public password: string;
 
   @Type(() => User)
