@@ -17,7 +17,7 @@ $dark-gray: #919191;
 .channelList {
 	// background-color: red;
 	height: calc(100% - 80px);
-	padding-top: 10px;
+	padding: 10px 0 10px 10px;
 	overflow-y: scroll;
 	position: relative;
 }
@@ -56,10 +56,10 @@ $dark-gray: #919191;
 // }
 
 .channelListWrapper .closeIcon {
-	font-size: 30px;
+	font-size: 35px;
 	position: absolute;
-	right: 20px;
-	top: 11px;
+	right: 15px;
+	top: 15px;
 	cursor: pointer;
 	// color: $accent_color;
 }
@@ -194,6 +194,7 @@ $dark-gray: #919191;
 	position: absolute;
 	display: inline-block;
 	visibility: hidden;
+	opacity: 0;
 	width: 140px;
 	height: 20px;
 	padding: 3px 0;
@@ -202,9 +203,10 @@ $dark-gray: #919191;
 	text-align: center;
 	font-size: 14px;
 	margin-left: -165px;
-	margin-top: -5px;
+	margin-top: -3px;
 	z-index: 2;
 	pointer-events: none;
+	transition: opacity 0.5s;
 }
 
 .add_channel_button .tooltiptop::after {
@@ -221,6 +223,7 @@ $dark-gray: #919191;
 
 .add_channel_button:hover .tooltiptop {
 	visibility: visible;
+	opacity: 1;
 }
 
 .separator div:first-child i {

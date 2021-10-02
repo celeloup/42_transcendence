@@ -10,7 +10,9 @@ type MessageProps = {
 export function Message ({ username, message }: MessageProps) {
 	return (
 		<div className="chat_message">
-			<div className="chat_profile_pic"></div>
+			<div className="chat_profile_pic">
+				{ username.charAt(0) }
+			</div>
 			<div className="chat_message_content">
 				<div className="chat_message_username">{username}</div>
 				<div className="chat_message_text">{message}</div>
