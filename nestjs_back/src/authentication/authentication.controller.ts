@@ -7,7 +7,9 @@ import {
   Post,
   UseGuards,
   UnauthorizedException,
-  SerializeOptions
+  SerializeOptions,
+  HttpException,
+  HttpStatus
 } from '@nestjs/common';
 import { Request } from 'express';
 import AuthenticationService from './authentication.service';
@@ -38,10 +40,13 @@ export default class AuthenticationController {
     type: AuthInfos
   })
   @ApiResponse({ status: 401, description: '42 Oauth token invalid.'})
+  @ApiResponse({ status: 403, description: 'The user is banned.'})
   async oauth(@Req() request: RequestWithUser): Promise<AuthInfos> {
     const { user } = request;
-    if (!user || user.site_banned) {
+    if (!user) {
       throw new UnauthorizedException();
+    } else if (user.site_banned) {
+      throw new HttpException('You have been banned', HttpStatus.FORBIDDEN);
     }
     const accessJwt = this.authenticationService.getJwtToken(user.id);
     const { accessTokenCookie, accessTokenExpiration } = this.authenticationService.getCookieForJwtToken(accessJwt);
@@ -69,10 +74,13 @@ export default class AuthenticationController {
     type: AuthInfos
   })
   @ApiResponse({ status: 401, description: 'Refresh token invalid.'})
+  @ApiResponse({ status: 403, description: 'The user is banned.'})
   async refresh(@Req() request: RequestWithUser): Promise<AuthInfos> {
     const { user } = request;
-    if (!user || user.site_banned) {
+    if (!user) {
       throw new UnauthorizedException();
+    } else if (user.site_banned) {
+      throw new HttpException('You have been banned', HttpStatus.FORBIDDEN);
     }
     const accessJwt = this.authenticationService.getJwtToken(user.id);
     const { accessTokenCookie, accessTokenExpiration } = this.authenticationService.getCookieForJwtToken(accessJwt);
@@ -98,6 +106,7 @@ export default class AuthenticationController {
     type: myUserInfos
   })
   @ApiResponse({ status: 401, description: 'Authentication token invalid.'})
+  @ApiResponse({ status: 403, description: 'The user is banned.'})
   @SerializeOptions({
     groups: ['me']
   })
@@ -105,8 +114,10 @@ export default class AuthenticationController {
   @Get()
   async authenticate(@Req() request: RequestWithUser) {
     const { user } = request;
-    if (!user || user.site_banned) {
+    if (!user) {
       throw new UnauthorizedException();
+    } else if (user.site_banned) {
+      throw new HttpException('You have been banned', HttpStatus.FORBIDDEN);
     }
     return await this.authenticationService.getPrivateInfos(user);
   }
@@ -119,7 +130,6 @@ export default class AuthenticationController {
     description: 'The user has been successfully registered.',
     type: AuthInfos
   })
-  @ApiResponse({ status: 401, description: 'Authenticaation token invalid.'})
   async register(@Body() registrationData: RegisterDto, @Req() req: Request): Promise<AuthInfos> {
     const fakeUser = await this.authenticationService.register(registrationData);
     const accessJwt = this.authenticationService.getJwtToken(fakeUser.id);
@@ -145,8 +155,13 @@ export default class AuthenticationController {
     description: 'The user has been successfully logged.',
     type: AuthInfos
   })
+  @ApiResponse({ status: 404, description: 'User not found with this 42id.'})
+  @ApiResponse({ status: 403, description: 'The user is banned.'})
   async login(@Body() loginData: LoginDto, @Req() req: Request): Promise<AuthInfos> {
     const fakeUser = await this.authenticationService.findUserFrom42Id(loginData.id42)
+    if (fakeUser.site_banned) {
+      throw new HttpException('You have been banned', HttpStatus.FORBIDDEN);
+    }
     const accessJwt = this.authenticationService.getJwtToken(fakeUser.id);
     const { accessTokenCookie, accessTokenExpiration } = this.authenticationService.getCookieForJwtToken(accessJwt);
     const refreshJwt = await this.authenticationService.getJwtRefreshToken(fakeUser.id);
@@ -168,12 +183,15 @@ export default class AuthenticationController {
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')
   @ApiResponse({ status: 200, description: 'The user has been successfully logout.'})
-  @ApiResponse({ status: 401, description: 'Authenticaation token invalid.'})
+  @ApiResponse({ status: 401, description: 'Authentication token invalid.'})
+  @ApiResponse({ status: 403, description: 'The user is banned.'})
   @HttpCode(200)
   async logOut(@Req() request: RequestWithUser) {
     const { user } = request;
-    if (!user || user.site_banned) {
+    if (!user) {
       throw new UnauthorizedException();
+    } else if (user.site_banned) {
+      throw new HttpException('You have been banned', HttpStatus.FORBIDDEN);
     }
     await this.authenticationService.removeRefreshToken(user.id);
     request.res.setHeader('Set-Cookie', this.authenticationService.getCookieForLogOut());
