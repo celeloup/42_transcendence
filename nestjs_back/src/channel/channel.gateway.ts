@@ -46,15 +46,11 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     this.server.emit('connected_users', Array.from(this.connectedUsers.values()));
   }
 
-  handleDisconnect(client: Socket) {
+  async handleDisconnect(client: Socket) {
+    const user: User = await this.authenticationService.getUserFromSocket(client);
     this.logger.log(`Disconnect: ${this.connectedUsers.get(client)}`);
     this.connectedUsers.delete(client);
-    for (let [key, value] of this.listSocket.entries()) {
-      if (value === client) {
-        this.listSocket.delete(key);
-        break;
-      }
-    }
+    this.listSocket.delete(user);
     this.server.emit('connected_users', Array.from(this.connectedUsers.values()));
   }
 
@@ -63,8 +59,15 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     @MessageBody() room: number,
     @ConnectedSocket() client: Socket,
   ) {
-      this.server.in(client.id).socketsJoin(room.toString());
-      this.logger.log(`Client ${this.connectedUsers.get(client)} joined room ${room}`);
+    const user: User = await this.authenticationService.getUserFromSocket(client);
+    if (this.channelService.isAMember(room, user.id) && this.channelService.isBanned(room, user.id)) {
+      return ;
+    }
+    if (!this.channelService.isAMember(room, user.id)) {
+      this.channelService.addMember(room, user.id, user.id);
+    }
+    this.server.in(client.id).socketsJoin(room.toString());
+    this.logger.log(`Client ${this.connectedUsers.get(client)} joined room ${room}`);
   }
 
   @SubscribeMessage('leave_chan')
@@ -72,27 +75,49 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     @MessageBody() room: number,
     @ConnectedSocket() client: Socket,
   ) {
-      client.leave(room.toString());    
-      this.logger.log(`Client ${this.connectedUsers.get(client)} left room ${room}`);
+    client.leave(room.toString());
+    this.logger.log(`Client ${this.connectedUsers.get(client)} left room ${room}`);
   }
-  
+
   @SubscribeMessage('mute_user')
   async muteUser(
     @MessageBody() data: { channel: Channel, member: User, time: number },
     @ConnectedSocket() client: Socket,
   ) {
-      let user: User;
-      
-      for (let [key, value] of this.listSocket.entries()) {
-        if (value === client) {
-          user = key;
-          break;
-        }
-      }
-      if (user) {
-        this.channelService.muteAMember(data.channel.id, data.member.id, user.id);
-        this.listSocket.get(user).emit('user_banned');
-      }    
+    const user: User = await this.authenticationService.getUserFromSocket(client);
+    let memberSocket: Socket = this.listSocket.get(data.member);
+    if (user) {
+      this.channelService.muteAMember(data.channel.id, data.member.id, user.id);
+      memberSocket.emit('user_muted');
+    }
+  }
+
+  @SubscribeMessage('unmute_user')
+  async unmuteUser(
+    @MessageBody() data: { channel: Channel, member: User },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const user: User = await this.authenticationService.getUserFromSocket(client);
+    const memberSocket: Socket = this.listSocket.get(data.member);
+    if (user) {
+      this.channelService.unmuteAMember(data.channel.id, data.member.id, user.id);
+      memberSocket.emit('user_unmuted');
+    }
+  }
+
+  @SubscribeMessage('ban_user')
+  async banUser(
+    @MessageBody() data: { channel: Channel, member: User },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const user: User = await this.authenticationService.getUserFromSocket(client);
+    const memberSocket: Socket = this.listSocket.get(data.member);
+    
+    if (user) {
+      memberSocket.leave(data.channel.id.toString());
+      this.channelService.banAMember(data.channel.id, data.member.id, user.id);
+      memberSocket.emit('user_banned');
+    }
   }
 
 
@@ -102,20 +127,27 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     @ConnectedSocket() client: Socket,
   ) {
     const author = await this.authenticationService.getUserFromSocket(client);
+
+    if (!(this.channelService.isAMember(data.recipient.id, author.id))) {
+      return ;
+    }
+    if (this.channelService.isBanned(data.recipient.id, author.id) || this.channelService.isMuted(data.recipient.id, author.id)) {
+      return ;
+    }
     this.logger.log(`Message from ${this.connectedUsers.get(client)} to ${data.recipient.name}: ${data.content}`);
     const message = await this.channelService.saveMessage(data.content, author, data.recipient);
     this.server.in(data.recipient.id.toString()).emit('receive_message', message);
   }
 
-  @SubscribeMessage('request_messages')
-  async requestMessagesByChannel(
-    @ConnectedSocket() socket: Socket,
-    @MessageBody() channel: Channel,
-  ) {
-    this.logger.log(`Request message of ${channel.name}`);
-    const messages = await this.channelService.getMessageByChannel(channel);
-    socket.emit('messages_channel', messages);
-  }
+  // @SubscribeMessage('request_messages')
+  // async requestMessagesByChannel(
+  //   @ConnectedSocket() socket: Socket,
+  //   @MessageBody() channel: Channel,
+  // ) {
+  //   this.logger.log(`Request message of ${channel.name}`);
+  //   const messages = await this.channelService.getMessageByChannel(channel);
+  //   socket.emit('messages_channel', messages);
+  // }
 
   @SubscribeMessage('get_users')
   async requestConnectedUsers(@ConnectedSocket() socket: Socket) {
