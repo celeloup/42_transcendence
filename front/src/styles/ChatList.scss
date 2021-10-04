@@ -17,7 +17,7 @@ $dark-gray: #919191;
 .channelList {
 	// background-color: red;
 	height: calc(100% - 80px);
-	padding-top: 10px;
+	padding: 10px 0 10px 10px;
 	overflow-y: scroll;
 	position: relative;
 }
@@ -56,10 +56,10 @@ $dark-gray: #919191;
 // }
 
 .channelListWrapper .closeIcon {
-	font-size: 30px;
+	font-size: 35px;
 	position: absolute;
-	right: 20px;
-	top: 11px;
+	right: 15px;
+	top: 15px;
 	cursor: pointer;
 	// color: $accent_color;
 }
@@ -71,17 +71,20 @@ $dark-gray: #919191;
 .channelListTitle {
 	color: $accent_color;
 	font-size: 20px;
-	font-family: "Dogica Pixel";
+	font-family: "Dogica";
 	margin: 20px 0 20px 40px;
 	// text-align: center;
 }
 
 .channel {
-	display:flex;
+	display: flex;
+	gap: 10px;
 	align-items: center;
 	cursor: pointer;
 	border-radius: 5px;
 	margin: 5px 10px;
+	padding: 10px;
+	overflow-wrap: anywhere;
 }
 
 .channel.selected {
@@ -91,17 +94,19 @@ $dark-gray: #919191;
 
 .channel:not(.selected):hover {
 	background-color: $dark-gray;
-	// color: $background-color
 }
 
 .channelImg {
-	margin: 10px 15px 10px 10px;
 	width: 35px;
 	height: 35px;
 	background-color: $dark-gray;
 	border: 2px solid white;
 	border-radius: 5px;
 	position: relative;
+}
+
+.channelName {
+	width: 80%;
 }
 
 .dm::after {
@@ -115,11 +120,11 @@ $dark-gray: #919191;
 	border-radius: 50%;
 }
 
-// *************************************************** SEARCH BAR
+// ************************* SEARCH BAR
 
 .channelSearchBar {
 	display: flex;
-	width: 240px;
+	width: calc(100% - 90px);
 	height: 25px;
 	margin: 15px 10px 10px 10px;
 	background-color: $background-color;
@@ -194,6 +199,7 @@ $dark-gray: #919191;
 	position: absolute;
 	display: inline-block;
 	visibility: hidden;
+	opacity: 0;
 	width: 140px;
 	height: 20px;
 	padding: 3px 0;
@@ -202,9 +208,10 @@ $dark-gray: #919191;
 	text-align: center;
 	font-size: 14px;
 	margin-left: -165px;
-	margin-top: -5px;
+	margin-top: -3px;
 	z-index: 2;
 	pointer-events: none;
+	transition: opacity 0.5s;
 }
 
 .add_channel_button .tooltiptop::after {
@@ -221,6 +228,7 @@ $dark-gray: #919191;
 
 .add_channel_button:hover .tooltiptop {
 	visibility: visible;
+	opacity: 1;
 }
 
 .separator div:first-child i {

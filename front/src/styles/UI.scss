@@ -27,7 +27,9 @@ $accent_color: #FFCD27;
 .window
 {
 	position: relative;
-	margin-right: 33px;
+	margin: 15px;
+    flex-grow: 0;
+    flex-shrink: 0;
 }
 
 .border_div {
@@ -116,7 +118,7 @@ $accent_color: #FFCD27;
 	color: $background-color;
 	width: 100%;
 	outline: 4px solid white;
-	font-family: "Dogica Pixel";
+	font-family: "Dogica", "Fira Mono";
 	font-size: 16px;
 }
 
@@ -177,7 +179,7 @@ $accent_color: #FFCD27;
 .navButton span
 {
 	color: $background-color;
-	font-family: "Dogica Pixel";
+	font-family: "Dogica", "Fira Mono";
 	font-size: 14px;
 }
 
@@ -203,4 +205,14 @@ $accent_color: #FFCD27;
 	border-radius: 4px;
 }
 
+@media (max-height: 1000px) { 
+
+	#navBar {
+		position: absolute;
+		display: flex;
+		right: -240px;
+		top: 300px;
+		margin-top: 0;
+	}
+}
 

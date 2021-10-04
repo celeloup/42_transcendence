@@ -3,15 +3,13 @@ import React, { useEffect } from 'react';
 import { AuthContext, AuthProvider, ContextType }  from './contexts/AuthContext';
 import { BrowserRouter as Router, Switch, RouteComponentProps, Redirect } from 'react-router-dom';
 import { Route } from './components/Route';
-import Logo from './components/ui_components/Logo';
 
 import Admin from './components/Admin';
 import Home from './components/Home';
 import Profile from './components/Profile';
 import Parameters from './components/Parameters';
-import NavButton from './components/ui_components/NavButton';
-
 import axios from 'axios';
+import PageWrapper from './components/ui_components/PageWrapper';
 
 function OAuth({ location } : RouteComponentProps) {
 	const { login } = React.useContext(AuthContext) as ContextType;
@@ -36,7 +34,7 @@ function OAuth({ location } : RouteComponentProps) {
 				console.log("Error catch :", error.response);
 				setLoading(false);
 			})
-	}, [code]);
+	}, [code]); // eslint-disable-line
 
 	if (loading === false)
 		return <Redirect to={{ pathname: '/' }} />;
@@ -49,36 +47,30 @@ const App = () => {
 		<AuthProvider>
 			<Router>
 				<div className="App">
-					<header className="App-header">
-						<Logo />
-					</header>
-					<div id="navBar" className="rotate_right">
-						<NavButton name="Parameters" icon="fa-cog" link="/parameters"></NavButton>
-						<NavButton name="Profile" icon="fa-user-circle" link="/profile"></NavButton>
-						<NavButton name="Admin" icon="fa-cog" link="/admin"></NavButton>
-					</div>
+					<PageWrapper>
 					<Switch>
 						<Route
 							typeOfRoute="protected"
 							exact={true}
 							path='/admin'
-							component={Admin}
+							component={ Admin }
 						/>
-						<Route typeOfRoute="protected" path='/parameters' component={Parameters} />
+						<Route typeOfRoute="protected" path='/parameters' component={ Parameters } />
 						<Route
 							typeOfRoute="protected"
 							exact={true}
 							path='/profile'
-							component={Profile}
+							component={ Profile }
 						/>
 						<Route
 							typeOfRoute="protected"
 							exact={true}
 							path='/'
-							component={Home}
+							component={ Home }
 						/>
 						<Route typeOfRoute="public" exact={true} path='/oauth' component={ OAuth } />
 					</Switch>
+					</PageWrapper>
 				</div>
 			</Router>
 		</AuthProvider>

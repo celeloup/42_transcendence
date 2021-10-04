@@ -1,13 +1,13 @@
 import axios from 'axios';
-import { useState, useContext, useEffect } from 'react';
-import { AuthContext, ContextType as AuthContextType }  from '../../contexts/AuthContext';
+import { useState, useContext } from 'react';
+// import { AuthContext, ContextType as AuthContextType }  from '../../contexts/AuthContext';
 import '../../styles/CreateChan.scss';
 import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
 
-type User = {
-	id: number,
-	name: string
-};
+// type User = {
+// 	id: number,
+// 	name: string
+// };
 
 type channelSettings = {
 	type: number,
@@ -24,25 +24,25 @@ type CreateChanProps = {
 };
 
 function CreateChan({ type, hide, socket } : CreateChanProps) {
-	const { user } = useContext(AuthContext) as AuthContextType; // might remove once create chan change
-	var { setChannel, toggleDisplayList, channel } = useContext(ChannelContext) as ContextType;
+	// const { user } = useContext(AuthContext) as AuthContextType; // might remove once create chan change
+	var { changeChannel, toggleDisplayList } = useContext(ChannelContext) as ContextType;
 
 	// -------- List users
-	const [users, setUsers] = useState<User[]>([]);
-	useEffect(() => {
-		const getUsers = async () => {
-			try {
-				const res = await axios.get('/users');
-				// console.log(res);
-				setUsers(res.data);
-			} catch (err) { console.log(err); }
-		};
-		getUsers();
-	}, []);
+	// const [users, setUsers] = useState<User[]>([]);
+	// useEffect(() => {
+	// 	const getUsers = async () => {
+	// 		try {
+	// 			const res = await axios.get('/users');
+	// 			// console.log(res);
+	// 			setUsers(res.data);
+	// 		} catch (err) { console.log(err); }
+	// 	};
+	// 	getUsers();
+	// }, []);
 	
-	var usersList = users.length !== 0 
-		? users.map((user:any) => <option key={user.id} value={user.name}/>)
-		: <p className="no_chan">No user found.</p>;
+	// var usersList = users.length !== 0 
+	// 	? users.map((user:any) => <option key={user.id} value={user.name}/>)
+	// 	: <p className="no_chan">No user found.</p>;
 
 	// ------ Style password
 	const [ typePassword, setTypePassword ] = useState(true);
@@ -51,9 +51,8 @@ function CreateChan({ type, hide, socket } : CreateChanProps) {
 	const [ chanType, setChanType ] = useState<number>(type);
 	const [ chanName, setChanName ] = useState<string>("");
 	const [ chanPassword, setChanPassword ] = useState<string>("");
-	const [ userDM, setUserDM ] = useState<User>();
+	// const [ userDM, setUserDM ] = useState<User>();
 	const [ errors, setErrors ] = useState<Array<{key:string, value:string}>>([]);
-
 	const handleSubmit = (e:any) => {
 		e.preventDefault();
 		
@@ -79,12 +78,7 @@ function CreateChan({ type, hide, socket } : CreateChanProps) {
 			const submitNewChannel = async () => {
 				try {
 					const res = await axios.post('/channel', chanSettings);
-					// console.log(res);
-					if (channel)
-						socket.emit('leave_chan', channel.id);
-					setChannel(res.data);
-					// if (channel)
-					// 	socket.emit('join_chan', channel.id);
+					changeChannel(res.data);
 					hide(0);
 					toggleDisplayList();
 				} catch (err) { console.log(err); }
@@ -112,7 +106,7 @@ function CreateChan({ type, hide, socket } : CreateChanProps) {
 	}
 	else if (chanType === 2)
 	{
-		chanInfo = "/i\\ This channel will only be accessible to the members of your choosing.";
+		chanInfo = "/i\\ This channel will only be accessible to the members of your choosing or anyone that knows the password.";
 		chanForm = <><label>
 			Name your channel
 			<input 
@@ -166,17 +160,17 @@ function CreateChan({ type, hide, socket } : CreateChanProps) {
 				<div id="typeChanSelect">
 					<div
 						className={ chanType === 1 ? "selected" : "" } 
-						onClick={ () => setChanType(1) } >
+						onClick={ () => { setChanType(1); setErrors([]); }} >
 						Public
 					</div>
 					<div
 						className={ chanType === 2 ? "selected" : "" } 
-						onClick={ () => setChanType(2) } >
+						onClick={ () => { setChanType(2); setErrors([]); }} >
 						Private
 					</div>
 					<div
 						className={ chanType === 3 ? "selected" : "" }
-						onClick={ () => setChanType(3) } >
+						onClick={ () => { setChanType(3); setErrors([]); } } >
 						DM
 					</div>
 				</div>
