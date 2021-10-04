@@ -24,7 +24,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 
   private connectedUsers: Map<number, Socket> = new Map();
   private currentGames: Map<number, Round> = new Map();
-  // private param: Round;
+  private inGame: Array<number>;
 
   //pour tester avec des users non 42
   private i: number = 0;
@@ -100,9 +100,13 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
     this.currentGames.set(match.id, round);
 
     //on lance le jeu 
-    await this.gameService.startGame(this.server, round, this.connectedUsers);
-    
-    //on supprime le jeu quand on a fini de l'utiliser
+    await this.gameService.startGame(this.server, round, this.connectedUsers, this.inGame);
+   
+    /////////////SAVE GAME /!\ Attention au cas ou il y a un abandon ////////////////////////
+
+    //on supprime les joueurs et le jeu des listes en cours;
+    delete this.inGame[round.id_player1];
+    delete this.inGame[round.id_player2];
     this.currentGames.delete(match.id);
   }
 
@@ -146,5 +150,12 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
   async resetCounter() {
     this.logger.log("Reseting...");
     this.i = 0;
+  }
+
+  @SubscribeMessage('get_users')
+  async requestConnectedUsers(@ConnectedSocket() socket: Socket)
+  {
+    this.logger.log(`List of connected users`);
+    socket.emit('connected_users', Array.from(this.connectedUsers.keys()), this.currentGames);
   }
 }

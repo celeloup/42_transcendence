@@ -73,13 +73,6 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     socket.emit('messages_channel', messages);
   }
 
-  @SubscribeMessage('get_users')
-  async requestConnectedUsers(@ConnectedSocket() socket: Socket)
-  {
-    this.logger.log(`List of connected users`);
-    socket.emit('connected_users', Array.from(this.connectedUsers.values()));
-  }
-
   @SubscribeMessage('send_invit')
   async sendGameInvit(
     @MessageBody() data: {guest: string, match: Match},
