@@ -55,7 +55,7 @@ export function Chat() {
 				try {
 					const res = await axios.get(`/channel/messages/${channel.id}`);
 					console.log("GET MESSAGES", res);
-					setMessages(res.data);
+					setMessages(res.data.reverse());
 				} catch (err) {
 					console.log(err);
 				}
@@ -76,7 +76,7 @@ export function Chat() {
 	const inputRef = useRef<any>(null);
 	const handleSubmit = (e:any) => {
 		e.preventDefault();
-		if (newMessage !== "")
+		if (newMessage !== "" && channel !== null)
 		{
 			const message : any = {
 				content: newMessage,
@@ -94,7 +94,7 @@ export function Chat() {
 	if (messages.length !== 0)
 		messageList = messages.map((mes:any) => <Message key={ mes.id } username={ mes.author ? mes.author.name : "empty" } message={ mes.content }/>)
 	else
-		messageList = <p className="no_chan">No message yet.</p>
+		messageList = <p className="no_msg">No message yet.</p>
 
 	
 	return (
@@ -103,13 +103,20 @@ export function Chat() {
 				{ displayList && <ChannelList socket={socket}/> }
 				<ChatHeader />
 				<div id="chat_messages">
-					<div>
-						{/* <div className="chat_date">13/09/2021</div> */}
-						{ messageList }
-						<div ref={messagesEndRef} />
-					</div>
+					{ channel === null && 
+						<div className="no_chan_msg">
+							<i className="fas fa-comment-dots"></i><br/>
+							Select a channel to start chatting
+						</div>
+					}
+					{ channel && 
+						<div>
+							{ messageList }
+							<div ref={messagesEndRef} />
+						</div>
+					}
 				</div>
-				<div id="chat_input">
+				<div id="chat_input" className={ channel === null ? "disabled" : ""}>
 					<i className="fas fa-chevron-right"></i>
 					<form onSubmit={ handleSubmit }>
 						<input 
@@ -119,7 +126,9 @@ export function Chat() {
 							autoComplete="off"
 							onChange={ (e) => setNewMessage(e.target.value) }
 							value={ newMessage }
-							ref={inputRef}>
+							ref={inputRef}
+							disabled={ channel === null ? true : false }
+						>
 						</input>
 					<i className="fas fa-paper-plane" onClick={ handleSubmit }></i>
 					</form>
