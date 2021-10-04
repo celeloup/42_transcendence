@@ -1,6 +1,6 @@
 import * as api from '../API';
 import React from 'react';
-import { AuthContext, ContextType} from '../AuthContext';
+import { AuthContext, ContextType} from '../contexts/AuthContext';
 import { useHistory } from "react-router-dom";
 
 function Parameters() {
@@ -19,6 +19,7 @@ function Parameters() {
 			this is the Parameters page
 		  </p>
 		  <button onClick={paramLogout}>LOGOUT</button>
+		  <p><br/>[HERE CHANGE USERNAME, PROFILE PIC, ENABLE DOUBLE AUTH AND LOGOUT]</p>
 	  </div>
 	);
   }

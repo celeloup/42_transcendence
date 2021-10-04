@@ -4,6 +4,9 @@ type MessageProps = {
 	// ADD PROFILE PIC
 }
 
+
+// ADD PROFILE CARD WHEN CLICK ON PROFILE
+
 export function Message ({ username, message }: MessageProps) {
 	return (
 		<div className="chat_message">

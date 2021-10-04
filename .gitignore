@@ -1,5 +1,6 @@
 nestjs_back/dist
 nestjs_back/node_modules
+nestjs_back/avatars
 front/node_modules
 websocket_client/node_modules
 postgres_data
