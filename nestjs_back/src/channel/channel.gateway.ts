@@ -8,13 +8,14 @@ import {
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
-  WsResponse,
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import Channel from './channel.entity';
 import Match from 'src/matches/match.entity';
+import User from 'src/users/user.entity';
 import AuthenticationService from '../authentication/authentication.service';
 import ChannelService from './channel.service';
+import { channel } from 'diagnostics_channel';
 
 @WebSocketGateway({ serveClient: false, namespace: '/channel' })
 export default class ChannelGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -23,6 +24,7 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
   private logger: Logger = new Logger("ChannelGateway");
 
   private connectedUsers: Map<Socket, string> = new Map();
+  private listSocket: Map<User, Socket> = new Map();
 
   constructor(
     private readonly channelService: ChannelService,
@@ -37,9 +39,9 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     const user = await this.authenticationService.getUserFromSocket(client);
     if (user) {
       this.connectedUsers.set(client, user.name);
-    } else {
-      this.connectedUsers.set(client, `ghosty sockect`);
+      this.listSocket.set(user, client);
     }
+    //else throw error ?
     this.logger.log(`Connection: ${this.connectedUsers.get(client)}`);
     this.server.emit('connected_users', Array.from(this.connectedUsers.values()));
   }
@@ -47,6 +49,12 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
   handleDisconnect(client: Socket) {
     this.logger.log(`Disconnect: ${this.connectedUsers.get(client)}`);
     this.connectedUsers.delete(client);
+    for (let [key, value] of this.listSocket.entries()) {
+      if (value === client) {
+        this.listSocket.delete(key);
+        break;
+      }
+    }
     this.server.emit('connected_users', Array.from(this.connectedUsers.values()));
   }
 
@@ -55,8 +63,8 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     @MessageBody() room: number,
     @ConnectedSocket() client: Socket,
   ) {
-    this.server.in(client.id).socketsJoin(room.toString());
-    this.logger.log(`Room ${room} joined`);
+      this.server.in(client.id).socketsJoin(room.toString());
+      this.logger.log(`Client ${this.connectedUsers.get(client)} joined room ${room}`);
   }
 
   @SubscribeMessage('leave_chan')
@@ -64,8 +72,27 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     @MessageBody() room: number,
     @ConnectedSocket() client: Socket,
   ) {
-    client.leave(room.toString());
-    this.logger.log(`Room ${room} left`);
+      client.leave(room.toString());    
+      this.logger.log(`Client ${this.connectedUsers.get(client)} left room ${room}`);
+  }
+  
+  @SubscribeMessage('mute_user')
+  async muteUser(
+    @MessageBody() data: { channel: Channel, member: User, time: number },
+    @ConnectedSocket() client: Socket,
+  ) {
+      let user: User;
+      
+      for (let [key, value] of this.listSocket.entries()) {
+        if (value === client) {
+          user = key;
+          break;
+        }
+      }
+      if (user) {
+        this.channelService.muteAMember(data.channel.id, data.member.id, user.id);
+        this.listSocket.get(user).emit('user_banned');
+      }    
   }
 
 

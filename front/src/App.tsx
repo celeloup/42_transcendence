@@ -1,14 +1,15 @@
 import './styles/App.scss';
 import React, { useEffect } from 'react';
-import { AuthContext, AuthProvider, ContextType }  from './AuthContext';
+import { AuthContext, AuthProvider, ContextType }  from './contexts/AuthContext';
 import { BrowserRouter as Router, Switch, RouteComponentProps, Redirect } from 'react-router-dom';
-import { Route } from './Route';
+import { Route } from './components/Route';
 import Logo from './components/ui_components/Logo';
 
 import Admin from './components/Admin';
 import Home from './components/Home';
 import Profile from './components/Profile';
 import Parameters from './components/Parameters';
+import NavButton from './components/ui_components/NavButton';
 
 import axios from 'axios';
 
@@ -23,10 +24,10 @@ function OAuth({ location } : RouteComponentProps) {
 			.then(response => {
 				// console.log("RESPONSE GOOD : ", response);
 				const user = { 
-					id: response.data.id, 
+					id: response.data.id,
+					admin: response.data.admin,
 					id42: response.data.id42,
 					isTwoFactorAuth: response.data.isTwoFactorAuthenticationEnabled,
-					name: response.data.name
 				}
 				login(user);
 				setLoading(false);
@@ -51,6 +52,11 @@ const App = () => {
 					<header className="App-header">
 						<Logo />
 					</header>
+					<div id="navBar" className="rotate_right">
+						<NavButton name="Parameters" icon="fa-cog" link="/parameters"></NavButton>
+						<NavButton name="Profile" icon="fa-user-circle" link="/profile"></NavButton>
+						<NavButton name="Admin" icon="fa-cog" link="/admin"></NavButton>
+					</div>
 					<Switch>
 						<Route
 							typeOfRoute="protected"
