@@ -8,6 +8,7 @@ import Channel from './channel.entity';
 import CreateChannelDto from './dto/createChannel.dto';
 import UsersService from '../users/users.service';
 import NewPasswordDto from './dto/newPassword.dto';
+import { IsAscii } from 'class-validator';
 
 @Injectable()
 export default class ChannelService {
@@ -34,27 +35,34 @@ export default class ChannelService {
   }
 
   async deleteMessages(recipient: Channel) {
-    await this.getChannelById(recipient.id);
-    const messages = await this.getMessageByChannel(recipient);
-    for (var id of messages) {
-      this.messagesRepository.delete(id);
-    }
+    recipient.historic = []
+    await this.channelRepository.save(recipient)
   }
 
   async getMessageByChannel(channel: Channel) {
     return this.messagesRepository.find({
       where: { recipient: channel },
-      relations: ["author"]
+      relations: ["author"],
+      order: {
+        lastupdate: "ASC"
+      }
     });
   }
 
-  async getMessagesByChannelId(channel_id: number) {
+  async getMessagesByChannelId(channel_id: number, userId: number) {
     const channel = await this.channelRepository.findOne({ id: channel_id });
-    return this.getMessageByChannel(channel);
+   // if ((await this.isAMember(channel_id, userId) || (await this.usersService.isSiteAdmin(userId)))) {
+      return await this.getMessageByChannel(channel);
+  //  }//COMMENTED WHILE JOINING A CHANNEL VIA WEBSOCKET DOES NOT ADD ONESELF TO MEMBERS OF THE CHANNEL
+    throw new HttpException('Only members and site admins can see messages of a channel', HttpStatus.FORBIDDEN);
+  }
+
+  async getAllMessages() {
+    return await this.messagesRepository.find();
   }
 
   async getAllChannels() {
-    const channels = await this.channelRepository.find();
+    const channels = await this.channelRepository.find({ relations: ["historic"] });
     if (channels) {
       return channels;
     }
@@ -287,7 +295,7 @@ export default class ChannelService {
   async muteAMember(channel_id: number, member_id: number, user_id: number) {
     if ((await this.isAMember(channel_id, member_id))) {
       if (!(await this.isMuted(channel_id, member_id))) {
-        if (!(await this.isAnAdmin(channel_id, member_id))) {
+        if (!(await this.isAnAdmin(channel_id, member_id)) || (await this)) {
           let channel = await this.getAllInfosByChannelId(channel_id);
           let newMuted = await this.usersService.getById(member_id);
           await channel.muted.push(newMuted);
@@ -328,7 +336,7 @@ export default class ChannelService {
       if (!(await this.usersService.isBlocked(member_id, owner_id))) {
         if (member_id !== owner_id) {
           let newMember = await this.usersService.getById(member_id);
-          newChannel.members.push(newMember);
+          return newChannel.members.push(newMember);
         }
       }
       throw new HttpException('Owner of the channel is blocked by one of the members', HttpStatus.FORBIDDEN);
@@ -340,11 +348,11 @@ export default class ChannelService {
   }
 
   async deleteChannel(channel_id: number, user_id: number) {
-    const channel = await this.getAllInfosByChannelId(channel_id);//checking if channel exists
-    if ((await this.isOwner(channel_id, user_id))) {
+    const channel = await this.getAllInfosByChannelId(channel_id);
+    if ((await this.isOwner(channel_id, user_id)) || (await this.usersService.isSiteAdmin(user_id))) {
       await this.deleteMessages(channel);
       return (await this.channelRepository.delete(channel_id));
     }
-    throw new HttpException('A channel can only be deleted by its owner', HttpStatus.FORBIDDEN);
+    throw new HttpException('A channel can only be deleted by its owner or a website admin', HttpStatus.FORBIDDEN);
   }
 }

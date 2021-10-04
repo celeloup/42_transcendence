@@ -8,7 +8,6 @@ import UpdateUserDto from './dto/updateUser.dto';
 import Achievement from '../achievements/achievement.entity';
 import AchievementsService from '../achievements/achievements.service';
 import Channel from 'src/channel/channel.entity';
-import { CallbackObject } from '@nestjs/swagger/dist/interfaces/open-api-spec.interface';
 
 @Injectable()
 export default class UsersService {
@@ -94,8 +93,8 @@ export default class UsersService {
         'matches',
         'ownedChannels',
         'chan_admin',
-        'ban',
-        'mute',
+        'chan_banned',
+        'chan_muted',
         'friends',
         'friendOf',
         'blocked',
@@ -269,27 +268,71 @@ export default class UsersService {
     throw new HttpException('User has not been blocked before', HttpStatus.BAD_REQUEST);
   }
 
-  public async serveAvatar(userId: number, res: any){
+  public async serveAvatar(userId: number, res: any) {
     const avatar = (await this.getAllInfosByUserId(userId)).avatar;
-  //  return avatar;
+    //  return avatar;
     if (avatar)
-      return res.sendFile(avatar, {root: './'});
+      return res.sendFile(avatar, { root: './' });
     throw new HttpException('No avatar set yet', HttpStatus.BAD_REQUEST);
   }
 
   public async setAvatar(userId: number, avatarUrl: string) {
     const oldUrl = (await this.getById(userId)).avatar;
     const fs = require('fs');
-    if (oldUrl)
+    if (oldUrl && oldUrl !== "")
       fs.unlink(oldUrl, (err: any) => {
         if (err) {
-          console.error(err)
-          return
+          throw new HttpException('Could not delete old avatar', HttpStatus.NOT_FOUND);
         }
       })
-    this.usersRepository.update(userId, { avatar: avatarUrl });
+    return this.usersRepository.update(userId, { avatar: avatarUrl });
   }
 
+  public async appointModerator(userId: number, newModeratorId: number) {
+    const moderator = await this.getAllInfosByUserId(newModeratorId);
+    const user = await this.getAllInfosByUserId(userId);
+    if (user.owner === true) {
+      if (moderator.moderator === false && moderator.owner === false) {
+        moderator.moderator = true;
+        return await this.usersRepository.save(moderator);
+      }
+      throw new HttpException('This user is already a moderator or is a owner too', HttpStatus.FORBIDDEN);
+    }
+    throw new HttpException('Only the owner of the website can appoint moderators', HttpStatus.FORBIDDEN);
+  }
+
+  public async revokeModerator(userId: number, newModeratorId: number) {
+    const moderator = await this.getAllInfosByUserId(newModeratorId);
+    const user = await this.getAllInfosByUserId(userId);
+    if (user.owner === true) {
+      if (moderator.moderator === true && moderator.owner === false) {
+        moderator.moderator = false;
+        return await this.usersRepository.save(moderator);
+      }
+      throw new HttpException('This user is not a moderator or is a owner too', HttpStatus.FORBIDDEN);
+    }
+    throw new HttpException('Only the owner of the website can revoke moderators', HttpStatus.FORBIDDEN);
+  }
+
+  public async isSiteAdmin(userId: number){
+    const user = await this.getAllInfosByUserId(userId);
+    if (user.owner === true || user.moderator === true){
+      return true;
+    }
+    return false; 
+  }
+
+  public async banUser(userId: number, leperId: number){
+    const user = await this.getAllInfosByUserId(userId);
+    const leper = await this.getAllInfosByUserId(leperId);
+    if ((await this.isSiteAdmin(userId)) && !(leper.owner || (user.moderator && leper.moderator))){
+      leper.moderator = false;
+      leper.site_banned = true;
+      return await this.usersRepository.save(leper);
+    }
+    throw new HttpException('User does not have the rights to ban this member', HttpStatus.FORBIDDEN);
+  }
+  
   // Off topic
   // async deleteUser(user_id: number) {
   //   await this.getById(user_id);
