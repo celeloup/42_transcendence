@@ -38,7 +38,7 @@ export function Route({ typeOfRoute, ...routeProps}: RouteProps) {
 		{
 			setLoading(false);
 		}
-	}, [routeProps.path]);
+	}, [routeProps.path]); // eslint-disable-line
 	
 	if (loading === false)
 	{
@@ -47,7 +47,6 @@ export function Route({ typeOfRoute, ...routeProps}: RouteProps) {
 			if (isAuth) {
 				return <RouterRoute{...routeProps} />;
 			} else {
-				
 				return <Login></Login>;
 			}
 		} else {
