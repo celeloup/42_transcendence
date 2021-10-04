@@ -25,7 +25,7 @@ function Channel({ channelObj } : ChannelProps) {
 	
 	var selected:boolean;
 	if (channel)
-		selected = channel.name === channelObj.name;
+		selected = channel.id === channelObj.id;
 	else
 		selected = false;
 

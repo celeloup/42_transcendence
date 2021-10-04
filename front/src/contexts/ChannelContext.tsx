@@ -24,7 +24,7 @@ export const ChannelContext = createContext<Partial<ContextType>>({});
 
 export const ChannelProvider = ({ children } : Props) => {
 
-	const [channel, setChannel] = useState<Channel | null>();
+	const [channel, setChannel] = useState<Channel | null>(null);
 	const [displayList, setDisplayList] = useState<boolean>(false);
 	const [socket, setSocket] = useState<any>(null);
 
