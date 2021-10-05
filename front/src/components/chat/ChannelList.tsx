@@ -1,85 +1,133 @@
-import { useState } from 'react';
+import axios from 'axios';
+import { useState, useEffect, useContext } from 'react';
+// import { AuthContext } from '../../contexts/AuthContext';
+import '../../styles/ChatList.scss';
+import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
+import CreateChan from './CreateChan';
+
+type ChannelCategoryProps = {
+	channelList: any,
+	type: string,
+	setDisplayCreateChan: (type:number) => void;
+}
 
 type ChannelProps = {
-	name: string,
-	image: string,
-	type: string,
-	selected: boolean
+	channelObj: any,
 }
 
-function Channel({name, image, type, selected} : ChannelProps) {
+function Channel({ channelObj } : ChannelProps) {
+	var { channel, changeChannel, toggleDisplayList } = useContext(ChannelContext) as ContextType;
+	
+	const selectChannel = () => {
+		changeChannel(channelObj);
+		toggleDisplayList();
+	}
+	
+	var selected:boolean;
+	if (channel)
+		selected = channel.id === channelObj.id;
+	else
+		selected = false;
+
 	return (
-		<div className={selected ? "channel selected" : "channel"} >
-			<div className={ "channelImg " + type }></div>
-			<div className="channelName">{ name }</div>
+		<div className={selected ? "channel selected" : "channel"} onClick={ selectChannel }>
+			<div className={ "channelImg " + channelObj.type }></div>
+			<div className="channelName">{ channelObj.name }</div>
 		</div>
 	)
 }
 
-type PropsFunction = () => void;
-
-type ChannelListProps = {
-	toggleDisplayList: PropsFunction,
-	selected: string
-}
-
-function ChannelList ({ toggleDisplayList, selected } : ChannelListProps) {
-	const [displayPublicChan, setDisplayPublicChan] = useState(true);
-	const [displayPrivateChan, setDisplayPrivateChan] = useState(true);
-	const toggleDisplayPublicChan = (): void => {
-		setDisplayPublicChan(!displayPublicChan);
+function ChannelCategory({ channelList, type, setDisplayCreateChan } : ChannelCategoryProps) {
+	const [displayCategory, setDisplayCategory] = useState(true);
+	const toggleDisplayCategory = (): void => {
+		setDisplayCategory(!displayCategory);
 	};
-	const toggleDisplayPrivateChan = (): void => {
-		setDisplayPrivateChan(!displayPrivateChan);
-	};
+
+	const toggleDisplayCreateChan = (): void => {
+		if (type === "public")
+			setDisplayCreateChan(1);
+		else if (type === "private")
+			setDisplayCreateChan(2);
+		else if (type === "DM")
+			setDisplayCreateChan(3);
+	}
+
+	var chans;
+	if (channelList.length !== 0)
+		chans = channelList.map((chan:any) => <Channel key={chan.id} channelObj={chan}/>)
+	else
+		chans = <p className="no_chan">No {type} channel yet.</p>
+	
 	return (
-		<div id="channelList" >
-			<div className="channelListWrapper">
-				<i className="fas fa-times closeIcon" onClick={ toggleDisplayList }></i>
-				{/* <div className="channelListTitle">channels_</div> */}
-				<div className="channelSearchBar">
-					<input type="text" placeholder="Search" id="channelSearch"></input>
-					<i id="searchButton"className="fas fa-search"></i>
+		<>
+			<div className="separator">
+				<div onClick={ toggleDisplayCategory }>
+					<i className={ displayCategory ? "fas fa-chevron-down" : "fas fa-chevron-right" } ></i>
+					{type}_
 				</div>
-				<div className="channelList">
-					<div className="separator">
-						<div onClick={ toggleDisplayPublicChan }>
-							<i className={ displayPublicChan ? "fas fa-chevron-down" : "fas fa-chevron-right" } ></i>
-							public_
-						</div>
-						<div className="add_channel_button">+
-							<span className="tooltiptop">Create channel</span>
-						</div>
-					</div>
-					{ displayPublicChan && <div className="publicChannels">
-						<Channel name="General" image="" type="group" selected={ true }/>
-						<Channel name="Random" image="" type="group" selected={ false }/>
-					</div> }
-					<div className="separator">
-						<div onClick={ toggleDisplayPrivateChan }>
-							<i className={ displayPrivateChan ? "fas fa-chevron-down" : "fas fa-chevron-right" } ></i>
-							private_
-						</div>
-						<div className="add_channel_button">+
-							<span className="tooltiptop">Create channel</span>
-						</div>
-					</div>
-					{ displayPrivateChan && <div className="privateChannels">
-						<Channel name="Jeanne" image="" type="dm" selected={false} />
-						<Channel name="Flavien" image="" type="dm" selected={false}/>
-						<Channel name="Les boss" image="" type="group" selected={false}/>
-						<Channel name="Anthony" image="" type="dm" selected={false}/>
-						{/* <Channel name="Jeanne" image="" type="dm" selected={false} />
-						<Channel name="Flavien" image="" type="dm" selected={false}/>
-						<Channel name="Les boss" image="" type="group" selected={false}/>
-						<Channel name="Anthony" image="" type="dm" selected={false}/> */}
-					</div>}
-
+				<div className="add_channel_button" onClick={ toggleDisplayCreateChan }>+
+					<span className="tooltiptop">Create channel</span>
 				</div>
 			</div>
-			<div className="dummyModal" onClick={ toggleDisplayList }></div>
-		</div>
+			{ displayCategory && <div className="publicChannels">
+				{ chans }
+			</div> }
+		</>
 	)
+}
+
+function ChannelList (socket:any) {
+	const [ channels, setChannels ] = useState([]);
+	const [ channelsPriv, setChannelsPriv ] = useState([]);
+	const [ channelsPub, setChannelsPub ] = useState([]);
+	const [ isLoading, setIsLoading ] = useState(true);
+	const [ displayCreateChan, setDisplayCreateChan ] = useState<number>(0);
+
+	// const { user } = useContext(AuthContext);
+	var { toggleDisplayList } = useContext(ChannelContext) as ContextType;
+
+	useEffect(() => {
+		const filterPubChan = () => {
+			var res = channels.filter((chan:any) => chan.type === 1);
+			setChannelsPub(res);
+		};
+		const filterPrivChan = () => {
+			var res = channels.filter((chan:any) => chan.type === 2);
+			setChannelsPriv(res);
+		};
+		const getChannels = async () => {
+			try {
+				const res = await axios.get(`/channel`);
+				// console.log(res);
+				setChannels(res.data);
+				filterPubChan();
+				filterPrivChan();
+				setIsLoading(false);
+			} catch (err) {
+				console.log(err);
+			}
+		};
+		getChannels();
+	}, [isLoading, channels]);
+	
+	return (
+	<div id="channelList" >
+		{ displayCreateChan !== 0 && <CreateChan type={ displayCreateChan } hide={ setDisplayCreateChan } socket={socket}/> }
+		<div className="channelListWrapper">
+			<i className="fas fa-times closeIcon" onClick={ toggleDisplayList }></i>
+			<div className="channelSearchBar">
+				<input type="text" placeholder="Search" id="channelSearch"></input>
+				<i id="searchButton"className="fas fa-search"></i>
+			</div>
+
+			<div className="channelList">
+				<ChannelCategory channelList={ channelsPub } type="public" setDisplayCreateChan={ setDisplayCreateChan }/>
+				<ChannelCategory channelList={ channelsPriv } type="private" setDisplayCreateChan={ setDisplayCreateChan }/>
+			</div>
+		</div>
+		{/* <div className="dummyModal" onClick={ toggleDisplayList }></div> */}
+	</div>
+	);
 }
 
 export default ChannelList;

@@ -17,24 +17,21 @@ connector.on("connect", () => {
     io(URL),
     io(URL),
     io(URL),
-    io(URL),
-    io(URL),
-    io(URL),
   ]
   for (const [i, client] of clients.entries()) {
     client.on("connect", () => {
       console.log(`client ${i}: connected!`);
       if (i == 1) {
-        client.emit('launch_game', { id: 444, friendly: false, user1_id: 1, user2_id: 5, user1_score: 10, user2_score: 10 });
-        client.emit('join_game', 444);
+        client.emit('launch_game', { id: 444, friendly: false, user1_id: 1, user2_id: 2, user1_score: 10, user2_score: 10 });
         // client.emit('paddle_movement', { id_game: 444, y: 9 })
       }
+      if (i == 1 || i == 2)
+      client.emit('join_game', 444);
       // if (i == 4) {
       //   client.emit('launch_game', { id: 789, friendly: false, user1_id: 3, user2_id: 4, user1_score: 10, user2_score: 10 });
       //   client.emit('paddle_movement', { id_game: 789, y: 28 })
       // }
-      if (i == 5) {
-        client.emit('join_room', 444);
+      if (i == 2) {
         connector.emit("reset_counter");
       }
     });
@@ -65,18 +62,16 @@ connector.on("connect", () => {
       setTimeout(() => {
         console.log(`client ${i}: disconnection...`);
         client.disconnect();
-      }, 500);
-    }, 5000);
+      }, 100);
+    }, 1000);
   }
 
   setTimeout(() => {
     console.log(`End of the test! send reset to the api...`);
-    connector.emit('leave_game', "444");
-    connector.emit('leave_game', "789");
     connector.disconnect();
   }, 2000);
 
   setTimeout(() => {
     console.log("Ending test");
-  }, 7000);
+  }, 3000);
 });

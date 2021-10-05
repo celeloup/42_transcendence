@@ -23,8 +23,9 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
   private logger: Logger = new Logger("GameGateway");
 
   private connectedUsers: Map<number, Socket> = new Map();
+  private usersRoom: Map<Socket, string> = new Map();
   private currentGames: Map<number, Round> = new Map();
-  private inGame: Array<number>;
+  private inGame: number[] = [];
 
   //pour tester avec des users non 42
   private i: number = 0;
@@ -55,6 +56,10 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 
   async handleDisconnect(client: Socket) {
     const user = await this.authenticationService.getUserFromSocket(client);
+    
+    //le user quitte ses rooms quand il est deco;
+    this.usersRoom.delete(client);
+
     if (user) {
       this.connectedUsers.delete(user.id);
       this.logger.log(`Deconnection : ${user.name}`);
@@ -72,19 +77,21 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 
   @SubscribeMessage('join_game')
   async joinRoom(
-    @MessageBody() room: string,
+    @MessageBody() room: number,
     @ConnectedSocket() client: Socket,
   ) {
-      this.server.in(client.id).socketsJoin(room);
+      this.server.in(client.id).socketsJoin(room.toString());
+      this.usersRoom.set(client, room.toString());
       this.logger.log(`Room ${room} joined`);
   }
 
   @SubscribeMessage('leave_game')
   async leaveRoom(
-    @MessageBody() room: string,
+    @MessageBody() room: number,
     @ConnectedSocket() client: Socket,
   ) {
-      client.leave(room);    
+      client.leave(room.toString());
+      this.usersRoom.delete(client);
       this.logger.log(`Room ${room} left`);
   }
 
@@ -100,7 +107,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
     this.currentGames.set(match.id, round);
 
     //on lance le jeu 
-    await this.gameService.startGame(this.server, round, this.connectedUsers, this.inGame);
+    await this.gameService.startGame(this.server, round, this.connectedUsers, this.usersRoom, this.inGame);
    
     /////////////SAVE GAME /!\ Attention au cas ou il y a un abandon ////////////////////////
 

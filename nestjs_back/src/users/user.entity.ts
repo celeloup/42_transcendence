@@ -11,10 +11,6 @@ class User {
   @Expose()
   id: number;
 
-  @Column({nullable: true})
-  @Expose({ groups: ['me'] })
-  admin: boolean;
-
   @Column({ unique: true })
   @Expose({ groups: ['me'] })
   id42: number;
@@ -26,6 +22,18 @@ class User {
   @Column({ unique: true })
   @Expose()
   name: string;
+
+  @Column({nullable: true, default: false})
+  @Expose()
+  owner: boolean;
+
+  @Column({nullable: true, default: false})
+  @Expose()
+  site_banned: boolean;
+
+  @Column({nullable: true, default: false})
+  @Expose()
+  moderator: boolean
 
   @Column({ nullable: true })
   currentHashedRefreshToken?: string;
@@ -50,10 +58,10 @@ class User {
   chan_admin: Channel[];
 
   @ManyToMany(() => Channel, (channel: Channel) => channel.banned)
-  ban: Channel[];
+  chan_banned: Channel[];
 
   @ManyToMany(() => Channel, (channel: Channel) => channel.muted)
-  mute: Channel[];
+  chan_muted: Channel[];
   
   @Expose({ groups: ['infos'] })
   @ManyToMany(() => Match, (match: Match) => match.users)
@@ -93,6 +101,10 @@ class User {
   @Expose({ groups: ['me'] })
   @ManyToMany(() => User, (user: User) => user.blocked)
   blockedBy: User[];
+
+  @Column({nullable: true, default: null})
+  @Expose({ groups: ['infos'] })
+  public avatar: string;
 
   //  @Column("simple-array", {nullable: true})
   //  friends: string[];

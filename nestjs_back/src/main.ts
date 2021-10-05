@@ -17,10 +17,10 @@ async function bootstrap() {
   app.useGlobalInterceptors(new ClassSerializerInterceptor(
     app.get(Reflector))
   );
-  app.use(cookieParser());
+ app.use(cookieParser());
   app.setGlobalPrefix('api');
   app.enableCors({
-    credentials: true,
+   credentials: true,
     origin: 'http://localhost:3000'
   });
 

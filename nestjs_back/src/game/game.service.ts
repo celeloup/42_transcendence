@@ -10,28 +10,42 @@ export default class GameService {
     private readonly authenticationService: AuthenticationService;
     private logger: Logger = new Logger("GameService");
 
-    async startGame(server: Server, param: Round, users: Map<number, Socket>, inGame: Array<number>) {
-        await this.waitPlayer(server, param, users);
+    checkDisconnection(game: string, player1: Socket, player2: Socket, usersRoom: Map<Socket, string> ) {
+        if (usersRoom.get(player1) != game) {
+            return 1;
+        }
+        if (usersRoom.get(player2) != game) {
+            return 2;
+        }
+        return 0;
+    }
+
+    async startGame(server: Server, param: Round, users: Map<number, Socket>, usersRoom: Map<Socket, string>, inGame: Array<number>) {
+        let idGame = param.id_game;
+        let socketPlayer1 = users.get(param.id_player1);
+        let socketPlayer2 = users.get(param.id_player2);
+
+        await this.waitPlayer(server, idGame, socketPlayer1, socketPlayer2, usersRoom);
         this.logger.log(`Start game ${param.id_game}`);
 
-        //on ajoute les joueurs a la liste des users en cours de jeu;
+        //on ajoute les joueurs a la liste des users en cours de jeu et on attend laisse une pause avant de lancer la partie;
         inGame.push(param.id_player1);
         inGame.push(param.id_player2);
         await new Promise(f => setTimeout(f, 1000));
 
-        while (!param.victory) {
+        let missingPlayer = 0;
+        while (!param.victory && !missingPlayer) {
+            missingPlayer = this.checkDisconnection(idGame, socketPlayer1, socketPlayer2, usersRoom);
+            this.updateFrame(param);
+            server.in(idGame).emit('new_frame', param);
             //update every 60 fps
             await new Promise(f => setTimeout(f, 16)); //timer
-            this.updateFrame(param);
-            server.in(param.id_game).emit('new_frame', param);
         }
-
+ 
         if (param.victory) {
             server.emit('finish_game', param);
         }
-        else { 
-            server.emit('finish_game', param);
-        }
+        
         //est-ce qu'on garde cette option ?
         // if (nbPlayer < 2) {
         //     server.emit('interrupted_game');
@@ -61,21 +75,11 @@ export default class GameService {
         this.hasVictory(param);
     }
 
-    async waitPlayer(server: Server, param: Round, users: Map<number, Socket>) {
-        this.logger.log(`Waiting for the player game ${param.id_game}`);
+    async waitPlayer(server: Server, idGame: string, player1: Socket, player2: Socket, usersRoom: Map<Socket, string>) {
+        this.logger.log(`Waiting for the player game ${idGame}`);
         return new Promise(resolve => {
-            let nbPlayer: number;
-            let users_id = Array.from(users.keys())
             let waitingPlayer = setInterval(() => {
-                nbPlayer = 0;
-                users_id.forEach(user => {
-                    if (this.getPlayer(param, user) > 0) {
-                        nbPlayer++;
-                        let client = users.get(user);
-                        server.in(client.id).socketsJoin(param.id_game);
-                    }
-                });
-                if (nbPlayer === 2) {
+                if (!this.checkDisconnection(idGame, player1, player2, usersRoom)) {
                     clearInterval(waitingPlayer);
                     resolve(0);
                 }

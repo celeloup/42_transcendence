@@ -5,7 +5,6 @@ import User from './user.entity';
 import * as bcrypt from 'bcrypt';
 import CreateUserDto from './dto/createUser.dto';
 import UpdateUserDto from './dto/updateUser.dto';
-import AddFriendDto from './dto/addFriend.dto';
 import Achievement from '../achievements/achievement.entity';
 import AchievementsService from '../achievements/achievements.service';
 import Channel from 'src/channel/channel.entity';
@@ -21,8 +20,8 @@ export default class UsersService {
   ) { }
 
   async getById(id: number): Promise<User> {
-    const user = await this.usersRepository.findOne({id});
-  //  const user = await this.usersRepository.findOne({id}, {loadRelationIds: true});
+    const user = await this.usersRepository.findOne({ id });
+    //  const user = await this.usersRepository.findOne({id}, {loadRelationIds: true});
     if (user) {
       return user;
     }
@@ -51,49 +50,59 @@ export default class UsersService {
         loadRelationIds: true
       }
     );
-  //  const user = await this.usersRepository.findOne({id}, {loadRelationIds: true});
-    if (user) {
+    //  const user = await this.usersRepository.findOne({id}, {loadRelationIds: true});
+    if (user)
       return user;
-    }
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
   async getMatchesByUserId(id: number) {
     const user = await this.usersRepository.findOne(id, { relations: ['matches'] });
-    if (user) {
+    if (user)
       return user.matches;
-    }
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
   async getChannelsByUserId(id: number): Promise<Channel[]> {
     const user = await this.usersRepository.findOne(id, { relations: ['channels'] });
-    if (user) {
+    if (user)
       return user.channels;
-    }
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
   async getAchievementsByUserId(id: number) {
     const user = await this.usersRepository.findOne(id, { relations: ['achievements'] });
-    if (user) {
+    if (user)
       return user.achievements;
-    }
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
   async getFriendsByUserId(id: number) {
     const user = await this.usersRepository.findOne(id, { relations: ['friends'] });
-    if (user) {
+    if (user)
       return user.friends;
-    }
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
   async getAllInfosByUserId(id: number) {
-    const user = await this.usersRepository.findOne(id, { relations: ['achievements', 'channels', 'matches', 'ownedChannels', 'chan_admin', 'ban', 'mute', 'friends', 'friendOf', 'blocked', 'blockedBy'] })
+    const user = await this.usersRepository.findOne(
+      id, {
+      relations: [
+        'achievements',
+        'channels',
+        'matches',
+        'ownedChannels',
+        'chan_admin',
+        'chan_banned',
+        'chan_muted',
+        'friends',
+        'friendOf',
+        'blocked',
+        'blockedBy']
+    })
     if (user)
       return user;
+    throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
   async getBy42Id(id42: number): Promise<User> {
@@ -112,7 +121,16 @@ export default class UsersService {
     return newUser;
   }
 
+  async nameAlreadyInUse(name: string) {
+    const user = this.usersRepository.findOne({ name });
+    if (user)
+      return true;
+    return false;
+  }
+
   async changeName(id: number, userData: UpdateUserDto): Promise<User> {
+    if ((await this.nameAlreadyInUse(userData.name)))
+      throw new HttpException('Name already in use', HttpStatus.FORBIDDEN);
     await this.usersRepository.update(id, userData);
     const updatedUser = await this.getById(id);
     if (updatedUser) {
@@ -250,4 +268,75 @@ export default class UsersService {
     throw new HttpException('User has not been blocked before', HttpStatus.BAD_REQUEST);
   }
 
+  public async serveAvatar(userId: number, res: any) {
+    const avatar = (await this.getAllInfosByUserId(userId)).avatar;
+    //  return avatar;
+    if (avatar)
+      return res.sendFile(avatar, { root: './' });
+    throw new HttpException('No avatar set yet', HttpStatus.BAD_REQUEST);
+  }
+
+  public async setAvatar(userId: number, avatarUrl: string) {
+    const oldUrl = (await this.getById(userId)).avatar;
+    const fs = require('fs');
+    if (oldUrl && oldUrl !== "")
+      fs.unlink(oldUrl, (err: any) => {
+        if (err) {
+          throw new HttpException('Could not delete old avatar', HttpStatus.NOT_FOUND);
+        }
+      })
+    return this.usersRepository.update(userId, { avatar: avatarUrl });
+  }
+
+  public async appointModerator(userId: number, newModeratorId: number) {
+    const moderator = await this.getAllInfosByUserId(newModeratorId);
+    const user = await this.getAllInfosByUserId(userId);
+    if (user.owner === true) {
+      if (moderator.moderator === false && moderator.owner === false) {
+        moderator.moderator = true;
+        return await this.usersRepository.save(moderator);
+      }
+      throw new HttpException('This user is already a moderator or is a owner too', HttpStatus.FORBIDDEN);
+    }
+    throw new HttpException('Only the owner of the website can appoint moderators', HttpStatus.FORBIDDEN);
+  }
+
+  public async revokeModerator(userId: number, newModeratorId: number) {
+    const moderator = await this.getAllInfosByUserId(newModeratorId);
+    const user = await this.getAllInfosByUserId(userId);
+    if (user.owner === true) {
+      if (moderator.moderator === true && moderator.owner === false) {
+        moderator.moderator = false;
+        return await this.usersRepository.save(moderator);
+      }
+      throw new HttpException('This user is not a moderator or is a owner too', HttpStatus.FORBIDDEN);
+    }
+    throw new HttpException('Only the owner of the website can revoke moderators', HttpStatus.FORBIDDEN);
+  }
+
+  public async isSiteAdmin(userId: number){
+    const user = await this.getAllInfosByUserId(userId);
+    if (user.owner === true || user.moderator === true){
+      return true;
+    }
+    return false; 
+  }
+
+  public async banUser(userId: number, leperId: number){
+    const user = await this.getAllInfosByUserId(userId);
+    const leper = await this.getAllInfosByUserId(leperId);
+    if ((await this.isSiteAdmin(userId)) && !(leper.owner || (user.moderator && leper.moderator))){
+      leper.moderator = false;
+      leper.site_banned = true;
+      return await this.usersRepository.save(leper);
+    }
+    throw new HttpException('User does not have the rights to ban this member', HttpStatus.FORBIDDEN);
+  }
+  
+  // Off topic
+  // async deleteUser(user_id: number) {
+  //   await this.getById(user_id);
+  //   await this.usersRepository.delete(user_id);
+  //   //Ne rien renvoyer si success ?
+  // }
 }
