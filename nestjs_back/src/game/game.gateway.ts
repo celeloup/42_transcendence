@@ -171,10 +171,18 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
     this.i = 0;
   }
 
+  @SubscribeMessage('get_current_games')
+  async requestCurrentGames(@ConnectedSocket() socket: Socket)
+  {
+    this.logger.log(`List of current games`);
+    socket.emit('connected_users', Array.from(this.currentGames.keys()));
+  }
+  
   @SubscribeMessage('get_users')
   async requestConnectedUsers(@ConnectedSocket() socket: Socket)
   {
-    this.logger.log(`List of connected users`);
-    socket.emit('connected_users', Array.from(this.connectedUsers.keys()), this.currentGames);
+    this.logger.log(`List of connected users and playing users`);
+    socket.emit('connected_users', Array.from(this.connectedUsers.keys()), this.inGame);
   }
+
 }
