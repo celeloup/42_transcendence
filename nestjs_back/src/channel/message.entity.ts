@@ -3,7 +3,6 @@ import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } f
 import { Type } from 'class-transformer';
 import User from '../users/user.entity';
 import Channel from './channel.entity';
-import { classToPlain } from 'class-transformer';
 
 @Entity()
 class Message {
