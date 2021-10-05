@@ -37,9 +37,9 @@ function Game() {
 	// 	})
 	// })
 
-	const launch_game = () => {
-		// socket.emit('launch_game', { user1_id: 1, user2_id: 2 });
-	}
+	// const launch_game = () => {
+	// 	// socket.emit('launch_game', { user1_id: 1, user2_id: 2 });
+	// }
 
 	// ------------- CANVAS
 
@@ -72,7 +72,7 @@ function Game() {
 			
 		<div id="game">
 			<div className="window_header">
-				MACHIN VS TRUC <button onClick={launch_game}>LAUNCH GAME</button>
+				{/*MACHIN VS TRUC <button onClick={launch_game}>LAUNCH GAME</button>
 			</div>
 			<div id="game_window">
 				{/* <Sketch setup={setup} draw={draw} /> */}
