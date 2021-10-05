@@ -62,10 +62,14 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     @ConnectedSocket() client: Socket,
   ) {
     const user: User = await this.authenticationService.getUserFromSocket(client);
-    if (this.channelService.isAMember(room, user.id) && this.channelService.isBanned(room, user.id)) {
+    const is_member: boolean = await this.channelService.isAMember(room, user.id);
+    const is_ban: boolean = await this.channelService.isBanned(room, user.id);
+
+    if (is_member && is_ban) {
+      this.logger.log('User has been ban');
       return ;
     }
-    if (!this.channelService.isAMember(room, user.id)) {
+    if (!is_member) {
       this.channelService.addMember(room, user.id, user.id);
     }
     this.server.in(client.id).socketsJoin(room.toString());
@@ -89,7 +93,7 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     const user: User = await this.authenticationService.getUserFromSocket(client);
     let memberSocket: Socket = this.listSocket.get(data.member);
     if (user) {
-      this.channelService.muteAMember(data.channel.id, data.member.id, user.id);
+      await this.channelService.muteAMember(data.channel.id, data.member.id, user.id);
       memberSocket.emit('user_muted');
     }
   }
@@ -102,7 +106,7 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     const user: User = await this.authenticationService.getUserFromSocket(client);
     const memberSocket: Socket = this.listSocket.get(data.member);
     if (user) {
-      this.channelService.unmuteAMember(data.channel.id, data.member.id, user.id);
+      await this.channelService.unmuteAMember(data.channel.id, data.member.id, user.id);
       memberSocket.emit('user_unmuted');
     }
   }
@@ -117,7 +121,7 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     
     if (user) {
       memberSocket.leave(data.channel.id.toString());
-      this.channelService.banAMember(data.channel.id, data.member.id, user.id);
+      await this.channelService.banAMember(data.channel.id, data.member.id, user.id);
       memberSocket.emit('user_banned');
     }
   }
@@ -131,16 +135,17 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     const author = await this.authenticationService.getUserFromSocket(client);
     // const user = await this.authenticationService.getUserFromSocket(client);
     // const author = classToClass(user);
+    const is_member: boolean = await this.channelService.isAMember(data.recipient.id, author.id);
+    const is_banned: boolean = await this.channelService.isBanned(data.recipient.id, author.id);
+    const is_muted: boolean = await this.channelService.isMuted(data.recipient.id, author.id);
 
-    if (!(this.channelService.isAMember(data.recipient.id, author.id))) {
-      return ;
-    }
-    if (this.channelService.isBanned(data.recipient.id, author.id) || this.channelService.isMuted(data.recipient.id, author.id)) {
+    if (!(is_member) || is_banned || is_muted) {
+      this.logger.log('Unauthorized access');
       return ;
     }
     this.logger.log(`Message from ${this.connectedUsers.get(client)} to ${data.recipient.name}: ${data.content}`);
     const message = await this.channelService.saveMessage(data.content, author, data.recipient);
-    this.server.in(data.recipient.id.toString()).emit('receive_message', message);
+    this.server.in(data.recipient.id.toString()).emit('receive_message', classToPlain(message));
   }
 
   // @SubscribeMessage('request_messages')
