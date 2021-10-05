@@ -1,7 +1,8 @@
 import WindowBorder from '../ui_components/WindowBorder';
 import { useRef, useContext, useState, useEffect, EffectCallback } from 'react';
 import ChannelList from '../chat/ChannelList';
-import { Message } from '../chat/ChannelConversation';
+import { ChannelAdmin } from './ChannelAdmin';
+import { Message } from './Message';
 import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
 // import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
 import { io } from "socket.io-client";
@@ -32,7 +33,6 @@ export function Chat() {
 	var { displayList, channel, socket, setSocket } = useContext(ChannelContext) as ContextType;
 	
 	// ---------- SOCKETS
-	// var [socket, setSocket] = useState<any>(null);
 	useEffect(() : ReturnType<EffectCallback> => {
 		const newSocket:any = io(`http://localhost:8080/channel`, { transports: ["websocket"] });
 		setSocket(newSocket);
@@ -41,7 +41,7 @@ export function Chat() {
 
 	useEffect(() => {
 		socket?.on('receive_message', (data:any) => {
-			console.log("RECEIVED :", data);
+			// console.log("RECEIVED :", data);
 			setMessages(oldArray => [...oldArray, data]);
 		})
 	}, [socket])
@@ -49,19 +49,16 @@ export function Chat() {
 	// ---------- GET MESSAGES
 	useEffect(() => {
 		// console.log("CURRENT CHANNEL: ", channel);
-		const getMessages = async () => {
-			if (channel)
-			{
-				try {
-					const res = await axios.get(`/channel/messages/${channel.id}`);
-					console.log("GET MESSAGES", res);
-					setMessages(res.data.reverse());
-				} catch (err) {
-					console.log(err);
-				}
-			}
-		};
-		getMessages();
+		if (channel) {
+			axios.get(`/channel/messages/${channel.id}`)
+			.then( res => {
+				console.log("GET MESSAGES", res);
+				setMessages(res.data);
+			})
+			.catch (err => {
+				console.log("Error:", err);
+			})
+		}
 	}, [channel])
 
 	// ---------- SCROLL
@@ -90,9 +87,8 @@ export function Chat() {
 	}
 
 	var messageList;
-	// console.log(messages);
 	if (messages.length !== 0)
-		messageList = messages.map((mes:any) => <Message key={ mes.id } username={ mes.author ? mes.author.name : "empty" } message={ mes.content }/>)
+		messageList = messages.map((mes:any) => <Message key={ mes.id } id={ mes.author.id } username={ mes.author.name } message={ mes.content }/>)
 	else
 		messageList = <p className="no_msg">No message yet.</p>
 

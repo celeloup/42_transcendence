@@ -17,7 +17,7 @@ type Props = {
 }
 
 function PageWrapper( { children }: Props) {
-	var { isAuth } = useContext(AuthContext) as ContextType;
+	var { isAuth, user } = useContext(AuthContext) as ContextType;
 	return (
 		<>
 		{ isAuth && <header className="App-header">
@@ -33,7 +33,7 @@ function PageWrapper( { children }: Props) {
 		{ isAuth && <div id="navBar" className="rotate_right">
 			<NavButton name="Parameters" icon="fa-cog" link="/parameters"></NavButton>
 			<NavButton name="Profile" icon="fa-user-circle" link="/profile"></NavButton>
-			<NavButton name="Admin" icon="fa-cog" link="/admin"></NavButton>
+		{ user?.admin && <NavButton name="Admin" icon="fa-cog" link="/admin"></NavButton> }
 		</div>} 
 		<div className="body_wrapper">
 			{ children }
