@@ -11,6 +11,7 @@ import {
 } from '@nestjs/websockets';
 import { Server, Socket } from 'socket.io';
 import Match from '../matches/match.entity';
+import MatchService from '../matches/matches.service';
 import Round from './class/round.class';
 import GameService from "./game.service";
 import AuthenticationService from '../authentication/authentication.service';
@@ -33,6 +34,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
   constructor(
     private readonly authenticationService: AuthenticationService,
     private readonly gameService: GameService,
+    private readonly matchService: MatchService,
   ) { }
 
   afterInit(server: Server) {
@@ -80,6 +82,10 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
     @MessageBody() room: number,
     @ConnectedSocket() client: Socket,
   ) {
+      let actual_room = this.usersRoom.get(client);
+      if (actual_room) {
+        client.leave(actual_room);
+      }
       this.server.in(client.id).socketsJoin(room.toString());
       this.usersRoom.set(client, room.toString());
       this.logger.log(`Room ${room} joined`);
@@ -106,12 +112,18 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
     let round = new Round(match.id.toString(), match.user1_id, match.user2_id, 10, 10, false);
     this.currentGames.set(match.id, round);
 
-    //on lance le jeu 
-    await this.gameService.startGame(this.server, round, this.connectedUsers, this.usersRoom, this.inGame);
-   
-    /////////////SAVE GAME /!\ Attention au cas ou il y a un abandon ////////////////////////
+    //on lance le jeu, retourne 1 si la partie a ete annule
+    if (await this.gameService.startGame(this.server, round, this.connectedUsers, this.usersRoom, this.inGame)) {
+      return ;
+    }
+  
+    //on met a jour l'objet match
+    match.score_user1 = round.score_player1;
+    match.score_user2 = round.score_player2;
+    match.winner = round.victory;
 
-    //on supprime les joueurs et le jeu des listes en cours;
+    //on save le game et on retire les infos "en cours";
+    this.matchService.updateMatch(match.id, match);
     delete this.inGame[round.id_player1];
     delete this.inGame[round.id_player2];
     this.currentGames.delete(match.id);

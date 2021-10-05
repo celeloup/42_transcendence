@@ -12,6 +12,9 @@ export default class GameService {
 
     checkDisconnection(game: string, player1: Socket, player2: Socket, usersRoom: Map<Socket, string> ) {
         if (usersRoom.get(player1) != game) {
+            if (usersRoom.get(player2) != game) {
+                return 3;
+            }
             return 1;
         }
         if (usersRoom.get(player2) != game) {
@@ -25,16 +28,20 @@ export default class GameService {
         let socketPlayer1 = users.get(param.id_player1);
         let socketPlayer2 = users.get(param.id_player2);
 
-        await this.waitPlayer(server, idGame, socketPlayer1, socketPlayer2, usersRoom);
+        //on attendant que tous les players soient dans la room, si plus aucun playeur, on annule la partie;
+        if (await this.waitPlayer(server, idGame, socketPlayer1, socketPlayer2, usersRoom) == 1) {
+            return 1;
+        }
         this.logger.log(`Start game ${param.id_game}`);
 
         //on ajoute les joueurs a la liste des users en cours de jeu et on attend laisse une pause avant de lancer la partie;
+        param.pending = false;
         inGame.push(param.id_player1);
         inGame.push(param.id_player2);
         await new Promise(f => setTimeout(f, 1000));
 
         let missingPlayer = 0;
-        while (!param.victory && !missingPlayer) {
+        while (param.victory == - 1 && !missingPlayer) {
             missingPlayer = this.checkDisconnection(idGame, socketPlayer1, socketPlayer2, usersRoom);
             this.updateFrame(param);
             server.in(idGame).emit('new_frame', param);
@@ -42,14 +49,18 @@ export default class GameService {
             await new Promise(f => setTimeout(f, 16)); //timer
         }
  
-        if (param.victory) {
+        if (param.victory != -1) {
             server.emit('finish_game', param);
+            return 0;
         }
-        
-        //est-ce qu'on garde cette option ?
-        // if (nbPlayer < 2) {
-        //     server.emit('interrupted_game');
-        // }
+        if (missingPlayer == 1) {
+            param.victory = param.id_player2;
+        } 
+        if (missingPlayer == 2) {
+            param.victory = param.id_player1;
+        } 
+        server.emit('interrupted_game', param);
+            return 0;
     }
 
     getPlayer(param: Round, id: number) {
@@ -65,8 +76,13 @@ export default class GameService {
     }
 
     hasVictory(param: Round) {
-        if (param.score_player1 === param.goal || param.score_player2 == param.goal) {
-            param.victory = true;
+        if (param.score_player1 === param.goal) {
+            param.victory = param.id_player1;
+            return ;
+        }
+        if (param.score_player2 === param.goal) {
+            param.victory = param.id_player2;
+            return ;
         }
     }
 
@@ -79,10 +95,16 @@ export default class GameService {
         this.logger.log(`Waiting for the player game ${idGame}`);
         return new Promise(resolve => {
             let waitingPlayer = setInterval(() => {
-                if (!this.checkDisconnection(idGame, player1, player2, usersRoom)) {
+                let missingPlayers = this.checkDisconnection(idGame, player1, player2, usersRoom);
+                if (missingPlayers == 0) {
                     clearInterval(waitingPlayer);
                     resolve(0);
                 }
+                if (missingPlayers == 3) {
+                    clearInterval(waitingPlayer);
+                    resolve(1);
+                }
+
             }, 60);
         });
     }

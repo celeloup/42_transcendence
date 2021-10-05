@@ -29,12 +29,12 @@ export default class MatchesController {
     return this.matchesService.createMatch(match);
   }
 
-  @ApiParam({name: 'id', type: Number, description: 'match id'})
-  @Put(':id')
-  @ApiOperation({summary: "Update a match"})
-  async updateMatch(@Param() { id }: FindOneParams, @Body() match: UpdateMatchDto){
-    return this.matchesService.updateMatch(Number(id), match);
-  }
+  // @ApiParam({name: 'id', type: Number, description: 'match id'})
+  // @Put(':id')
+  // @ApiOperation({summary: "Update a match"})
+  // async updateMatch(@Param() { id }: FindOneParams, @Body() match: UpdateMatchDto){
+  //   return this.matchesService.updateMatch(Number(id), match);
+  // }
 
   @Delete('/:id')
   @ApiOperation({summary: "Delete a match"})
