@@ -20,7 +20,7 @@ function OAuth({ location } : RouteComponentProps) {
 	useEffect(() => {
 		axios.get(`/authentication/oauth${code}`)
 			.then(response => {
-				// console.log("RESPONSE GOOD : ", response);
+				console.log("RES Oauth : ", response);
 				const user = { 
 					id: response.data.id,
 					admin: response.data.admin,

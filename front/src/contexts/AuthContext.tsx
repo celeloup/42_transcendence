@@ -26,6 +26,7 @@ export const AuthProvider= ({ children } : Props) => {
 	const [user, setUser] = React.useState<User | null>();
 
 	const loginContext = (user:User) => {
+		// console.log("Context login : ", user);
 		setIsAuth(true);
 		setUser(user);
 	};

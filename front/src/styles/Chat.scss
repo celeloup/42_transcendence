@@ -89,6 +89,7 @@ $green: #81A439;
 	border: 2px solid white;
 	border-radius: 6px;
 	margin-right: -15px;
+	margin-top: 0px;
 	color: $dark-gray;
 	font-family: "Dogica", "Fira Mono";
 	font-size: 30px;
@@ -108,7 +109,6 @@ $green: #81A439;
 	color: $accent_color;
 	font-family: "Dogica", "Fira Mono";
 	font-size: 12px;
-	margin-bottom: 5px;
 	cursor: pointer;
 }
 
@@ -116,6 +116,7 @@ $green: #81A439;
 	display: block;
 	font-size: 14px;
 	line-height: 140%;
+	margin-top: 3px;
 	overflow-wrap: break-word;
 }
 
@@ -190,6 +191,7 @@ $green: #81A439;
 	top: 140px;
 	color: $background-color;
 	text-align: left;
+	min-height: 20px;
 
 	.close_icon {
 		font-size: 30px;
@@ -289,6 +291,10 @@ $green: #81A439;
 			margin-left: 12px;
 			margin-right: 0;
 		}
+	}
+
+	#profile_button {
+		margin-top: 20px;
 	}
 }
 
