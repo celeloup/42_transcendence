@@ -16,6 +16,8 @@ import User from 'src/users/user.entity';
 import AuthenticationService from '../authentication/authentication.service';
 import ChannelService from './channel.service';
 import { channel } from 'diagnostics_channel';
+import { classToClass, classToPlain } from 'class-transformer';
+
 
 @WebSocketGateway({ serveClient: false, namespace: '/channel' })
 export default class ChannelGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -127,6 +129,8 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     @ConnectedSocket() client: Socket,
   ) {
     const author = await this.authenticationService.getUserFromSocket(client);
+    // const user = await this.authenticationService.getUserFromSocket(client);
+    // const author = classToClass(user);
 
     if (!(this.channelService.isAMember(data.recipient.id, author.id))) {
       return ;
