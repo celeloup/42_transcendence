@@ -1,11 +1,10 @@
-import { Body, Controller, Param, Put, Delete, Req, UseGuards, Post, Get, SerializeOptions } from '@nestjs/common';
+import { Body, Controller, Param, Put, Delete, Req, UseGuards, Post, Get } from '@nestjs/common';
 import ChannelService from './channel.service';
 import CreateChannelDto from './dto/createChannel.dto'
 import FindOneParams from '../utils/findOneParams';
 import UserDto from './dto/User.dto';
 import { ApiOperation, ApiParam, ApiTags, ApiResponse, ApiBearerAuth, ApiCookieAuth, ApiBody } from '@nestjs/swagger';
 import JwtTwoFactorGuard from 'src/authentication/guard/jwtTwoFactor.guard';
-import User from 'src/users/user.entity';
 import RequestWithUser from 'src/authentication/interface/requestWithUser.interface';
 import NewPasswordDto from './dto/newPassword.dto';
 

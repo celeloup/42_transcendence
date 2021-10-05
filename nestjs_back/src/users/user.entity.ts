@@ -25,7 +25,7 @@ class User {
 
   @Column({nullable: true, default: false})
   @Expose()
-  owner: boolean;
+  site_owner: boolean;
 
   @Column({nullable: true, default: false})
   @Expose()
@@ -33,7 +33,7 @@ class User {
 
   @Column({nullable: true, default: false})
   @Expose()
-  moderator: boolean
+  site_moderator: boolean
 
   @Column({ nullable: true })
   currentHashedRefreshToken?: string;
