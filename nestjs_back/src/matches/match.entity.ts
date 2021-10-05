@@ -1,23 +1,21 @@
-import { Column, Entity, PrimaryGeneratedColumn, ManyToOne, ManyToMany, CreateDateColumn } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn, ManyToMany, CreateDateColumn } from 'typeorm';
 import User from '../users/user.entity';
 import { Exclude } from 'class-transformer';
 
 @Entity()
 class Match {
   @PrimaryGeneratedColumn()
-  public id?: number;
+  public id: number;
 
-  @Column()
+  @Column({default: true})
   public friendly: boolean;
 
   @ManyToMany(() => User, (user: User) => user.matches)
   public users: User[];
 
-  // @RelationId((match: Match) => match.user1)
-  @Column()
+  @Column({nullable: true})
   public user1_id: number;
 
-  // @RelationId((match: Match) => match.user2)
   @Column()
   public user2_id: number;
 
@@ -29,6 +27,15 @@ class Match {
 
   @Column({ nullable: true })
   public winner?: number;
+
+  @Column({ nullable: true })
+  public speed: number;
+
+  @Column({ default: 10 })
+  public goal: number;
+
+  @Column({nullable: true, default: false})
+  public boost_available: boolean;
 
   @CreateDateColumn()
   createdDate: Date;

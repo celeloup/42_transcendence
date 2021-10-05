@@ -1,12 +1,15 @@
-import { Body, Controller, Put, Req, Get, UseGuards, Param, Delete, SerializeOptions } from '@nestjs/common';
+import { Body, Controller, Put, Req, Get, Res, UseGuards, Param, Delete, SerializeOptions, Post, UseInterceptors, UploadedFile } from '@nestjs/common';
 import FindOneParams from '../utils/findOneParams';
 import UsersService from './users.service';
 import User from './user.entity';
 import UpdateUserDto from './dto/updateUser.dto';
 import RequestWithUser from '../authentication/interface/requestWithUser.interface';
 import JwtTwoFactorGuard from '../authentication/guard/jwtTwoFactor.guard';
-import { ApiBearerAuth, ApiCookieAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
-import AddFriendDto from './dto/addFriend.dto';
+import { ApiBearerAuth, ApiCookieAuth, ApiOperation, ApiParam, ApiResponse, ApiTags, ApiBody, ApiConsumes } from '@nestjs/swagger';
+import AddUserDto from './dto/addUser.dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { editFileName, imageFileFilter } from 'src/utils/file-uploading.utils';
 import Match from '../matches/match.entity';
 import Channel from '../channel/channel.entity';
 import Achievement from '../achievements/achievement.entity';
@@ -14,12 +17,15 @@ import userInfos from './interface/userInfos.interface';
 import myUserInfos from 'src/authentication/interface/myUserInfos.interface';
 import extendedUserInfos from './interface/extendedUserInfos.interface';
 
-@ApiTags('users') 
+@SerializeOptions({
+  groups: ['users']
+})
+@ApiTags('users')
 @Controller('users')
 export default class UsersController {
   constructor(
     private readonly userService: UsersService
-  ) {}
+  ) { }
 
   @ApiOperation({ summary: "Update the authenticated user" })
   @ApiBearerAuth('bearer-authentication')
@@ -34,9 +40,8 @@ export default class UsersController {
     groups: ['me']
   })
   @Put('me')
-  async replacePost(@Req() req: RequestWithUser, @Body() userData: UpdateUserDto) {
-    const { user } = req;
-    return this.userService.changeName(user.id, userData);
+  async changeName(@Req() req: RequestWithUser, @Body() user: UpdateUserDto): Promise<User> {
+    return this.userService.changeName(req.user.id, user);
   }
 
   @ApiOperation({ summary: "Get all the users" })
@@ -107,7 +112,7 @@ export default class UsersController {
   @Get('achievements/:id')
   getAchievementsByUserId(@Param() { id }: FindOneParams) {
     return this.userService.getAchievementsByUserId(Number(id));
-  } 
+  }
 
   @ApiOperation({ summary: "Get friends of a user" })
   @ApiParam({ name: 'id', type: Number, description: 'user id' })
@@ -122,7 +127,7 @@ export default class UsersController {
   @Get('friends/:id')
   getFriendsByUserId(@Param() { id }: FindOneParams) {
     return this.userService.getFriendsByUserId(Number(id));
-  } 
+  }
 
   @ApiOperation({ summary: "Get all infos of the authenticated user" })
   @ApiBearerAuth('bearer-authentication')
@@ -165,9 +170,9 @@ export default class UsersController {
   })
   @UseGuards(JwtTwoFactorGuard)
   @Put('friend/me')
-  addAFriend(@Req() req: RequestWithUser, @Body() friend: AddFriendDto) {
+  addAFriend(@Req() req: RequestWithUser, @Body() friend: AddUserDto) {
     const { user } = req;
-    return this.userService.addAFriend(user.id, friend.friendId);
+    return this.userService.addAFriend(user.id, friend.userId);
   }
 
   @ApiOperation({ summary: "Delete a friend of the authenticated user" })
@@ -184,13 +189,13 @@ export default class UsersController {
   })
   @UseGuards(JwtTwoFactorGuard)
   @Delete('friend/me')
-  deleteAFriend(@Req() req: RequestWithUser, @Body() friend: AddFriendDto) {
+  deleteAFriend(@Req() req: RequestWithUser, @Body() friend: AddUserDto) {
     const { user } = req;
-    return this.userService.deleteAFriend(user.id, friend.friendId);
+    return this.userService.deleteAFriend(user.id, friend.userId);
   }
 
   @ApiOperation({ summary: "Block a user for the authenticated user" })
-  @ApiParam({name: 'id', type: Number, description: 'user id'})
+  @ApiParam({ name: 'id', type: Number, description: 'user id' })
   @ApiResponse({
     status: 200,
     description: 'User successfully blocked',
@@ -202,9 +207,9 @@ export default class UsersController {
   })
   @UseGuards(JwtTwoFactorGuard)
   @Put('block/me')
-  blockAUser(@Req() req: RequestWithUser, @Body() friend: AddFriendDto) {
+  blockAUser(@Req() req: RequestWithUser, @Body() friend: AddUserDto) {
     const { user } = req;
-    return this.userService.blockAUser(user.id, friend.friendId);
+    return this.userService.blockAUser(user.id, friend.userId);
   }
 
   @ApiOperation({ summary: "Unblock a user for the authenticated user" })
@@ -220,8 +225,116 @@ export default class UsersController {
   })
   @UseGuards(JwtTwoFactorGuard)
   @Delete('block/me')
-  unblockAUser(@Req() req: RequestWithUser, @Body() friend: AddFriendDto) {
+  unblockAUser(@Req() req: RequestWithUser, @Body() friend: AddUserDto) {
     const { user } = req;
-    return this.userService.unblockAUser(user.id, friend.friendId);
+    return this.userService.unblockAUser(user.id, friend.userId);
   }
+
+  @ApiOperation({ summary: "Appoint moderator" })
+  @ApiParam({ name: 'id', type: Number, description: 'user id' })
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully promoted moderator',
+    type: [User]
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found for this id'
+  })
+  @UseGuards(JwtTwoFactorGuard)
+  @Put('moderator/me')
+  appointModerator(@Req() req: RequestWithUser, @Body() newModerator: AddUserDto) {
+    const { user } = req;
+    return this.userService.appointModerator(user.id, newModerator.userId);
+  }
+
+  @ApiOperation({ summary: "Revoke a moderator" })
+  @ApiParam({ name: 'id', type: Number, description: 'user id' })
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully promoted moderator',
+    type: [User]
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found for this id'
+  })
+  @UseGuards(JwtTwoFactorGuard)
+  @Delete('moderator/me')
+  revokeModerator(@Req() req: RequestWithUser, @Body() newModerator: AddUserDto) {
+    const { user } = req;
+    return this.userService.revokeModerator(user.id, newModerator.userId);
+  }
+
+  @ApiOperation({ summary: "Ban a user from website" })
+  @ApiParam({ name: 'id', type: Number, description: 'user id' })
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully promoted moderator',
+    type: [User]
+  })
+  @ApiResponse({
+    status: 404,
+    description: 'User not found for this id'
+  })
+  @UseGuards(JwtTwoFactorGuard)
+  @Delete('block/me')
+  banUser(@Req() req: RequestWithUser, @Body() otherUser: AddUserDto) {
+    const { user } = req;
+    return this.userService.banUser(user.id, otherUser.userId);
+  }
+
+  // Delete account not in subject? 
+  // @Delete('/me')
+  // @ApiOperation({ summary: "Delete a user//Not working so far" })
+  // async deleteUser(@Param() { id }: FindOneParams) {
+  //   return this.userService.deleteUser(Number(id));
+  // }
+
+  @Post('avatar/me')
+  @ApiOperation({ summary: "Upload an avatar /!\\ For now uploads for user with id 1" })
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @ApiResponse({
+    status: 200,
+    description: 'The avatar has been successfully uploaded to the server',
+    type: [User]
+  })
+  @UseGuards(JwtTwoFactorGuard)
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        avatar: {
+          type: 'string',
+          format: 'binary',
+        },
+      },
+    },
+  })
+  @UseInterceptors(
+    FileInterceptor(
+      'avatar',
+      {
+        storage: diskStorage({
+          destination: './avatars',
+          filename: editFileName
+        }),
+        fileFilter: imageFileFilter,
+      }
+    )
+  )
+  async uploadAvatar(@Req() req: RequestWithUser, @UploadedFile() file: Express.Multer.File) {
+    const { user } = req;
+    return this.userService.setAvatar(user.id, file.path); 
+  }
+
+  @Get('avatar/:id')
+  @ApiOperation({ summary: "Get avatar of a user" })
+  @ApiParam({ name: 'id', type: Number, description: 'user id' })
+  async serveAvatar(@Param() { id }: FindOneParams, @Res() res: any): Promise<any> {
+    return this.userService.serveAvatar(Number(id), res);
+  }
+
 }

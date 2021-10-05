@@ -1,6 +1,6 @@
 import { ExecSyncOptionsWithBufferEncoding } from 'child_process';
-import { Column, Entity, ManyToOne, ManyToMany, PrimaryGeneratedColumn, OneToMany, JoinTable, ObjectID, ObjectIdColumn, Index, UpdateDateColumn } from 'typeorm';
-import { Type } from 'class-transformer';
+import { Column, Entity, ManyToOne, ManyToMany, PrimaryGeneratedColumn, OneToMany, JoinTable, UpdateDateColumn } from 'typeorm';
+import { Type, Expose } from 'class-transformer';
 import User from '../users/user.entity';
 import Message from './message.entity';
 
@@ -15,7 +15,7 @@ class Channel {
   @Column({ default: 1 })
   public type: number;//  (1 = public, 2 = private, 3 = mp)
   
-  @Column({ default: null , nullable: true})
+  @Column({ default: "" , nullable: true})
   public password: string;
 
   @Type(() => User)
@@ -35,12 +35,12 @@ class Channel {
   // public members_id: number[];
 
   @Type(() => User)
-  @ManyToMany(() => User, (banned: User) => banned.ban)
+  @ManyToMany(() => User, (banned: User) => banned.chan_banned)
   @JoinTable()
   public banned: User[];
 
   @Type(() => User)
-  @ManyToMany(() => User, (muted: User) => muted.mute)
+  @ManyToMany(() => User, (muted: User) => muted.chan_muted)
   @JoinTable()
   public muted: User[];
 
