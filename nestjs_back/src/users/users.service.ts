@@ -64,7 +64,7 @@ export default class UsersService {
   }
 
   async getChannelsByUserId(id: number): Promise<Channel[]> {
-    const user = await this.usersRepository.findOne(id, { relations: ['channels'] });
+    const user = await this.usersRepository.findOne(id, { relations: ['channels', 'channels.members'] });
     if (user)
       return user.channels;
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
@@ -291,9 +291,9 @@ export default class UsersService {
   public async appointModerator(userId: number, newModeratorId: number) {
     const moderator = await this.getAllInfosByUserId(newModeratorId);
     const user = await this.getAllInfosByUserId(userId);
-    if (user.owner === true) {
-      if (moderator.moderator === false && moderator.owner === false) {
-        moderator.moderator = true;
+    if (user.site_owner === true) {
+      if (moderator.site_moderator === false && moderator.site_owner === false) {
+        moderator.site_moderator = true;
         return await this.usersRepository.save(moderator);
       }
       throw new HttpException('This user is already a moderator or is a owner too', HttpStatus.FORBIDDEN);
@@ -304,9 +304,9 @@ export default class UsersService {
   public async revokeModerator(userId: number, newModeratorId: number) {
     const moderator = await this.getAllInfosByUserId(newModeratorId);
     const user = await this.getAllInfosByUserId(userId);
-    if (user.owner === true) {
-      if (moderator.moderator === true && moderator.owner === false) {
-        moderator.moderator = false;
+    if (user.site_owner === true) {
+      if (moderator.site_moderator === true && moderator.site_owner === false) {
+        moderator.site_moderator = false;
         return await this.usersRepository.save(moderator);
       }
       throw new HttpException('This user is not a moderator or is a owner too', HttpStatus.FORBIDDEN);
@@ -316,7 +316,7 @@ export default class UsersService {
 
   public async isSiteAdmin(userId: number){
     const user = await this.getAllInfosByUserId(userId);
-    if (user.owner === true || user.moderator === true){
+    if (user.site_owner === true || user.site_moderator === true){
       return true;
     }
     return false; 
@@ -325,8 +325,8 @@ export default class UsersService {
   public async banUser(userId: number, leperId: number){
     const user = await this.getAllInfosByUserId(userId);
     const leper = await this.getAllInfosByUserId(leperId);
-    if ((await this.isSiteAdmin(userId)) && !(leper.owner || (user.moderator && leper.moderator))){
-      leper.moderator = false;
+    if ((await this.isSiteAdmin(userId)) && !(leper.site_owner || (user.site_moderator && leper.site_moderator))){
+      leper.site_moderator = false;
       leper.site_banned = true;
       return await this.usersRepository.save(leper);
     }
