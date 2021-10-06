@@ -175,6 +175,12 @@ export default class ChannelService {
     return false;
   }
 
+  async hasChannelRightsOverMember(channel_id: number, user_id: number, member_id: number){
+    if (await this.usersService.hasSiteRightsOverOtherUser(user_id, member_id))
+      return true;
+      
+  }
+
   async addMember(channel_id: number, member_id: number, user_id: number) {
     if (member_id === user_id || (await this.usersService.isAFriend(member_id, user_id)) || (await this.isAnAdmin(channel_id, user_id))) {
       if (!(await this.isAMember(channel_id, member_id))) {
