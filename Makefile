@@ -24,6 +24,14 @@ down:
 	$(DC) --project-name $(NAME) down
 ps:
 	$(DC) --project-name $(NAME) ps
+clean.linux:
+	$(DC) --project-name $(NAME) down --rmi all --volumes
+	sudo rm -fr ./nestjs_back/dist
+	sudo rm -fr ./nestjs_back/node_modules
+	sudo rm -fr ./front/dist
+	sudo rm -fr ./front/node_modules
+	sudo rm -fr ./websocket_client/node_modules
+	sudo rm -fr ./postgres_data
 clean:
 	$(DC) --project-name $(NAME) down --rmi all --volumes
 	rm -fr ./nestjs_back/dist
