@@ -5,6 +5,7 @@ import { ChannelAdmin } from './ChannelAdmin';
 import { Message } from './Message';
 import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
 // import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
+// import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
 import { io } from "socket.io-client";
 import '../../styles/Chat.scss';
 import axios from 'axios';
@@ -31,7 +32,9 @@ export function Chat() {
 
 	// ---------- DISPLAY
 	var { displayList, channel, socket, setSocket } = useContext(ChannelContext) as ContextType;
-	
+	// var { user, setUser } = useContext(AuthContext) as AuthContextType;
+	const [ blockedUsers, setBlockedUsers ] = useState<any[]>([]);
+
 	// ---------- SOCKETS
 	useEffect(() : ReturnType<EffectCallback> => {
 		const newSocket:any = io(`http://localhost:8080/channel`, { transports: ["websocket"] });
@@ -52,13 +55,21 @@ export function Chat() {
 		if (channel) {
 			axios.get(`/channel/messages/${channel.id}`)
 			.then( res => {
-				console.log("GET MESSAGES", res);
+				// console.log("GET MESSAGES", res);
 				setMessages(res.data);
 			})
 			.catch (err => {
 				console.log("Error:", err);
 			})
 		}
+		axios.get(`/users/infos/me`)
+			.then( res => {
+				// console.log("GET infos me", res);
+				setBlockedUsers(res.data.blocked);
+			})
+			.catch (err => {
+				console.log("Error:", err);
+			})
 	}, [channel])
 
 	// ---------- SCROLL
@@ -87,8 +98,18 @@ export function Chat() {
 	}
 
 	var messageList;
-	if (messages.length !== 0)
-		messageList = messages.map((mes:any) => <Message key={ mes.id } id={ mes.author.id } username={ mes.author.name } message={ mes.content }/>)
+	var test = blockedUsers.find((x:any) => x.id === 2);
+	if (messages.length !== 0) {
+		// console.log(test);
+		messageList = messages.map((mes:any) =>
+			<Message 
+			key={ mes.id }
+			id={ mes.author.id }
+			username={ mes.author.name }
+			message={ mes.content }
+			setBlockedUsers={ setBlockedUsers }
+			blocked={ blockedUsers.find((x:any) => x.id === mes.author.id) !== undefined ? true : false } />)
+	}
 	else
 		messageList = <p className="no_msg">No message yet.</p>
 
