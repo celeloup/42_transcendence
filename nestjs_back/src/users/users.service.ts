@@ -5,7 +5,6 @@ import User from './user.entity';
 import * as bcrypt from 'bcrypt';
 import CreateUserDto from './dto/createUser.dto';
 import UpdateUserDto from './dto/updateUser.dto';
-import Achievement from '../achievements/achievement.entity';
 import AchievementsService from '../achievements/achievements.service';
 import Channel from 'src/channel/channel.entity';
 
@@ -14,14 +13,11 @@ export default class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    @InjectRepository(Achievement)
-    private achievementsRepository: Repository<Achievement>,
     private achievementsService: AchievementsService
   ) { }
 
   async getById(id: number): Promise<User> {
     const user = await this.usersRepository.findOne({ id });
-    //  const user = await this.usersRepository.findOne({id}, {loadRelationIds: true});
     if (user) {
       return user;
     }
@@ -175,12 +171,12 @@ export default class UsersService {
     });
   }
 
-  async isAFriend(user_id: number, friendId: number) {
+  async isAFriend(user_id: number, friend_id: number) {
     const user = await this.getAllInfosByUserId(user_id);
     if (user) {
-      const friend = await this.getById(friendId)
+      const friend = await this.getById(friend_id)
       if (friend) {
-        if ((user.friends && (user.friends.findIndex(element => element.id === friendId))) !== -1)
+        if ((user.friends && (user.friends.findIndex(element => element.id === friend_id))) !== -1)
           return true;
         return false;
       }
@@ -189,13 +185,13 @@ export default class UsersService {
     throw new HttpException('User not found', HttpStatus.NOT_FOUND);
   }
 
-  async addAFriend(user_id: number, friendId: number): Promise<User[]> {
-    if (user_id !== friendId) {
-      if (!(await this.isAFriend(user_id, friendId))) {
-        if (!(await this.isBlocked(user_id, friendId))) {
-          if (!(await this.isBlocked(friendId, user_id))) {
+  async addAFriend(user_id: number, friend_id: number): Promise<User[]> {
+    if (user_id !== friend_id) {
+      if (!(await this.isAFriend(user_id, friend_id))) {
+        if (!(await this.isBlocked(user_id, friend_id))) {
+          if (!(await this.isBlocked(friend_id, user_id))) {
             const user = await this.getAllInfosByUserId(user_id);
-            const friend = await this.getById(friendId);
+            const friend = await this.getById(friend_id);
             const firstFriend = await this.achievementsService.getAchievementById(1);
             if (user.friends.length === 0)
               user.achievements.push(firstFriend);
@@ -212,10 +208,10 @@ export default class UsersService {
     throw new HttpException('Although your inner thoughts might be broad, you cannot be friend with yourself', HttpStatus.BAD_REQUEST);
   }
 
-  async deleteAFriend(user_id: number, friendId: number) {
-    if ((await this.isAFriend(user_id, friendId))) {
+  async deleteAFriend(user_id: number, friend_id: number) {
+    if ((await this.isAFriend(user_id, friend_id))) {
       const user = await this.getAllInfosByUserId(user_id);
-      const friend = await this.getById(friendId);
+      const friend = await this.getById(friend_id);
       let index = user.friends.indexOf(friend);
       user.friends.splice(index, 1);
       await this.usersRepository.save(user);
@@ -224,12 +220,12 @@ export default class UsersService {
     throw new HttpException('Users are not friends', HttpStatus.BAD_REQUEST);
   }
 
-  async isBlocked(user_id: number, otherId: number) {
+  async isBlocked(user_id: number, other_id: number) {
     const user = await this.getAllInfosByUserId(user_id);
     if (user) {
-      const other = await this.getById(otherId)
+      const other = await this.getById(other_id)
       if (other) {
-        if ((user.blocked && (user.blocked.findIndex(element => element.id === otherId))) !== -1)
+        if ((user.blocked && (user.blocked.findIndex(element => element.id === other_id))) !== -1)
           return true;
         return false;
       }
@@ -238,15 +234,15 @@ export default class UsersService {
     throw new HttpException('User not found', HttpStatus.NOT_FOUND);
   }
 
-  async blockAUser(user_id: number, otherId: number): Promise<User[]> {
-    if (user_id !== otherId) {
-      if (!(await this.isBlocked(user_id, otherId))) {
+  async blockAUser(user_id: number, other_id: number): Promise<User[]> {
+    if (user_id !== other_id) {
+      if (!(await this.isBlocked(user_id, other_id))) {
         const user = await this.getAllInfosByUserId(user_id);
-        const other = await this.getById(otherId);
-        if ((await this.isAFriend(user_id, otherId)))
-          await this.deleteAFriend(user_id, otherId);
-        if ((await this.isAFriend(otherId, user_id)))
-          await this.deleteAFriend(otherId, user_id);
+        const other = await this.getById(other_id);
+        if ((await this.isAFriend(user_id, other_id)))
+          await this.deleteAFriend(user_id, other_id);
+        if ((await this.isAFriend(other_id, user_id)))
+          await this.deleteAFriend(other_id, user_id);
         user.blocked.push(other);
         await this.usersRepository.save(user);
         return user.blocked;
@@ -256,10 +252,10 @@ export default class UsersService {
     throw new HttpException('Although your inner thoughts might be unbearable, you cannot block yourself', HttpStatus.BAD_REQUEST);
   }
 
-  async unblockAUser(user_id: number, otherId: number) {
-    if ((await this.isBlocked(user_id, otherId))) {
+  async unblockAUser(user_id: number, other_id: number) {
+    if ((await this.isBlocked(user_id, other_id))) {
       const user = await this.getAllInfosByUserId(user_id);
-      const other = await this.getById(otherId);
+      const other = await this.getById(other_id);
       let index = user.blocked.indexOf(other);
       user.blocked.splice(index, 1);
       await this.usersRepository.save(user);
@@ -313,17 +309,18 @@ export default class UsersService {
     }
     throw new HttpException('Only the owner of the website can revoke moderators', HttpStatus.FORBIDDEN);
   }
-  public async hasSiteRightsOverOtherUser(user_id: number, other_id: number) {
-    if (await this.isSiteOwner(other_id))
-      return false;
-    if (await this.isSiteOwner(user_id))
-      return true;
-    if (await this.isSiteAdmin(other_id))
-      return false;
-    if (await this.isSiteAdmin(user_id))
-      return true;
-    return false; 
-    }
+
+  // public async hasSiteRightsOverOtherUser(user_id: number, other_id: number) {
+  //   if (await this.isSiteOwner(other_id))
+  //     return false;
+  //   if (await this.isSiteOwner(user_id))
+  //     return true;
+  //   if (await this.isSiteAdmin(other_id))
+  //     return false;
+  //   if (await this.isSiteAdmin(user_id))
+  //     return true;
+  //   return false; 
+  //   }
 
   public async isSiteOwner(user_id: number) {
     const user = await this.getAllInfosByUserId(user_id);
