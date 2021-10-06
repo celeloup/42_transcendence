@@ -98,7 +98,6 @@ class User {
   @JoinTable()
   blocked: User[];
 
-  @Expose({ groups: ['me'] })
   @ManyToMany(() => User, (user: User) => user.blocked)
   blockedBy: User[];
 

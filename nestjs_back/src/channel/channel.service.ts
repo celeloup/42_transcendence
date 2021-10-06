@@ -1,5 +1,4 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import AuthenticationService from '../authentication/authentication.service';
 import Message from './message.entity';
 import User from '../users/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -16,14 +15,11 @@ export default class ChannelService {
     private messagesRepository: Repository<Message>,
     @InjectRepository(Channel)
     private channelRepository: Repository<Channel>,
-    @InjectRepository(User)
-    private usersRepository: Repository<User>,
     private usersService: UsersService,
-    private readonly authenticationService: AuthenticationService,
   ) {
   }
   async saveMessage(content: string, author: User, recipient: Channel) {
-    await this.getChannelById(recipient.id, author.id);//to check if channel exists
+    await this.getChannelById(recipient.id, author.id);//to check if channel exists throw error otherwise
     const newMessage = await this.messagesRepository.create({
       content,
       author,
@@ -126,7 +122,7 @@ export default class ChannelService {
   }
 
   async changePassword(channel_id: number, user_id: number, password: NewPasswordDto) {
-    const channel = await this.getAllInfosByChannelId(channel_id, user_id);
+    await this.getAllInfosByChannelId(channel_id, user_id);
     if ((await this.isOwner(channel_id, user_id))) {
       return (await this.channelRepository.update(channel_id, password));
     }
@@ -175,11 +171,11 @@ export default class ChannelService {
     return false;
   }
 
-  async hasChannelRightsOverMember(channel_id: number, user_id: number, member_id: number){
-    if (await this.usersService.hasSiteRightsOverOtherUser(user_id, member_id))
-      return true;
+  // async hasChannelRightsOverMember(channel_id: number, user_id: number, member_id: number){
+  //   if (await this.usersService.hasSiteRightsOverOtherUser(user_id, member_id))
+  //     return true;
       
-  }
+  // }
 
   async addMember(channel_id: number, member_id: number, user_id: number) {
     if (member_id === user_id || (await this.usersService.isAFriend(member_id, user_id)) || (await this.isAnAdmin(channel_id, user_id))) {
