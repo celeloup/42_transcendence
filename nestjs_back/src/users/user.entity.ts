@@ -57,9 +57,11 @@ class User {
   @ManyToMany(() => Channel, (channel: Channel) => channel.admins)
   chan_admin: Channel[];
 
+  @Expose({ groups: ['me'] })
   @ManyToMany(() => Channel, (channel: Channel) => channel.banned)
   chan_banned: Channel[];
 
+  @Expose({ groups: ['me'] })
   @ManyToMany(() => Channel, (channel: Channel) => channel.muted)
   chan_muted: Channel[];
   
