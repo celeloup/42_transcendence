@@ -62,16 +62,14 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     @ConnectedSocket() client: Socket,
   ) {
     const user: User = await this.authenticationService.getUserFromSocket(client);
-    const is_member: boolean = await this.channelService.isAMember(room, user.id);
     const is_ban: boolean = await this.channelService.isBanned(room, user.id);
 
-    if (is_member && is_ban) {
+    if (is_ban) {
       this.logger.log('User has been ban');
       return ;
     }
-    if (!is_member) {
-      this.channelService.addMember(room, user.id, user.id);
-    }
+    //add member to the channel (nothing happen if already ban);
+    this.channelService.addMember(room, user.id, user.id);
     this.server.in(client.id).socketsJoin(room.toString());
     this.logger.log(`Client ${this.connectedUsers.get(client)} joined room ${room}`);
   }

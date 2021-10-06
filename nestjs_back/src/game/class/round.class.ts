@@ -5,6 +5,7 @@ import Puck from './puck.class';
 
 export default class Round {
   id_game: string;
+  pending: boolean = true;
 
   id_player1: number;
   id_player2: number;
@@ -15,7 +16,7 @@ export default class Round {
 
   score_player1: number = 0;
   score_player2: number = 0;
-  victory: boolean = false;
+  victory: number = -1;
 
   paddle_player1: Paddle;
   paddle_player2: Paddle;
