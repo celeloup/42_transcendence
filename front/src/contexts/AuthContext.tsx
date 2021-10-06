@@ -5,13 +5,15 @@ export type User = {
 	admin: boolean,
 	id42: number,
 	isTwoFactorAuth: boolean,
+	blocked?: any
 }
 
 export type ContextType = {
 	isAuth: boolean,
 	login: (user:User) => void,
 	logout: () => void,
-	user: User | null
+	user: User | null,
+	setUser: (user:User) => void,
   }
 
 interface Props {
@@ -35,5 +37,5 @@ export const AuthProvider= ({ children } : Props) => {
 		setUser(null);
 	};
 	
-	return ( <AuthContext.Provider value={{isAuth: isAuth, login: loginContext, logout: logoutContext, user: user}}>{ children }</AuthContext.Provider> );
+	return ( <AuthContext.Provider value={{isAuth: isAuth, login: loginContext, logout: logoutContext, user: user, setUser:setUser}}>{ children }</AuthContext.Provider> );
 }

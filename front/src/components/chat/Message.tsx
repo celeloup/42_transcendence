@@ -4,16 +4,19 @@ import axios from 'axios';
 type MessageProps = {
 	id: number,
 	username: string,
-	message: string
+	message: string,
+	setBlockedUsers: (blocked:any) => void,
+	blocked:boolean
 	// ADD PROFILE PIC
 }
 
 type CardProps = {
 	id: number,
-	setDisplayCard: (set:boolean) => void
+	setDisplayCard: (set:boolean) => void,
+	setBlockedUsers: (blocked:any) => void
 }
 
-function ProfileCard( {id, setDisplayCard}: CardProps) {
+function ProfileCard( {id, setDisplayCard, setBlockedUsers }: CardProps) {
 	const [ user, setUser ] = useState<any>(null);
 	const [ me, setMe ] = useState<any>(null);
 	const [ isFriend, setIsFriend ] = useState(false);
@@ -60,6 +63,7 @@ function ProfileCard( {id, setDisplayCard}: CardProps) {
 			})
 			.then( res => {
 				// console.log(res.data);
+				setBlockedUsers(res.data);
 				setIsBlocked(false);
 				setLoadingBlock(false);
 			})
@@ -71,6 +75,7 @@ function ProfileCard( {id, setDisplayCard}: CardProps) {
 			})
 			.then( res => {
 				// console.log(res.data);
+				setBlockedUsers(res.data);
 				setIsBlocked(true);
 				setLoadingBlock(false);
 			})
@@ -154,7 +159,7 @@ function ProfileCard( {id, setDisplayCard}: CardProps) {
 	)
 }
 
-export function Message ({ id, username, message }: MessageProps) {
+export function Message ({ id, username, message, setBlockedUsers, blocked }: MessageProps) {
 	
 	const [ displayCard, setDisplayCard ] = useState(false);
 	
@@ -171,11 +176,11 @@ export function Message ({ id, username, message }: MessageProps) {
 			</div>
 			<div className="chat_message_content">
 				<div className="chat_message_username" onClick={ () => setDisplayCard(true)}>{ username }</div>
-				<div className="chat_message_text">{ message }</div>
+				<div className="chat_message_text">{ !blocked ? message : "You have blocked this user." }</div>
 			</div>
 			{ displayCard && 
 				<div id="card_modal" onClick={ closeCard }>
-					<ProfileCard id={id} setDisplayCard={setDisplayCard}/>
+					<ProfileCard id={ id } setDisplayCard={ setDisplayCard } setBlockedUsers={ setBlockedUsers }/>
 				</div>
 			}
 		</div>
