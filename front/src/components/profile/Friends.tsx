@@ -2,7 +2,6 @@ import WindowBorder from "../ui_components/WindowBorder";
 import '../../styles/Profile.scss';
 
 type friendsProp = {
-    login: string,
 	list_friends: string[],
 }
 
@@ -12,15 +11,19 @@ type friendProp = {
 
 function Friend ({login}: friendProp) {
     return (
-        <div> {login} </div>
+        //donner une classe avec width de 100 pour cent qui revient a la ligne
+        <p> {login}</p>
     )
 }
 
-function Friends ( {login, list_friends}: friendsProp) {
-    const friends = list_friends.map((friend) => <Friend login={friend}/>)
+function Friends (  {list_friends}: friendsProp) {
+    const friends = list_friends.map((friend) => <Friend key={friend} login={friend}/>)
     return (
-        <WindowBorder w='200' h='200'>
-            <div id='friends'><p>{login} friends: </p>{friends}</div>
+        <WindowBorder w='318' h='451' id="friend_window" >
+            <div id ='friends_card'>
+                <div className="window_header header_title">friends_</div>
+                <div id='list_friends'>{friends}</div>
+            </div>
         </WindowBorder>
     )
 }

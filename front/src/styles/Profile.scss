@@ -2,14 +2,80 @@ $background-color: #232323;
 $text-color: white;
 $accent_color: #FFCD27;
 
-#picture {
+.profile{
     display: flex;
-    width: 100%;
-    align-items: center;
     justify-content: center;
+    width: 980px;
+    height: 667px;
+    // border: 1px solid red;
+    margin: auto;
+    gap: 20px;
+
+    .header_title {
+    	text-align: left;
+		height: 30px;
+    	padding-top: 8px;
+    	// overflow: hidden;
+    	// white-space: nowrap;
+    	// text-overflow: ellipsis;
+    }
+
+    #column_left{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    #column_right{
+        flex-grow: 2;
+        display: flex;
+        flex-direction: column;
+		gap: 10px;
+	}
+    
+    #user_window .border_div {
+        background-color: $accent_color;
+    }
+
+    #user_window .border_div:after, #user_window .border_div:before {
+        background-color: $accent_color;
+    }
+
+    #friend_window {
+        flex-grow: 2;
+    }
+	
+	#history_window {
+        flex-grow: 2;
+    }
+
+	#achievement_imgs {
+		display: flex;
+		justify-content: space-evenly;
+		padding: 5px;
+		.empty {
+			height: 90px;
+			width: 180px;
+			background-color: gray;
+		}
+	}
+
+
+}
+
+
+#user_card{
+    // border: 1px solid red;
+    outline: 4px solid $accent_color ;
+    background-color: $accent_color;
+    height: 100%;
+}
+
+#avatar {
+    width: 50%;
+    justify-content: left;
 }
 
 #friends {
-    display: flex;
     align-items: right;
 }
