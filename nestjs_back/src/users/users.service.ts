@@ -118,9 +118,9 @@ export default class UsersService {
   }
 
   async nameAlreadyInUse(name: string) {
-    const user = this.usersRepository.findOne({ name });
+    const user = await this.usersRepository.findOne({ name });
     if (user)
-      return true;
+       return true;
     return false;
   }
 

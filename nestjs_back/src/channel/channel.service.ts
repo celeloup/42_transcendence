@@ -174,11 +174,20 @@ export default class ChannelService {
   // async hasChannelRightsOverMember(channel_id: number, user_id: number, member_id: number){
   //   if (await this.usersService.hasSiteRightsOverOtherUser(user_id, member_id))
   //     return true;
-      
+
+  // }
+
+  // async canAddMemberInAPrivateChannel(channel_id: number, member_id: number, user_id: number) {
+  //   if (await this.usersService.isSiteAdmin(user_id)
+  //     || ((await this.usersService.isAFriend(member_id, user_id)))
+  //     || ((await this.isAnAdmin(channel_id, user_id))
+  //       && !(await this.usersService.isBlocked(member_id, user_id))))
+  //     return true;
+  //   return false;
   // }
 
   async addMember(channel_id: number, member_id: number, user_id: number) {
-    if (member_id === user_id || (await this.usersService.isAFriend(member_id, user_id)) || (await this.isAnAdmin(channel_id, user_id))) {
+    if (member_id === user_id || (((await this.usersService.isAFriend(member_id, user_id)) || (await this.isAnAdmin(channel_id, user_id))))) {
       if (!(await this.isAMember(channel_id, member_id))) {
         if (!(await this.isBanned(channel_id, member_id))) {
           let channel = await this.getAllInfosByChannelId(channel_id, user_id);
@@ -194,7 +203,7 @@ export default class ChannelService {
       }
       throw new HttpException('User is already a member of this channel', HttpStatus.OK);
     }
-    throw new HttpException('To add a member, you need to be their friend OR be an admin OR be this member', HttpStatus.FORBIDDEN);
+    throw new HttpException('To add a member, you need to be their friend OR be an admin OR be this member (depending on channel type)', HttpStatus.FORBIDDEN);
   }
 
   async removeMember(channel_id: number, member_id: number, user_id: number) {
@@ -224,10 +233,12 @@ export default class ChannelService {
 
   async removeOwner(channel_id: number, owner_id: number, user_id: number) {
     if (owner_id === user_id) {
+      let channel = await this.getAllInfosByChannelId(channel_id, user_id);
       await this.removeAdmin(channel_id, owner_id, user_id);
       await this.removeMember(channel_id, owner_id, user_id);
-      let channel = await this.getAllInfosByChannelId(channel_id, user_id);
-      if (channel.members && channel.members[0])
+      if (channel.admins && channel.admins[0])
+        channel.owner = channel.admins[0];
+      else if (channel.members && channel.members[0])
         channel.owner = channel.members[0];
       else
         return (await this.deleteChannel(channel_id, owner_id));
