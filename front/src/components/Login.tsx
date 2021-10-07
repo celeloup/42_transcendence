@@ -17,14 +17,17 @@ function Login(){
 	useEffect(() => {
 		if (ghostLogin)
 		{
-			axios.post(`/authentication/register`, { "id42": 30, "email": "tes8@test.com", "name": "ghosty"})
+			// axios.post(`/authentication/register`, { "id42": 31, "email": "test@test.com", "name": "ghostyyyyyyyyyyyyyyyyyyy"})
+			axios.post(`/authentication/log-in`, { "id42": 30 })
 			.then (response => {
 				console.log(response);
 				login(response.data);
 				setRedir(true);
+				setGhostLogin(false);
 			})
 			.catch(error => {
 				console.log("Error catch :", error.response);
+				setGhostLogin(false);
 			})
 		}
 	}, [ghostLogin]); // eslint-disable-line

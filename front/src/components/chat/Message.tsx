@@ -169,16 +169,18 @@ export function Message ({ id, username, message, setBlockedUsers, blocked }: Me
 			setDisplayCard(false);
 	}
 
+	const blockMsg = <><i className="fas fa-info-circle"></i>You have blocked this user.</>
+
 	return (
-		<div className="chat_message">
-			<div className="chat_profile_pic" onClick={ () => setDisplayCard(true)}>
+		<div className={ blocked ? "chat_message blocked" : "chat_message" }>
+			<div className="profile_pic" onClick={ () => setDisplayCard(true)}>
 				{ username.charAt(0) }
 			</div>
-			<div className="chat_message_content">
-				<div className="chat_message_username" onClick={ () => setDisplayCard(true)}>{ username }</div>
-				<div className="chat_message_text">{ !blocked ? message : "You have blocked this user." }</div>
+			<div className="content">
+				<div className="username" onClick={ () => setDisplayCard(true)}>{ username }</div>
+				<div className="text">{ blocked ? blockMsg : message }</div>
 			</div>
-			{ displayCard && 
+			{ displayCard &&
 				<div id="card_modal" onClick={ closeCard }>
 					<ProfileCard id={ id } setDisplayCard={ setDisplayCard } setBlockedUsers={ setBlockedUsers }/>
 				</div>
