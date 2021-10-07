@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { useState, useEffect, useContext } from 'react';
-// import { AuthContext } from '../../contexts/AuthContext';
 import '../../styles/ChatList.scss';
 import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
 import CreateChan from './CreateChan';
@@ -80,8 +79,6 @@ function ChannelList (socket:any) {
 	const [ channels, setChannels ] = useState([]);
 	const [ isLoading, setIsLoading ] = useState(true);
 	const [ displayCreateChan, setDisplayCreateChan ] = useState<number>(0);
-
-	// const { user } = useContext(AuthContext);
 	var { toggleDisplayList } = useContext(ChannelContext) as ContextType;
 
 	useEffect(() => {
@@ -116,7 +113,6 @@ function ChannelList (socket:any) {
 			</div>
 			}
 		</div>
-		{/* <div className="dummyModal" onClick={ toggleDisplayList }></div> */}
 	</div>
 	);
 }
