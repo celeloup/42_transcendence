@@ -20,9 +20,6 @@ function Profile() {
 					<MatchHistory />
 					<Achievements />
 				</div>
-				{/* <Avatar alt_img='cowgirl' alert_prof={() => alert('Hello jgonfroy')} /> */}
-				{/* { user && <p>id42 = { user.id42 }</p> } */}
-				{/* <p><br/>[HERE SEE USERNAME, PROFILE PIC, LIST OF FRIENDS, MATCH HISTORY, ACHIEVEMENT]</p> */}
 			</div>
 	);
   }
