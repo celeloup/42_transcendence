@@ -20,6 +20,22 @@ $accent_color: #FFCD27;
     	// text-overflow: ellipsis;
     }
 
+    .status {
+        display: flex;
+        gap: 10px;
+        .dot_status {
+            width: 15px;
+            height: 15px;
+            border-radius: 10px;
+        }
+        #online {
+            background-color: green;
+        }
+        #offline {
+            background-color: grey;
+        }
+    }
+
     #column_left{
         display: flex;
         flex-direction: column;
