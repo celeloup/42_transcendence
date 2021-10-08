@@ -17,7 +17,7 @@ function ChatHeader() {
 			<div className="header_title">
 				<i className="fas fa-user-friends"></i>{ name }
 			</div>
-			<i className="fas fa-cog header_button" onClick={ toggleDisplayAdmin }></i>
+			{ channel && <i className="fas fa-cog header_button" onClick={ toggleDisplayAdmin }></i> }
 			{/* <i className="fas fa-comment-alt"></i> */}
 		</div>
 	)

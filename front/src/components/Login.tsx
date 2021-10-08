@@ -17,8 +17,7 @@ function Login(){
 	useEffect(() => {
 		if (ghostLogin)
 		{
-			// axios.post(`/authentication/register`, { "id42": 31, "email": "test@test.com", "name": "ghostyyyyyyyyyyyyyyyyyyy"})
-			axios.post(`/authentication/log-in`, { "id42": 30 })
+			axios.post(`/authentication/register`, { "id42": 31, "email": "test@test.com", "name": "ghosty"})
 			.then (response => {
 				console.log(response);
 				login(response.data);

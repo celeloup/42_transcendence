@@ -6,7 +6,7 @@ $light-gray: #E3E3E3;
 $dark-gray: #919191;
 
 
-#channelAdmin {
+#channel_admin {
 	position: absolute;
 	width: calc(100% - 20px);
 	height: calc(100% - 20px);
@@ -15,12 +15,45 @@ $dark-gray: #919191;
 	z-index: 3;
 	padding: 10px;
 	outline: 4px solid $background-color;
-	.closeIcon {
+	
+	.close_icon {
 		font-size: 35px;
 		position: absolute;
 		right: 15px;
 		top: 15px;
 		cursor: pointer;
 		// color: $accent_color;
+	}
+
+	#member_list {
+		width: 100%;
+		padding: 20px;
+		// border: 1px solid red;
+	}
+
+	.member_card {
+		padding: 15px;
+		cursor: pointer;
+		text-align: left;
+		font-size: 18px;
+		border-radius: 5px;
+		
+		&:hover {
+			background-color: $accent_color;
+			color: $background-color;
+		}
+
+		.member_status i {
+			margin: 5px;
+			text-align: right;
+			
+			&.inactive {
+				color: $dark-gray;
+			}
+
+			&.action:hover {
+				color: #BF3030;
+			}
+		}
 	}
 }
