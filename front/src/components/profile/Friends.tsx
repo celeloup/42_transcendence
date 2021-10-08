@@ -1,23 +1,31 @@
 import WindowBorder from "../ui_components/WindowBorder";
 import '../../styles/Profile.scss';
+import { useState } from "react";
+import calamityImage from "./logo.jpg";
 
 type friendsProp = {
 	list_friends: string[],
 }
 
 type friendProp = {
-    login: string,
+    username: string,
 }
 
-function Friend ({login}: friendProp) {
+function Friend ({username}: friendProp) {
+	const [online, setOnline] = useState(false);
     return (
-        //donner une classe avec width de 100 pour cent qui revient a la ligne
-        <p> {login}</p>
+        <div className ='friends_info'>
+    		{/* donner une classe avec width de 100 pour cent qui revient a la ligne */}
+    	    <img id='avatar' src={calamityImage} alt='cowgirl'/>
+			<p>{username}</p>
+	    	<div className={`dot_status ${online ? 'online': 'offline'}`} ></div>
+			{/* div:hover */}
+	    </div>
     )
 }
 
 function Friends (  {list_friends}: friendsProp) {
-    const friends = list_friends.map((friend) => <Friend key={friend} login={friend}/>)
+    const friends = list_friends.map((friend) => <Friend key={friend} username={friend}/>)
     return (
         <WindowBorder w='318' h='451' id="friend_window" >
             <div id ='friends_card'>

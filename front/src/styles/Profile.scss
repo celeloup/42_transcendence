@@ -1,6 +1,8 @@
 $background-color: #232323;
 $text-color: white;
 $accent_color: #FFCD27;
+$online_dot: #81A439;
+$offline_dot: #919191;
 
 .profile{
     display: flex;
@@ -20,23 +22,19 @@ $accent_color: #FFCD27;
     	// text-overflow: ellipsis;
     }
 
-    .status {
-        display: flex;
-        gap: 10px;
-        .dot_status {
-            width: 15px;
-            height: 15px;
-            border-radius: 10px;
-        }
-        #online {
-            background-color: green;
-        }
-        #offline {
-            background-color: grey;
-        }
+    .dot_status {
+		width: 15px;
+		height: 15px;
+		border-radius: 50%;
+	}
+	.online {
+        background-color: $online_dot;
+    }
+    .offline {
+    	background-color: $offline_dot;
     }
 
-    #column_left{
+	#column_left{
         display: flex;
         flex-direction: column;
         gap: 10px;
@@ -51,14 +49,57 @@ $accent_color: #FFCD27;
     
     #user_window .border_div {
         background-color: $accent_color;
-    }
+		
+		&:after, &:before{
+    		background-color: $accent_color;
+		}
+	}
 
-    #user_window .border_div:after, #user_window .border_div:before {
-        background-color: $accent_color;
-    }
+	#user_card{
+	    // border: 1px solid red;
+		padding: 5px;
+	    outline: 4px solid $accent_color ;
+	    background-color: $accent_color;
+	    height: 200px;
+		color: $background-color;
+		font-family: "Dogica";
+		font-size: 20px;
+		display: flex;
+
+		#avatar {
+			height: 85px;
+			width: 80px;
+			justify-content: left;
+			border: 5px solid white;
+			border-radius: 5px;
+		}
+	
+		#column_right {
+			text-align: left;
+			padding: 15px;
+			.status {
+		        display: flex;
+				align-items: center;
+		        gap: 10px;
+				font-family: "Fira Mono";
+				font-size: 15px;
+		    }
+		}
+	}
 
     #friend_window {
         flex-grow: 2;
+
+		.friends_info {
+			font-family: "Dogica";
+			font-size: 15px;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+			#avatar {
+				width: 15%;
+			}
+		}	
     }
 	
 	#history_window {
@@ -69,6 +110,7 @@ $accent_color: #FFCD27;
 		display: flex;
 		justify-content: space-evenly;
 		padding: 5px;
+		gap: 10px;
 		.empty {
 			height: 90px;
 			width: 180px;
@@ -77,21 +119,4 @@ $accent_color: #FFCD27;
 	}
 
 
-}
-
-
-#user_card{
-    // border: 1px solid red;
-    outline: 4px solid $accent_color ;
-    background-color: $accent_color;
-    height: 100%;
-}
-
-#avatar {
-    width: 50%;
-    justify-content: left;
-}
-
-#friends {
-    align-items: right;
 }
