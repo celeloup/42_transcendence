@@ -26,11 +26,14 @@ function UserCard ({ user_name }: UserCardProps) {
     return (
         <WindowBorder id='user_window' w='319' h='208'>
             <div id='user_card'>
-                <img id='avatar' src={calamityImage} alt='cowgirl'/>
-                <div id='column_right'>
-                    <p>{user_name}</p>
-                    <StatusDisplay state={online ? 'online' : 'offline'} />
+                <div id='row_top'>
+                    <img id='avatar' src={calamityImage} alt='cowgirl'/>
+                    <div id='column_right'>
+                        <p>{user_name}</p>
+                        <StatusDisplay state={online ? 'online' : 'offline'} />
+                    </div>
                 </div>
+                <div id='stats'>stats ...</div>
             </div>
         </WindowBorder>
     )
