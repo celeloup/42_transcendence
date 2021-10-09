@@ -3,6 +3,8 @@ $text-color: white;
 $accent_color: #FFCD27;
 $online_dot: #81A439;
 $offline_dot: #919191;
+$profile_background: rgb(65, 62, 62);
+
 
 .profile{
     display: flex;
@@ -38,6 +40,7 @@ $offline_dot: #919191;
         display: flex;
         flex-direction: column;
         gap: 10px;
+		max-width: 40%;
     }
     
     #column_right{
@@ -45,6 +48,7 @@ $offline_dot: #919191;
         display: flex;
         flex-direction: column;
 		gap: 10px;
+		// min-width: 60%;
 	}
     
     #user_window .border_div {
@@ -55,50 +59,89 @@ $offline_dot: #919191;
 		}
 	}
 
-	#user_card{
-	    // border: 1px solid red;
-		padding: 5px;
-	    outline: 4px solid $accent_color ;
-	    background-color: $accent_color;
-	    height: 200px;
-		color: $background-color;
-		font-family: "Dogica";
-		font-size: 20px;
-		display: flex;
-
-		#avatar {
-			height: 85px;
-			width: 80px;
-			justify-content: left;
-			border: 5px solid white;
-			border-radius: 5px;
-		}
+	#avatar {
+		border: 5px solid white;
+		border-radius: 5px;
+	}
 	
-		#column_right {
-			text-align: left;
-			padding: 15px;
-			.status {
-		        display: flex;
-				align-items: center;
-		        gap: 10px;
-				font-family: "Fira Mono";
-				font-size: 15px;
-		    }
+	#user_window {
+
+	    background-color: $accent_color;
+		
+		#user_card{
+	    	outline: 4px solid $accent_color ;
+	    	height: 200px;
+			color: $background-color;
+			font-size: 15px;
+			display: flex;
+			flex-direction: column;
+			gap: 10%;
+
+			#row_top{
+				max-width: 400px;
+				// border: 1px solid red;
+				padding: 5px;
+				font-family: "Dogica";
+				font-size: 20px;
+				display: flex;
+
+				#avatar {
+					height: 85px;
+					width: 80px;
+					justify-content: left;
+				}
+
+				#column_right {
+					text-align: left;
+					overflow-wrap: anywhere;
+					padding: 15px;
+
+					.status {
+				        display: flex;
+						align-items: center;
+				        gap: 10px;
+						font-family: "Fira Mono";
+						font-size: 15px;
+					}
+				}
+			}
+
+			#stats {
+//				padding-top: 30px;
+			}
 		}
 	}
+	
 
     #friend_window {
         flex-grow: 2;
 
-		.friends_info {
-			font-family: "Dogica";
-			font-size: 15px;
+		#list_friends {
+			padding-top: 25px;
+			padding-left: 30px;
 			display: flex;
-			align-items: center;
-			gap: 10px;
-			#avatar {
-				width: 15%;
+			flex-direction: column;
+			gap:25px;
+			.friends_info {
+				font-family: "Dogica";
+				font-size: 15px;
+				display: flex;
+				align-items: center;
+				gap: 15px;
+			// #avatar {
+			// 	width: 15%;
+			// }
+			
+			.generated	{
+				width: 40px;
+				height: 40px;
+				background-color: $profile_background;
+				color: white;
+				font-family: "Dogica", "Fira Mono";
+				font-size: 25px;
+				text-align: center;
 			}
+		}
 		}	
     }
 	

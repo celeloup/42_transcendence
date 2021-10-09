@@ -14,6 +14,7 @@ function Profile() {
 			<div className="profile">
 				<div id="column_left">
 					<UserCard user_name="Calamity"/>
+					{/* <UserCard user_name="Calamity_a_choisit_un_login_tres_tres_tres_long_juste_pour_faire_chier"/> */}
 					<Friends list_friends={my_friends}/>
 				</div>
 				<div id="column_right">
