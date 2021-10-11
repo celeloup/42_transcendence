@@ -310,17 +310,17 @@ export default class UsersService {
     throw new HttpException('Only the owner of the website can revoke moderators', HttpStatus.FORBIDDEN);
   }
 
-  // public async hasSiteRightsOverOtherUser(user_id: number, other_id: number) {
-  //   if (await this.isSiteOwner(other_id))
-  //     return false;
-  //   if (await this.isSiteOwner(user_id))
-  //     return true;
-  //   if (await this.isSiteAdmin(other_id))
-  //     return false;
-  //   if (await this.isSiteAdmin(user_id))
-  //     return true;
-  //   return false; 
-  //   }
+  public async hasSiteRightsOverOtherUser(user_id: number, other_id: number) {
+    if (await this.isSiteOwner(other_id))
+      return false;
+    if (await this.isSiteOwner(user_id))
+      return true;
+    if (await this.isSiteAdmin(other_id))
+      return false;
+    if (await this.isSiteAdmin(user_id))
+      return true;
+    return false; 
+    }
 
   public async isSiteOwner(user_id: number) {
     const user = await this.getAllInfosByUserId(user_id);
