@@ -8,7 +8,6 @@ $accent_color: #FFCD27;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
-
 }
 
 #login_button {
@@ -26,5 +25,4 @@ $accent_color: #FFCD27;
 #login_button:hover {
 	background-color: $accent_color;
 	color: $background-color;
-	
 }

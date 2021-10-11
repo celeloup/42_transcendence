@@ -5,7 +5,7 @@ import { Redirect } from 'react-router-dom';
 import '../styles/Login.scss';
 import Logo from './ui_components/Logo';
 
-function Login(){
+function Login() {
 	const [ redir, setRedir ] = useState<boolean>(false);
 	const { login } = useContext(AuthContext) as ContextType;
 

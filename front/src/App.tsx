@@ -52,10 +52,15 @@ const App = () => {
 						<Route
 							typeOfRoute="protected"
 							exact={true}
-							path='/admin'
-							component={ Admin }
+							path='/'
+							component={ Home }
 						/>
-						<Route typeOfRoute="protected" path='/parameters' component={ Parameters } />
+						<Route
+							typeOfRoute="protected"
+							exact={true}
+							path='/parameters'
+							component={ Parameters }
+						/>
 						<Route
 							typeOfRoute="protected"
 							exact={true}
@@ -65,10 +70,15 @@ const App = () => {
 						<Route
 							typeOfRoute="protected"
 							exact={true}
-							path='/'
-							component={ Home }
+							path='/admin'
+							component={ Admin }
 						/>
-						<Route typeOfRoute="public" exact={true} path='/oauth' component={ OAuth } />
+						<Route
+							typeOfRoute="public"
+							exact={true}
+							path='/oauth'
+							component={ OAuth }
+						/>
 					</Switch>
 					</PageWrapper>
 				</div>

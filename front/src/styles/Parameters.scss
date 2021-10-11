@@ -1,0 +1,137 @@
+$background-color: #232323;
+$text-color: white;
+$accent_color: #FFCD27;
+$twofa_accent_color: #64A1E9;
+$logout_accent_color: #BF3030;
+$light-gray: #E3E3E3;
+$dark-gray: #919191;
+
+.parameters {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+h1 {
+	font-family: "Dogica";
+	height: 100px;
+}
+
+#layer {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	flex-wrap: wrap;
+	width: 100%;
+}
+
+.sublayer {
+	display: flex;
+	flex-direction: column;
+	width: 50%;
+}
+
+.left {
+	flex-wrap: wrap-reverse;
+}
+
+.right {
+	flex-wrap: wrap;
+}
+
+#nameChangeBar {
+	display: block;
+	margin: 50px 50px 0px 50px;
+	width: 275px;
+	height: 25px;
+	background-color: $background-color;
+	color: $text-color;
+	font-family: "Fira Mono";
+	border: 2px solid white;
+	border-radius: 5px;
+	padding: 5px 10px;
+}
+
+.btn {
+	display: inline-block;
+	font-family: "Fira Mono";
+	width: 300px;
+	height: 75px;
+	margin: 50px;
+	font-size: 25px;
+	padding: 20px 20px;
+	background-color: $background-color;
+	border-radius: 5px;
+	transition: background-color 0.2s, color 0.2s;
+}
+
+.btn:hover {
+	color: $background-color;
+    cursor: pointer;
+}
+
+.namechange {
+	color: $accent_color;
+	border: 2px solid $accent_color;
+}
+
+.namechange:hover {
+	background-color: $accent_color;
+}
+
+.twofa {
+	color: $twofa_accent_color;
+	border: 2px solid $twofa_accent_color;
+	margin-bottom: 0px;
+}
+
+.twofa:hover {
+	background-color: $twofa_accent_color;
+}
+
+.disable {
+	opacity: 0.5;
+}
+
+.logout {
+	color: $logout_accent_color;
+	border: 2px solid $logout_accent_color;
+}
+
+.logout:hover {
+	background-color: $logout_accent_color;
+}
+
+.profile_pic {
+	display: inline-block;
+	margin: 0px 75px 50px 75px;
+	width: 250px;
+	height: 250px;
+	background: url(https://play-lh.googleusercontent.com/IeNJWoKYx1waOhfWF6TiuSiWBLfqLb18lmZYXSgsH1fvb8v1IYiZr5aYWe0Gxu-pVZX3=s360-rw);
+	background-size: contain;
+	background-color: $light-gray;
+	border: 5px solid white;
+	border-radius: 6px;
+	color: $dark-gray;
+	font-family: "Dogica", "Fira Mono";
+	font-size: 200px;
+	text-align: center;
+	padding: 5px;
+	user-select: none;
+	cursor: pointer;
+}
+
+.modify {
+	position: relative;
+	bottom: 285px;
+	right: 95px;
+	width: 40px;
+	height: 40px;
+	font-size: 40px;
+	color: white;
+	text-shadow: 0 0 5px #000;
+	border-radius: 50%;
+	pointer-events: none;
+}
