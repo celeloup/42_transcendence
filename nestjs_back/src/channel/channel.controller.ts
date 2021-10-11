@@ -15,8 +15,9 @@ export default class ChannelController {
     private readonly channelService: ChannelService
   ) {}
 
+  //change to only site admin at the end
   @Get()
-  @ApiOperation({summary: "Get all channels"})
+  @ApiOperation({summary: "Get all channels / Open route for the moment => In the end for admins only"})
   getAllChannels() {
     return this.channelService.getAllChannels();
   }
@@ -56,10 +57,11 @@ export default class ChannelController {
     return this.channelService.getAllInfosByChannelId(Number(id));
   }
 
+  //Change for site admins at the end
   @Get('messages')
-  @ApiOperation({summary: "Get all messages // debug purpose"})
+  @ApiOperation({summary: "Get all messages // open route for now; for site admins only in the end"})
   getAllMessages() {
-    return this.channelService.getAllMessages();
+    return this.channelService.getAllMessagesOfAllChannels();
   }
 
   @Post()
