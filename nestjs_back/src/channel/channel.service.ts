@@ -199,7 +199,9 @@ export default class ChannelService {
       await this.removeAdmin(channel_id, owner_id, user_id);
       await this.removeMember(channel_id, owner_id, user_id);
       let channel = await this.getAllInfosByChannelId(channel_id);
-      if (channel.members && channel.members[0])
+      if (channel.admins && channel.admins[0])
+        channel.owner = channel.admins[0];
+      else if (channel.members && channel.members[0])
         channel.owner = channel.members[0];
       else
         return (await this.deleteChannel(channel_id, owner_id));
@@ -283,7 +285,7 @@ export default class ChannelService {
         await this.channelRepository.save(channel);
         return channel;
       }
-      throw new HttpException('User with this id has not been banned', HttpStatus.NOT_FOUND);
+      throw new HttpException('User with this id has not been banned', HttpStatus.OK);
     }
     throw new HttpException('Only admins can unban members', HttpStatus.FORBIDDEN);
   }
@@ -300,7 +302,7 @@ export default class ChannelService {
         }
         throw new HttpException('User with this id is an admin of this channel', HttpStatus.FORBIDDEN);
       }
-      throw new HttpException('User with this id is already muted', HttpStatus.NOT_FOUND);
+      throw new HttpException('User with this id is already muted', HttpStatus.OK);
     }
     throw new HttpException('User with this id is not a member of this channel', HttpStatus.NOT_FOUND);
   }
