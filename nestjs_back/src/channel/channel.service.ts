@@ -45,9 +45,9 @@ export default class ChannelService {
     });
   }
 
-  async getMessagesByChannelId(channel_id: number, userId: number) {
+  async getMessagesByChannelId(channel_id: number, user_id: number) {
     const channel = await this.channelRepository.findOne({ id: channel_id });
-    if ((await this.isAMember(channel_id, userId) || (await this.usersService.isSiteAdmin(userId)))) {
+    if ((await this.isAMember(channel_id, user_id) || (await this.usersService.isSiteAdmin(user_id)))) {
       return await this.getMessageByChannel(channel);
     }
     throw new HttpException('Only members and site admins can see messages of a channel', HttpStatus.FORBIDDEN);
@@ -150,28 +150,25 @@ export default class ChannelService {
     return false;
   }
 
-  // async hasChannelRightsOverMember(channel_id: number, user_id: number, member_id: number){
-  //   if (await this.usersService.hasSiteRightsOverOtherUser(user_id, member_id))
-  //     return true;
 
-  // }
+  //RIGHTS TO ADD OR REMOVE OTHER USERS IN A CHANNEL
 
-  // async canAddMemberInAPrivateChannel(channel_id: number, member_id: number, user_id: number) {
-  //   if (await this.usersService.isSiteAdmin(user_id)
-  //     || ((await this.usersService.isAFriend(member_id, user_id)))
-  //     || ((await this.isAnAdmin(channel_id, user_id))
-  //       && !(await this.usersService.isBlocked(member_id, user_id))))
-  //     return true;
-  //   return false;
-  // }
+  async canAddMemberInAPrivateChannel(channel_id: number, other_id: number, user_id: number) {
+    if (await this.usersService.isSiteAdmin(user_id)
+      || ((await this.usersService.isAFriend(other_id, user_id)))
+      || ((await this.isAnAdmin(channel_id, user_id))
+        && !(await this.usersService.isBlocked(other_id, user_id))))
+      return true;
+    return false;
+  }
 
-  async addMember(channel_id: number, member_id: number, user_id: number) {
-    if (member_id === user_id || (await this.usersService.isAFriend(member_id, user_id)) || (await this.isAnAdmin(channel_id, user_id))) {
-      if (!(await this.isAMember(channel_id, member_id))) {
-        if (!(await this.isBanned(channel_id, member_id))) {
-          let channel = await this.getAllInfosByChannelId(channel_id);
+  async addMember(channel_id: number, other_id: number, user_id: number) {
+    let channel = await this.getAllInfosByChannelId(channel_id);
+    if (other_id === user_id || (channel.type === 2 && (await this.canAddMemberInAPrivateChannel(channel_id, other_id, user_id)))) {
+      if (!(await this.isAMember(channel_id, other_id))) {
+        if (!(await this.isBanned(channel_id, other_id))) {
           if (channel.type !== 3) {
-            let newMember = await this.usersService.getAllInfosByUserId(member_id);
+            let newMember = await this.usersService.getAllInfosByUserId(other_id);
             channel.members.push(newMember);
             await this.channelRepository.save(channel);
             return channel;
@@ -185,67 +182,81 @@ export default class ChannelService {
     throw new HttpException('To add a member, you need to be their friend OR be an admin OR be this member (depending on channel type)', HttpStatus.FORBIDDEN);
   }
 
-  async removeMember(channel_id: number, member_id: number, user_id: number) {
-    if (member_id === user_id || (await this.isAnAdmin(channel_id, user_id))) {
-      if ((await this.isAMember(channel_id, member_id))) {
+  async removeMember(channel_id: number, other_id: number, user_id: number) {
+    if (other_id === user_id || (await this.hasChannelRightsOverMember(channel_id, user_id, other_id))) {
+      if ((await this.isAMember(channel_id, other_id))) {
         let channel = await this.getAllInfosByChannelId(channel_id);
-        let index = channel.members.findIndex(element => element.id === member_id);
+        let index = channel.members.findIndex(element => element.id === other_id);
         await channel.members.splice(index, 1);
         await this.channelRepository.save(channel);
         return channel;
       }
       throw new HttpException('User with this id is not a member of this channel', HttpStatus.NOT_FOUND);
     }
-    throw new HttpException('A member can only be removed by themselves or an admin', HttpStatus.FORBIDDEN);
+    throw new HttpException('Your rights in this channel are too low', HttpStatus.FORBIDDEN);
   }
 
-  async removeAdmin(channel_id: number, member_id: number, user_id: number) {
-    if (member_id === user_id || (await this.isOwner(channel_id, user_id))) {
+  async removeAdmin(channel_id: number, other_id: number, user_id: number) {
+    if (other_id === user_id || (await this.hasChannelRightsOverMember(channel_id, user_id, other_id))) {
       let channel = await this.getAllInfosByChannelId(channel_id);
-      let index = channel.admins.findIndex(element => element.id === member_id);
+      let index = channel.admins.findIndex(element => element.id === other_id);
       await channel.admins.splice(index, 1);
       await this.channelRepository.save(channel);
       return channel;
     }
-    throw new HttpException('An admin can only be revoked by themselves or the owner', HttpStatus.FORBIDDEN);
+    throw new HttpException('Your rights in this channel are too low', HttpStatus.FORBIDDEN);
   }
 
-  async removeOwner(channel_id: number, owner_id: number, user_id: number) {
-    if (owner_id === user_id) {
-      await this.removeAdmin(channel_id, owner_id, user_id);
-      await this.removeMember(channel_id, owner_id, user_id);
+  async removeOwner(channel_id: number, other_id: number, user_id: number) {
+    if (other_id === user_id || (await this.hasChannelRightsOverMember(channel_id, user_id, other_id))) {
+      await this.removeAdmin(channel_id, other_id, user_id);
+      await this.removeMember(channel_id, other_id, user_id);
       let channel = await this.getAllInfosByChannelId(channel_id);
       if (channel.admins && channel.admins[0])
         channel.owner = channel.admins[0];
       else if (channel.members && channel.members[0])
         channel.owner = channel.members[0];
       else
-        return (await this.deleteChannel(channel_id, owner_id));
+        return (await this.deleteChannel(channel_id, user_id));
       await this.channelRepository.save(channel);
       return channel;
     }
-    throw new HttpException('The owner can only be revoked by themselves', HttpStatus.FORBIDDEN);
+    throw new HttpException('Your rights in this channel are too low', HttpStatus.FORBIDDEN);
   }
 
-  async removeFromChannel(channel_id: number, member_id: number, user_id: number) {
-    if ((await this.isAMember(channel_id, member_id))) {
-      if ((await this.isAnAdmin(channel_id, member_id))) {
-        if ((await this.isOwner(channel_id, member_id))) {
-          return (await this.removeOwner(channel_id, member_id, user_id));
+  async removeFromChannel(channel_id: number, other_id: number, user_id: number) {
+    if ((await this.isAMember(channel_id, other_id))) {
+      if ((await this.isAnAdmin(channel_id, other_id))) {
+        if ((await this.isOwner(channel_id, other_id))) {
+          return (await this.removeOwner(channel_id, other_id, user_id));
         }
-        await this.removeAdmin(channel_id, member_id, user_id);
+        await this.removeAdmin(channel_id, other_id, user_id);
       }
-      return (await this.removeMember(channel_id, member_id, user_id));
+      return (await this.removeMember(channel_id, other_id, user_id));
     }
     throw new HttpException('User with this id is not a member of this channel', HttpStatus.NOT_FOUND);
   }
 
-  async addAdmin(channel_id: number, member_id: number, owner_id: number) {
-    if ((await this.isOwner(channel_id, owner_id))) {
-      if ((await this.isAMember(channel_id, member_id))) {
-        if (!(await this.isAnAdmin(channel_id, member_id))) {
+
+  //RIGHTS OVER OVER USERS IN A CHANNEL :
+
+  async hasChannelRightsOverMember(channel_id: number, user_id: number, other_id: number) {
+    if (user_id !== other_id) {
+      if ((await this.usersService.hasSiteRightsOverOtherUser(user_id, other_id))
+        || (!(await this.usersService.hasSiteRightsOverOtherUser(other_id, user_id))
+          && ((await this.isOwner(channel_id, user_id))
+            || ((await this.isAnAdmin(channel_id, user_id)) && !(await this.isAnAdmin(channel_id, other_id))))))
+        return true;
+    }
+    return false;
+  }
+
+  async addAdmin(channel_id: number, other_id: number, user_id: number) {
+    if ((await this.hasChannelRightsOverMember(channel_id, user_id, other_id))) {
+      if ((await this.isAMember(channel_id, other_id))) {
+        if (!(await this.isAnAdmin(channel_id, other_id))) {
           let channel = await this.getAllInfosByChannelId(channel_id);
-          let newAdmin = await this.usersService.getById(member_id);
+          let newAdmin = await this.usersService.getById(other_id);
           await channel.admins.push(newAdmin);
           await this.channelRepository.save(channel);
           return channel;
@@ -254,85 +265,85 @@ export default class ChannelService {
       }
       throw new HttpException('User with this id is not a member of this channel', HttpStatus.NOT_FOUND);
     }
-    throw new HttpException('Only the owner of a channel can add new admins', HttpStatus.FORBIDDEN);
+    throw new HttpException('Your rights in this channel are too low', HttpStatus.FORBIDDEN);
   }
 
-  async revokeAdmin(channel_id: number, member_id: number, owner_id: number) {
-    if ((await this.isOwner(channel_id, owner_id))) {
-      if ((await this.isAnAdmin(channel_id, member_id))) {
-        if (!(await this.isOwner(channel_id, member_id))) {
-          let channel = await this.getAllInfosByChannelId(channel_id);
-          if (channel.admins.length > 1) {
-            let index = channel.admins.findIndex(element => element.id === member_id);
-            await channel.admins.splice(index, 1);
-            await this.channelRepository.save(channel);
-            return channel;
-          }
-          throw new HttpException('Revoking this admin would result in the absence of an admin for this channel', HttpStatus.FORBIDDEN);
+  async revokeAdmin(channel_id: number, other_id: number, user_id: number) {
+    if ((await this.hasChannelRightsOverMember(channel_id, user_id, other_id))) {
+      if ((await this.isAnAdmin(channel_id, other_id))) {
+        let channel = await this.getAllInfosByChannelId(channel_id);
+        if (channel.admins.length > 1) {
+          let index = channel.admins.findIndex(element => element.id === other_id);
+          await channel.admins.splice(index, 1);
+          await this.channelRepository.save(channel);
+          return channel;
         }
-        throw new HttpException('User with this id is the owner of this channel', HttpStatus.FORBIDDEN);
+        throw new HttpException('Revoking this admin would result in the absence of an admin for this channel', HttpStatus.FORBIDDEN);
       }
       throw new HttpException('User with this id is not an admin of this channel', HttpStatus.NOT_FOUND);
     }
-    throw new HttpException('Only the owner of a channel can revoke an admin', HttpStatus.FORBIDDEN);
+    throw new HttpException('Your rights in this channel are too low', HttpStatus.FORBIDDEN);
   }
 
-  async banAMember(channel_id: number, member_id: number, user_id: number) {
-    if ((await this.isAnAdmin(channel_id, user_id))) {
-      if (!(await this.isAnAdmin(channel_id, member_id)) || ((await this.isAnAdmin(channel_id, member_id)) && (await this.isOwner(channel_id, user_id)))) {
-        await this.removeFromChannel(channel_id, member_id, user_id);
-        let channel = await this.getAllInfosByChannelId(channel_id);
-        let newBanned = await this.usersService.getById(member_id);
-        await channel.banned.push(newBanned);
-        await this.channelRepository.save(channel);
-        return channel;
-      }
-      throw new HttpException('Only the owner can ban admins', HttpStatus.FORBIDDEN)
+  async banAMember(channel_id: number, other_id: number, user_id: number) {
+    if ((await this.hasChannelRightsOverMember(channel_id, user_id, other_id))) {
+      await this.removeFromChannel(channel_id, other_id, user_id);
+      let channel = await this.getAllInfosByChannelId(channel_id);
+      let newBanned = await this.usersService.getById(other_id);
+      await channel.banned.push(newBanned);
+      await this.channelRepository.save(channel);
+      return channel;
     }
-    throw new HttpException('Only admins can ban members', HttpStatus.FORBIDDEN);
+    throw new HttpException('Your rights in this channel are too low', HttpStatus.FORBIDDEN);
   }
 
-  async unbanAMember(channel_id: number, member_id: number, user_id: number) {
-    if ((await this.isAnAdmin(channel_id, user_id))) {
-      if ((await this.isBanned(channel_id, member_id))) {
+  async unbanAMember(channel_id: number, other_id: number, user_id: number) {
+    if ((await this.hasChannelRightsOverMember(channel_id, user_id, other_id))) {
+      if ((await this.isBanned(channel_id, other_id))) {
         let channel = await this.getAllInfosByChannelId(channel_id);
-        let index = channel.banned.findIndex(element => element.id === member_id);
+        let index = channel.banned.findIndex(element => element.id === other_id);
         await channel.banned.splice(index, 1);
         await this.channelRepository.save(channel);
         return channel;
       }
       throw new HttpException('User with this id has not been banned', HttpStatus.OK);
     }
-    throw new HttpException('Only admins can unban members', HttpStatus.FORBIDDEN);
+    throw new HttpException('Your rights in this channel are too low', HttpStatus.FORBIDDEN);
   }
 
-  async muteAMember(channel_id: number, member_id: number, user_id: number) {
-    if ((await this.isAMember(channel_id, member_id))) {
-      if (!(await this.isMuted(channel_id, member_id))) {
-        if (!(await this.isAnAdmin(channel_id, member_id)) || (await this)) {
+  async muteAMember(channel_id: number, other_id: number, user_id: number) {
+    if ((await this.isAMember(channel_id, other_id))) {
+      if ((await this.hasChannelRightsOverMember(channel_id, user_id, other_id))) {
+        if (!(await this.isMuted(channel_id, other_id))) {
           let channel = await this.getAllInfosByChannelId(channel_id);
-          let newMuted = await this.usersService.getById(member_id);
+          let newMuted = await this.usersService.getById(other_id);
           await channel.muted.push(newMuted);
           await this.channelRepository.save(channel);
           return channel;
         }
-        throw new HttpException('User with this id is an admin of this channel', HttpStatus.FORBIDDEN);
+        throw new HttpException('User with this id is already muted', HttpStatus.OK);
       }
-      throw new HttpException('User with this id is already muted', HttpStatus.OK);
+      throw new HttpException('Your rights in this channel are too low', HttpStatus.FORBIDDEN);
     }
     throw new HttpException('User with this id is not a member of this channel', HttpStatus.NOT_FOUND);
   }
 
-  async unmuteAMember(channel_id: number, member_id: number, user_id: number) {
-    if ((await this.isMuted(channel_id, member_id))) {
-      let channel = await this.getAllInfosByChannelId(channel_id);
-      let index = channel.muted.findIndex(element => element.id === member_id);
-      await channel.muted.splice(index, 1);
-      await this.channelRepository.save(channel);
-      return channel;
+  async unmuteAMember(channel_id: number, other_id: number, user_id: number) {
+    if ((await this.hasChannelRightsOverMember(channel_id, user_id, other_id))) {
+      if ((await this.isMuted(channel_id, other_id))) {
+        let channel = await this.getAllInfosByChannelId(channel_id);
+        let index = channel.muted.findIndex(element => element.id === other_id);
+        await channel.muted.splice(index, 1);
+        await this.channelRepository.save(channel);
+        return channel;
+      }
+      throw new HttpException('User with this id has not been muted', HttpStatus.NOT_FOUND);
     }
-    throw new HttpException('User with this id has not been muted', HttpStatus.NOT_FOUND);
+    throw new HttpException('Your rights in this channel are too low', HttpStatus.FORBIDDEN);
   }
+
+
+  //CHANNEL CREATION
 
   async getPrivateMessageChannel(user_id: number, other_id: number): Promise<Channel> {
     const userChannels = await this.usersService.getChannelsByUserId(user_id);
@@ -380,6 +391,9 @@ export default class ChannelService {
     this.channelRepository.save(newChannel);//add await ?
     return newChannel;
   }
+
+
+  //CHANNEL DELETION
 
   async deleteChannel(channel_id: number, user_id: number) {
     const channel = await this.getAllInfosByChannelId(channel_id);
