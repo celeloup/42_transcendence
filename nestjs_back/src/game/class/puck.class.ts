@@ -57,8 +57,8 @@ export default class Puck {
         function getRandomInt(max: number) {
             return Math.floor(Math.random() * max);
         }
-        this.x = getRandomInt(width);
-        this.y = getRandomInt(height);
+        this.x = width / 2;
+        this.y = getRandomInt(height - 15);
         this.x_speed *= -1;
         this.y_speed *= -1;
     }

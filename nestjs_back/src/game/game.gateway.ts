@@ -13,6 +13,7 @@ import { Server, Socket } from 'socket.io';
 import Match from '../matches/match.entity';
 import GameService from "./game.service";
 import AuthenticationService from '../authentication/authentication.service';
+import Round from './class/round.class';
 
 
 @WebSocketGateway({ serveClient: false, namespace: '/game' })
@@ -108,8 +109,16 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 	) {
 		let player: number;
 		let current = this.gameService.getCurrentGames();
-		let game = current.get(data.id_game);
-		console.log(current, current.get(data.id_game));
+		let game: Round;
+		console.log(`ID: ${data.id_game}`)
+		console.log(current);
+		for (let [key, value] of current.entries()) {
+			if (key == data.id_game) {
+				console.log(value);
+				game = value;
+				break;
+			}
+		}
 
 		//on verifie l'id envoye en param
 		if (game === undefined) {
