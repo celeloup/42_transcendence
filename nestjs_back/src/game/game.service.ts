@@ -69,7 +69,7 @@ export default class GameService {
         if (this.checkDisconnection(idGame, socketPlayer1, socketPlayer2, this.usersRoom) > 0) {
             return ;
         }
-        server.in(idGame).emit('game_starting');
+        server.in(idGame).emit('game_starting', idGame);
         
         //on ajoute les joueurs a la liste des users en cours de jeu et on attend laisse une pause avant de lancer la partie;
         inGame.push(param.id_player1);
