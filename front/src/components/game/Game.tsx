@@ -38,6 +38,7 @@ function Game() {
 	const [ paddleLeft, setPaddleLeft ] = useState<Paddle>({ is_left: true, x: 0, y: 0, w: 20, h: 80, indice:0 });
 	const [ score, setScore ] = useState<number[]>([0, 0]);
 	const [ match, setMatch ] = useState<any>(null);
+	const [ matchID, setMatchID ] = useState<number>(0);
 
 	useEffect(() : ReturnType<EffectCallback> => {
 		const newSocket:any = io(`http://localhost:8080/game`, { transports: ["websocket"] });
@@ -56,10 +57,16 @@ function Game() {
 
 		socket?.on('finish_game', (data:any) => {
 			alert("game finished !");
+			console.log("game finished !");
+		})
+		socket?.on('interrupted_game', (data:any) => {
+			alert("game interrupted !");
+			console.log("game interrupted !");
 		})
 
 		socket?.on('game_starting', (data:any) => {
 			console.log("game starting !", data);
+			setMatchID(data);
 		})
 	}, [socket])
 
@@ -115,11 +122,11 @@ function Game() {
 
 	const keyPressed = (p5: p5Types) => {
 		if (p5.key === "ArrowUp") {
-			console.log("up");
-			socket.emit('paddle_movement', match.id, "up")
+			console.log("up", matchID);
+			socket.emit('paddle_movement', { id_game: matchID, move: "up"})
 		} else if (p5.key === "ArrowDown") {
-			console.log("down");
-			socket.emit('paddle_movement', match.id, "down")
+			console.log("down", matchID);
+			socket.emit('paddle_movement', { id_game: matchID, move: "down"})
 		}
 	};
 
