@@ -6,9 +6,9 @@ function Home() {
 	return (
 		<div id="home">
 			<Game></Game>
-			<ChannelProvider>
+			{/* <ChannelProvider>
 				<Chat></Chat>
-			</ChannelProvider>
+			</ChannelProvider> */}
 		</div>
 	);
   }

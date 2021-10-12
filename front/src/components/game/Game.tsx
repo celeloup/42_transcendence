@@ -57,13 +57,21 @@ function Game() {
 		socket?.on('finish_game', (data:any) => {
 			alert("game finished !");
 		})
+
+		socket?.on('game_starting', (data:any) => {
+			console.log("game starting !", data);
+		})
 	}, [socket])
 
-	const launch_game = () => {
-		if (match === null)
-			console.log("CREATE MATCH BEFORE LAUNCH");
-		else
-			socket.emit('launch_game', match);
+	// const launch_game = () => {
+	// 	if (match === null)
+	// 		console.log("CREATE MATCH BEFORE LAUNCH");
+	// 	else
+	// 		socket.emit('launch_game', match);
+	// }
+
+	const matchmaking = () => {
+		socket.emit('match_player');
 	}
 
 	const create_game = () => {
@@ -73,8 +81,8 @@ function Game() {
 			"user2_id": 2
 		  })
 		  .then( res => { 
-			  console.log("create match success !", res);
-			  	socket.emit('join_game', res.data.id);
+			  	console.log("create match success !", res);
+			  	socket.emit('create_game', res.data);
 				setMatch(res.data)
 			} )
 		  .catch ( err => { console.log("create match fail :("); } )
@@ -122,7 +130,8 @@ function Game() {
 			<div className="window_header">
 				<button onClick={ create_game }>CREATE GAME</button>
 				{ score[0] } MACHIN VS TRUC { score[1] }
-				<button onClick={ launch_game }>LAUNCH GAME</button>
+				<button onClick={ matchmaking }>MATCH MAKING</button>
+				{/* <button onClick={ launch_game }>LAUNCH GAME</button> */}
 			</div>
 			<div id="game_window">
 				<Sketch setup={ setup } draw={ draw } keyPressed={ keyPressed } />
