@@ -157,29 +157,33 @@ export default class ChannelService {
     if (await this.usersService.isSiteAdmin(user_id)
       || ((await this.usersService.isAFriend(other_id, user_id)))
       || ((await this.isAnAdmin(channel_id, user_id))
-        && !(await this.usersService.isBlocked(other_id, user_id))))
+        && !((await this.usersService.isBlocked(other_id, user_id))
+          || (await this.usersService.isBlocked(user_id, other_id))
+          || (await this.isBanned(channel_id, other_id)))))
+      return true;
+    return false;
+  }
+
+  async canSendAPrivateMessage(other_id: number, user_id: number) {
+    if ((await this.usersService.isSiteAdmin(user_id))
+      || !(await this.usersService.isBlocked(other_id, user_id)))
       return true;
     return false;
   }
 
   async addMember(channel_id: number, other_id: number, user_id: number) {
     let channel = await this.getAllInfosByChannelId(channel_id);
-    if (other_id === user_id || (channel.type === 2 && (await this.canAddMemberInAPrivateChannel(channel_id, other_id, user_id)))) {
+    let newMember = await this.usersService.getAllInfosByUserId(other_id);
+    if (channel.type !== 3 && (other_id === user_id
+      || (channel.type === 2 && (await this.canAddMemberInAPrivateChannel(channel_id, other_id, user_id))))) {
       if (!(await this.isAMember(channel_id, other_id))) {
-        if (!(await this.isBanned(channel_id, other_id))) {
-          if (channel.type !== 3) {
-            let newMember = await this.usersService.getAllInfosByUserId(other_id);
-            channel.members.push(newMember);
-            await this.channelRepository.save(channel);
-            return channel;
-          }
-          throw new HttpException('A private chat is only between two users', HttpStatus.FORBIDDEN);
-        }
-        throw new HttpException('Banned users cannot be added to members', HttpStatus.FORBIDDEN);
+        channel.members.push(newMember);
+        await this.channelRepository.save(channel);
+        return channel;
       }
       throw new HttpException('User is already a member of this channel', HttpStatus.OK);
     }
-    throw new HttpException('To add a member, you need to be their friend OR be an admin OR be this member (depending on channel type)', HttpStatus.FORBIDDEN);
+    throw new HttpException('No right to add this member in this channel', HttpStatus.FORBIDDEN);
   }
 
   async removeMember(channel_id: number, other_id: number, user_id: number) {
@@ -241,7 +245,7 @@ export default class ChannelService {
   //RIGHTS OVER OVER USERS IN A CHANNEL :
 
   async hasChannelRightsOverMember(channel_id: number, user_id: number, other_id: number) {
-    if (user_id !== other_id) {
+    if ((await this.isAMember(channel_id, user_id)) && user_id !== other_id) {
       if ((await this.usersService.hasSiteRightsOverOtherUser(user_id, other_id))
         || (!(await this.usersService.hasSiteRightsOverOtherUser(other_id, user_id))
           && ((await this.isOwner(channel_id, user_id))
@@ -359,13 +363,19 @@ export default class ChannelService {
   }
 
   async createChannel(channelData: CreateChannelDto, user_id: number) {
+    if (channelData.type !== 1 && channelData.type !== 2 && channelData.type !== 3)
+      throw new HttpException('What type of channel are you trying to create?! 1 for public channel, 2 for private channel, 3 for private message', HttpStatus.FORBIDDEN);
     if (channelData.type === 3) {
-      if (channelData.members.length !== 1)
-        throw new HttpException('A private chat is only between two members', HttpStatus.FORBIDDEN);
-      let channel = await this.getPrivateMessageChannel(user_id, channelData.members[0]);
+      if (!(channelData.otherUserIdForPrivateMessage))
+        throw new HttpException('No member given for private message', HttpStatus.FORBIDDEN);
+      if (!(await this.canSendAPrivateMessage(channelData.otherUserIdForPrivateMessage, user_id)))
+        throw new HttpException('This user has blocked you', HttpStatus.FORBIDDEN);
+      let channel = await this.getPrivateMessageChannel(user_id, channelData.otherUserIdForPrivateMessage);
       if (channel)
         return channel;
     }
+    if (channelData.type !== 3 && channelData.otherUserIdForPrivateMessage)
+      throw new HttpException('A private or public channel can only be created with one member (you) at the beginning', HttpStatus.FORBIDDEN);
     let channelOwner = await this.usersService.getById(user_id);
     let newChannel = await this.channelRepository.create({
       name: channelData.name,
@@ -377,19 +387,13 @@ export default class ChannelService {
       banned: [],
       muted: []
     });
-    for (var member_id of channelData.members) {
-      if (await this.usersService.isBlocked(member_id, user_id))
-        throw new HttpException('Owner of the channel is blocked by one of the members', HttpStatus.FORBIDDEN);
-      else if (member_id !== user_id) {
-        if (member_id !== user_id) {
-          let newMember = await this.usersService.getById(member_id);
-          if (newChannel.members.indexOf(newMember) === -1)
-            return newChannel.members.push(newMember);
-        }
-      }
+    if (newChannel.type === 3) {
+      let newMember = await this.usersService.getById(channelData.otherUserIdForPrivateMessage);
+      newChannel.members.push(newMember);
     }
-    this.channelRepository.save(newChannel);//add await ?
-    return newChannel;
+    await this.channelRepository.save(newChannel);//add await ?
+    newChannel = await this.getAllInfosByChannelId(newChannel.id);
+    return (newChannel);
   }
 
 

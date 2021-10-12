@@ -222,16 +222,10 @@ export default class UsersService {
 
   async isBlocked(user_id: number, other_id: number) {
     const user = await this.getAllInfosByUserId(user_id);
-    if (user) {
       const other = await this.getById(other_id)
-      if (other) {
         if ((user.blocked && (user.blocked.findIndex(element => element.id === other_id))) !== -1)
           return true;
         return false;
-      }
-      throw new HttpException('Friend not found', HttpStatus.NOT_FOUND);
-    }
-    throw new HttpException('User not found', HttpStatus.NOT_FOUND);
   }
 
   async blockAUser(user_id: number, other_id: number): Promise<User[]> {
@@ -266,7 +260,6 @@ export default class UsersService {
 
   public async serveAvatar(user_id: number, res: any) {
     const avatar = (await this.getAllInfosByUserId(user_id)).avatar;
-    //  return avatar;
     if (avatar)
       return res.sendFile(avatar, { root: './' });
     throw new HttpException('No avatar set yet', HttpStatus.BAD_REQUEST);
