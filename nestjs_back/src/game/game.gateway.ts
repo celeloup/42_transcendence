@@ -116,33 +116,6 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
     this.gameService.launchGame(this.server, game, this.connectedUsers);
   } 
 
-  
-  // @SubscribeMessage('launch_game')
-  // async launchGame(
-  //   @MessageBody() match: Match,
-  //   @ConnectedSocket() client: Socket,
-  // ) {
-  //   //on initialise la game avec les parametres de jeu envoye par le front et on l'ajoute aux matchs en cours
-  //   let round = new Round(match.id.toString(), match.user1_id, match.user2_id, 10, 10, false);
-  //   this.currentGames.set(match.id, round);
-
-  //   //on lance le jeu, retourne 1 si la partie a ete annule
-  //   if (await this.gameService.startGame(this.server, round, this.connectedUsers, this.inGame)) {
-  //     return ;
-  //   }
-  
-  //   //on met a jour l'objet match
-  //   match.score_user1 = round.score_player1;
-  //   match.score_user2 = round.score_player2;
-  //   match.winner = round.victory;
-
-  //   //on save le game et on retire les infos "en cours";
-  //   this.matchService.updateMatch(match.id, match);
-  //   delete this.inGame[round.id_player1];
-  //   delete this.inGame[round.id_player2];
-  //   this.currentGames.delete(match.id);
-  // }
-
   @SubscribeMessage('paddle_movement')
   async setNewPosition(
     @MessageBody() data: {id_game: number, move: string},
