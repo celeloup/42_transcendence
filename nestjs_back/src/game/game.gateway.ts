@@ -107,10 +107,12 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		@ConnectedSocket() client: Socket,
 	) {
 		let player: number;
-		let game = this.gameService.getCurrentGames().get(data.id_game);
+		let current = this.gameService.getCurrentGames();
+		let game = current.get(data.id_game);
+		console.log(current, current.get(data.id_game));
 
 		//on verifie l'id envoye en param
-		if (!game) {
+		if (game === undefined) {
 			this.logger.log(`This game doesn't exit, are you sure it's the good id?`);
 			return;
 		}

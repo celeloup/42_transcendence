@@ -9,8 +9,10 @@ import MatchService from '../matches/matches.service';
 @Injectable()
 export default class GameService {
 
-    private readonly matchService: MatchService;
-    private logger: Logger = new Logger("GameService");
+	constructor(
+   		private readonly matchService: MatchService
+	) {}
+	private logger: Logger = new Logger("GameService");
     
     private usersRoom: Map<Socket, string> = new Map();
     private currentGames: Map<number, Round> = new Map();
