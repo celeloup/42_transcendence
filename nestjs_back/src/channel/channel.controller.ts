@@ -65,7 +65,7 @@ export default class ChannelController {
   }
 
   @Post()
-  @ApiOperation({ summary: "Create a channel with the authenticated user" })
+  @ApiOperation({ summary: "Create a channel with the authenticated user / NB: members are id numbers not strings / 1 for public, 2 for private, 3 for MP" })
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')
   @UseGuards(JwtTwoFactorGuard)
