@@ -22,7 +22,11 @@ export default class GameService {
     getCurrentGames() {
         return this.currentGames;
     }
-    
+   
+    setCurrentGames(id: number, param: Round) {
+        this.currentGames.set(id, param);
+    }
+
     getPlayingUsers() {
         return this.playingUsers;
     }
@@ -61,7 +65,6 @@ export default class GameService {
         this.matchService.updateMatch(match.id, match);
         delete this.playingUsers[round.id_player1];
         delete this.playingUsers[round.id_player2];
-        // this.currentGames.d(this.getIndexOf(match.id));
         this.currentGames.delete(match.id);
     }
 
@@ -139,7 +142,7 @@ export default class GameService {
         let speed = 10;
         let margin = player.h / 2;
 
-        if (move = "up") {
+        if (move === "down") {
             if (player.y + speed + margin <= height) {
                 player.y += speed;
             }
@@ -148,8 +151,8 @@ export default class GameService {
             }
         }
 
-        if (move = "down") {
-            if (player.y + speed + margin >= 0) {
+        if (move === "up") {
+            if (player.y - speed - margin >= 0) {
                 player.y -= speed;
             }
             else {
