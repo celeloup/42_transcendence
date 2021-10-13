@@ -16,6 +16,7 @@ export default class GameService {
     
     private usersRoom: Map<Socket, string> = new Map();
     private currentGames: Map<number, Round> = new Map();
+    // private currentGames: Round[] = [];
     private playingUsers: number[] = [];
 
     getCurrentGames() {
@@ -44,6 +45,7 @@ export default class GameService {
         //on initialise la game avec les parametres de jeu envoye par le front et on l'ajoute aux matchs en cours
         let round = new Round(match.id.toString(), match.user1_id, match.user2_id, match.speed, match.goal, match.boost_available);
         this.currentGames.set(match.id, round);
+        // this.currentGames.push(round);
         
         //on lance le jeu, retourne 1 si la partie a ete annule
         if (await this.startGame(server, round, usersSocket, this.playingUsers)) {
@@ -59,6 +61,7 @@ export default class GameService {
         this.matchService.updateMatch(match.id, match);
         delete this.playingUsers[round.id_player1];
         delete this.playingUsers[round.id_player2];
+        // this.currentGames.d(this.getIndexOf(match.id));
         this.currentGames.delete(match.id);
     }
 
@@ -153,6 +156,7 @@ export default class GameService {
                 player.y = 0 + margin;
             }
         }
+        return player;
     }
 
     async waitPlayer(server: Server, idGame: string, player1: Socket, player2: Socket, usersRoom: Map<Socket, string>) {

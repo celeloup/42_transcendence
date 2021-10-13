@@ -104,22 +104,11 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 
 	@SubscribeMessage('paddle_movement')
 	async setNewPosition(
-		@MessageBody() data: { id_game: number, move: string },
+		@MessageBody() data: { id_game: string, move: string },
 		@ConnectedSocket() client: Socket,
 	) {
 		let player: number;
-		let current = this.gameService.getCurrentGames();
-		let game: Round;
-		console.log(`ID: ${data.id_game}`)
-		console.log(current);
-		for (let [key, value] of current.entries()) {
-			if (key == data.id_game) {
-				console.log(value);
-				game = value;
-				break;
-			}
-		}
-
+		let game: Round = this.gameService.getCurrentGames().get(Number(data.id_game));
 		//on verifie l'id envoye en param
 		if (game === undefined) {
 			this.logger.log(`This game doesn't exit, are you sure it's the good id?`);
@@ -131,10 +120,10 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		if (user) {
 			player = this.gameService.getPlayer(game, user.id);
 			if (player == 1) {
-				this.gameService.movePaddle(game.paddle_player1, data.move);
+				game.paddle_player1 = this.gameService.movePaddle(game.paddle_player1, data.move);
 			}
 			else if (player == 2) {
-				this.gameService.movePaddle(game.paddle_player2, data.move);
+				game.paddle_player2 = this.gameService.movePaddle(game.paddle_player2, data.move);
 			}
 		}
 	}
