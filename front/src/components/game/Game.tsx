@@ -109,6 +109,7 @@ function Game() {
 	}
 
 	const setup = (p5: p5Types, canvasParentRef: Element) => {
+		p5.rectMode(p5.CENTER);
 		p5.createCanvas(782, 630).parent(canvasParentRef);
 	};
 

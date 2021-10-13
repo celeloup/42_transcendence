@@ -108,7 +108,8 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		@ConnectedSocket() client: Socket,
 	) {
 		let player: number;
-		let game: Round = this.gameService.getCurrentGames().get(Number(data.id_game));
+		let id: number = Number(data.id_game);
+		let game: Round = this.gameService.getCurrentGames().get(id);
 		//on verifie l'id envoye en param
 		if (game === undefined) {
 			this.logger.log(`This game doesn't exit, are you sure it's the good id?`);
@@ -120,12 +121,13 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		if (user) {
 			player = this.gameService.getPlayer(game, user.id);
 			if (player == 1) {
-				game.paddle_player1 = this.gameService.movePaddle(game.paddle_player1, data.move);
+				this.gameService.movePaddle(game.paddle_player1, data.move);
 			}
 			else if (player == 2) {
-				game.paddle_player2 = this.gameService.movePaddle(game.paddle_player2, data.move);
+				this.gameService.movePaddle(game.paddle_player2, data.move);
 			}
 		}
+		console.log(game);
 	}
 
 	@SubscribeMessage('get_current_games')
