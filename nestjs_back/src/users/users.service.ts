@@ -191,10 +191,11 @@ export default class UsersService {
       if (!(await this.isAFriend(user_id, friend_id))) {
         if (!(await this.isBlocked(user_id, friend_id))) {
           if (!(await this.isBlocked(friend_id, user_id))) {
-            const user = await this.getAllInfosByUserId(user_id);
+            let user = await this.getAllInfosByUserId(user_id);
             const friend = await this.getById(friend_id);
             const firstFriend = await this.achievementsService.getAchievementById(1);
-            if (user.friends.length === 0)
+            if (user.friends.length === 0 && user.achievements
+              && user.achievements.findIndex(achievement => achievement.id === 1) !==1)
               user.achievements.push(firstFriend);
             user.friends.push(friend);
             await this.usersRepository.save(user);
