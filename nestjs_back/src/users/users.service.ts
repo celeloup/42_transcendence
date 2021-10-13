@@ -106,6 +106,7 @@ export default class UsersService {
     if (user) {
       return user;
     }
+    throw new HttpException('User with this id42 does not exist', HttpStatus.NOT_FOUND);
   }
 
   async create(userData: CreateUserDto): Promise<User> {
