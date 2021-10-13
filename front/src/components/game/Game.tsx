@@ -38,7 +38,7 @@ function Game() {
 	const [ paddleLeft, setPaddleLeft ] = useState<Paddle>({ is_left: true, x: 0, y: 0, w: 20, h: 80, indice:0 });
 	const [ score, setScore ] = useState<number[]>([0, 0]);
 	const [ match, setMatch ] = useState<any>(null);
-	const [ matchID, setMatchID ] = useState<number>(0);
+	const [ matchID, setMatchID ] = useState<string>("");
 
 	useEffect(() : ReturnType<EffectCallback> => {
 		const newSocket:any = io(`http://localhost:8080/game`, { transports: ["websocket"] });
