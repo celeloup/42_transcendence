@@ -18,9 +18,10 @@ export default class CreateChannelDto {
   @IsOptional()
   password?: string;
  
-  @IsNumber({},{each: true})
-  @IsArray()
+  @IsNumber()
   @ApiProperty()
-  members: number[];
+  @ApiPropertyOptional()
+  @IsOptional()
+  otherUserIdForPrivateMessage: number;
 
 }
