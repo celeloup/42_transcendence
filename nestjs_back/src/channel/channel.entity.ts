@@ -3,7 +3,7 @@ import { Column, Entity, ManyToOne, ManyToMany, PrimaryGeneratedColumn, OneToMan
 import { Type } from 'class-transformer';
 import User from '../users/user.entity';
 import Message from './message.entity';
-import SilencedUntil from './interface/mute.interface';
+import muteObj from './interface/mute.interface';
 
 @Entity()
 class Channel {
@@ -41,18 +41,21 @@ class Channel {
   @JoinTable()
   public banned: User[];
 
-  @Type(() => User)
-  @ManyToMany(() => User, (muted: User) => muted.chan_muted)
-  @JoinTable()
-  public muted: User[];
-
   @OneToMany(() => Message, (message: Message) => message.recipient)
   public historic: Message[];
 
   @UpdateDateColumn()
   public lastupdate: Date;
 
-  public mutedUsers: SilencedUntil[];
+  @Type(() => User)
+  @ManyToMany(() => User, (muted: User) => muted.chan_muted)
+  @JoinTable()
+  public muted: User[];
+  
+  public muteDates: muteObj[];
+
+  @Column({nullable: true, default: null})
+  public next_unmute_date: number;
 }
 
 export default Channel;
