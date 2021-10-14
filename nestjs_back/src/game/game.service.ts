@@ -1,8 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import Round from './class/round.class';
 import { Server, Socket } from 'socket.io';
-import Paddle from './class/paddle.class';
-import { height } from './game.settings';
 import Match from 'src/matches/match.entity';
 import MatchService from '../matches/matches.service';
 
@@ -53,6 +51,8 @@ export default class GameService {
         
         //on lance le jeu, retourne 1 si la partie a ete annule
         if (await this.startGame(server, round, usersSocket, this.playingUsers)) {
+            this.matchService.deleteMatch(match.id);
+            this.currentGames.delete(match.id);
             return ;
         }
         
@@ -75,7 +75,8 @@ export default class GameService {
 
         //on verifie que les joueurs sont encore dans la room avant de lancer
         if (this.checkDisconnection(idGame, socketPlayer1, socketPlayer2, this.usersRoom) > 0) {
-            return ;
+            server.in(idGame).emit('cancel_game', idGame);
+            return 1;
         }
         server.in(idGame).emit('game_starting', idGame);
         
