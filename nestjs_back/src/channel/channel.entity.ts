@@ -1,8 +1,9 @@
 import { ExecSyncOptionsWithBufferEncoding } from 'child_process';
 import { Column, Entity, ManyToOne, ManyToMany, PrimaryGeneratedColumn, OneToMany, JoinTable, UpdateDateColumn } from 'typeorm';
-import { Type, Expose } from 'class-transformer';
+import { Type } from 'class-transformer';
 import User from '../users/user.entity';
 import Message from './message.entity';
+import SilencedUntil from './interface/mute.interface';
 
 @Entity()
 class Channel {
@@ -27,6 +28,7 @@ class Channel {
   @JoinTable()
   public admins: User[];
 
+  @Type(() => User)
   @ManyToMany(() => User, (member: User) => member.channels)
   @JoinTable()
   public members: User[];
@@ -49,6 +51,8 @@ class Channel {
 
   @UpdateDateColumn()
   public lastupdate: Date;
+
+  public mutedUsers: SilencedUntil[];
 }
 
 export default Channel;

@@ -5,7 +5,6 @@ import User from './user.entity';
 import * as bcrypt from 'bcrypt';
 import CreateUserDto from './dto/createUser.dto';
 import UpdateUserDto from './dto/updateUser.dto';
-import Achievement from '../achievements/achievement.entity';
 import AchievementsService from '../achievements/achievements.service';
 import Channel from 'src/channel/channel.entity';
 
@@ -14,14 +13,11 @@ export default class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    @InjectRepository(Achievement)
-    private achievementsRepository: Repository<Achievement>,
     private achievementsService: AchievementsService
   ) { }
 
   async getById(id: number): Promise<User> {
     const user = await this.usersRepository.findOne({ id });
-    //  const user = await this.usersRepository.findOne({id}, {loadRelationIds: true});
     if (user) {
       return user;
     }
@@ -64,7 +60,7 @@ export default class UsersService {
   }
 
   async getChannelsByUserId(id: number): Promise<Channel[]> {
-    const user = await this.usersRepository.findOne(id, { relations: ['channels'] });
+    const user = await this.usersRepository.findOne(id, { relations: ['channels', 'channels.members'] });
     if (user)
       return user.channels;
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
@@ -110,6 +106,7 @@ export default class UsersService {
     if (user) {
       return user;
     }
+    throw new HttpException('User with this id42 does not exist', HttpStatus.NOT_FOUND);
   }
 
   async create(userData: CreateUserDto): Promise<User> {
@@ -122,9 +119,9 @@ export default class UsersService {
   }
 
   async nameAlreadyInUse(name: string) {
-    const user = this.usersRepository.findOne({ name });
+    const user = await this.usersRepository.findOne({ name });
     if (user)
-      return true;
+       return true;
     return false;
   }
 
@@ -139,15 +136,15 @@ export default class UsersService {
     throw new HttpException('User not found', HttpStatus.NOT_FOUND);
   }
 
-  async setCurrentRefreshToken(refreshToken: string, userId: number) {
+  async setCurrentRefreshToken(refreshToken: string, user_id: number) {
     const currentHashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-    await this.usersRepository.update(userId, {
+    await this.usersRepository.update(user_id, {
       currentHashedRefreshToken
     });
   }
 
-  async getUserIfRefreshTokenMatches(refreshToken: string, userId: number): Promise<User> {
-    const user = await this.getById(userId);
+  async getUserIfRefreshTokenMatches(refreshToken: string, user_id: number): Promise<User> {
+    const user = await this.getById(user_id);
     const isRefreshTokenMatching = await bcrypt.compare(
       refreshToken,
       user.currentHashedRefreshToken
@@ -157,30 +154,30 @@ export default class UsersService {
     }
   }
 
-  async removeRefreshToken(userId: number): Promise<UpdateResult> {
-    return this.usersRepository.update(userId, {
+  async removeRefreshToken(user_id: number): Promise<UpdateResult> {
+    return this.usersRepository.update(user_id, {
       currentHashedRefreshToken: null
     });
   }
 
-  async setTwoFactorAuthenticationSecret(secret: string, userId: number): Promise<UpdateResult> {
-    return this.usersRepository.update(userId, {
+  async setTwoFactorAuthenticationSecret(secret: string, user_id: number): Promise<UpdateResult> {
+    return this.usersRepository.update(user_id, {
       twoFactorAuthenticationSecret: secret
     });
   }
 
-  async turnOnTwoFactorAuthentication(userId: number): Promise<UpdateResult> {
-    return this.usersRepository.update(userId, {
+  async turnOnTwoFactorAuthentication(user_id: number): Promise<UpdateResult> {
+    return this.usersRepository.update(user_id, {
       isTwoFactorAuthenticationEnabled: true
     });
   }
 
-  async isAFriend(userId: number, friendId: number) {
-    const user = await this.getAllInfosByUserId(userId);
+  async isAFriend(user_id: number, friend_id: number) {
+    const user = await this.getAllInfosByUserId(user_id);
     if (user) {
-      const friend = await this.getById(friendId)
+      const friend = await this.getById(friend_id)
       if (friend) {
-        if ((user.friends && (user.friends.findIndex(element => element.id === friendId))) !== -1)
+        if ((user.friends && (user.friends.findIndex(element => element.id === friend_id))) !== -1)
           return true;
         return false;
       }
@@ -189,13 +186,13 @@ export default class UsersService {
     throw new HttpException('User not found', HttpStatus.NOT_FOUND);
   }
 
-  async addAFriend(userId: number, friendId: number): Promise<User[]> {
-    if (userId !== friendId) {
-      if (!(await this.isAFriend(userId, friendId))) {
-        if (!(await this.isBlocked(userId, friendId))) {
-          if (!(await this.isBlocked(friendId, userId))) {
-            const user = await this.getAllInfosByUserId(userId);
-            const friend = await this.getById(friendId);
+  async addAFriend(user_id: number, friend_id: number): Promise<User[]> {
+    if (user_id !== friend_id) {
+      if (!(await this.isAFriend(user_id, friend_id))) {
+        if (!(await this.isBlocked(user_id, friend_id))) {
+          if (!(await this.isBlocked(friend_id, user_id))) {
+            const user = await this.getAllInfosByUserId(user_id);
+            const friend = await this.getById(friend_id);
             const firstFriend = await this.achievementsService.getAchievementById(1);
             if (user.friends.length === 0)
               user.achievements.push(firstFriend);
@@ -212,10 +209,10 @@ export default class UsersService {
     throw new HttpException('Although your inner thoughts might be broad, you cannot be friend with yourself', HttpStatus.BAD_REQUEST);
   }
 
-  async deleteAFriend(userId: number, friendId: number) {
-    if ((await this.isAFriend(userId, friendId))) {
-      const user = await this.getAllInfosByUserId(userId);
-      const friend = await this.getById(friendId);
+  async deleteAFriend(user_id: number, friend_id: number) {
+    if ((await this.isAFriend(user_id, friend_id))) {
+      const user = await this.getAllInfosByUserId(user_id);
+      const friend = await this.getById(friend_id);
       let index = user.friends.indexOf(friend);
       user.friends.splice(index, 1);
       await this.usersRepository.save(user);
@@ -224,29 +221,23 @@ export default class UsersService {
     throw new HttpException('Users are not friends', HttpStatus.BAD_REQUEST);
   }
 
-  async isBlocked(userId: number, otherId: number) {
-    const user = await this.getAllInfosByUserId(userId);
-    if (user) {
-      const other = await this.getById(otherId)
-      if (other) {
-        if ((user.blocked && (user.blocked.findIndex(element => element.id === otherId))) !== -1)
+  async isBlocked(user_id: number, other_id: number) {
+    const user = await this.getAllInfosByUserId(user_id);
+      const other = await this.getById(other_id)
+        if ((user.blocked && (user.blocked.findIndex(element => element.id === other_id))) !== -1)
           return true;
         return false;
-      }
-      throw new HttpException('Friend not found', HttpStatus.NOT_FOUND);
-    }
-    throw new HttpException('User not found', HttpStatus.NOT_FOUND);
   }
 
-  async blockAUser(userId: number, otherId: number): Promise<User[]> {
-    if (userId !== otherId) {
-      if (!(await this.isBlocked(userId, otherId))) {
-        const user = await this.getAllInfosByUserId(userId);
-        const other = await this.getById(otherId);
-        if ((await this.isAFriend(userId, otherId)))
-          await this.deleteAFriend(userId, otherId);
-        if ((await this.isAFriend(otherId, userId)))
-          await this.deleteAFriend(otherId, userId);
+  async blockAUser(user_id: number, other_id: number): Promise<User[]> {
+    if (user_id !== other_id) {
+      if (!(await this.isBlocked(user_id, other_id))) {
+        const user = await this.getAllInfosByUserId(user_id);
+        const other = await this.getById(other_id);
+        if ((await this.isAFriend(user_id, other_id)))
+          await this.deleteAFriend(user_id, other_id);
+        if ((await this.isAFriend(other_id, user_id)))
+          await this.deleteAFriend(other_id, user_id);
         user.blocked.push(other);
         await this.usersRepository.save(user);
         return user.blocked;
@@ -256,10 +247,10 @@ export default class UsersService {
     throw new HttpException('Although your inner thoughts might be unbearable, you cannot block yourself', HttpStatus.BAD_REQUEST);
   }
 
-  async unblockAUser(userId: number, otherId: number) {
-    if ((await this.isBlocked(userId, otherId))) {
-      const user = await this.getAllInfosByUserId(userId);
-      const other = await this.getById(otherId);
+  async unblockAUser(user_id: number, other_id: number) {
+    if ((await this.isBlocked(user_id, other_id))) {
+      const user = await this.getAllInfosByUserId(user_id);
+      const other = await this.getById(other_id);
       let index = user.blocked.indexOf(other);
       user.blocked.splice(index, 1);
       await this.usersRepository.save(user);
@@ -268,16 +259,15 @@ export default class UsersService {
     throw new HttpException('User has not been blocked before', HttpStatus.BAD_REQUEST);
   }
 
-  public async serveAvatar(userId: number, res: any) {
-    const avatar = (await this.getAllInfosByUserId(userId)).avatar;
-    //  return avatar;
+  public async serveAvatar(user_id: number, res: any) {
+    const avatar = (await this.getAllInfosByUserId(user_id)).avatar;
     if (avatar)
       return res.sendFile(avatar, { root: './' });
     throw new HttpException('No avatar set yet', HttpStatus.BAD_REQUEST);
   }
 
-  public async setAvatar(userId: number, avatarUrl: string) {
-    const oldUrl = (await this.getById(userId)).avatar;
+  public async setAvatar(user_id: number, avatarUrl: string) {
+    const oldUrl = (await this.getById(user_id)).avatar;
     const fs = require('fs');
     if (oldUrl && oldUrl !== "")
       fs.unlink(oldUrl, (err: any) => {
@@ -285,15 +275,15 @@ export default class UsersService {
           throw new HttpException('Could not delete old avatar', HttpStatus.NOT_FOUND);
         }
       })
-    return this.usersRepository.update(userId, { avatar: avatarUrl });
+    return this.usersRepository.update(user_id, { avatar: avatarUrl });
   }
 
-  public async appointModerator(userId: number, newModeratorId: number) {
+  public async appointModerator(user_id: number, newModeratorId: number) {
     const moderator = await this.getAllInfosByUserId(newModeratorId);
-    const user = await this.getAllInfosByUserId(userId);
-    if (user.owner === true) {
-      if (moderator.moderator === false && moderator.owner === false) {
-        moderator.moderator = true;
+    const user = await this.getAllInfosByUserId(user_id);
+    if (user.site_owner === true) {
+      if (moderator.site_moderator === false && moderator.site_owner === false) {
+        moderator.site_moderator = true;
         return await this.usersRepository.save(moderator);
       }
       throw new HttpException('This user is already a moderator or is a owner too', HttpStatus.FORBIDDEN);
@@ -301,12 +291,12 @@ export default class UsersService {
     throw new HttpException('Only the owner of the website can appoint moderators', HttpStatus.FORBIDDEN);
   }
 
-  public async revokeModerator(userId: number, newModeratorId: number) {
+  public async revokeModerator(user_id: number, newModeratorId: number) {
     const moderator = await this.getAllInfosByUserId(newModeratorId);
-    const user = await this.getAllInfosByUserId(userId);
-    if (user.owner === true) {
-      if (moderator.moderator === true && moderator.owner === false) {
-        moderator.moderator = false;
+    const user = await this.getAllInfosByUserId(user_id);
+    if (user.site_owner === true) {
+      if (moderator.site_moderator === true && moderator.site_owner === false) {
+        moderator.site_moderator = false;
         return await this.usersRepository.save(moderator);
       }
       throw new HttpException('This user is not a moderator or is a owner too', HttpStatus.FORBIDDEN);
@@ -314,25 +304,45 @@ export default class UsersService {
     throw new HttpException('Only the owner of the website can revoke moderators', HttpStatus.FORBIDDEN);
   }
 
-  public async isSiteAdmin(userId: number){
-    const user = await this.getAllInfosByUserId(userId);
-    if (user.owner === true || user.moderator === true){
+  public async hasSiteRightsOverOtherUser(user_id: number, other_id: number) {
+    if (await this.isSiteOwner(other_id))
+      return false;
+    if (await this.isSiteOwner(user_id))
+      return true;
+    if (await this.isSiteAdmin(other_id))
+      return false;
+    if (await this.isSiteAdmin(user_id))
+      return true;
+    return false; 
+    }
+
+  public async isSiteOwner(user_id: number) {
+    const user = await this.getAllInfosByUserId(user_id);
+    if (user.site_owner === true) {
       return true;
     }
-    return false; 
+    return false;
   }
 
-  public async banUser(userId: number, leperId: number){
-    const user = await this.getAllInfosByUserId(userId);
-    const leper = await this.getAllInfosByUserId(leperId);
-    if ((await this.isSiteAdmin(userId)) && !(leper.owner || (user.moderator && leper.moderator))){
-      leper.moderator = false;
+  public async isSiteAdmin(user_id: number) {
+    const user = await this.getAllInfosByUserId(user_id);
+    if (user.site_owner === true || user.site_moderator === true) {
+      return true;
+    }
+    return false;
+  }
+
+  public async banUser(user_id: number, leper_id: number) {
+    const user = await this.getAllInfosByUserId(user_id);
+    const leper = await this.getAllInfosByUserId(leper_id);
+    if ((await this.isSiteAdmin(user_id)) && !(leper.site_owner || (user.site_moderator && leper.site_moderator))) {
+      leper.site_moderator = false;
       leper.site_banned = true;
       return await this.usersRepository.save(leper);
     }
     throw new HttpException('User does not have the rights to ban this member', HttpStatus.FORBIDDEN);
   }
-  
+
   // Off topic
   // async deleteUser(user_id: number) {
   //   await this.getById(user_id);

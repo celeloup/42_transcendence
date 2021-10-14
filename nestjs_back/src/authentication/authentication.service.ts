@@ -60,7 +60,7 @@ export default class AuthenticationService {
 	  } catch (error) {
       // should never happen -> to delete after tests
       if (error?.code === PostgresErrorCode.UniqueViolation) {
-        throw new HttpException('User with that id already exists', HttpStatus.BAD_REQUEST);
+        throw new HttpException('User with that id or name or email already exists', HttpStatus.BAD_REQUEST);
       }
       throw new HttpException('Something went wrong', HttpStatus.INTERNAL_SERVER_ERROR);
 	  }

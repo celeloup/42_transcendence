@@ -25,7 +25,7 @@ class User {
 
   @Column({nullable: true, default: false})
   @Expose()
-  owner: boolean;
+  site_owner: boolean;
 
   @Column({nullable: true, default: false})
   @Expose()
@@ -33,7 +33,7 @@ class User {
 
   @Column({nullable: true, default: false})
   @Expose()
-  moderator: boolean
+  site_moderator: boolean
 
   @Column({ nullable: true })
   currentHashedRefreshToken?: string;
@@ -57,9 +57,11 @@ class User {
   @ManyToMany(() => Channel, (channel: Channel) => channel.admins)
   chan_admin: Channel[];
 
+  @Expose({ groups: ['me'] })
   @ManyToMany(() => Channel, (channel: Channel) => channel.banned)
   chan_banned: Channel[];
 
+  @Expose({ groups: ['me'] })
   @ManyToMany(() => Channel, (channel: Channel) => channel.muted)
   chan_muted: Channel[];
   
@@ -98,7 +100,6 @@ class User {
   @JoinTable()
   blocked: User[];
 
-  //@Expose({ groups: ['me'] })
   @ManyToMany(() => User, (user: User) => user.blocked)
   blockedBy: User[];
 

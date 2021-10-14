@@ -195,7 +195,6 @@ export default class UsersController {
   }
 
   @ApiOperation({ summary: "Block a user for the authenticated user" })
-  @ApiParam({ name: 'id', type: Number, description: 'user id' })
   @ApiResponse({
     status: 200,
     description: 'User successfully blocked',
@@ -213,7 +212,6 @@ export default class UsersController {
   }
 
   @ApiOperation({ summary: "Unblock a user for the authenticated user" })
-  @ApiParam({ name: 'id', type: Number, description: 'user id' })
   @ApiResponse({
     status: 200,
     description: 'User successfully unblocked',
@@ -231,7 +229,6 @@ export default class UsersController {
   }
 
   @ApiOperation({ summary: "Appoint moderator" })
-  @ApiParam({ name: 'id', type: Number, description: 'user id' })
   @ApiResponse({
     status: 200,
     description: 'User successfully promoted moderator',
@@ -249,7 +246,6 @@ export default class UsersController {
   }
 
   @ApiOperation({ summary: "Revoke a moderator" })
-  @ApiParam({ name: 'id', type: Number, description: 'user id' })
   @ApiResponse({
     status: 200,
     description: 'User successfully promoted moderator',
@@ -267,7 +263,6 @@ export default class UsersController {
   }
 
   @ApiOperation({ summary: "Ban a user from website" })
-  @ApiParam({ name: 'id', type: Number, description: 'user id' })
   @ApiResponse({
     status: 200,
     description: 'User successfully promoted moderator',
@@ -292,7 +287,7 @@ export default class UsersController {
   // }
 
   @Post('avatar/me')
-  @ApiOperation({ summary: "Upload an avatar /!\\ For now uploads for user with id 1" })
+  @ApiOperation({ summary: "Upload an avatar" })
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')
   @ApiResponse({
