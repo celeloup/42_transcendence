@@ -17,10 +17,12 @@ export function Route({ typeOfRoute, ...routeProps}: RouteProps) {
 		{
 			axios.get(`/authentication`)
 			.then(response => { 
-				// console.log("RES isAuth", response.data);
+				console.log("RES isAuth", response.data);
 				const user = { 
 					id: response.data.id,
-					admin: response.data.owner,
+					site_owner: response.data.site_owner,
+					site_moderator: response.data.site_moderator,
+					site_banned: response.data.site_banned,
 					id42: response.data.id42,
 					isTwoFactorAuth: response.data.isTwoFactorAuthenticationEnabled,
 				}

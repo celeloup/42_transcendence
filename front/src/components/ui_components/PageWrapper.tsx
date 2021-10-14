@@ -33,7 +33,7 @@ function PageWrapper( { children }: Props) {
 		{ isAuth && <div id="navBar" className="rotate_right">
 			<NavButton name="Parameters" icon="fa-cog" link="/parameters"></NavButton>
 			<NavButton name="Profile" icon="fa-user-circle" link="/profile"></NavButton>
-		{ user?.admin && <NavButton name="Admin" icon="fa-cog" link="/admin"></NavButton> }
+		{ (user?.site_owner || user?.site_moderator) && <NavButton name="Admin" icon="fa-cog" link="/admin"></NavButton> }
 		</div>} 
 		<div className="body_wrapper">
 			{ children }

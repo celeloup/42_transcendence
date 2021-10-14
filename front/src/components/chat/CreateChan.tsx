@@ -12,8 +12,7 @@ import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
 type channelSettings = {
 	type: number,
 	name: string,
-	password: string,
-	members: [],
+	password: string
 };
 
 type CreateChanProps = {
@@ -69,8 +68,8 @@ function CreateChan({ type, hide, socket } : CreateChanProps) {
 			var chanSettings:channelSettings = {
 				type: chanType,
 				name: (chanType === 1 || chanType === 2) ? chanName : "", 
-				password: chanType === 2 ? chanPassword : "", 
-				members: [],
+				password: chanType === 2 ? chanPassword : ""
+				// members: [],
 			};
 			// console.log(chanSettings);
 			const submitNewChannel = async () => {

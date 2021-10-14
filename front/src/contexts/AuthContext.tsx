@@ -2,10 +2,11 @@ import * as React from "react";
 
 export type User = {
 	id: number,
-	admin: boolean,
+	site_owner: boolean,
+	site_moderator: boolean,
 	id42: number,
 	isTwoFactorAuth: boolean,
-	blocked?: any
+	site_banned: boolean
 }
 
 export type ContextType = {
