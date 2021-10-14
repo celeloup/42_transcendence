@@ -44,7 +44,7 @@ $darker-gray: #3E3E3E;
 .pic_wrapper {
 	display: inline-block;
 	position: relative;
-	margin: 0px 75px 50px 75px;
+	margin: 0px 75px 0px 75px;
 	width: 230px;
 	height: 230px;
 	border: 5px solid $accent_color;
@@ -212,7 +212,7 @@ $darker-gray: #3E3E3E;
 	color: $accent_color;
 	border: 2px solid $accent_color;
 	border-radius: 5px;
-	margin-top: 0px;
+	margin-bottom: 0px;
 }
 
 .twofa:hover {
@@ -229,7 +229,7 @@ $darker-gray: #3E3E3E;
 	color: $logout_accent_color;
 	border: 2px solid $logout_accent_color;
 	border-radius: 5px;
-	margin-top: 0px;
+	margin-bottom: 0px;
 }
 
 .logout:hover {
