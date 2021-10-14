@@ -1,6 +1,5 @@
 import axios from 'axios';
 import { useState, useEffect, useContext } from 'react';
-// import { AuthContext } from '../../contexts/AuthContext';
 import '../../styles/ChatList.scss';
 import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
 import CreateChan from './CreateChan';
@@ -78,37 +77,24 @@ function ChannelCategory({ channelList, type, setDisplayCreateChan } : ChannelCa
 
 function ChannelList (socket:any) {
 	const [ channels, setChannels ] = useState([]);
-	const [ channelsPriv, setChannelsPriv ] = useState([]);
-	const [ channelsPub, setChannelsPub ] = useState([]);
 	const [ isLoading, setIsLoading ] = useState(true);
 	const [ displayCreateChan, setDisplayCreateChan ] = useState<number>(0);
-
-	// const { user } = useContext(AuthContext);
 	var { toggleDisplayList } = useContext(ChannelContext) as ContextType;
 
 	useEffect(() => {
-		const filterPubChan = () => {
-			var res = channels.filter((chan:any) => chan.type === 1);
-			setChannelsPub(res);
-		};
-		const filterPrivChan = () => {
-			var res = channels.filter((chan:any) => chan.type === 2);
-			setChannelsPriv(res);
-		};
-		const getChannels = async () => {
-			try {
-				const res = await axios.get(`/channel`);
-				// console.log(res);
-				setChannels(res.data);
-				filterPubChan();
-				filterPrivChan();
-				setIsLoading(false);
-			} catch (err) {
-				console.log(err);
-			}
-		};
-		getChannels();
-	}, [isLoading, channels]);
+		axios.get(`/channel/`)
+		.then( res => {
+			// console.log("GET CHANNELS", res);
+			setChannels(res.data);
+			setIsLoading(false);
+		})
+		.catch (err => {
+			console.log("Error:", err);
+		})
+	}, []);
+
+	var publicChans = channels.filter((chan:any) => chan.type === 1);
+	var privateChans = channels.filter((chan:any) => chan.type === 2);
 	
 	return (
 	<div id="channelList" >
@@ -119,13 +105,14 @@ function ChannelList (socket:any) {
 				<input type="text" placeholder="Search" id="channelSearch"></input>
 				<i id="searchButton"className="fas fa-search"></i>
 			</div>
-
+			{ isLoading && <span>Loading...</span>}
+			{ !isLoading && 
 			<div className="channelList">
-				<ChannelCategory channelList={ channelsPub } type="public" setDisplayCreateChan={ setDisplayCreateChan }/>
-				<ChannelCategory channelList={ channelsPriv } type="private" setDisplayCreateChan={ setDisplayCreateChan }/>
+				<ChannelCategory channelList={ publicChans } type="public" setDisplayCreateChan={ setDisplayCreateChan }/>
+				<ChannelCategory channelList={ privateChans } type="private" setDisplayCreateChan={ setDisplayCreateChan }/>
 			</div>
+			}
 		</div>
-		{/* <div className="dummyModal" onClick={ toggleDisplayList }></div> */}
 	</div>
 	);
 }

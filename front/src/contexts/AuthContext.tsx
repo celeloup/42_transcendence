@@ -2,16 +2,19 @@ import * as React from "react";
 
 export type User = {
 	id: number,
-	admin: boolean,
+	site_owner: boolean,
+	site_moderator: boolean,
 	id42: number,
 	isTwoFactorAuth: boolean,
+	site_banned: boolean
 }
 
 export type ContextType = {
 	isAuth: boolean,
 	login: (user:User) => void,
 	logout: () => void,
-	user: User | null
+	user: User | null,
+	setUser: (user:User) => void,
   }
 
 interface Props {
@@ -26,6 +29,7 @@ export const AuthProvider= ({ children } : Props) => {
 	const [user, setUser] = React.useState<User | null>();
 
 	const loginContext = (user:User) => {
+		// console.log("Context login : ", user);
 		setIsAuth(true);
 		setUser(user);
 	};
@@ -33,6 +37,6 @@ export const AuthProvider= ({ children } : Props) => {
 		setIsAuth(false);
 		setUser(null);
 	};
-	
-	return ( <AuthContext.Provider value={{isAuth: isAuth, login: loginContext, logout: logoutContext, user: user}}>{ children }</AuthContext.Provider> );
+
+  return ( <AuthContext.Provider value={{isAuth: isAuth, login: loginContext, logout: logoutContext, user: user, setUser:setUser}}>{ children }</AuthContext.Provider> );
 }
