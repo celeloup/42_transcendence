@@ -1,4 +1,3 @@
-import { ExecSyncOptionsWithBufferEncoding } from 'child_process';
 import { Column, Entity, ManyToOne, PrimaryGeneratedColumn, UpdateDateColumn } from 'typeorm';
 import { Type } from 'class-transformer';
 import User from '../users/user.entity';

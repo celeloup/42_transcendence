@@ -16,6 +16,8 @@ import User from 'src/users/user.entity';
 import AuthenticationService from '../authentication/authentication.service';
 import ChannelService from './channel.service';
 import { channel } from 'diagnostics_channel';
+import { classToClass, classToPlain } from 'class-transformer';
+
 
 @WebSocketGateway({ serveClient: false, namespace: '/channel' })
 export default class ChannelGateway implements OnGatewayInit, OnGatewayConnection, OnGatewayDisconnect {
@@ -67,6 +69,7 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
       this.logger.log('User has been ban');
       return ;
     }
+    //add member to the channel (nothing happen if already ban);
     if (!is_member) {
       this.channelService.addMember(room, user.id, user.id);
     }
@@ -131,18 +134,19 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     @ConnectedSocket() client: Socket,
   ) {
     const author = await this.authenticationService.getUserFromSocket(client);
+    // const user = await this.authenticationService.getUserFromSocket(client);
+    // const author = classToClass(user);
     const is_member: boolean = await this.channelService.isAMember(data.recipient.id, author.id);
     const is_banned: boolean = await this.channelService.isBanned(data.recipient.id, author.id);
     const is_muted: boolean = await this.channelService.isMuted(data.recipient.id, author.id);
 
-    
     if (!(is_member) || is_banned || is_muted) {
       this.logger.log('Unauthorized access');
       return ;
     }
     this.logger.log(`Message from ${this.connectedUsers.get(client)} to ${data.recipient.name}: ${data.content}`);
     const message = await this.channelService.saveMessage(data.content, author, data.recipient);
-    this.server.in(data.recipient.id.toString()).emit('receive_message', message);
+    this.server.in(data.recipient.id.toString()).emit('receive_message', classToPlain(message));
   }
 
   // @SubscribeMessage('request_messages')

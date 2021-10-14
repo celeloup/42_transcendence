@@ -9,7 +9,7 @@ import UsersService from 'src/users/users.service';
 import User from 'src/users/user.entity';
 import AchievementsService from 'src/achievements/achievements.service';
 import { match } from 'assert';
- 
+
 @Injectable()
 export default class MatchesService {
   constructor(
@@ -20,7 +20,7 @@ export default class MatchesService {
     private usersService: UsersService,
     private achievementsService: AchievementsService
 
-  ) {}
+  ) { }
 
   async getMatchById(id: number) {
     const match = await this.matchesRepository.findOne(id);
@@ -29,42 +29,42 @@ export default class MatchesService {
     }
     throw new HttpException('Match with this id does not exist', HttpStatus.NOT_FOUND);
   }
-  
+
   async createMatch(matchData: CreateMatchDto) {
     const newMatch = await this.matchesRepository.create({
       ...matchData,
-      score_user1:0,
-      score_user2:0,
+      score_user1: 0,
+      score_user2: 0,
       users: [await this.usersService.getById(matchData.user1_id),
-        await this.usersService.getById(matchData.user2_id)]
+      await this.usersService.getById(matchData.user2_id)]
     });
     await this.matchesRepository.save(newMatch);
     return newMatch;
   }
 
-  async weHaveAWinner(match: Match){
+  async weHaveAWinner(match: Match) {
     const user1 = await this.usersService.getAllInfosByUserId(match.user1_id);
     const user2 = await this.usersService.getAllInfosByUserId(match.user2_id);
     if (!user1.achievements)
       user1.achievements = new Array;
     if (!user2.achievements)
       user2.achievements = new Array;
-    if (!match.friendly){
+    if (!match.friendly) {
       const tenVictories = await this.achievementsService.getAchievementById(2);
       const aHundredPoints = await this.achievementsService.getAchievementById(3);
       user1.points += match.score_user1;
-      if (user1.points >= 100 && user1.points < ( 100 + match.goal))
+      if (user1.points >= 100 && user1.points < (100 + match.goal))
         user1.achievements.push(aHundredPoints);
       user2.points += match.score_user2;
-      if (user2.points >= 100 && user2.points < ( 100 + match.goal))
+      if (user2.points >= 100 && user2.points < (100 + match.goal))
         user2.achievements.push(aHundredPoints);
-      if (match.score_user1 === match.goal){
+      if (match.score_user1 === match.goal) {
         user1.victories++;
         if (user1.victories === match.goal)
           user1.achievements.push(tenVictories);
         user2.defeats++;
       }
-      else{
+      else {
         user2.victories++;
         if (user2.victories === match.goal)
           user2.achievements.push(tenVictories);
@@ -81,19 +81,15 @@ export default class MatchesService {
     return match;
   }
 
-  async updateMatch(id: number, matchData: UpdateMatchDto) {
-    //await this.matchesRepository.update(id, matchData);
-    const updatedMatch = await this.getMatchById(id);
-    if (updatedMatch) {
-      if (updatedMatch.score_user1 === updatedMatch.goal || updatedMatch.score_user2 === updatedMatch.goal)
-        return await this.weHaveAWinner(updatedMatch);
-      else
-        return updatedMatch;
-    }
-    throw new HttpException('Match not found', HttpStatus.NOT_FOUND);
+  async updateMatch(id: number, updatedMatch: Match) {
+    await this.getMatchById(id);
+    if (updatedMatch.score_user1 === updatedMatch.goal || updatedMatch.score_user2 === updatedMatch.goal)
+      return await this.weHaveAWinner(updatedMatch);
+    else
+      await this.matchesRepository.save(updatedMatch);
   }
-  
-  async deleteMatch(match_id: number){
+
+  async deleteMatch(match_id: number) {
     await this.getMatchById(match_id);
     await this.matchesRepository.delete(match_id);
     //Ne rien renvoyer si success ?
