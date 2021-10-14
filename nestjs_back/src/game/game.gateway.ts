@@ -70,6 +70,41 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		this.gameService.leaveRoom(room.toString(), client);
 	}
 
+	//envoie une invation pour jouer a un user
+	@SubscribeMessage('send_invit')
+	async sendGame(
+		@MessageBody() match: Match,
+		@ConnectedSocket() client: Socket,
+	) {
+		let guest_socket = this.connectedUsers.get(match.user2_id);
+		guest_socket.emit('invitation', match);
+	}
+	
+	
+	//accepte une invitation a jouer, join les 2 joueurs dans la room et lance la partie
+	@SubscribeMessage('accept_match')
+	async acceptMatch(
+		@MessageBody() match: Match,
+		@ConnectedSocket() client: Socket,
+	) {
+		let sender_socket = this.connectedUsers.get(match.user1_id);
+		this.gameService.joinRoom(this.server, match.id.toString(), client);
+		this.gameService.joinRoom(this.server, match.id.toString(), sender_socket);
+		this.gameService.launchGame(this.server, match, this.connectedUsers);
+	}
+
+	//refuse une invation, previens le joueur et suppr le match de la DB
+	@SubscribeMessage('decline_match')
+	async declineMatch(
+		@MessageBody() match: Match,
+		@ConnectedSocket() client: Socket,
+	) {
+		let sender_socket = this.connectedUsers.get(match.user1_id);
+		sender_socket.emit('invit_decline');
+		this.gameService.deleteMatchObjet(match.id);
+	}
+
+	//creer un game pour le MM, la partie est en attente
 	@SubscribeMessage('create_game')
 	async createGame(
 		@MessageBody() match: Match,
@@ -86,25 +121,17 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		this.logger.log(`Game ${match.id} created`);
 	}
 
-	@SubscribeMessage('send_invit')
-	async sendGame(
-		@MessageBody() match: Match,
-		@ConnectedSocket() client: Socket,
-	) {
-	}
-
-
+	//match un joueur avec un jeu attente, previent le user si aucun jeu n'est dispo
 	@SubscribeMessage('match_player')
 	async matchPlayer(
 		@ConnectedSocket() client: Socket,
 	) {
 		if (this.pendingGame.length === 0) {
 			client.emit('no_pending_game');
-			return ;
+			return;
 		}
 
 		let game = this.pendingGame.shift();
-
 		for (let [key, value] of this.connectedUsers.entries()) {
 			if (value === client) {
 				game.user2_id = key;
@@ -115,6 +142,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		this.gameService.launchGame(this.server, game, this.connectedUsers);
 	}
 
+	//recoit up ou down quand un player bouge son paddle
 	@SubscribeMessage('paddle_movement')
 	async setNewPosition(
 		@MessageBody() data: { id_game: string, move: string },
@@ -123,14 +151,14 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		let player: number;
 		let id: number = Number(data.id_game);
 		let game: Round = this.gameService.getCurrentGames().get(id);
-	
+
 		//on verifie l'id envoye en param
 		if (game === undefined) {
 			this.logger.log(`This game doesn't exit, are you sure it's the good id?`);
 			return;
 		}
 		// this.logger.log(`Change paddle position game ${data.id_game}`);
-		
+
 		//on verifie que les nouvelles positions viennent bien des players et on actualise leur position dans les infos de la partie
 		const user = await this.authenticationService.getUserFromSocket(client);
 		if (user) {
@@ -144,12 +172,14 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		}
 	}
 
+	//renvoie la liste des jeux en cours
 	@SubscribeMessage('get_current_games')
 	async requestCurrentGames(@ConnectedSocket() socket: Socket) {
 		this.logger.log(`List of current games`);
 		socket.emit('connected_users', Array.from(this.gameService.getCurrentGames().keys()));
 	}
 
+	//renvoie la liste des users et des personnes en train de jouer
 	@SubscribeMessage('get_users')
 	async requestConnectedUsers(@ConnectedSocket() socket: Socket) {
 		this.logger.log(`List of connected users and playing users`);

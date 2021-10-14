@@ -42,6 +42,10 @@ export default class GameService {
         return 0;
     }
 
+    deleteMatchObjet(matchId: number) {
+        this.matchService.deleteMatch(matchId);
+    }
+
     async launchGame(server: Server, match: Match, usersSocket: Map<number, Socket>) {
         
         //on initialise la game avec les parametres de jeu envoye par le front et on l'ajoute aux matchs en cours
@@ -51,7 +55,7 @@ export default class GameService {
         
         //on lance le jeu, retourne 1 si la partie a ete annule
         if (await this.startGame(server, round, usersSocket, this.playingUsers)) {
-            this.matchService.deleteMatch(match.id);
+            this.deleteMatchObjet(match.id);
             this.currentGames.delete(match.id);
             return ;
         }
