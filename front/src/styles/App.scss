@@ -31,19 +31,12 @@ header, footer {
 	width: 320px;
 }
 
-#logo * {
-	color: $accent_color;
+#logo p {
 	font-family: "Star Jedi";
 	font-size: 60px;
 	letter-spacing: 3px;
-	// margin-top: 50px;
-	display: flex;
-	flex-direction: column;
-}
-
-#logo p {
+	color: $accent_color;
 	display: block;
-	// max-width: 100px;
 	padding: 0;
 	margin: 0;
 	margin-top: -40px;
@@ -52,6 +45,10 @@ header, footer {
 	-ms-user-select: none; /* IE10+/Edge */
 	user-select: none; /* Standard */
 }
+
+// #logo p:nth-child(2) {
+// 	margin-top: -60px;
+// }
 
 .square {
 	width: 195px;
@@ -128,10 +125,13 @@ header, footer {
 	#logo p {
 		margin-top: 0;
 	}
+	#logo p:nth-child(2) {
+		margin-top: 0 !important;
+	}
 	img {
 		height: 100%;
 	}
 	.body_wrapper {
-		margin-top: 0;
+		margin-top: 20px;
 	}
 }

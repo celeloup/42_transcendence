@@ -11,6 +11,8 @@ export type ContextType = {
 	setChannel: (chan:Channel) => void,
 	displayList: boolean,
 	toggleDisplayList: () => void,
+	displayAdmin: boolean,
+	toggleDisplayAdmin: () => void,
 	changeChannel: (chan:Channel) => void,
 	socket: any | null,
 	setSocket: (sok:any) => void
@@ -24,12 +26,16 @@ export const ChannelContext = createContext<Partial<ContextType>>({});
 
 export const ChannelProvider = ({ children } : Props) => {
 
-	const [channel, setChannel] = useState<Channel | null>(null);
-	const [displayList, setDisplayList] = useState<boolean>(false);
-	const [socket, setSocket] = useState<any>(null);
+	const [ channel, setChannel ] = useState<Channel | null>(null);
+	const [ displayList, setDisplayList ] = useState<boolean>(false);
+	const [ displayAdmin, setDisplayAdmin ] = useState<boolean>(false);
+	const [ socket, setSocket ] = useState<any>(null);
 
 	const toggleDisplayList = () => {
 		setDisplayList(!displayList);
+	}
+	const toggleDisplayAdmin = () => {
+		setDisplayAdmin(!displayAdmin);
 	}
 
 	const changeChannel = (chan: Channel) => {
@@ -47,7 +53,9 @@ export const ChannelProvider = ({ children } : Props) => {
 				toggleDisplayList: toggleDisplayList,
 				changeChannel: changeChannel,
 				socket: socket,
-				setSocket: setSocket
+				setSocket: setSocket,
+				toggleDisplayAdmin: toggleDisplayAdmin,
+				displayAdmin: displayAdmin
 			}}>
 				{ children }
 			</ChannelContext.Provider> );
