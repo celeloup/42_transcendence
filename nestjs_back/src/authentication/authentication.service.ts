@@ -10,17 +10,22 @@ import jwt from './interface/jwt.interface';
 import { Socket } from 'socket.io';
 import { WsException } from '@nestjs/websockets';
 import { parse } from 'cookie';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export default class AuthenticationService {
 	constructor(
 	  private readonly usersService: UsersService,
     private readonly jwtService: JwtService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
 	) {}
 
   public async findUserFrom42Id(id42: number): Promise<User> {
-    return this.usersService.getBy42Id(id42);
+    return await this.usersRepository.findOne({ id42 });
+    //return this.usersService.getBy42Id(id42);
   }
 
   public async getUserFromAuthenticationToken(token: string): Promise<User> {

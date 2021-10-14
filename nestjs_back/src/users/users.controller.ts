@@ -138,7 +138,7 @@ export default class UsersController {
   })
   @UseGuards(JwtTwoFactorGuard)
   @SerializeOptions({
-    groups: ['infos']
+    groups: ['me', 'infos']
   })
   @Get('infos/me')
   getAllInfos(@Req() req: RequestWithUser) {
