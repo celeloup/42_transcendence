@@ -115,19 +115,18 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 			this.logger.log(`This game doesn't exit, are you sure it's the good id?`);
 			return;
 		}
-		this.logger.log(`Change paddle position game ${data.id_game}`);
+		// this.logger.log(`Change paddle position game ${data.id_game}`);
 		//on verifie que les nouvelles positions viennent bien des players et on actualise leur position dans les infos de la partie
 		const user = await this.authenticationService.getUserFromSocket(client);
 		if (user) {
 			player = this.gameService.getPlayer(game, user.id);
 			if (player == 1) {
-				this.gameService.movePaddle(game.paddle_player1, data.move);
+				game.paddle_player1.move(data.move);
 			}
 			else if (player == 2) {
-				this.gameService.movePaddle(game.paddle_player2, data.move);
+				game.paddle_player2.move(data.move);
 			}
 		}
-		console.log(game);
 	}
 
 	@SubscribeMessage('get_current_games')

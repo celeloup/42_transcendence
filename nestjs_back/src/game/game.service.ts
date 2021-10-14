@@ -112,11 +112,11 @@ export default class GameService {
 
     getPlayer(param: Round, id: number) {
         if (id === param.id_player1) {
-            this.logger.log(`Found player 1 game ${param.id_game}`);
+            // this.logger.log(`Found player 1 game ${param.id_game}`);
             return 1;
         }
         if (id === param.id_player2) {
-            this.logger.log(`Found player 2 game ${param.id_game}`);
+            // this.logger.log(`Found player 2 game ${param.id_game}`);
             return 2;
         }
         return 0;
@@ -136,30 +136,6 @@ export default class GameService {
     updateFrame(param: Round) {
         param.puck.update(param);
         this.hasVictory(param);
-    }
-
-    movePaddle(player: Paddle, move: string) {
-        let speed = 10;
-        let margin = player.h / 2;
-
-        if (move === "down") {
-            if (player.y + speed + margin <= height) {
-                player.y += speed;
-            }
-            else {
-                player.y = height - margin;
-            }
-        }
-
-        if (move === "up") {
-            if (player.y - speed - margin >= 0) {
-                player.y -= speed;
-            }
-            else {
-                player.y = 0 + margin;
-            }
-        }
-        return player;
     }
 
     async waitPlayer(server: Server, idGame: string, player1: Socket, player2: Socket, usersRoom: Map<Socket, string>) {

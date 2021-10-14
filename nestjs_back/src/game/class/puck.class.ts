@@ -23,9 +23,11 @@ export default class Puck {
         let puck_top = this.y - this.r;
 
         let pladdle1_right = param.paddle_player1.x + param.paddle_player1.w / 2;
+        let pladdle1_left = param.paddle_player1.x - param.paddle_player1.w / 2;
         let pladdle1_top = param.paddle_player1.y - param.paddle_player1.h / 2;
         let pladdle1_bottom = param.paddle_player1.y + param.paddle_player1.h / 2;
 
+        let pladdle2_right = param.paddle_player2.x + param.paddle_player2.w / 2;
         let pladdle2_left = param.paddle_player2.x - param.paddle_player2.w / 2;
         let pladdle2_top = param.paddle_player2.y - param.paddle_player2.h / 2;
         let pladdle2_bottom = param.paddle_player2.y + param.paddle_player2.h / 2;
@@ -43,22 +45,23 @@ export default class Puck {
         }
 
         if (this.x < 0) {
-            param.id_player2++;
+            param.score_player2++;
             this.reset();
         }
 
         if (this.x > width) {
-            param.id_player1++;
+            param.score_player1++;
             this.reset();
         }
     }
 
     reset() {
-        function getRandomInt(max: number) {
-            return Math.floor(Math.random() * max);
+        function getRandomInt(min: number, max: number) {
+            return Math.floor(Math.random() * (max - min)) + min;
         }
+
         this.x = width / 2;
-        this.y = getRandomInt(height - 15);
+        this.y = getRandomInt(40, height - 40);
         this.x_speed *= -1;
         this.y_speed *= -1;
     }
