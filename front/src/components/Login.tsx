@@ -6,7 +6,7 @@ import '../styles/Login.scss';
 import Logo from './ui_components/Logo';
 import Logo42 from './ui_components/42Logo';
 
-function Login(){
+function Login() {
 	const [ redir, setRedir ] = useState<boolean>(false);
 	const { login } = useContext(AuthContext) as ContextType;
 
