@@ -86,10 +86,23 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		this.logger.log(`Game ${match.id} created`);
 	}
 
+	@SubscribeMessage('send_invit')
+	async sendGame(
+		@MessageBody() match: Match,
+		@ConnectedSocket() client: Socket,
+	) {
+	}
+
+
 	@SubscribeMessage('match_player')
 	async matchPlayer(
 		@ConnectedSocket() client: Socket,
 	) {
+		if (this.pendingGame.length === 0) {
+			client.emit('no_pending_game');
+			return ;
+		}
+
 		let game = this.pendingGame.shift();
 
 		for (let [key, value] of this.connectedUsers.entries()) {
@@ -110,12 +123,14 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		let player: number;
 		let id: number = Number(data.id_game);
 		let game: Round = this.gameService.getCurrentGames().get(id);
+	
 		//on verifie l'id envoye en param
 		if (game === undefined) {
 			this.logger.log(`This game doesn't exit, are you sure it's the good id?`);
 			return;
 		}
 		// this.logger.log(`Change paddle position game ${data.id_game}`);
+		
 		//on verifie que les nouvelles positions viennent bien des players et on actualise leur position dans les infos de la partie
 		const user = await this.authenticationService.getUserFromSocket(client);
 		if (user) {
