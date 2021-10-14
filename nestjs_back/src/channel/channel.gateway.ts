@@ -127,7 +127,6 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     }
   }
 
-
   @SubscribeMessage('send_message')
   async listenForMessages(
     @MessageBody() data: { content: string, recipient: Channel },
