@@ -6,6 +6,8 @@ import Sketch from "react-p5";
 import p5Types from "p5";
 import P5 from "p5";
 import axios from "axios";
+import '../../styles/Game.scss';
+import Landing from './Landing';
 
 // type GameSettings = {
 // 	friendly: boolean, 
@@ -133,14 +135,13 @@ function Game() {
 
 	return (
 		<WindowBorder w='816px' h='670px'>
-			
 		<div id="game">
 			<div className="window_header">
 				<button onClick={ create_game }>CREATE GAME</button>
 				{ score[0] } MACHIN VS TRUC { score[1] }
 				<button onClick={ matchmaking }>MATCH MAKING</button>
-				{/* <button onClick={ launch_game }>LAUNCH GAME</button> */}
 			</div>
+			{/* <Landing /> */}
 			<div id="game_window">
 				<Sketch setup={ setup } draw={ draw } keyPressed={ keyPressed } />
 			</div>
