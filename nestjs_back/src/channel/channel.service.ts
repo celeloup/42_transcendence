@@ -375,9 +375,13 @@ export default class ChannelService {
           let channel = await this.getAllInfosByChannelId(channel_id);
           let newMuted = await this.usersService.getById(other_id);
           await channel.muted.push(newMuted);
-          let newMuteObj: muteObj;
-          newMuteObj.userId = other_id;
-          newMuteObj.silencedUntil = Date.now() + time;
+          let newMuteObj: muteObj = {
+
+        
+          "userId": other_id,
+          "silencedUntil": Date.now() + time}
+          // if (!channel.mutedDates)
+          //   channel.muteDates = new muteObj[];
           await channel.muteDates.push(newMuteObj);
           if (channel.next_unmute_date > newMuteObj.silencedUntil)
             channel.next_unmute_date = newMuteObj.silencedUntil;
@@ -451,7 +455,8 @@ export default class ChannelService {
       members: [channelOwner],
       admins: [channelOwner],
       banned: [],
-      muted: []
+      muted: [],
+      muteDates: []
     });
     if (newChannel.type === 3) {
       let newMember = await this.usersService.getById(channelData.otherUserIdForPrivateMessage);

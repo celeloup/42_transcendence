@@ -12,9 +12,7 @@ import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
 type channelSettings = {
 	type: number,
 	name: string,
-	password: string,
-	members: [],
-//	owner_id: number
+	password: string
 };
 
 type CreateChanProps = {
@@ -26,7 +24,7 @@ type CreateChanProps = {
 function CreateChan({ type, hide, socket } : CreateChanProps) {
 	// const { user } = useContext(AuthContext) as AuthContextType; // might remove once create chan change
 	var { changeChannel, toggleDisplayList } = useContext(ChannelContext) as ContextType;
-
+	const [ isLoading, setIsLoading ] = useState(false);
 	// -------- List users
 	// const [users, setUsers] = useState<User[]>([]);
 	// useEffect(() => {
@@ -70,18 +68,24 @@ function CreateChan({ type, hide, socket } : CreateChanProps) {
 			var chanSettings:channelSettings = {
 				type: chanType,
 				name: (chanType === 1 || chanType === 2) ? chanName : "", 
-				password: chanType === 2 ? chanPassword : "", 
-				members: [],
-			//	owner_id: user? user.id : 1 // TO CHANGE LATER OR TO REMOVE
+				password: chanType === 2 ? chanPassword : ""
+				// members: [],
 			};
 			// console.log(chanSettings);
 			const submitNewChannel = async () => {
-				try {
-					const res = await axios.post('/channel', chanSettings);
+				setIsLoading(true);
+				axios.post('/channel', chanSettings)
+				.then( res => {
+					console.log ("RES post new chan", res);
 					changeChannel(res.data);
 					hide(0);
 					toggleDisplayList();
-				} catch (err) { console.log(err); }
+					setIsLoading(false);
+				})
+				.catch (err => {
+					console.log(err);
+					setIsLoading(false);
+				})
 			};
 			submitNewChannel();
 		}
@@ -183,7 +187,7 @@ function CreateChan({ type, hide, socket } : CreateChanProps) {
 					<input 
 						className={ chanName !== "" ? "readyToSubmit" : "" }
 						type="submit" 
-						value="Create channel"
+						value={ isLoading ? "Loading..." : "Create channel" }
 					/>
 				</form>
 
