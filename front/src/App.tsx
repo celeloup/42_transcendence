@@ -34,8 +34,8 @@ function OAuth({ location } : RouteComponentProps) {
 			})
 			.catch(error => {
 				console.log("Error catch :", error.response);
-				if (!error.data)
-					alert("Looks like the back is down !!\n\nERR_EMPTY_RESPONSE");
+				// if (!error.data)
+				// 	alert("Looks like the back is down !!\n\nERR_EMPTY_RESPONSE");
 				setLoading(false);
 			})
 	}, [code]); // eslint-disable-line
