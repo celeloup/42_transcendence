@@ -7,13 +7,16 @@ import CreateUserDto from './dto/createUser.dto';
 import UpdateUserDto from './dto/updateUser.dto';
 import AchievementsService from '../achievements/achievements.service';
 import Channel from 'src/channel/channel.entity';
+import Match from 'src/matches/match.entity';
 
 @Injectable()
 export default class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    private achievementsService: AchievementsService
+    private achievementsService: AchievementsService,
+    @InjectRepository(Match)
+    private matchesRepository: Repository<Match>
   ) { }
 
   async getById(id: number): Promise<User> {
@@ -53,9 +56,11 @@ export default class UsersService {
   }
 
   async getMatchesByUserId(id: number) {
-    const user = await this.usersRepository.findOne(id, { relations: ['matches'] });
-    if (user)
-      return user.matches;
+    const matches = await this.matchesRepository.find({
+      where: [{ user1_id: id }, { user2_id: id }], order: { createdDate: "DESC" }
+    });
+    if (matches)
+      return matches;
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
@@ -121,11 +126,13 @@ export default class UsersService {
   async nameAlreadyInUse(name: string) {
     const user = await this.usersRepository.findOne({ name });
     if (user)
-       return true;
+      return true;
     return false;
   }
 
   async changeName(id: number, userData: UpdateUserDto): Promise<User> {
+    if (userData.name.length < 3 || userData.name.length > 15)
+      throw new HttpException('Name must be between 3 and 15 characters', HttpStatus.FORBIDDEN);
     if ((await this.nameAlreadyInUse(userData.name)))
       throw new HttpException('Name already in use', HttpStatus.FORBIDDEN);
     await this.usersRepository.update(id, userData);
@@ -191,10 +198,11 @@ export default class UsersService {
       if (!(await this.isAFriend(user_id, friend_id))) {
         if (!(await this.isBlocked(user_id, friend_id))) {
           if (!(await this.isBlocked(friend_id, user_id))) {
-            const user = await this.getAllInfosByUserId(user_id);
+            let user = await this.getAllInfosByUserId(user_id);
             const friend = await this.getById(friend_id);
             const firstFriend = await this.achievementsService.getAchievementById(1);
-            if (user.friends.length === 0)
+            if (user.friends.length === 0 && user.achievements
+              && user.achievements.findIndex(achievement => achievement.id === 1) !== 1)
               user.achievements.push(firstFriend);
             user.friends.push(friend);
             await this.usersRepository.save(user);
@@ -223,10 +231,10 @@ export default class UsersService {
 
   async isBlocked(user_id: number, other_id: number) {
     const user = await this.getAllInfosByUserId(user_id);
-      const other = await this.getById(other_id)
-        if ((user.blocked && (user.blocked.findIndex(element => element.id === other_id))) !== -1)
-          return true;
-        return false;
+    const other = await this.getById(other_id)
+    if ((user.blocked && (user.blocked.findIndex(element => element.id === other_id))) !== -1)
+      return true;
+    return false;
   }
 
   async blockAUser(user_id: number, other_id: number): Promise<User[]> {
@@ -313,8 +321,8 @@ export default class UsersService {
       return false;
     if (await this.isSiteAdmin(user_id))
       return true;
-    return false; 
-    }
+    return false;
+  }
 
   public async isSiteOwner(user_id: number) {
     const user = await this.getAllInfosByUserId(user_id);

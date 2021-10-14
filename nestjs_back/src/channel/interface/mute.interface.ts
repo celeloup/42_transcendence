@@ -1,4 +1,4 @@
-export default interface SilencedUntil {
+export default interface muteObj {
 	userId: number;
-	silencedUntil: Date;
+	silencedUntil: number;//date in milliseconds since 1970
 }
