@@ -15,6 +15,7 @@ import TwoFactorAuthenticationCodeDto from './dto/twoFactorAuthenticationCode.dt
 import AuthenticationService from '../authentication.service';
 import AuthInfos from '../interface/authInfos.interface';
 import { ApiResponse, ApiTags, ApiBearerAuth, ApiCookieAuth, ApiOperation } from '@nestjs/swagger';
+import JwtTwoFactorGuard from '../guard/jwtTwoFactor.guard';
 
 @ApiTags('2 Factors authentication')
 @Controller('2fa')
@@ -51,7 +52,7 @@ export default class TwoFactorAuthenticationController {
     status: 200,
     description: '2 factor authentication successfully enabled.',
   })
-  @ApiResponse({ status: 401, description: 'Authentication token invalid or Wrong authentication code.'})
+  @ApiResponse({ status: 401, description: 'Authentication token invalid or Wrong 2fa authentication code.'})
   async turnOnTwoFactorAuthentication(
     @Req() request: RequestWithUser,
     @Body() { twoFactorAuthenticationCode } : TwoFactorAuthenticationCodeDto
@@ -65,18 +66,42 @@ export default class TwoFactorAuthenticationController {
     await this.usersService.turnOnTwoFactorAuthentication(request.user.id);
   }
 
-  @UseGuards(JwtAuthenticationGuard)
-  @Post('authenticate')
-  @ApiOperation({summary: "return user associated with the authentication token"})
+  @UseGuards(JwtTwoFactorGuard)
+  @Post('turn-off')
+  @ApiOperation({summary: "Disable the 2fa with the 2fa code"})
   @HttpCode(200)
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')
   @ApiResponse({
     status: 200,
-    description: '2 factor authentication successfully enabled.',
+    description: '2 factor authentication successfully disabled.',
+  })
+  @ApiResponse({ status: 401, description: 'Authentication token invalid or Wrong 2fa authentication code.'})
+  async turnOffTwoFactorAuthentication(
+    @Req() request: RequestWithUser,
+    @Body() { twoFactorAuthenticationCode } : TwoFactorAuthenticationCodeDto
+  ) {
+    const isCodeValid = this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
+      twoFactorAuthenticationCode, request.user
+    );
+    if (!isCodeValid) {
+      throw new UnauthorizedException('Wrong 2fa authentication code');
+    }
+    await this.usersService.turnOffTwoFactorAuthentication(request.user.id);
+  }
+
+  @UseGuards(JwtAuthenticationGuard)
+  @Post('authenticate')
+  @ApiOperation({summary: "return 2fa tokens if 2fa code is valid"})
+  @HttpCode(200)
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @ApiResponse({
+    status: 200,
+    description: '2 factor authentication successfull.',
     type: AuthInfos
   })
-  @ApiResponse({ status: 401, description: 'Authentication token invalid or Wrong authentication code.'})
+  @ApiResponse({ status: 401, description: 'Authentication token invalid or Wrong 2fa authentication code.'})
   async authenticate(
     @Req() request: RequestWithUser,
     @Body() { twoFactorAuthenticationCode } : TwoFactorAuthenticationCodeDto
@@ -85,7 +110,7 @@ export default class TwoFactorAuthenticationController {
       twoFactorAuthenticationCode, request.user
     );
     if (!isCodeValid) {
-      throw new UnauthorizedException('Wrong authentication code');
+      throw new UnauthorizedException('Wrong 2fa authentication code');
     }
     const { user } = request;
     const accessJwt = this.authenticationService.getJwtToken(user.id, true);
