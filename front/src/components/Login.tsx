@@ -54,7 +54,7 @@ function Login() {
 		return (
 			<div className="login" >
 				<Logo/>
-				<a id="login_button" href="https://api.intra.42.fr/oauth/authorize?client_id=19e5ab89328bbc134e124cc4611ecc7c3fd0d88176bd38eda6e7ee23d649df3b&redirect_uri=http%3A%2F%2Flocalhost%3A3000%2Foauth&response_type=code">
+				<a id="login_button" href={ process.env.REACT_APP_OAUTH }>
 					<Logo42 /> LOGIN
 				</a>
 				<div id="ghosts">
