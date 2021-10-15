@@ -135,28 +135,17 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
 				break;
 			}
 		}
-		if (!author) {
-			return;
+		if (author) {
+
+			if ((await this.channelService.isAuthorized(data.recipient.id, author)) == false) {
+				this.logger.log('Unauthorized access');
+				return;
+			}
+
+			this.logger.log(`Message from ${this.connectedUsers.get(client)} to ${data.recipient.name}: ${data.content}`);
+			const message = await this.channelService.saveMessage(data.content, author, data.recipient);
+			this.server.in(data.recipient.id.toString()).emit('receive_message', classToPlain(message));
 		}
-
-		// const author = await this.authenticationService.getUserFromSocket(client);
-		// const is_member: boolean = await this.channelService.isAMember(data.recipient.id, author.id);
-		// const is_banned: boolean = await this.channelService.isBanned(data.recipient.id, author.id);
-		// const is_muted: boolean = await this.channelService.isMuted(data.recipient.id, author.id);
-
-		// if (!(is_member) || is_banned || is_muted) {
-		// 	this.logger.log('Unauthorized access');
-		// 	return;
-		// }
-
-		if (this.channelService.isAuthorized(data.recipient.id, author)) {
-			this.logger.log('Unauthorized access');
-			return;
-		}
-
-		this.logger.log(`Message from ${this.connectedUsers.get(client)} to ${data.recipient.name}: ${data.content}`);
-		const message = await this.channelService.saveMessage(data.content, author, data.recipient);
-		this.server.in(data.recipient.id.toString()).emit('receive_message', classToPlain(message));
 	}
 
 	// @SubscribeMessage('request_messages')
