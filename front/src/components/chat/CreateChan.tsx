@@ -12,7 +12,8 @@ import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
 type channelSettings = {
 	type: number,
 	name: string,
-	password: string
+	password: string, 
+	otherUserIdForPrivateMessage: number
 };
 
 type CreateChanProps = {
@@ -68,8 +69,8 @@ function CreateChan({ type, hide, socket } : CreateChanProps) {
 			var chanSettings:channelSettings = {
 				type: chanType,
 				name: (chanType === 1 || chanType === 2) ? chanName : "", 
-				password: chanType === 2 ? chanPassword : ""
-				// members: [],
+				password: chanType === 2 ? chanPassword : "",
+				otherUserIdForPrivateMessage: 0
 			};
 			// console.log(chanSettings);
 			const submitNewChannel = async () => {
