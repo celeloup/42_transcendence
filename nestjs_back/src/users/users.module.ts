@@ -8,10 +8,11 @@ import JwtStrategy from '../authentication/strategy/jwt.strategy';
 import UsersController from './users.controller';
 import AchievementsModule from '../achievements/achievements.module';
 import Achievement from '../achievements/achievement.entity';
+import Match from 'src/matches/match.entity';
  
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User, Achievement]),
+    TypeOrmModule.forFeature([User, Achievement, Match]),
     ConfigModule,
     JwtModule.registerAsync({
       imports: [ConfigModule],

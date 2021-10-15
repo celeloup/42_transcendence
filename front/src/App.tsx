@@ -20,10 +20,12 @@ function OAuth({ location } : RouteComponentProps) {
 	useEffect(() => {
 		axios.get(`/authentication/oauth${code}`)
 			.then(response => {
-				// console.log("RESPONSE GOOD : ", response);
+				console.log("RES Oauth : ", response);
 				const user = { 
 					id: response.data.id,
-					admin: response.data.admin,
+					site_owner: response.data.site_owner,
+					site_moderator: response.data.site_moderator,
+					site_banned: response.data.site_banned,
 					id42: response.data.id42,
 					isTwoFactorAuth: response.data.isTwoFactorAuthenticationEnabled,
 				}
@@ -32,6 +34,8 @@ function OAuth({ location } : RouteComponentProps) {
 			})
 			.catch(error => {
 				console.log("Error catch :", error.response);
+				if (!error.data)
+					alert("Looks like the back is down !!\n\nERR_EMPTY_RESPONSE");
 				setLoading(false);
 			})
 	}, [code]); // eslint-disable-line
@@ -52,10 +56,15 @@ const App = () => {
 						<Route
 							typeOfRoute="protected"
 							exact={true}
-							path='/admin'
-							component={ Admin }
+							path='/'
+							component={ Home }
 						/>
-						<Route typeOfRoute="protected" path='/parameters' component={ Parameters } />
+						<Route
+							typeOfRoute="protected"
+							exact={true}
+							path='/parameters'
+							component={ Parameters }
+						/>
 						<Route
 							typeOfRoute="protected"
 							exact={true}
@@ -65,10 +74,15 @@ const App = () => {
 						<Route
 							typeOfRoute="protected"
 							exact={true}
-							path='/'
-							component={ Home }
+							path='/admin'
+							component={ Admin }
 						/>
-						<Route typeOfRoute="public" exact={true} path='/oauth' component={ OAuth } />
+						<Route
+							typeOfRoute="public"
+							exact={true}
+							path='/oauth'
+							component={ OAuth }
+						/>
 					</Switch>
 					</PageWrapper>
 				</div>

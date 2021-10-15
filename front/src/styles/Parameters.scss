@@ -1,0 +1,237 @@
+$background-color: #232323;
+$text-color: white;
+$accent_color: #FFCD27;
+$logout_accent_color: #BF3030;
+$light-gray: #E3E3E3;
+$dark-gray: #919191;
+$darker-gray: #3E3E3E;
+
+.parameters {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.param_h1 {
+	font-family: "Dogica";
+	height: 100px;
+}
+
+.param_container {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	flex-wrap: wrap;
+	width: 100%;
+}
+
+.param_subcontainer {
+	display: flex;
+	flex-direction: column;
+	width: 50%;
+}
+
+.left {
+	flex-wrap: wrap-reverse;
+}
+
+.right {
+	flex-wrap: wrap;
+}
+
+.pic_wrapper {
+	display: inline-block;
+	position: relative;
+	margin: 0px 75px 0px 75px;
+	width: 230px;
+	height: 230px;
+	border: 5px solid $accent_color;
+	color: transparent;
+	border-radius: 0px 6px 6px 6px;
+	user-select: none;
+	color: transparent;
+}
+
+.pic_wrapper:before {
+	content:"your avatar_";
+	font-family: "Dogica";
+	position: relative;
+	top: -24px;
+	left: -22px;
+	background-color: $accent_color;
+	color: white;
+	height: 20px;
+	width: 1000px;
+	padding: 5px 20px;
+	border-radius: 5px 5px 0px 0px;
+}
+
+.pic_base {
+	position: relative;
+	top: -19px;
+	width: 231px;
+	height: 230px;
+	background-color: $darker-gray;
+	color: white;
+	font-family: "Dogica", "Fira Mono";
+	font-size: 200px;
+}
+
+.pic_base_text {
+	position: relative;
+	top: 20px;
+}
+
+.pic_input {
+	position: relative;
+	top: -250px;
+	width: 231px;
+	height: 232px;
+	cursor: pointer;
+	user-select: none;
+	color: transparent;
+}
+
+.pic_input::-webkit-file-upload-button {
+	visibility: hidden;
+}
+
+.pic_pencil {
+	position: relative;
+	top: -460px;
+	left: 75px;
+	width: 40px;
+	height: 40px;
+	font-size: 40px;
+	color: $accent_color;
+	text-shadow: 0 0 15px black;
+	border-radius: 50%;
+	pointer-events: none;
+}
+
+.name_wrapper {
+	display: block;
+	margin: 50px 50px 0px 50px;
+	width: 276px;
+	height: 25px;
+	background-color: $background-color;
+	border: 3px solid $accent_color;
+	border-radius: 0px 5px 5px 5px;
+	padding: 5px 10px;
+}
+
+.name_wrapper:before {
+	content:"your username_";
+	font-family: "Dogica";
+	position: relative;
+	top: -27px;
+	left: -36px;
+	background-color: $accent_color;
+	color: white;
+	height: 20px;
+	width: 1000px;
+	padding: 5px 20px;
+	border-radius: 5px 5px 0px 0px;
+}
+
+.name_changebar {
+	display: inline-block;
+	position: relative;
+	top: -24px;
+	left: -10px;
+	width: 275px;
+	height: 25px;
+	background-color: $background-color;
+	color: $text-color;
+	font-family: "Fira Mono";
+	font-size: 1em;
+	padding: 5px 10px;
+	border: none;
+	outline: none;
+}
+
+.field_changed {
+	display: inline-block;
+	font-family: "Fira Mono";
+	width: 400px;
+	margin-top: 20px;
+}
+
+.btn {
+	display: inline-block;
+	background-color: $background-color;
+	transition: background-color 0.2s, color 0.2s;
+}
+
+.btn:hover {
+	color: $background-color;
+    cursor: pointer;
+}
+
+.namechange {
+	color: $accent_color;
+	font-family: "Dogica";
+	font-size: 1em;
+	width: 200px;
+	height: 50px;
+	margin: 20px 101px;
+	border: 3px solid $accent_color;
+	border-radius: 5px;
+}
+
+.namechange:hover {
+	background-color: $accent_color;
+}
+
+.namechange_disabled {
+	color: $dark-gray;
+	font-family: "Dogica";
+	font-size: 1em;
+	width: 200px;
+	height: 50px;
+	margin: 20px 101px;
+	border: 3px solid $dark-gray;
+	border-radius: 5px;
+}
+
+.namechange_disabled:hover {
+	pointer-events: none;
+	color: $dark-gray;
+	cursor: not-allowed; // <= this does nothing because of pointer-events none
+}
+
+.twofa {
+	font-family: "Fira Mono";
+	width: 300px;
+	height: 75px;
+	margin: 30px;
+	font-size: 25px;
+	padding: 20px 20px;
+	color: $accent_color;
+	border: 2px solid $accent_color;
+	border-radius: 5px;
+	margin-bottom: 0px;
+}
+
+.twofa:hover {
+	background-color: $accent_color;
+}
+
+.logout {
+	font-family: "Fira Mono";
+	width: 300px;
+	height: 75px;
+	margin: 30px;
+	font-size: 25px;
+	padding: 20px 20px;
+	color: $logout_accent_color;
+	border: 2px solid $logout_accent_color;
+	border-radius: 5px;
+	margin-bottom: 0px;
+}
+
+.logout:hover {
+	background-color: $logout_accent_color;
+}
