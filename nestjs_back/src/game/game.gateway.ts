@@ -87,6 +87,13 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		@ConnectedSocket() client: Socket,
 	) {
 		let sender_socket = this.connectedUsers.get(match.user1_id);
+		
+		//si l'host s'est deco entre temps on annule le match
+		if (sender_socket === undefined) {
+			client.emit('cancel_game', match.id.toString());
+			return ;
+		}
+
 		this.gameService.joinRoom(this.server, match.id.toString(), client);
 		this.gameService.joinRoom(this.server, match.id.toString(), sender_socket);
 		this.gameService.launchGame(this.server, match, this.connectedUsers);
@@ -99,7 +106,9 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		@ConnectedSocket() client: Socket,
 	) {
 		let sender_socket = this.connectedUsers.get(match.user1_id);
-		sender_socket.emit('invit_decline');
+		if (sender_socket != undefined) {
+			sender_socket.emit('invit_decline', match.id.toString());
+		}
 		this.gameService.deleteMatchObjet(match.id);
 	}
 

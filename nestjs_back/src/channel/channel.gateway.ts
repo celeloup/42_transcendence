@@ -134,8 +134,6 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     @ConnectedSocket() client: Socket,
   ) {
     const author = await this.authenticationService.getUserFromSocket(client);
-    // const user = await this.authenticationService.getUserFromSocket(client);
-    // const author = classToClass(user);
     const is_member: boolean = await this.channelService.isAMember(data.recipient.id, author.id);
     const is_banned: boolean = await this.channelService.isBanned(data.recipient.id, author.id);
     const is_muted: boolean = await this.channelService.isMuted(data.recipient.id, author.id);

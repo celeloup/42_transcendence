@@ -26,16 +26,20 @@ export default class Round {
     this.id_game = id;
     this.id_player1 = id1;
     this.id_player2 = id2;
-    if (speed > 0 && speed < 21) {
-      this.speed = speed;
+    
+    if (speed < 0 || speed > 2) {
+      speed = 1;
     }
+    this.speed = speed;
+    
     if (goal > 0 && goal < 21) {
       this.goal = goal;
     }
+    
     this.boost_available = boost;
 
     this.paddle_player1 = new Paddle (true),
     this.paddle_player2 = new Paddle (false),
-    this.puck = new Puck;
+    this.puck = new Puck (this.speed);
   }
 }
