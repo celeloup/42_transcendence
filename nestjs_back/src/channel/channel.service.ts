@@ -71,17 +71,17 @@ export default class ChannelService {
   }
 
   async refreshMutedUsers(channel: &Channel) {
-    let date = await this.getNextExpiredMuteDate(channel.muteDates);
-    while (date !== null && date < Date.now()) {
-      let dateIndex = channel.muteDates.findIndex(muteObj => muteObj.silencedUntil === date);
-      let user_id = channel.muteDates[dateIndex].userId;
-      let userIndex = channel.muted.findIndex(user => user.id === user_id);
-      channel.muteDates.splice(dateIndex, 1);
-      channel.muted.splice(userIndex, 1);
-      date = await this.getNextExpiredMuteDate(channel.muteDates);
-    }
-    channel.next_unmute_date = date;
-    await this.channelRepository.save(channel);
+  //  let date = await this.getNextExpiredMuteDate(channel.muteDates);
+  //  while (date !== null && date < Date.now()) {
+  //    let dateIndex = channel.muteDates.findIndex(muteObj => muteObj.silencedUntil === date);
+  //    let user_id = channel.muteDates[dateIndex].userId;
+  //    let userIndex = channel.muted.findIndex(user => user.id === user_id);
+  //    channel.muteDates.splice(dateIndex, 1);
+  //    channel.muted.splice(userIndex, 1);
+  //    date = await this.getNextExpiredMuteDate(channel.muteDates);
+  //  }
+  //  channel.next_unmute_date = date;
+  //  await this.channelRepository.save(channel);
     return channel;
   }
 
@@ -185,12 +185,12 @@ export default class ChannelService {
     let indexUsers = channel.muted.findIndex(element => element.id === user_id);
     if (indexUsers === -1)
       return false;
-    let indexDates = channel.muteDates.findIndex(element => element.userId === user_id);
-    if (indexDates !== -1) {
+ //   let indexDates = channel.muteDates.findIndex(element => element.userId === user_id);
+ //   if (indexDates !== -1) {
 
-    }
-    if (indexDates === -1 && indexUsers !== indexDates)
-      return true
+  //  }
+  //  if (indexDates === -1 && indexUsers !== indexDates)
+  //    return true
     return true;
   }
 
@@ -382,7 +382,7 @@ export default class ChannelService {
           "silencedUntil": Date.now() + time}
           // if (!channel.mutedDates)
           //   channel.muteDates = new muteObj[];
-          await channel.muteDates.push(newMuteObj);
+        //  await channel.muteDates.push(newMuteObj);
           if (channel.next_unmute_date > newMuteObj.silencedUntil)
             channel.next_unmute_date = newMuteObj.silencedUntil;
           await this.channelRepository.save(channel);
@@ -397,10 +397,10 @@ export default class ChannelService {
 
   async unmuteChecksOK(channel_id: number, other_id: number) {
     let channel = await this.getAllInfosByChannelId(channel_id);
-    let mutedIndex = channel.muted.findIndex(user => user.id === other_id);
-    channel.muted.splice(mutedIndex, 1);
-    let muteObjIndex = channel.muteDates.findIndex(muteObj => muteObj.userId === other_id);
-    channel.muteDates.splice(muteObjIndex, 1);
+  //  let mutedIndex = channel.muted.findIndex(user => user.id === other_id);
+  //  channel.muted.splice(mutedIndex, 1);
+  //  let muteObjIndex = channel.muteDates.findIndex(muteObj => muteObj.userId === other_id);
+  //  channel.muteDates.splice(muteObjIndex, 1);
     await this.refreshMutedUsers(channel);
     await this.channelRepository.save(channel);
     return channel;
@@ -456,7 +456,7 @@ export default class ChannelService {
       admins: [channelOwner],
       banned: [],
       muted: [],
-      muteDates: []
+   //   muteDates: []
     });
     if (newChannel.type === 3) {
       let newMember = await this.usersService.getById(channelData.otherUserIdForPrivateMessage);
