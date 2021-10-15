@@ -15,8 +15,6 @@ function Friend ({username}: friendProp) {
 	const [online, setOnline] = useState(false);
     return (
         <div className ='friends_info'>
-    		{/* donner une classe avec width de 100 pour cent qui revient a la ligne */}
-    	    {/* <img id='avatar' src={calamityImage} alt='cowgirl'/> */}
             <div id='avatar' className='generated'> { username.charAt(0)}</div>
 			<p>{username}</p>
 	    	<div className={`dot_status ${online ? 'online': 'offline'}`} ></div>
