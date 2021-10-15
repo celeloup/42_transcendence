@@ -18,31 +18,32 @@ function Login() {
 	useEffect(() => {
 		if (ghostLogin !== 0)
 		{
-			axios.post(`/authentication/log-in`, { "id42": ghostLogin })
+			axios.post(`/authentication/register`, { "id42": 30, "email": "ghosty@mail.com", "name":"ghosty" })
 			.then (response => {
-				console.log(response);
+				// console.log(response);
 				login(response.data);
 				setRedir(true);
 				setGhostLogin(0);
 			})
 			.catch(error => {
 				console.log("Error catch :", error);
-				if (!error.data)
-					alert("Looks like the back is down !!\n\nERR_EMPTY_RESPONSE");
-				if (error.data.statusCode === 404)
-				{
-					axios.post(`/authentication/register`, { "id42": 1, email:"ghosty@mail.com", name: "ghosty"})
-					.then (response => {
-						console.log(response);
-						login(response.data);
-						setRedir(true);
-						// setGhostLogin(0);
-					})
-					.catch(error => {
-						console.log("Error catch :", error);
-						// setGhostLogin(0);
-					})
-				}
+				// if (!error.data)
+				// 	alert("Looks like the back is down !!\n\nERR_EMPTY_RESPONSE");
+				// if (error.data.statusCode === 404)
+				// {
+				// 	console.log(error);
+					// axios.post(`/authentication/register`, { "id42": 1, email:"ghosty@mail.com", name: "ghosty"})
+					// .then (response => {
+					// 	console.log(response);
+					// 	login(response.data);
+					// 	setRedir(true);
+					// 	// setGhostLogin(0);
+					// })
+					// .catch(error => {
+					// 	console.log("Error catch :", error);
+					// 	// setGhostLogin(0);
+					// })
+				// }
 				setGhostLogin(0);
 			})
 		}

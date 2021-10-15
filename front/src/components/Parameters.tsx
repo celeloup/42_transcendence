@@ -94,9 +94,9 @@ function Parameters() {
 
 	return (
 		<div className="parameters">
-			<div className="param_container">
+			{/* <div className="param_container">
 				<h1 className="param_h1">Parameters</h1>
-			</div>
+			</div> */}
 			<div className="param_container">
 				<div className="param_subcontainer left">
 					<div className="pic_wrapper">
