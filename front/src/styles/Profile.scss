@@ -128,20 +128,18 @@ $profile_background: rgb(65, 62, 62);
 				display: flex;
 				align-items: center;
 				gap: 15px;
-			// #avatar {
-			// 	width: 15%;
-			// }
 			
-			.generated	{
-				width: 40px;
-				height: 40px;
-				background-color: $profile_background;
-				color: white;
-				font-family: "Dogica", "Fira Mono";
-				font-size: 25px;
-				text-align: center;
+				.generated	{
+					width: 40px;
+					height: 40px;
+					background-color: $profile_background;
+					color: white;
+					font-family: "Dogica", "Fira Mono";
+					font-size: 30px;
+					text-align: center;
+					padding: 5px;
+				}
 			}
-		}
 		}	
     }
 	
