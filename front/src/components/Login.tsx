@@ -20,7 +20,7 @@ function Login() {
 		{
 			axios.post(`/authentication/register`, { "id42": 30, "email": "ghosty@mail.com", "name":"ghosty" })
 			.then (response => {
-				console.log(response);
+				// console.log(response);
 				login(response.data);
 				setRedir(true);
 				setGhostLogin(0);
