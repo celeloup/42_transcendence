@@ -10,6 +10,15 @@ $dark-gray: #919191;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+
+	#logo p {
+		font-size: 160px;
+		height: 180px;
+	}
+
+	#logo {
+		margin-bottom: 100px;
+	}
 }
 
 #login_button {
