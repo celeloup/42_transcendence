@@ -77,7 +77,7 @@ function CreateChan({ type, hide, socket } : CreateChanProps) {
 				setIsLoading(true);
 				axios.post('/channel', chanSettings)
 				.then( res => {
-					console.log ("RES post new chan", res);
+					// console.log ("RES post new chan", res);
 					changeChannel(res.data);
 					hide(0);
 					toggleDisplayList();
