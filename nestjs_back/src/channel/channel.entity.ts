@@ -52,8 +52,8 @@ class Channel {
   @JoinTable()
   public muted: User[];
   
-  @Column("simple-array", {array: true, nullable: true, default: [{}]})
-  public muteDates: muteObj[];
+  // @Column("simple-array", {array: true, nullable: true, default: [{}]})
+  // public muteDates: muteObj[];
 
   @Column({nullable: true, default: null})
   public next_unmute_date: number;

@@ -17,6 +17,6 @@ import ChannelController from "./channel.controller";
 	],
 	providers: [ChannelGateway, ChannelService],
 	controllers: [ChannelController],
-	exports: [ChannelService]
+	exports: [ChannelService] 
 })
 export default class ChannelModule { }
