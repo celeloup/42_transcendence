@@ -12,6 +12,8 @@ import FortyTwoStrategy from './strategy/42.strategy';
 import TwoFactorAuthenticationController from './twoFactor/twoFactorAuthentication.controller';
 import TwoFactorAuthenticationService from './twoFactor/twoFactorAuthentication.service';
 import JwtTwoFactorStrategy from './strategy/jwtTwoFactor.strategy';
+import User from 'src/users/user.entity';
+import { TypeOrmModule } from '@nestjs/typeorm';
  
 @Module({
   imports: [
@@ -19,6 +21,7 @@ import JwtTwoFactorStrategy from './strategy/jwtTwoFactor.strategy';
     HttpModule,
     PassportModule,
     ConfigModule,
+    TypeOrmModule.forFeature([User]), 
     JwtModule.registerAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
