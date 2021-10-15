@@ -10,7 +10,6 @@ function Parameters() {
 	const [is2FA, setIs2FA] = React.useState<boolean>(false);
 	const [nameWasChanged, setNameWasChanged] = React.useState<boolean>(false);
 	const [nameNotChanged, setNameNotChanged] = React.useState<boolean>(false);
-	const [avatarWasChanged, setAvatarWasChanged] = React.useState<boolean>(false);
 	const [avatarNotChanged, setAvatarNotChanged] = React.useState<boolean>(false);
 	const [oldUsername, setOldUsername] = React.useState<string>("");
 	const [newUsername, setNewUsername] = React.useState<string>("");
@@ -20,8 +19,7 @@ function Parameters() {
 
 	useEffect(() => {
 		axios.get("/users/infos/me")
-		.then(response => { console.log(response.data);
-							setNewUsername(response.data.name);
+		.then(response => { setNewUsername(response.data.name);
 							setOldUsername(response.data.name);
 							setUserId(response.data.id);
 							setAvatar(response.data.avatar);
@@ -62,15 +60,11 @@ function Parameters() {
 		const formData = new FormData();
 		formData.append('avatar', e.target.files[0]);
 		axios.post("/users/avatar/me", formData)
-		.then(response => { console.log("success!");
-							setAvatarWasChanged(true);
-							setAvatarNotChanged(false);
-							console.log(document.getElementsByClassName("param_profile_pic"));
+		.then(response => { setAvatarNotChanged(false);
 							window.location.reload();
 						})
 		.catch(error => { console.log(error.response);
 							setAvatarNotChanged(true);
-							setAvatarWasChanged(false);
 						});
 	}
 
