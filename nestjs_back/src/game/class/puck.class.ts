@@ -5,9 +5,20 @@ export default class Puck {
     x: number = width / 2;
     y: number = height / 2;
     r: number = 12;
-    x_speed: number = 2;
+    x_speed: number = 3;
     y_speed: number = 3;
     indice: number = 1;
+
+    constructor(speed: number) {
+        if (speed == 0) {
+            this.x_speed = 1;
+            this.y_speed = 1;
+        }
+        if (speed == 2) {
+            this.x_speed = 5;
+            this.y_speed = 5;
+        }
+    }
 
     update(param: Round) {
         this.x += this.x_speed;
