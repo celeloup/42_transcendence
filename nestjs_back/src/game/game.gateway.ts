@@ -80,7 +80,6 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		guest_socket.emit('invitation', match);
 	}
 	
-	
 	//accepte une invitation a jouer, join les 2 joueurs dans la room et lance la partie
 	@SubscribeMessage('accept_match')
 	async acceptMatch(
