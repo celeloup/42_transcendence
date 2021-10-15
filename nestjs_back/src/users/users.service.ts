@@ -179,6 +179,12 @@ export default class UsersService {
     });
   }
 
+  async turnOffTwoFactorAuthentication(user_id: number): Promise<UpdateResult> {
+    return this.usersRepository.update(user_id, {
+      isTwoFactorAuthenticationEnabled: false
+    });
+  }
+
   async isAFriend(user_id: number, friend_id: number) {
     const user = await this.getAllInfosByUserId(user_id);
     if (user) {
