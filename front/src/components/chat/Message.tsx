@@ -25,7 +25,7 @@ function ProfileCard( {id, setDisplayCard, setBlockedUsers }: CardProps) {
 	useEffect(() => {
 		axios.get(`/users/infos/${id}`)
 		.then( res => {
-			console.log("GET USER", res);
+			// console.log("GET USER", res);
 			setUser(res.data);
 			
 		})
@@ -34,7 +34,7 @@ function ProfileCard( {id, setDisplayCard, setBlockedUsers }: CardProps) {
 		})
 		axios.get(`/users/infos/me`)
 		.then( res => {
-			console.log("GET ME", res);
+			// console.log("GET ME", res);
 			setMe(res.data);
 			if (id !== res.data.id)
 			{

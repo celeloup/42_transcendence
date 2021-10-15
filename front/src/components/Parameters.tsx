@@ -20,7 +20,7 @@ function Parameters() {
 
 	useEffect(() => {
 		axios.get("/users/infos/me")
-		.then(response => { console.log(response.data);
+		.then(response => { //console.log(response.data);
 							setNewUsername(response.data.name);
 							setOldUsername(response.data.name);
 							setUserId(response.data.id);
@@ -52,7 +52,7 @@ function Parameters() {
 							setNameWasChanged(true);
 							setNameNotChanged(false);
 						})
-		.catch(error => { console.log(error.response);
+		.catch(error => { //console.log(error.response);
 							setNameNotChanged(true);
 							setNameWasChanged(false);
 						});
@@ -62,7 +62,7 @@ function Parameters() {
 		const formData = new FormData();
 		formData.append('avatar', e.target.files[0]);
 		axios.post("/users/avatar/me", formData)
-		.then(response => { console.log("success!");
+		.then(response => { //console.log("success!");
 							setAvatarWasChanged(true);
 							setAvatarNotChanged(false);
 							console.log(document.getElementsByClassName("param_profile_pic"));
@@ -84,7 +84,7 @@ function Parameters() {
 	const proPicStyle = (id: number, avatar: string) => {
 		if (id !== -1 && avatar !== null) {
 			return {
-				backgroundImage: "url(http://localhost:8080/api/users/avatar/" + id + ")",
+				backgroundImage: `url(${process.env.REACT_APP_BACK_URL}/api/users/avatar/${id})`,
 				backgroundSize: "cover",
 			}
 		}

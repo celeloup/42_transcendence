@@ -36,6 +36,7 @@ $dark-gray: #919191;
 	transition: background-color 0.1s, color 0.1s;
 	font-size: 36px;
 	font-family: "Dogica";
+	cursor: pointer;
 
 	svg {
 		width: 105px;
@@ -57,7 +58,6 @@ $dark-gray: #919191;
 #ghosts {
 	position: absolute;
 	display: flex;
-	// padding-top: 200px;
 	bottom: 50px;
 	gap: 20px;
 }
