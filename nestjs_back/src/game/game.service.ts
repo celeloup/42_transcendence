@@ -1,8 +1,10 @@
 import { Injectable, Logger } from '@nestjs/common';
 import Round from './class/round.class';
 import { Server, Socket } from 'socket.io';
-import User from 'src/users/user.entity';
 import AuthenticationService from 'src/authentication/authentication.service';
+import Paddle from './class/paddle.class';
+import { height } from './game.settings';
+import { EventListenerTypes } from 'typeorm/metadata/types/EventListenerTypes';
 
 @Injectable()
 export default class GameService {
@@ -89,6 +91,31 @@ export default class GameService {
     updateFrame(param: Round) {
         param.puck.update(param);
         this.hasVictory(param);
+    }
+
+    movePaddle(player: Paddle, move: string) {
+        let speed = 10;
+        let margin = player.h / 2;
+
+        if (move = "up") {
+            if (player.y + speed + margin <= height)
+            {
+                player.y += speed;
+            }
+            else {
+                player.y = height - margin;
+            }
+        }
+        
+        if (move = "down") {
+            if (player.y + speed + margin >= 0)
+            {
+                player.y -= speed;
+            }
+            else {
+                player.y = 0 + margin;
+            }
+        }
     }
 
     async waitPlayer(server: Server, idGame: string, player1: Socket, player2: Socket, usersRoom: Map<Socket, string>) {

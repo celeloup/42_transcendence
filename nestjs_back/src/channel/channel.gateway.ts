@@ -15,8 +15,7 @@ import Match from 'src/matches/match.entity';
 import User from 'src/users/user.entity';
 import AuthenticationService from '../authentication/authentication.service';
 import ChannelService from './channel.service';
-import { channel } from 'diagnostics_channel';
-import { classToClass, classToPlain } from 'class-transformer';
+import { classToPlain } from 'class-transformer';
 
 
 @WebSocketGateway({ serveClient: false, namespace: '/channel' })

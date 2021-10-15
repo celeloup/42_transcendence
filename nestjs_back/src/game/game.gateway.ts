@@ -102,7 +102,6 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
   }
 
   
-  //est-ce qu'on revient ici si le jeux a ete interrompu ?
   @SubscribeMessage('launch_game')
   async launchGame(
     @MessageBody() match: Match,
@@ -131,7 +130,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 
   @SubscribeMessage('paddle_movement')
   async setNewPosition(
-    @MessageBody() data: {id_game: number, y: number},
+    @MessageBody() data: {id_game: number, move: string},
     @ConnectedSocket() client: Socket,
   ) {
     let player: number;
@@ -147,21 +146,22 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
     //on verifie que les nouvelles positions viennent bien des players et on actualise leur position dans les infos de la partie
     const user = await this.authenticationService.getUserFromSocket(client);
     if (user)
-      player = this.gameService.getPlayer(this.currentGames.get(data.id_game), user.id);
+      player = this.gameService.getPlayer(game, user.id);
     else {
       for (let [key, value] of this.connectedUsers.entries()) {
         if (value === client) {
-          player = this.gameService.getPlayer(this.currentGames.get(data.id_game), key);
+          player = this.gameService.getPlayer(game, key);
           break;
         }
       }
     }
 
     if (player == 1) {
-      this.currentGames.get(data.id_game).paddle_player1.y = data.y;
+      this.gameService.movePaddle(game.paddle_player1, data.move);
     }
     else if (player == 2) {
-      this.currentGames.get(data.id_game).paddle_player2.y = data.y;
+      this.gameService.movePaddle(game.paddle_player2, data.move);
+      // this.currentGames.get(data.id_game).paddle_player2.y = data.y;
     }
   }
 
