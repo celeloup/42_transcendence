@@ -45,17 +45,29 @@ function UserLine ( { infos, adminFunction, modFunction, banFunction } : UserLin
 	return (
 		<div className="userLine">
 			<div>
-				<span>{infos.name} </span>
+				<span>{infos.name}</span>
 			</div>
-			<i id="user_button" className="fas fa-crown" onClick={callAdmin}>
-				<span className="tooltiptop">Make admin</span>
-			</i>
-			<div id="user_button" className="fas fa-wrench" onClick={callMod}>
-				<span className="tooltiptop">Make moderator</span>
+			<div className="user_button admin" onClick={callAdmin}>
+				<i className="fas fa-crown">
+					<span className="tooltiptop admin">
+						<span className="tooltiptext">Make admin</span>
+					</span>
+				</i>
 			</div>
-			<i id="user_button" className="fas fa-times-circle" onClick={callBan}>
-				<span className="tooltiptop">Ban user</span>
-			</i>
+			<div className="user_button mod" onClick={callAdmin}>
+				<i className="fas fa-wrench">
+					<span className="tooltiptop mod">
+						<span className="tooltiptext">Make moderator</span>
+					</span>
+				</i>
+			</div>
+			<div className="user_button ban" onClick={callAdmin}>
+				<i className="fas fa-times-circle">
+					<span className="tooltiptop ban">
+						<span className="tooltiptext">Ban user</span>
+					</span>
+				</i>
+			</div>
 		</div>
 	);
 }
@@ -72,7 +84,7 @@ function UserCategory({ list, type, search, adminFunction, modFunction, banFunct
 			<div className="separator">
 				<div onClick={ toggleDisplayCategory }>
 					<i className={ displayCategory ? "fas fa-chevron-down" : "fas fa-chevron-right" } ></i>
-					{type}s_
+					<span className="separator_text">{type}_</span>
 				</div>
 			</div>
 			{ displayCategory && <div className="publicChannels">
@@ -91,20 +103,24 @@ function Admin () {
 	const [admins, setAdmins] = useState<User[]>([]);
 	const [moderators, setModerators] = useState<User[]>([]);
 	const [others, setOthers] = useState<User[]>([]);
+	const [banned, setBanned] = useState<User[]>([]);
 	const [searched, setSearched] = useState<string>("");
 
 	useEffect(() => {
 		axios.get('/users')
 		.then ( response => {
 			setAdmins(response.data.filter(function(user : User) {
-				return (user.site_owner);
-			  }));
+				return (!user.site_banned && user.site_owner);
+			}));
 			setModerators(response.data.filter(function(user : User) {
-				return (!user.site_owner && user.site_moderator);
+				return (!user.site_banned && !user.site_owner && user.site_moderator);
 			}));
 			setOthers(response.data.filter(function(user : User) {
-				return (!user.site_owner && !user.site_moderator);
-			  }));
+				return (!user.site_banned && !user.site_owner && !user.site_moderator);
+			}));
+			setBanned(response.data.filter(function(user : User) {
+				return (user.site_banned);
+			}));
 		})
 		.catch ( error => {
 			console.log(error.response); 
@@ -135,7 +151,7 @@ function Admin () {
 			</div>
 			<div className="admin_container">
 				<div className="admin_subcontainer left">
-					<WindowBorder w='382px' h='450px'>
+					<WindowBorder w='450px' h='450px'>
 						<div className="userPanel">
 							<div className="userListWrapper">
 								<div className="userSearchBar">
@@ -144,11 +160,13 @@ function Admin () {
 								</div>
 
 								<div className="userList">
-									<UserCategory list={admins} type="admin" search={searched}
+									<UserCategory list={admins} type="admins" search={searched}
 										adminFunction={makeAdmin} modFunction={makeMod} banFunction={banUser}/>
-									<UserCategory list={moderators} type="moderator" search={searched}
+									<UserCategory list={moderators} type="moderators" search={searched}
 										adminFunction={makeAdmin} modFunction={makeMod} banFunction={banUser}/>
-									<UserCategory list={others} type="user" search={searched}
+									<UserCategory list={others} type="users" search={searched}
+										adminFunction={makeAdmin} modFunction={makeMod} banFunction={banUser}/>
+									<UserCategory list={banned} type="banned" search={searched}
 										adminFunction={makeAdmin} modFunction={makeMod} banFunction={banUser}/>
 								</div>
 							</div>
