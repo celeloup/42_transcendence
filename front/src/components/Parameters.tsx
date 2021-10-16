@@ -135,7 +135,9 @@ function Parameters() {
 			</div>
 			<div className="param_container">
 				<button className="btn logout" onClick={paramLogout}>
-					<i className="fas fa-door-closed fa-lg"></i> Log out
+					<i id="closed_door" className="fas fa-door-closed fa-lg"></i>
+					<i id="open_door" className="fas fa-door-open fa-lg"></i>
+					<span id="logout_text"> Log out</span>
 				</button>
 			</div>
 		</div>
