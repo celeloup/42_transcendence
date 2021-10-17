@@ -3,10 +3,12 @@ import { useState, useEffect, useContext } from 'react';
 import '../../styles/ChatList.scss';
 import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
 import CreateChan from './CreateChan';
+import React from 'react';
 
 type ChannelCategoryProps = {
 	channelList: any,
 	type: string,
+	search: string,
 	setDisplayCreateChan: (type:number) => void;
 }
 
@@ -36,7 +38,7 @@ function Channel({ channelObj } : ChannelProps) {
 	)
 }
 
-function ChannelCategory({ channelList, type, setDisplayCreateChan } : ChannelCategoryProps) {
+function ChannelCategory({ channelList, type, search, setDisplayCreateChan } : ChannelCategoryProps) {
 	const [displayCategory, setDisplayCategory] = useState(true);
 	const toggleDisplayCategory = (): void => {
 		setDisplayCategory(!displayCategory);
@@ -53,7 +55,12 @@ function ChannelCategory({ channelList, type, setDisplayCreateChan } : ChannelCa
 
 	var chans;
 	if (channelList.length !== 0)
-		chans = channelList.map((chan:any) => <Channel key={chan.id} channelObj={chan}/>)
+		chans = channelList.map((chan:any) => {
+			if (chan.name.includes(search))
+				return (<Channel key={chan.id} channelObj={chan}/>);
+			else
+				return (<React.Fragment key={chan.id}></React.Fragment>);
+		})
 	else
 		chans = <p className="no_chan">No {type} channel yet.</p>
 	
@@ -79,6 +86,8 @@ function ChannelList (socket:any) {
 	const [ channels, setChannels ] = useState([]);
 	const [ isLoading, setIsLoading ] = useState(true);
 	const [ displayCreateChan, setDisplayCreateChan ] = useState<number>(0);
+	const [search, setSearch] = useState<string>("");
+
 	var { toggleDisplayList } = useContext(ChannelContext) as ContextType;
 
 	useEffect(() => {
@@ -102,14 +111,14 @@ function ChannelList (socket:any) {
 		<div className="channelListWrapper">
 			<i className="fas fa-times closeIcon" onClick={ toggleDisplayList }></i>
 			<div className="channelSearchBar">
-				<input type="text" placeholder="Search" id="channelSearch"></input>
+				<input type="text" placeholder="Search" id="channelSearch" value={search} onChange={ e => setSearch(e.target.value) }></input>
 				<i id="searchButton"className="fas fa-search"></i>
 			</div>
 			{ isLoading && <span>Loading...</span>}
 			{ !isLoading && 
 			<div className="channelList">
-				<ChannelCategory channelList={ publicChans } type="public" setDisplayCreateChan={ setDisplayCreateChan }/>
-				<ChannelCategory channelList={ privateChans } type="private" setDisplayCreateChan={ setDisplayCreateChan }/>
+				<ChannelCategory channelList={ channelsPub } type="public" setDisplayCreateChan={ setDisplayCreateChan } search={search}/>
+				<ChannelCategory channelList={ channelsPriv } type="private" setDisplayCreateChan={ setDisplayCreateChan } search={search}/>
 			</div>
 			}
 		</div>
