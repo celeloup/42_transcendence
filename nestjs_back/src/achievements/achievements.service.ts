@@ -1,4 +1,4 @@
-import { HttpException, HttpStatus, Injectable, Inject } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import CreateAchievementDto from './dto/createAchievement.dto';
@@ -12,22 +12,12 @@ export default class AchievementsService {
   ) {}
 
   async getAchievementByName(name: string) {
-    const achievement = await this.achievementsRepository.findOne(name);
-    if (achievement) {
-      return achievement;
-    }
-    throw new HttpException('Achievement with this name does not exist', HttpStatus.NOT_FOUND);
+    return await this.achievementsRepository.findOne({name});
   }
 
   async getAchievementById(id: number) {
-    const achievement = await this.achievementsRepository.findOne(id);
-    if (achievement) {
-      return achievement;
-    }
-    throw new HttpException('Achievement with this id does not exist', HttpStatus.NOT_FOUND);
+    return await this.achievementsRepository.findOne(id);
   }
-
-  
   
   async createAchievement(achievementData: CreateAchievementDto) {
     const newAchievement = await this.achievementsRepository.create(achievementData);

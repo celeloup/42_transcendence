@@ -20,10 +20,12 @@ function OAuth({ location } : RouteComponentProps) {
 	useEffect(() => {
 		axios.get(`/authentication/oauth${code}`)
 			.then(response => {
-				// console.log("RESPONSE GOOD : ", response);
+				// console.log("RES Oauth : ", response);
 				const user = { 
 					id: response.data.id,
-					admin: response.data.admin,
+					site_owner: response.data.site_owner,
+					site_moderator: response.data.site_moderator,
+					site_banned: response.data.site_banned,
 					id42: response.data.id42,
 					isTwoFactorAuth: response.data.isTwoFactorAuthenticationEnabled,
 				}
@@ -32,6 +34,8 @@ function OAuth({ location } : RouteComponentProps) {
 			})
 			.catch(error => {
 				console.log("Error catch :", error.response);
+				// if (!error.data)
+				// 	alert("Looks like the back is down !!\n\nERR_EMPTY_RESPONSE");
 				setLoading(false);
 			})
 	}, [code]); // eslint-disable-line

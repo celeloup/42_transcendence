@@ -50,7 +50,7 @@ function Parameters() {
 							setNameWasChanged(true);
 							setNameNotChanged(false);
 						})
-		.catch(error => { console.log(error.response);
+		.catch(error => { //console.log(error.response);
 							setNameNotChanged(true);
 							setNameWasChanged(false);
 						});
@@ -78,7 +78,7 @@ function Parameters() {
 	const proPicStyle = (id: number, avatar: string) => {
 		if (id !== -1 && avatar !== null) {
 			return {
-				backgroundImage: "url(http://localhost:8080/api/users/avatar/" + id + ")",
+				backgroundImage: `url(${process.env.REACT_APP_BACK_URL}/api/users/avatar/${id})`,
 				backgroundSize: "cover",
 			}
 		}
@@ -88,9 +88,9 @@ function Parameters() {
 
 	return (
 		<div className="parameters">
-			<div className="param_container">
+			{/* <div className="param_container">
 				<h1 className="param_h1">Parameters</h1>
-			</div>
+			</div> */}
 			<div className="param_container">
 				<div className="param_subcontainer left">
 					<div className="pic_wrapper">

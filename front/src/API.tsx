@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 axios.defaults.withCredentials = true;
-axios.defaults.baseURL = "http://localhost:8080/api";
+axios.defaults.baseURL = `${process.env.REACT_APP_BACK_URL}/api`;
 
 export function oauth(code:string) {
 	  axios.get(`/authentication/oauth${code}`)
