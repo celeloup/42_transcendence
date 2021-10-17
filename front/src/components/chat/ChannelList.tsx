@@ -117,8 +117,8 @@ function ChannelList (socket:any) {
 			{ isLoading && <span>Loading...</span>}
 			{ !isLoading && 
 			<div className="channelList">
-				<ChannelCategory channelList={ channelsPub } type="public" setDisplayCreateChan={ setDisplayCreateChan } search={search}/>
-				<ChannelCategory channelList={ channelsPriv } type="private" setDisplayCreateChan={ setDisplayCreateChan } search={search}/>
+				<ChannelCategory channelList={ publicChans } type="public" setDisplayCreateChan={ setDisplayCreateChan } search={search}/>
+				<ChannelCategory channelList={ privateChans } type="private" setDisplayCreateChan={ setDisplayCreateChan } search={search}/>
 			</div>
 			}
 		</div>
