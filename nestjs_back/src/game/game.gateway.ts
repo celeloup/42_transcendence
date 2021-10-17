@@ -172,10 +172,10 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		if (user) {
 			player = this.gameService.getPlayer(game, user.id);
 			if (player == 1) {
-				game.paddle_player1.move(data.move);
+				game.paddle_player1.setDirection(data.move);
 			}
 			else if (player == 2) {
-				game.paddle_player2.move(data.move);
+				game.paddle_player2.setDirection(data.move);
 			}
 		}
 	}
