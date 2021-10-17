@@ -86,18 +86,18 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     this.logger.log(`Client ${this.connectedUsers.get(client)} left room ${room}`);
   }
 
-  @SubscribeMessage('mute_user')
-  async muteUser(
-    @MessageBody() data: { channel: Channel, member: User, time: number },
-    @ConnectedSocket() client: Socket,
-  ) {
-    const user: User = await this.authenticationService.getUserFromSocket(client);
-    let memberSocket: Socket = this.listSocket.get(data.member);
-    if (user) {
-      await this.channelService.muteAMember(data.channel.id, data.member.id, data.time, user.id);
-      memberSocket.emit('user_muted');
-    }
-  }
+  // @SubscribeMessage('mute_user')
+  // async muteUser(
+  //   @MessageBody() data: { channel: Channel, member: User, time: number },
+  //   @ConnectedSocket() client: Socket,
+  // ) {
+  //   const user: User = await this.authenticationService.getUserFromSocket(client);
+  //   let memberSocket: Socket = this.listSocket.get(data.member);
+  //   if (user) {
+  //     await this.channelService.muteAMember(data.channel.id, data.member.id, data.time, user.id);
+  //     memberSocket.emit('user_muted');
+  //   }
+  // }
 
   @SubscribeMessage('unmute_user')
   async unmuteUser(
