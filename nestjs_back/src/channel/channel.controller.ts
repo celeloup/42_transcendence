@@ -3,10 +3,11 @@ import ChannelService from './channel.service';
 import CreateChannelDto from './dto/createChannel.dto'
 import FindOneParams from '../utils/findOneParams';
 import UserDto from './dto/User.dto';
-import { ApiOperation, ApiParam, ApiTags, ApiResponse, ApiBearerAuth, ApiCookieAuth, ApiBody } from '@nestjs/swagger';
+import { ApiOperation, ApiParam, ApiTags, ApiBearerAuth, ApiCookieAuth } from '@nestjs/swagger';
 import JwtTwoFactorGuard from 'src/authentication/guard/jwtTwoFactor.guard';
 import RequestWithUser from 'src/authentication/interface/requestWithUser.interface';
 import NewPasswordDto from './dto/newPassword.dto';
+import MuteUserDto from './dto/muteUser';
 
 @ApiTags('channel')
 @Controller('channel')
@@ -15,8 +16,9 @@ export default class ChannelController {
     private readonly channelService: ChannelService
   ) {}
 
+  //change to only site admin at the end
   @Get()
-  @ApiOperation({summary: "Get all channels"})
+  @ApiOperation({summary: "Get all channels / Open route for the moment => In the end for admins only"})
   getAllChannels() {
     return this.channelService.getAllChannels();
   }
@@ -56,14 +58,15 @@ export default class ChannelController {
     return this.channelService.getAllInfosByChannelId(Number(id));
   }
 
+  //Change for site admins at the end
   @Get('messages')
-  @ApiOperation({summary: "Get all messages // debug purpose"})
+  @ApiOperation({summary: "Get all messages // open route for now; for site admins only in the end"})
   getAllMessages() {
-    return this.channelService.getAllMessages();
+    return this.channelService.getAllMessagesOfAllChannels();
   }
 
   @Post()
-  @ApiOperation({ summary: "Create a channel with the authenticated user" })
+  @ApiOperation({ summary: "Create a channel with the authenticated user / 1 for public, 2 for private, 3 for MP" })
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')
   @UseGuards(JwtTwoFactorGuard)
@@ -155,9 +158,9 @@ export default class ChannelController {
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')
   @UseGuards(JwtTwoFactorGuard)
-  muteAMember(@Req() req: RequestWithUser, @Param() { id }: FindOneParams, @Body() member: UserDto) {
+  muteAMember(@Req() req: RequestWithUser, @Param() { id }: FindOneParams, @Body() muteObj: MuteUserDto) {
     const {user} = req;
-    return this.channelService.muteAMember(Number(id), member.userId, user.id);
+    return this.channelService.muteAMember(Number(id), muteObj.userId, muteObj.timeInMilliseconds, user.id);
   }
 
   @Put('unmute/:id')

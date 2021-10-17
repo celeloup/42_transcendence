@@ -16,23 +16,11 @@ $dark-gray: #919191;
 
 .channelList {
 	// background-color: red;
-	height: calc(100% - 80px);
+	height: calc(100% - 90px);
 	padding: 10px 0 10px 10px;
 	overflow-y: scroll;
 	position: relative;
 }
-
-// #channelList::after {
-// 	content: "";
-// 	z-index: 1;
-// 	width: 4px;
-// 	height: 686px;
-// 	background-color: white;
-// 	position: absolute;
-// 	left: 324px;
-// 	top: -8px;
-// 	z-index: 0;
-// }
 
 .channelListWrapper {
 	height: 100%;
@@ -46,34 +34,19 @@ $dark-gray: #919191;
 	color: white;
 }
 
-// .dummyModal {
-// 	flex-grow: 1;
-// 	z-index: 1;
-// 	height: 100%;
-// 	// margin-left: 4px;
-// 	// background-color: $background-color;
-// 	// opacity: 0.9;
-// }
-
 .channelListWrapper .closeIcon {
 	font-size: 35px;
 	position: absolute;
 	right: 15px;
 	top: 15px;
 	cursor: pointer;
-	// color: $accent_color;
 }
-
-// .channelListWrapper .closeIcon:hover {
-// 	color: $accent_color;
-// }
 
 .channelListTitle {
 	color: $accent_color;
 	font-size: 20px;
 	font-family: "Dogica";
 	margin: 20px 0 20px 40px;
-	// text-align: center;
 }
 
 .channel {

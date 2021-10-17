@@ -23,7 +23,7 @@ connector.on("connect", () => {
       console.log(`client ${i}: connected!`);
       if (i == 1) {
         client.emit('launch_game', { id: 444, friendly: false, user1_id: 1, user2_id: 2, user1_score: 10, user2_score: 10 });
-        // client.emit('paddle_movement', { id_game: 444, y: 9 })
+        client.emit('paddle_movement', { id_game: 444, move: "up" })
       }
       if (i == 1 || i == 2)
       client.emit('join_game', 444);

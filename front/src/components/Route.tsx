@@ -15,13 +15,14 @@ export function Route({ typeOfRoute, ...routeProps}: RouteProps) {
 	React.useEffect(() => {
 		if (routeProps.path !== "/oauth")
 		{
-			// console.log("hello", routeProps.path);
 			axios.get(`/authentication`)
 			.then(response => { 
-				// console.log("YES IS AUTH", response.data);
+				// console.log("RES isAuth", response.data);
 				const user = { 
 					id: response.data.id,
-					admin: response.data.admin,
+					site_owner: response.data.site_owner,
+					site_moderator: response.data.site_moderator,
+					site_banned: response.data.site_banned,
 					id42: response.data.id42,
 					isTwoFactorAuth: response.data.isTwoFactorAuthenticationEnabled,
 				}

@@ -1,15 +1,15 @@
 import WindowBorder from '../ui_components/WindowBorder';
 import { useRef, useContext, useState, useEffect, EffectCallback } from 'react';
 import ChannelList from '../chat/ChannelList';
-import { Message } from '../chat/ChannelConversation';
+import { ChannelAdmin } from './ChannelAdmin';
+import { Message } from './Message';
 import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
-// import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
 import { io } from "socket.io-client";
 import '../../styles/Chat.scss';
 import axios from 'axios';
 
 function ChatHeader() {
-	var { channel, toggleDisplayList } = useContext(ChannelContext) as ContextType;
+	var { channel, toggleDisplayList, toggleDisplayAdmin } = useContext(ChannelContext) as ContextType;
 	var name = channel ? channel.name : "chat_";
 	return (
 		<div className="window_header chat_header">
@@ -17,51 +17,58 @@ function ChatHeader() {
 			<div className="header_title">
 				<i className="fas fa-user-friends"></i>{ name }
 			</div>
-			<i className="fas fa-cog header_button"></i>
+			{ channel && <i className="fas fa-cog header_button" onClick={ toggleDisplayAdmin }></i> }
 			{/* <i className="fas fa-comment-alt"></i> */}
 		</div>
 	)
 }
 
 export function Chat() {
-	// const { user } = useContext(AuthContext) as AuthContextType;
 	const [ messages, setMessages ] = useState<any[]>([]);
 	const [ newMessage, setNewMessage ] = useState("");
-
-	// ---------- DISPLAY
-	var { displayList, channel, socket, setSocket } = useContext(ChannelContext) as ContextType;
+	const [ msgIsLoading, setMsgIsLoading ] = useState(false);
+	const [ blockedUsers, setBlockedUsers ] = useState<any[]>([]);
+	var { displayList, displayAdmin, channel, socket, setSocket } = useContext(ChannelContext) as ContextType;
 	
 	// ---------- SOCKETS
-	// var [socket, setSocket] = useState<any>(null);
 	useEffect(() : ReturnType<EffectCallback> => {
-		const newSocket:any = io(`http://localhost:8080/channel`, { transports: ["websocket"] });
+		const newSocket:any = io(`${process.env.REACT_APP_BACK_URL}/channel`, { transports: ["websocket"] });
 		setSocket(newSocket);
 		return () => newSocket.close();
 	}, [setSocket]);
 
 	useEffect(() => {
 		socket?.on('receive_message', (data:any) => {
-			console.log("RECEIVED :", data);
+			// console.log("RECEIVED :", data);
 			setMessages(oldArray => [...oldArray, data]);
 		})
 	}, [socket])
 	
+	
 	// ---------- GET MESSAGES
 	useEffect(() => {
 		// console.log("CURRENT CHANNEL: ", channel);
-		const getMessages = async () => {
-			if (channel)
-			{
-				try {
-					const res = await axios.get(`/channel/messages/${channel.id}`);
-					console.log("GET MESSAGES", res);
-					setMessages(res.data.reverse());
-				} catch (err) {
-					console.log(err);
-				}
-			}
-		};
-		getMessages();
+		if (channel) {
+			setMsgIsLoading(true);
+			axios.get(`/channel/messages/${channel.id}`)
+			.then( res => {
+				// console.log("GET MESSAGES", res);
+				setMessages(res.data);
+				setMsgIsLoading(false);
+			})
+			.catch (err => {
+				console.log("Error:", err);
+				setMsgIsLoading(false);
+			})
+		}
+		axios.get(`/users/infos/me`)
+			.then( res => {
+				// console.log("GET infos me", res);
+				setBlockedUsers(res.data.blocked);
+			})
+			.catch (err => {
+				console.log("Error:", err);
+			})
 	}, [channel])
 
 	// ---------- SCROLL
@@ -73,6 +80,8 @@ export function Chat() {
 		scrollToBottom();
 	}, [messages])
 
+
+	// ---------- SUBMIT MESSAGE
 	const inputRef = useRef<any>(null);
 	const handleSubmit = (e:any) => {
 		e.preventDefault();
@@ -89,10 +98,19 @@ export function Chat() {
 		}
 	}
 
+	// ---------- MESSAGE LIST
 	var messageList;
-	// console.log(messages);
-	if (messages.length !== 0)
-		messageList = messages.map((mes:any) => <Message key={ mes.id } username={ mes.author ? mes.author.name : "empty" } message={ mes.content }/>)
+	if (messages.length !== 0) {
+		// console.log(test);
+		messageList = messages.map((mes:any) =>
+			<Message 
+			key={ mes.id }
+			id={ mes.author.id }
+			username={ mes.author.name }
+			message={ mes.content }
+			setBlockedUsers={ setBlockedUsers }
+			blocked={ blockedUsers.find((x:any) => x.id === mes.author.id) !== undefined ? true : false } />)
+	}
 	else
 		messageList = <p className="no_msg">No message yet.</p>
 
@@ -101,6 +119,7 @@ export function Chat() {
 		<WindowBorder w='382px' h='670px'>
 			<div id="chat">
 				{ displayList && <ChannelList socket={socket}/> }
+				{ displayAdmin && <ChannelAdmin/> }
 				<ChatHeader />
 				<div id="chat_messages">
 					{ channel === null && 
@@ -111,7 +130,7 @@ export function Chat() {
 					}
 					{ channel && 
 						<div>
-							{ messageList }
+							{ msgIsLoading ? "Loading..." : messageList }
 							<div ref={messagesEndRef} />
 						</div>
 					}
