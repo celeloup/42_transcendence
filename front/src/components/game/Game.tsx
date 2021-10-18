@@ -39,7 +39,7 @@ function Game() {
 	const paddle_margin: number = 10;
 
 	const [ socket, setSocket ] = useState<any>(null);
-	const [ puck, setPuck ] = useState<{x: number, y: number, r: number}>({ x: width / 2, y: height/ 2, r: 20 });
+	const [ puck, setPuck ] = useState<{x: number, y: number, r: number}>({ x: width / 2, y: height/ 2, r: 12 });
 	const [ paddleRight, setPaddleRight ] = useState<Paddle>({ is_left: false, x: width - paddle_margin - 20 / 2, y: height / 2, w: 20, h: 80, indice:0 });
 	const [ paddleLeft, setPaddleLeft ] = useState<Paddle>({ is_left: true, x: paddle_margin + 20 / 2, y: height / 2, w: 20, h: 80, indice:0 });
 	const [ score, setScore ] = useState<number[]>([0, 0]);
@@ -88,7 +88,7 @@ function Game() {
 			"map": 0,
 			"speed": 1,
 			"goal": 10,
-			"boost_available": false
+			"boost_available": true
 		  })
 		  .then( res => { 
 			  	// console.log("create match success !", res);
@@ -121,7 +121,7 @@ function Game() {
 	const draw = (p5: p5Types) => {
 		p5.background('#232323');
 		separation(p5);
-		p5.ellipse(puck.x, puck.y, puck.r, puck.r);
+		p5.ellipse(puck.x, puck.y, puck.r * 2, puck.r * 2);
 		p5.rect(paddleLeft.x, paddleLeft.y, paddleLeft.w, paddleLeft.h);
 		p5.rect(paddleRight.x, paddleRight.y, paddleRight.w, paddleRight.h);
 	};
