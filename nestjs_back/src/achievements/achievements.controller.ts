@@ -1,4 +1,4 @@
-import { Body, Controller, HttpCode, Param, Put, Req, UseGuards, Post, Get } from '@nestjs/common';
+import { Body, Controller, Param, HttpException, HttpStatus, Post, Get } from '@nestjs/common';
 import AchievementsService from './achievements.service';
 import CreateAchievementDto from './dto/createAchievement.dto'
 import FindOneParams from '../utils/findOneParams';
@@ -14,8 +14,11 @@ export default class AchievementsController {
   @ApiParam({name: 'id', type: Number, description: 'achievement id'})
   @Get(':id')
   @ApiOperation({summary: "Get an achievement"})
-  getAchievementById(@Param() { id }: FindOneParams) {
-    return this.achievementsService.getAchievementById(Number(id));
+  async getAchievementById(@Param() { id }: FindOneParams) {
+    const achievement = await this.achievementsService.getAchievementById(Number(id));
+    if (!achievement) {
+      throw new HttpException('Achievement with this id does not exist', HttpStatus.NOT_FOUND);
+    }
   }
 
   @Post()

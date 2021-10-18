@@ -1,8 +1,8 @@
 import { IsNotEmpty, IsNumber } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
 
-export default class MuteUser {
-    
+export default class MuteUserDto {
+
     @IsNumber()
     @IsNotEmpty()
     @ApiProperty()

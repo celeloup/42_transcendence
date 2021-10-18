@@ -7,7 +7,7 @@ up:
 	#if [ -d "postgres_data" ]; then mkdir postgres_data; fi
 	$(DC) --project-name $(NAME) up --detach
 logs:
-	$(DC) --project-name $(NAME) logs --follow
+	$(DC) --project-name $(NAME) logs --follow front back postgres
 front.logs:
 	$(DC) --project-name $(NAME) logs --follow front
 front.shell:
@@ -16,7 +16,7 @@ back.logs:
 	$(DC) --project-name $(NAME) logs --follow back
 back.shell:
 	$(DC) --project-name $(NAME) exec back sh
-back.test:
+back.test: 
 	$(DC) --project-name $(NAME) exec back npm run test
 stop:
 	$(DC) --project-name $(NAME) stop

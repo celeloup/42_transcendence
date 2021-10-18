@@ -94,6 +94,7 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     const user: User = await this.authenticationService.getUserFromSocket(client);
     let memberSocket: Socket = this.listSocket.get(data.member);
     if (user) {
+      await this.channelService.muteAMember(data.channel.id, data.member.id, data.time, user.id);
       memberSocket.emit('user_muted');
     }
   }
@@ -124,15 +125,12 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     }
   }
 
-
   @SubscribeMessage('send_message')
   async listenForMessages(
     @MessageBody() data: { content: string, recipient: Channel },
     @ConnectedSocket() client: Socket,
   ) {
     const author = await this.authenticationService.getUserFromSocket(client);
-    // const user = await this.authenticationService.getUserFromSocket(client);
-    // const author = classToClass(user);
     const is_member: boolean = await this.channelService.isAMember(data.recipient.id, author.id);
     const is_banned: boolean = await this.channelService.isBanned(data.recipient.id, author.id);
     const is_muted: boolean = await this.channelService.isMuted(data.recipient.id, author.id);
