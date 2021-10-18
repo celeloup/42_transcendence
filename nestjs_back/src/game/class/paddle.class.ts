@@ -8,6 +8,7 @@ export default class Paddle {
 	h: number = 80;
     indice: number = 1;
 	speed: number = 10;
+    direction: number = 0;
 
     constructor(is_left: boolean) {
 		this.is_left = is_left;
@@ -18,26 +19,35 @@ export default class Paddle {
 			this.x = width - paddle_margin - this.w / 2;
 	}
 
-	move(move: string) {
-		let margin = this.h / 2 + 10;
-
-		if (move === "down") {
-            if (this.y + this.speed + margin <= height) {
-                this.y += this.speed;
-            }
-            else {
-                this.y = height - margin;
-            }
+    setDirection(move: string) {
+        if (move === "stop") {
+            this.direction = 0;
+            return ;
         }
-
         if (move === "up") {
-            if (this.y - this.speed - margin >= 0) {
-                this.y -= this.speed;
-            }
-            else {
-                this.y = 0 + margin;
-            }
+            this.direction = -1;
+            return ;
         }
+        if (move === "down") {
+            this.direction = 1;
+            return ;
+        }
+    }
 
+	updatePosition() {
+        if (this.speed == 0)
+            return ;
+
+        let margin = this.h / 2 + 10;
+        let border = this.y + this.direction * (this.speed + margin)
+        if (border > height) {
+            this.y = height - margin;
+            return ;
+        }
+        if (border < 0) {
+            this.y = 0 + margin;
+            return ;
+        }
+        this.y = this.y + this.direction * this.speed;
 	}
 }

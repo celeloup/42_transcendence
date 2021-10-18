@@ -34,11 +34,14 @@ type Paddle = {
 }
 
 function Game() {
-	
+	const height: number = 626;
+	const width: number = 782;
+	const paddle_margin: number = 10;
+
 	const [ socket, setSocket ] = useState<any>(null);
-	const [ puck, setPuck ] = useState<{x: number, y: number}>({x:100, y:100});
-	const [ paddleRight, setPaddleRight ] = useState<Paddle>({ is_left: false, x: 0, y: 0, w: 20, h: 80, indice:0 });
-	const [ paddleLeft, setPaddleLeft ] = useState<Paddle>({ is_left: true, x: 0, y: 0, w: 20, h: 80, indice:0 });
+	const [ puck, setPuck ] = useState<{x: number, y: number, r: number}>({ x: width / 2, y: height/ 2, r: 20 });
+	const [ paddleRight, setPaddleRight ] = useState<Paddle>({ is_left: false, x: width - paddle_margin - 20 / 2, y: height / 2, w: 20, h: 80, indice:0 });
+	const [ paddleLeft, setPaddleLeft ] = useState<Paddle>({ is_left: true, x: paddle_margin + 20 / 2, y: height / 2, w: 20, h: 80, indice:0 });
 	const [ score, setScore ] = useState<number[]>([0, 0]);
 	const [ match, setMatch ] = useState<any>(null);
 	const [ matchID, setMatchID ] = useState<string>("");
@@ -96,28 +99,29 @@ function Game() {
 	}
 	
 	// ------------- CANVAS
+	
 
 	function separation(p5: p5Types) {
 		let wd = 5;
 		let hd = 20;
-		for (let it = 20; it < 630; it += 35)
+		for (let it = 15; it < height; it += 35)
 		{
 			p5.fill(255);
-			p5.rectMode(p5.CENTER);
-			p5.rect(782 / 2 - wd / 2, it, wd, hd);
+			// p5.rectMode(p5.CENTER);
+			p5.rect(width / 2, it, wd, hd);
 		}
 	}
 
 	const setup = (p5: p5Types, canvasParentRef: Element) => {
 		p5.rectMode(p5.CENTER);
-		p5.createCanvas(782, 630).parent(canvasParentRef);
+		p5.ellipseMode(p5.CENTER);
+		p5.createCanvas(width, height).parent(canvasParentRef);
 	};
 
 	const draw = (p5: p5Types) => {
-		p5.background(0);
+		p5.background('#232323');
 		separation(p5);
-		p5.rectMode(p5.CENTER);
-		p5.ellipse(puck.x, puck.y, 20, 20);
+		p5.ellipse(puck.x, puck.y, puck.r, puck.r);
 		p5.rect(paddleLeft.x, paddleLeft.y, paddleLeft.w, paddleLeft.h);
 		p5.rect(paddleRight.x, paddleRight.y, paddleRight.w, paddleRight.h);
 	};
@@ -132,13 +136,24 @@ function Game() {
 		}
 	};
 
-	const keyDown = (e: KeyboardEvent<HTMLImageElement>) => {
-		e.preventDefault();
-		console.log("keyDown");
-	  };
+	const keyReleased = (p5: p5Types) => {
+		if (p5.key === "ArrowUp") {
+			// console.log("up", matchID);
+			socket.emit('paddle_movement', { id_game: matchID, move: "stop"})
+		} else if (p5.key === "ArrowDown") {
+			// console.log("down", matchID);
+			socket.emit('paddle_movement', { id_game: matchID, move: "stop"})
+		}
+	};
+
+
+	// const keyDown = (e: KeyboardEvent<HTMLImageElement>) => {
+	// 	e.preventDefault();
+	// 	console.log("keyDown");
+	//   };
 
 	return (
-		<WindowBorder w='816px' h='670px'>
+		<WindowBorder w='782px' h='670px'>
 		<div id="game">
 				{/*onKeyDown={ keyDown }
 				tabIndex={0} */} 
@@ -149,7 +164,7 @@ function Game() {
 			</div>
 			{/* <Landing /> */}
 			<div id="game_window" >
-				<Sketch setup={ setup } draw={ draw } keyPressed={ keyPressed }/>
+				<Sketch setup={ setup } draw={ draw } keyPressed={ keyPressed } keyReleased= { keyReleased }/>
 			</div>
 		</div>
 	</WindowBorder>
