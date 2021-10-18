@@ -4,7 +4,7 @@ import Round from './round.class';
 export default class Puck {
     x: number = width / 2;
     y: number = height / 2;
-    r: number = 12;
+    r: number = 20;
     x_speed: number = 3;
     y_speed: number = 3;
     indice: number = 1;
@@ -23,6 +23,8 @@ export default class Puck {
     update(param: Round) {
         this.x += this.x_speed;
         this.y += this.y_speed;
+        param.paddle_player1.updatePosition();
+        param.paddle_player2.updatePosition();
         this.edges(param);
     }
 

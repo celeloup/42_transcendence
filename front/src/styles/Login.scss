@@ -25,7 +25,7 @@ $dark-gray: #919191;
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	gap: 20px;
+	// gap: 20px;
 	width: 350px;
 	height: 100px;
 	margin: 20px;
@@ -40,6 +40,7 @@ $dark-gray: #919191;
 
 	svg {
 		width: 105px;
+		margin-right: 20px;
 		path {
 			transition: stroke 0.1s;
 		}
@@ -58,13 +59,16 @@ $dark-gray: #919191;
 #ghosts {
 	position: absolute;
 	display: flex;
-	bottom: 50px;
-	gap: 20px;
+	bottom: 20px;
 }
 
 .ghost_button {
 	cursor: pointer;
-	padding: 15px 10px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px;
+	margin: 10px;
 	border: 2px solid $dark-gray;
 	font-family: "Dogica";
 	font-size: 15px;
@@ -75,7 +79,7 @@ $dark-gray: #919191;
 	i {
 		font-size: 25px;
 		width: 25px;
-		margin: auto;
+		// margin: auto;
 		margin-right: 10px;
 	}
 

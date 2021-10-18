@@ -116,17 +116,21 @@ header, footer {
 	}
 	#logo_wrapper {
 		width: auto;
+		height: 110px;
 	}
 	#logo a {
 		display: flex;
 		flex-direction: row;
-		gap: 30px;
+		// gap: 30px;
 	}
 	#logo p {
 		margin-top: 0;
 	}
 	#logo p:nth-child(2) {
 		margin-top: 0 !important;
+	}
+	#logo p:first-child {
+		margin-right:30px;
 	}
 	img {
 		height: 100%;
