@@ -5,7 +5,7 @@ import { ApiProperty } from '@nestjs/swagger';
 @Entity()
 class Achievement {
   @PrimaryGeneratedColumn()
-  public id?: number;
+  public id: number;
 
   @Column()
   @ApiProperty()

@@ -159,6 +159,9 @@ export default class AuthenticationController {
   @ApiResponse({ status: 403, description: 'The user is banned.'})
   async login(@Body() loginData: LoginDto, @Req() req: Request): Promise<AuthInfos> {
     const fakeUser = await this.authenticationService.findUserFrom42Id(loginData.id42)
+    if (!fakeUser) {
+      throw new HttpException('User not found with this 42id', HttpStatus.NOT_FOUND);
+    }
     if (fakeUser.site_banned) {
       throw new HttpException('You have been banned', HttpStatus.FORBIDDEN);
     }

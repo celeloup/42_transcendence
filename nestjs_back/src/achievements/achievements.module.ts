@@ -14,4 +14,29 @@ import AchievementsController from './achievements.controller';
   controllers: [AchievementsController],
   exports: [AchievementsService]
 })
-export default class AchievementsModule {}
+export default class AchievementsModule {
+  constructor(private readonly achievementsService: AchievementsService) {
+    const achievements = [
+      {
+        name: 'first_friend',
+        description: 'Congratulations, you made a friend ! You are not alone anymore in this big universe ...'
+      },
+      {
+        name: '10_victories',
+        description: '10 victories ? You are on a roll !'
+      },
+      {
+        name: '100_victories',
+        description: 'A HUNDRED POINTS ?! You are a real pro gamer ! GG !'
+      }
+    ]
+    for (const achievement of achievements) {
+      this.achievementsService.getAchievementByName(achievement.name)
+      .then(response => {
+        if (!response) {
+          this.achievementsService.createAchievement(achievement)
+        }
+      })
+    }
+  }
+}

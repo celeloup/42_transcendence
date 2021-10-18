@@ -10,13 +10,22 @@ $dark-gray: #919191;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
+
+	#logo p {
+		font-size: 160px;
+		height: 180px;
+	}
+
+	#logo {
+		margin-bottom: 100px;
+	}
 }
 
 #login_button {
 	display: flex;
 	align-items: center;
 	justify-content: center;
-	gap: 20px;
+	// gap: 20px;
 	width: 350px;
 	height: 100px;
 	margin: 20px;
@@ -27,9 +36,11 @@ $dark-gray: #919191;
 	transition: background-color 0.1s, color 0.1s;
 	font-size: 36px;
 	font-family: "Dogica";
+	cursor: pointer;
 
 	svg {
 		width: 105px;
+		margin-right: 20px;
 		path {
 			transition: stroke 0.1s;
 		}
@@ -48,14 +59,16 @@ $dark-gray: #919191;
 #ghosts {
 	position: absolute;
 	display: flex;
-	// padding-top: 200px;
-	bottom: 50px;
-	gap: 20px;
+	bottom: 20px;
 }
 
 .ghost_button {
 	cursor: pointer;
-	padding: 15px 10px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 10px;
+	margin: 10px;
 	border: 2px solid $dark-gray;
 	font-family: "Dogica";
 	font-size: 15px;
@@ -66,7 +79,7 @@ $dark-gray: #919191;
 	i {
 		font-size: 25px;
 		width: 25px;
-		margin: auto;
+		// margin: auto;
 		margin-right: 10px;
 	}
 

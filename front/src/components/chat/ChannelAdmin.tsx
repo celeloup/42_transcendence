@@ -43,7 +43,7 @@ export function ChannelAdmin () {
 		{
 			axios.get(`/channel/infos/${ channel.id }`)
 			.then( res => {
-				console.log("RES chan infos", res);
+				// console.log("RES chan infos", res);
 				setChan(res.data);
 			})
 			.catch (err => {
