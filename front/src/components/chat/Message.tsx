@@ -151,7 +151,7 @@ function ProfileCard( {id, setDisplayCard, setBlockedUsers }: CardProps) {
 					<div className="user_status online"></div>
 				</div>
 				<div className="username">{ user.name }</div>
-				<div className="stats"> { user.victories } victories | { user.defeats } defeat</div>
+				<div className="stats_profile_card"> { user.victories } victories | { user.defeats } defeat</div>
 				{ user.id === me.id ? myself : someone }
 			</>}
 			{ !user && <span>Loading...</span> }

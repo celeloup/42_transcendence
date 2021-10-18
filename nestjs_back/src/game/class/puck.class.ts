@@ -4,7 +4,7 @@ import Round from './round.class';
 export default class Puck {
     x: number = width / 2;
     y: number = height / 2;
-    r: number = 20;
+    r: number = 12;
     x_speed: number = 3;
     y_speed: number = 3;
     indice: number = 1;
