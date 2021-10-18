@@ -23,6 +23,8 @@ export default class Puck {
     update(param: Round) {
         this.x += this.x_speed;
         this.y += this.y_speed;
+        param.paddle_player1.updatePosition();
+        param.paddle_player2.updatePosition();
         this.edges(param);
     }
 
