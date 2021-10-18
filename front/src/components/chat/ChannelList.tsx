@@ -93,7 +93,6 @@ function ChannelList (socket:any) {
 	useEffect(() => {
 		axios.get(`/channel/`)
 		.then( res => {
-			// console.log("GET CHANNELS", res);
 			setChannels(res.data);
 			setIsLoading(false);
 		})
@@ -116,10 +115,10 @@ function ChannelList (socket:any) {
 			</div>
 			{ isLoading && <span>Loading...</span>}
 			{ !isLoading && 
-			<div className="channelList">
-				<ChannelCategory channelList={ publicChans } type="public" setDisplayCreateChan={ setDisplayCreateChan } search={search}/>
-				<ChannelCategory channelList={ privateChans } type="private" setDisplayCreateChan={ setDisplayCreateChan } search={search}/>
-			</div>
+				<div className="channelList">
+					<ChannelCategory channelList={ publicChans } type="public" setDisplayCreateChan={ setDisplayCreateChan } search={search}/>
+					<ChannelCategory channelList={ privateChans } type="private" setDisplayCreateChan={ setDisplayCreateChan } search={search}/>
+				</div>
 			}
 		</div>
 	</div>
