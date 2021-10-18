@@ -19,6 +19,16 @@ export default class Paddle {
 			this.x = width - paddle_margin - this.w / 2;
 	}
 
+    boostUp() {
+        this.h = 120;
+    }
+    boostDown () {
+        this.h = 40;
+    }
+    endBoost () {
+        this.h = 80;
+    }
+
     setDirection(move: string) {
         if (move === "stop") {
             this.direction = 0;
@@ -48,6 +58,6 @@ export default class Paddle {
             this.y = 0 + margin;
             return ;
         }
-        this.y = this.y + this.direction * this.speed;
+        this.y += this.direction * this.speed;
 	}
 }

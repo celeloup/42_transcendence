@@ -4,7 +4,7 @@ import Round from './round.class';
 export default class Puck {
     x: number = width / 2;
     y: number = height / 2;
-    r: number = 20;
+    r: number = 12;
     x_speed: number = 3;
     y_speed: number = 3;
     indice: number = 1;
@@ -20,12 +20,27 @@ export default class Puck {
         }
     }
 
+    boostUp(param: Round) {
+        param.puck.indice = 1.5;
+    }
+    boostDown (param: Round) {
+        param.puck.indice = 0.5;
+    }
+    endBoost (param: Round) {
+        param.puck.indice = 1;
+    }
+
     update(param: Round) {
-        this.x += this.x_speed;
-        this.y += this.y_speed;
+        this.x += this.indice * this.x_speed;
+        this.y += this.indice * this.y_speed;
         param.paddle_player1.updatePosition();
         param.paddle_player2.updatePosition();
         this.edges(param);
+        if (param.boost_available) {
+            if (param.score_player1 == 1) {
+                param.boost_function[4] (param);
+            }
+        }
     }
 
     edges(param: Round) {
@@ -36,11 +51,9 @@ export default class Puck {
         let puck_top = this.y - this.r;
 
         let pladdle1_right = param.paddle_player1.x + param.paddle_player1.w / 2;
-        let pladdle1_left = param.paddle_player1.x - param.paddle_player1.w / 2;
         let pladdle1_top = param.paddle_player1.y - param.paddle_player1.h / 2;
         let pladdle1_bottom = param.paddle_player1.y + param.paddle_player1.h / 2;
 
-        let pladdle2_right = param.paddle_player2.x + param.paddle_player2.w / 2;
         let pladdle2_left = param.paddle_player2.x - param.paddle_player2.w / 2;
         let pladdle2_top = param.paddle_player2.y - param.paddle_player2.h / 2;
         let pladdle2_bottom = param.paddle_player2.y + param.paddle_player2.h / 2;
