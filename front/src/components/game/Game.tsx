@@ -136,10 +136,21 @@ function Game() {
 		}
 	};
 
-	const keyDown = (e: KeyboardEvent<HTMLImageElement>) => {
-		e.preventDefault();
-		console.log("keyDown");
-	  };
+	const keyReleased = (p5: p5Types) => {
+		if (p5.key === "ArrowUp") {
+			// console.log("up", matchID);
+			socket.emit('paddle_movement', { id_game: matchID, move: "stop"})
+		} else if (p5.key === "ArrowDown") {
+			// console.log("down", matchID);
+			socket.emit('paddle_movement', { id_game: matchID, move: "stop"})
+		}
+	};
+
+
+	// const keyDown = (e: KeyboardEvent<HTMLImageElement>) => {
+	// 	e.preventDefault();
+	// 	console.log("keyDown");
+	//   };
 
 	return (
 		<WindowBorder w='782px' h='670px'>
@@ -153,7 +164,7 @@ function Game() {
 			</div>
 			{/* <Landing /> */}
 			<div id="game_window" >
-				<Sketch setup={ setup } draw={ draw } keyPressed={ keyPressed }/>
+				<Sketch setup={ setup } draw={ draw } keyPressed={ keyPressed } keyReleased= { keyReleased }/>
 			</div>
 		</div>
 	</WindowBorder>
