@@ -15,7 +15,7 @@ function Friend ({username}: friendProp) {
 	const [online, setOnline] = useState(false);
     return (
         <div className ='friends_info'>
-            <div id='avatar' className='generated'> { username.charAt(0)}</div>
+            <div id='avatar' className='generated'>{ username.charAt(0)}</div>
 			<p>{username}</p>
 	    	<div className={`dot_status ${online ? 'online': 'offline'}`} ></div>
 			{/* div:hover */}

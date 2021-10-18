@@ -107,11 +107,7 @@ export default class UsersService {
   }
 
   async getBy42Id(id42: number): Promise<User> {
-    const user = await this.usersRepository.findOne({ id42 });
-    if (user) {
-      return user;
-    }
-    throw new HttpException('User with this id42 does not exist', HttpStatus.NOT_FOUND);
+    return await this.usersRepository.findOne({ id42 });
   }
 
   async create(userData: CreateUserDto): Promise<User> {

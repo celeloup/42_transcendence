@@ -85,8 +85,9 @@ $darker-gray: #3E3E3E;
 }
 
 .pic_input {
-	position: relative;
-	top: -250px;
+	position: absolute;
+	top: -1px;
+	left: 0px;
 	width: 231px;
 	height: 232px;
 	cursor: pointer;
@@ -99,9 +100,9 @@ $darker-gray: #3E3E3E;
 }
 
 .pic_pencil {
-	position: relative;
-	top: -460px;
-	left: 75px;
+	position: absolute;
+	top: 20px;
+	right: 20px;
 	width: 40px;
 	height: 40px;
 	font-size: 40px;
@@ -234,4 +235,28 @@ $darker-gray: #3E3E3E;
 
 .logout:hover {
 	background-color: $logout_accent_color;
+}
+
+#logout_text {
+	position: relative;
+	left: -20px;
+}
+
+#open_door {
+	visibility: hidden;
+	position: relative;
+	left: -20px;
+}
+
+#closed_door {
+	position: relative;
+	left: 22px;
+}
+
+.btn:hover #open_door {
+	visibility: visible;
+}
+
+.btn:hover #closed_door {
+	visibility: hidden;	
 }

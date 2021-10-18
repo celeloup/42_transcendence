@@ -24,8 +24,7 @@ export default class AuthenticationService {
 	) {}
 
   public async findUserFrom42Id(id42: number): Promise<User> {
-    return await this.usersRepository.findOne({ id42 });
-    //return this.usersService.getBy42Id(id42);
+    return this.usersService.getBy42Id(id42);
   }
 
   public async getUserFromAuthenticationToken(token: string): Promise<User> {
