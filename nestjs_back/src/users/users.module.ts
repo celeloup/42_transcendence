@@ -30,4 +30,49 @@ import Match from 'src/matches/match.entity';
   controllers: [UsersController],
   exports: [UsersService]
 })
-export default class UsersModule {}
+export default class UsersModule {
+  constructor(private readonly usersService: UsersService) {
+    const users = [
+      {
+        name: 'ghosty',
+        email: 'ghosty@mail.com',
+        id42: 1,
+        site_owner: false,
+        site_banned: false,
+        site_moderator: false
+      },
+      {
+        name: 'administraghost',
+        email: 'administraghost@mail.com',
+        id42: 2,
+        site_owner: true,
+        site_banned: false,
+        site_moderator: false
+      },
+      {
+        name: 'casper',
+        email: 'casper@mail.com',
+        id42: 3,
+        site_owner: false,
+        site_banned: false,
+        site_moderator: false
+      },
+      {
+        name: 'modoghost',
+        email: 'modoghost@mail.com',
+        id42: 4,
+        site_owner: false,
+        site_banned: false,
+        site_moderator: true
+      }
+    ]
+    for (const user of users) {
+      this.usersService.getBy42Id(user.id42)
+      .then(response => {
+        if (!response) {
+          this.usersService.create(user)
+        }
+      })
+    }
+  }
+}

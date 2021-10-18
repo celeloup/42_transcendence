@@ -32,7 +32,7 @@ export function Chat() {
 	
 	// ---------- SOCKETS
 	useEffect(() : ReturnType<EffectCallback> => {
-		const newSocket:any = io(`http://localhost:8080/channel`, { transports: ["websocket"] });
+		const newSocket:any = io(`${process.env.REACT_APP_BACK_URL}/channel`, { transports: ["websocket"] });
 		setSocket(newSocket);
 		return () => newSocket.close();
 	}, [setSocket]);
