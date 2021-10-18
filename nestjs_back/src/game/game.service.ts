@@ -49,7 +49,7 @@ export default class GameService {
     async launchGame(server: Server, match: Match, usersSocket: Map<number, Socket>) {
         
         //on initialise la game avec les parametres de jeu envoye par le front et on l'ajoute aux matchs en cours
-        let round = new Round(match.id.toString(), match.user1_id, match.user2_id, match.speed, match.goal, match.boost_available);
+        let round = new Round(match.id.toString(), match.friendly, match.user1_id, match.user2_id, match.speed, match.goal, match.boost_available, match.map);
         this.currentGames.set(match.id, round);
         // this.currentGames.push(round);
         
