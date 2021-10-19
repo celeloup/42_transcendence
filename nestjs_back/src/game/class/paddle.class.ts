@@ -20,6 +20,8 @@ export default class Paddle {
 	}
 
     boostUp() {
+        if (this.is_left)
+            console.log("leftie");        
         this.h = 120;
     }
     boostDown () {

@@ -36,11 +36,7 @@ export default class Puck {
         param.paddle_player1.updatePosition();
         param.paddle_player2.updatePosition();
         this.edges(param);
-        if (param.boost_available) {
-            if (param.score_player1 == 1) {
-                param.boost_function[4] (param);
-            }
-        }
+        param.boost();
     }
 
     edges(param: Round) {
