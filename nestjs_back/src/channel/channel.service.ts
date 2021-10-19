@@ -202,7 +202,6 @@ export default class ChannelService {
   }
 
   async isMuted(channel_id: number, user_id: number) {
-    // return true;
     const channel = await this.getAllInfosByChannelId(channel_id);
     let user = await this.usersService.getById(user_id);
     if (channel.next_unmute_date && channel.next_unmute_date > String(Date.now())
@@ -406,10 +405,6 @@ export default class ChannelService {
 
   async unmuteChecksOK(channel_id: number, other_id: number) {
     let channel = await this.getAllInfosByChannelId(channel_id);
-  //  let mutedIndex = channel.muted.findIndex(user => user.id === other_id);
-  //  channel.muted.splice(mutedIndex, 1);
-  //  let muteObjIndex = channel.muteDates.findIndex(muteObj => muteObj.userId === other_id);
-  //  channel.muteDates.splice(muteObjIndex, 1);
     await this.refreshMutedUsers(channel);
     await this.channelRepository.save(channel);
     return channel;
@@ -465,7 +460,6 @@ export default class ChannelService {
       admins: [channelOwner],
       banned: [],
       muted: [],
-   //   muteDates: []
     });
     if (newChannel.type === 3) {
       let newMember = await this.usersService.getById(channelData.otherUserIdForPrivateMessage);
