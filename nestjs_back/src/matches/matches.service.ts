@@ -90,7 +90,9 @@ export default class MatchesService {
   }
 
   async deleteMatch(match_id: number) {
-    await this.getMatchById(match_id);
+    let match = await this.getMatchById(match_id);
+    match.users = [];
+    await this.matchesRepository.save(match);
     await this.matchesRepository.delete(match_id);
     //Ne rien renvoyer si success ?
   }
