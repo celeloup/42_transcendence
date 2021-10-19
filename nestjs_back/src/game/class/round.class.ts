@@ -57,4 +57,15 @@ export default class Round {
 		this.puck.boostDown,
 	];
   }
+
+  boost() {
+    if (this.boost_available)
+    {
+		if (this.score_player1 == 1)
+		{
+			console.log("Coucou");
+			this.boost_function[0] ();
+		}
+	}
+  }
 }
