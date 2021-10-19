@@ -169,51 +169,14 @@ function UserList () {
 }
 
 function Admin () {
-	const [admins, setAdmins] = useState<User[]>([]);
-	const [moderators, setModerators] = useState<User[]>([]);
-	const [others, setOthers] = useState<User[]>([]);
-	const [banned, setBanned] = useState<User[]>([]);
-	const [searched, setSearched] = useState<string>("");
 	const [nbUsers, setNbUsers] = useState<number>(0);
 
 	useEffect(() => {
 		axios.get('/users')
-		.then ( response => {
-			setAdmins(response.data.filter(function(user : User) {
-				return (!user.site_banned && user.site_owner);
-			}));
-			setModerators(response.data.filter(function(user : User) {
-				return (!user.site_banned && !user.site_owner && user.site_moderator);
-			}));
-			setOthers(response.data.filter(function(user : User) {
-				return (!user.site_banned && !user.site_owner && !user.site_moderator);
-			}));
-			setBanned(response.data.filter(function(user : User) {
-				return (user.site_banned);
-			}));
-			setNbUsers(response.data.length);
-		})
-		.catch ( error => {
-			console.log(error.response); 
-		})
+		.then ( response => { setNbUsers(response.data.length); })
+		.catch ( error => { console.log(error.response); })
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
-
-	const makeAdmin = (id : number) => {
-		// Route doesn't exist (yet ?)
-	}
-
-	const makeMod = (id : number) => {
-		axios.put('/users/moderators/me', id)
-		.then (response => { console.log("successfully made mod"); } )
-		.catch (error => { console.log(error.response); });
-	}
-
-	const banUser = (id : number) => {
-		axios.delete('/users/block/me', {data: id})
-		.then (response => { console.log("successfully banned user"); } )
-		.catch (error => { console.log(error.response); });
-	}
 
 	return (
 		<div className="admin_page">

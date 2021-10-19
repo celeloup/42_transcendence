@@ -7,3 +7,4 @@ postgres_data
 .DS_Store
 todo_list
 pgadmin
+initdocker.sh
