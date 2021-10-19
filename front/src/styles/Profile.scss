@@ -1,0 +1,163 @@
+$background-color: #232323;
+$text-color: white;
+$accent_color: #FFCD27;
+$online_dot: #81A439;
+$offline_dot: #919191;
+$profile_background: rgb(65, 62, 62);
+
+
+.profile{
+    display: flex;
+    justify-content: center;
+    width: 980px;
+    height: 667px;
+    // border: 1px solid red;
+    margin: auto;
+    gap: 20px;
+
+    .header_title {
+    	text-align: left;
+		height: 30px;
+    	padding-top: 8px;
+    	// overflow: hidden;
+    	// white-space: nowrap;
+    	// text-overflow: ellipsis;
+    }
+
+    .dot_status {
+		width: 15px;
+		height: 15px;
+		border-radius: 50%;
+	}
+	.online {
+        background-color: $online_dot;
+    }
+    .offline {
+    	background-color: $offline_dot;
+    }
+
+	#column_left{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+		max-width: 40%;
+    }
+    
+    #column_right{
+        flex-grow: 2;
+        display: flex;
+        flex-direction: column;
+		gap: 10px;
+		// min-width: 60%;
+	}
+    
+    #user_window .border_div {
+        background-color: $accent_color;
+		
+		&:after, &:before{
+    		background-color: $accent_color;
+		}
+	}
+
+	#avatar {
+		border: 5px solid white;
+		border-radius: 5px;
+	}
+	
+	#user_window {
+
+	    background-color: $accent_color;
+		
+		#user_card{
+	    	outline: 4px solid $accent_color ;
+	    	height: 200px;
+			color: $background-color;
+			font-size: 15px;
+			display: flex;
+			flex-direction: column;
+			gap: 10%;
+
+			#row_top{
+				max-width: 400px;
+				// border: 1px solid red;
+				padding: 5px;
+				font-family: "Dogica";
+				font-size: 20px;
+				display: flex;
+
+				#avatar {
+					height: 85px;
+					width: 80px;
+					justify-content: left;
+				}
+
+				#column_right {
+					text-align: left;
+					overflow-wrap: anywhere;
+					padding: 15px;
+
+					.status {
+				        display: flex;
+						align-items: center;
+				        gap: 10px;
+						font-family: "Fira Mono";
+						font-size: 15px;
+					}
+				}
+			}
+
+			#stats {
+//				padding-top: 30px;
+			}
+		}
+	}
+	
+
+    #friend_window {
+        flex-grow: 2;
+
+		#list_friends {
+			padding-top: 25px;
+			padding-left: 30px;
+			display: flex;
+			flex-direction: column;
+			gap:25px;
+			.friends_info {
+				font-family: "Dogica";
+				font-size: 15px;
+				display: flex;
+				align-items: center;
+				gap: 15px;
+			
+				.generated	{
+					width: 40px;
+					height: 40px;
+					background-color: $profile_background;
+					color: white;
+					font-family: "Dogica", "Fira Mono";
+					font-size: 30px;
+					text-align: center;
+					padding: 5px;
+				}
+			}
+		}	
+    }
+	
+	#history_window {
+        flex-grow: 2;
+    }
+
+	#achievement_imgs {
+		display: flex;
+		justify-content: space-evenly;
+		padding: 5px;
+		gap: 10px;
+		.empty {
+			height: 90px;
+			width: 180px;
+			background-color: gray;
+		}
+	}
+
+
+}

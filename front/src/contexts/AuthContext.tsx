@@ -37,6 +37,6 @@ export const AuthProvider= ({ children } : Props) => {
 		setIsAuth(false);
 		setUser(null);
 	};
-	
-	return ( <AuthContext.Provider value={{isAuth: isAuth, login: loginContext, logout: logoutContext, user: user, setUser:setUser}}>{ children }</AuthContext.Provider> );
+
+  return ( <AuthContext.Provider value={{isAuth: isAuth, login: loginContext, logout: logoutContext, user: user, setUser:setUser}}>{ children }</AuthContext.Provider> );
 }

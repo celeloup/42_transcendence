@@ -37,6 +37,7 @@ export default class MatchesController {
   // }
 
   @Delete('/:id')
+  @ApiParam({name: 'id', type: Number, description: 'match id'})
   @ApiOperation({summary: "Delete a match"})
   async deleteMatch(@Param() { id }: FindOneParams){
     return this.matchesService.deleteMatch(Number(id));
