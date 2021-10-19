@@ -107,11 +107,7 @@ export default class UsersService {
   }
 
   async getBy42Id(id42: number): Promise<User> {
-    const user = await this.usersRepository.findOne({ id42 });
-    if (user) {
-      return user;
-    }
-    throw new HttpException('User with this id42 does not exist', HttpStatus.NOT_FOUND);
+    return await this.usersRepository.findOne({ id42 });
   }
 
   async create(userData: CreateUserDto): Promise<User> {
@@ -176,6 +172,12 @@ export default class UsersService {
   async turnOnTwoFactorAuthentication(user_id: number): Promise<UpdateResult> {
     return this.usersRepository.update(user_id, {
       isTwoFactorAuthenticationEnabled: true
+    });
+  }
+
+  async turnOffTwoFactorAuthentication(user_id: number): Promise<UpdateResult> {
+    return this.usersRepository.update(user_id, {
+      isTwoFactorAuthenticationEnabled: false
     });
   }
 

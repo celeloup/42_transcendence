@@ -51,7 +51,7 @@ $dark-gray: #919191;
 
 .channel {
 	display: flex;
-	gap: 10px;
+	// gap: 10px;
 	align-items: center;
 	cursor: pointer;
 	border-radius: 5px;
@@ -76,6 +76,7 @@ $dark-gray: #919191;
 	border: 2px solid white;
 	border-radius: 5px;
 	position: relative;
+	margin-right: 10px;
 }
 
 .channelName {
