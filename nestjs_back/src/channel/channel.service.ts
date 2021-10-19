@@ -72,7 +72,6 @@ export default class ChannelService {
     return next;
   }
 
-<<<<<<< HEAD
   async refreshMutedUsers(channel: & Channel) {
     let date = await this.getNextExpiredMuteDate(channel.muteDates);
     while (date !== null && BigInt(date) < BigInt(Date.now())) {
@@ -85,20 +84,6 @@ export default class ChannelService {
     }
     channel.next_unmute_date = date;
     await this.channelRepository.save(channel);
-=======
-  async refreshMutedUsers(channel: &Channel) {
-  //  let date = await this.getNextExpiredMuteDate(channel.muteDates);
-  //  while (date !== null && date < Date.now()) {
-  //    let dateIndex = channel.muteDates.findIndex(muteObj => muteObj.silencedUntil === date);
-  //    let user_id = channel.muteDates[dateIndex].userId;
-  //    let userIndex = channel.muted.findIndex(user => user.id === user_id);
-  //    channel.muteDates.splice(dateIndex, 1);
-  //    channel.muted.splice(userIndex, 1);
-  //    date = await this.getNextExpiredMuteDate(channel.muteDates);
-  //  }
-  //  channel.next_unmute_date = date;
-  //  await this.channelRepository.save(channel);
->>>>>>> master
     return channel;
   }
 
@@ -398,7 +383,6 @@ export default class ChannelService {
           let channel = await this.getAllInfosByChannelId(channel_id);
           let newMuted = await this.usersService.getById(other_id);
           await channel.muted.push(newMuted);
-<<<<<<< HEAD
           let newMuteObj = await this.muteObjRepository.create({
             id: 0,
             userId: other_id,
@@ -408,17 +392,6 @@ export default class ChannelService {
           await this.muteObjRepository.save(newMuteObj);
           await channel.muteDates.push(newMuteObj);
           if (!channel.next_unmute_date || channel.next_unmute_date > newMuteObj.silencedUntil)
-=======
-          let newMuteObj: muteObj = {
-
-        
-          "userId": other_id,
-          "silencedUntil": Date.now() + time}
-          // if (!channel.mutedDates)
-          //   channel.muteDates = new muteObj[];
-        //  await channel.muteDates.push(newMuteObj);
-          if (channel.next_unmute_date > newMuteObj.silencedUntil)
->>>>>>> master
             channel.next_unmute_date = newMuteObj.silencedUntil;
           await this.channelRepository.save(channel);
           channel = await this.getAllInfosByChannelId(channel_id);
