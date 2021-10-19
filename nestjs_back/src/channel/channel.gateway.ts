@@ -136,17 +136,21 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     // const user = await this.authenticationService.getUserFromSocket(client);
     // const author = classToClass(user);
     const is_member: boolean = await this.channelService.isAMember(data.recipient.id, author.id);
-    const is_banned: boolean = await this.channelService.isBanned(data.recipient.id, author.id);
+    //const is_banned: boolean = await this.channelService.isBanned(data.recipient.id, author.id);
     const is_muted: boolean = await this.channelService.isMuted(data.recipient.id, author.id);
 
-    if (!(is_member) || is_banned || is_muted) {
+    let date = String(Date.now());
+    if (!(is_member) || is_muted) {
       this.logger.log('Unauthorized access');
+      this.logger.log(`Date: ${date}`);
       return ;
     }
     this.logger.log(`Message from ${this.connectedUsers.get(client)} to ${data.recipient.name}: ${data.content}`);
+    this.logger.log(`Date: ${date}`);
     const message = await this.channelService.saveMessage(data.content, author, data.recipient);
     this.server.in(data.recipient.id.toString()).emit('receive_message', classToPlain(message));
   }
+
 
   // @SubscribeMessage('request_messages')
   // async requestMessagesByChannel(
