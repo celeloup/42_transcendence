@@ -85,26 +85,151 @@ $green: #81A439;
 		font-family: "Dogica";
 		justify-content: space-evenly;
 		align-content: center;
-		margin-top: 100px;
+		margin-top: 60px;
 		
 		.settings_arrows {
 			width: 50px;
-			cursor: pointer;
+			&.active {
+				cursor: pointer;
+			}
+			&.disabled {
+				cursor: initial;
+			}
 		}
 
 		.settings_value {
-			margin: 20px;
+			margin: 10px;
 			font-size: 30px;
+			user-select: none;
+			height: 40px;
+			padding: 25px 0;
 		}
 
 		#goal div:first-child, #speed div:first-child, #boost div:first-child, #map div:first-child {
 			font-size: 20px;
-			margin-bottom: 20px;
+			user-select: none;
+			// background-color: $accent_color;
+			padding: 14px 10px;
+			width: 100px;
+			margin: auto;
+			margin-bottom: 30px;
+			color: $background-color;
+			// border-radius: 5px;
+			background-image: url("../assets/img/plate.svg");
+			background-size: contain;
+			background-repeat: no-repeat;
 		}
 
 		#goal .settings_value {
-			width: 55px;
+			width: 100px;
 			text-align: center;
+			font-size: 50px;
+		}
+
+		#speed .settings_value {
+			width: 155px;
+			text-align: center;
+			cursor: pointer;
+			font-size: 25px;
+		}
+
+		.slow_speed p{
+			letter-spacing: 12px;
+			// width: 130px;
+			margin-left: 11px;
+		}
+
+		.fast_speed {
+			padding-left: 65px;
+			// letter-spacing: -5px;
+			background-image: url("../assets/img/fast_line.svg");
+			background-size: 50%;
+			background-repeat: no-repeat;
+			// background-position: -65% 0% ;
+		}
+
+		.speedometer {
+			margin-bottom: 20px;
+			width: 120px;
+		}
+
+		#boost {
+			#toggle {
+				padding-top: 15px;
+				position: relative;
+			}
+			p {
+				display: inline-block;
+				width: 85px;
+				user-select: none;
+				position: absolute;
+				font-size: 25px;
+				cursor: pointer;
+				left: 14%;
+				height: 45px;
+				top: 15%;
+				padding: 20px 0 0px 0;
+
+				&.active {
+					color: $background-color;
+				}
+
+				&.disabled {
+					color: white;
+				}
+			}
+			#off:before {
+				content: "";
+				height: 10px;
+				width: 68px;
+				position: absolute;
+				top: -10px;
+			}
+			#on {
+				top: 52%;
+			}
+			#on:before {
+				content: "";
+				height: 10px;
+				width: 68px;
+				position: absolute;
+				bottom: -10px;
+				left: 8px;
+			}
+			svg {
+				width: 85px;
+				// cursor: pointer;
+			}
+		}
+
+		#map .settings_value {
+			// p {
+			// 	font-size: 20px;
+			// 	background-color: ;
+			// 	padding-top: 10px;
+			// }
+			width: 140px;
+			color: transparent;
+			// font-weight: bold;
+			
+			// background-color: red;
+			border: 4px solid $accent_color;
+			border-radius: 5px;
+			
+			background-size: 90%;
+			background-repeat: no-repeat;
+			background-position: 65% 50% ;
+
+			&.space {
+				background-image: url("../assets/img/space_map_preview.svg");
+			}
+			&.street {
+				background-image: url("../assets/img/street_fighter_preview.png");
+			}
+
+			&.mario {
+				background-image: url("../assets/img/mario_preview_2.png");
+			}
 		}
 	}
 }
