@@ -19,18 +19,6 @@ export default class Paddle {
 			this.x = width - paddle_margin - this.w / 2;
 	}
 
-    boostUp() {
-        if (this.is_left)
-            console.log("leftie");        
-        this.h = 120;
-    }
-    boostDown () {
-        this.h = 40;
-    }
-    endBoost () {
-        this.h = 80;
-    }
-
     setDirection(move: string) {
         if (move === "stop") {
             this.direction = 0;
