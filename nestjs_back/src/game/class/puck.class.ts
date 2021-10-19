@@ -9,6 +9,8 @@ export default class Puck {
     y_speed: number = 3;
     indice: number = 1;
 
+    boost_function: any[];
+
     constructor(speed: number) {
         if (speed == 0) {
             this.x_speed = 1;
@@ -18,17 +20,56 @@ export default class Puck {
             this.x_speed = 5;
             this.y_speed = 5;
         }
+
+        this.boost_function = [
+            this.boostUpPaddle1,
+            this.boostDownPaddle1,
+            this.boostUpPaddle2,
+            this.boostDownPaddle2,
+            this.boostUp,
+            this.boostDown,
+        ];
     }
 
+
+    //boost puck
     boostUp(param: Round) {
         param.puck.indice = 1.5;
     }
-    boostDown (param: Round) {
+    boostDown(param: Round) {
         param.puck.indice = 0.5;
     }
-    endBoost (param: Round) {
+    endBoost(param: Round) {
         param.puck.indice = 1;
     }
+
+    //boost paddle1
+    boostUpPaddle1(param: Round) {
+        param.paddle_player1.h = 120;
+    }
+
+    boostDownPaddle1(param: Round) {
+        param.paddle_player1.h = 40;
+    }
+
+    boostStopPaddle1(param: Round) {
+        param.paddle_player1.h = 80;
+    }
+
+    //boost paddle2
+    boostUpPaddle2(param: Round) {
+        param.paddle_player2.h = 120;
+    }
+
+    boostDownPaddle2(param: Round) {
+        param.paddle_player2.h = 40;
+    }
+
+    boostStopPaddle2(param: Round) {
+        param.paddle_player2.h = 80;
+    }
+
+
 
     update(param: Round) {
         this.x += this.indice * this.x_speed;
@@ -36,7 +77,9 @@ export default class Puck {
         param.paddle_player1.updatePosition();
         param.paddle_player2.updatePosition();
         this.edges(param);
-        param.boost();
+        if (param.boost_available && param.score_player1 == 1) {
+            this.boost_function[2](param);
+        }
     }
 
     edges(param: Round) {

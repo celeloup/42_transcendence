@@ -24,7 +24,6 @@ export default class Round {
   paddle_player2: Paddle;
   puck: Puck;
   
-  boost_function: any []; 
 
   constructor(id: string, friendly: boolean, id1: number, id2: number, speed: number, goal: number, boost: boolean, map: number) {
     this.id_game = id;
@@ -48,24 +47,5 @@ export default class Round {
     this.paddle_player2 = new Paddle (false),
     this.puck = new Puck (this.speed);
     
-    this.boost_function = [
-		this.paddle_player1.boostUp,
-		this.paddle_player1.boostDown,
-		this.paddle_player2.boostUp,
-		this.paddle_player2.boostDown,
-		this.puck.boostUp,
-		this.puck.boostDown,
-	];
-  }
-
-  boost() {
-    if (this.boost_available)
-    {
-		if (this.score_player1 == 1)
-		{
-			console.log("Coucou");
-			this.boost_function[0] ();
-		}
-	}
-  }
+     }
 }
