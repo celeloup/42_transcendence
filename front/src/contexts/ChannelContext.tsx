@@ -11,6 +11,7 @@ export type ContextType = {
 	setChannel: (chan:Channel) => void,
 	displayList: boolean,
 	toggleDisplayList: () => void,
+	setDisplayList: (set:boolean) => void,
 	displayAdmin: boolean,
 	toggleDisplayAdmin: () => void,
 	changeChannel: (chan:Channel) => void,
@@ -43,6 +44,7 @@ export const ChannelProvider = ({ children } : Props) => {
 			socket.emit('leave_chan', channel.id);
 		setChannel(chan);
 		socket.emit('join_chan', chan.id);
+		// toggleDisplayList();
 	}
 
 	return ( <ChannelContext.Provider 
@@ -51,6 +53,7 @@ export const ChannelProvider = ({ children } : Props) => {
 				setChannel: setChannel,
 				displayList: displayList,
 				toggleDisplayList: toggleDisplayList,
+				setDisplayList: setDisplayList,
 				changeChannel: changeChannel,
 				socket: socket,
 				setSocket: setSocket,
