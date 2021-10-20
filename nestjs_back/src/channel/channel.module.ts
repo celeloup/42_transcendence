@@ -8,12 +8,15 @@ import User from "../users/user.entity";
 import UsersModule from "../users/users.module";
 import Channel from './channel.entity';
 import ChannelController from "./channel.controller";
+import muteObj from "./mute.entity";
+import muteObjModule from "./muteObj.module";
 
 @Module({
 	imports: [
 		AuthenticationModule,
-		TypeOrmModule.forFeature([Channel, Message, User]),
+		TypeOrmModule.forFeature([Channel, Message, User, muteObj]),
 		UsersModule,
+		muteObjModule
 	],
 	providers: [ChannelGateway, ChannelService],
 	controllers: [ChannelController],
