@@ -48,6 +48,6 @@ export default class Paddle {
             this.y = 0 + margin;
             return ;
         }
-        this.y = this.y + this.direction * this.speed;
+        this.y += this.direction * this.speed;
 	}
 }

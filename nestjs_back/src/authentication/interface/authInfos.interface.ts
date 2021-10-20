@@ -1,4 +1,4 @@
-import { ApiProperty } from '@nestjs/swagger';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export default class AuthInfos {
   @ApiProperty()
@@ -18,4 +18,7 @@ export default class AuthInfos {
 
   @ApiProperty()
   refreshTokenExpiration: Date;
+
+  @ApiPropertyOptional()
+  isTwoFactorAuthenticationEnabled?: boolean;
 }

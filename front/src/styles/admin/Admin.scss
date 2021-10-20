@@ -1,0 +1,54 @@
+$background-color: #232323;
+$text-color: white;
+$accent_color: #FFCD27;
+$mod_accent_color: #64A1E9;
+$ban_accent_color: #BF3030;
+$light-gray: #E3E3E3;
+$dark-gray: #919191;
+$darker-gray: #3E3E3E;
+
+.admin_page {
+	height: 100%;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+    background-color: $background-color;
+
+	h1 {
+		font-family: "Dogica";
+		height: 100px;
+	}
+
+	.container {
+		display: flex;
+		flex-direction: row;
+		justify-content: center;
+		flex-wrap: wrap;
+		width: 100%;
+
+		.subcontainer {
+			display: flex;
+			flex-direction: column;
+			width: 50%;
+
+			&.left {
+				flex-wrap: wrap-reverse;
+			}
+
+			&.right {
+				flex-wrap: wrap;
+			}
+
+			.stats {
+				font-family: "Dogica";
+				font-size: 18px;
+				margin: 25px;
+
+				.special {
+					color: $accent_color;
+				}
+			}
+		}
+	}
+}
