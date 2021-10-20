@@ -47,5 +47,5 @@ export default class Round {
     this.paddle_player2 = new Paddle (false),
     this.puck = new Puck (this.speed);
     
-     }
+  }
 }

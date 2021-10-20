@@ -1,3 +1,4 @@
+import { getDefaultSettings } from 'http2';
 import { height, width, paddle_margin } from '../game.settings'
 import Round from './round.class';
 
@@ -10,6 +11,8 @@ export default class Puck {
     indice: number = 1;
 
     boost_function: any[];
+    boost_on: boolean = false;
+    boost_id: number;
 
     constructor(speed: number) {
         if (speed == 0) {
@@ -31,12 +34,14 @@ export default class Puck {
         ];
     }
 
-///////////////////////BOOST PART////////////////////
 
-    launchBoost()
-    {
-        
-    }
+    ///tools
+    getRandomInt(min: number, max: number) {
+            return Math.floor(Math.random() * (max - min)) + min;
+        }
+
+
+///////////////////////BOOST PART////////////////////
 
     //boost puck
     boostUp(param: Round) {
@@ -76,7 +81,13 @@ export default class Puck {
     }
 
 
-    launchBoost() {}
+    setBoost(param: Round) {
+        if (!this.boost_on) {
+            this.boost_id = this.getRandomInt(0, 6);
+            this.boost_function[this.boost_id] (param);
+            this.boost_on = true;
+        }
+    }
 
     update(param: Round) {
         this.x += this.indice * this.x_speed;
@@ -85,7 +96,7 @@ export default class Puck {
         param.paddle_player2.updatePosition();
         this.edges(param);
         if (param.boost_available) {
-            this.launchBoost();
+            this.setBoost(param);
         }
     }
 
@@ -128,12 +139,10 @@ export default class Puck {
     }
 
     reset() {
-        function getRandomInt(min: number, max: number) {
-            return Math.floor(Math.random() * (max - min)) + min;
-        }
+        
 
         this.x = width / 2;
-        this.y = getRandomInt(40, height - 40);
+        this.y = this.getRandomInt(40, height - 40);
         this.x_speed *= -1;
         this.y_speed *= -1;
     }
