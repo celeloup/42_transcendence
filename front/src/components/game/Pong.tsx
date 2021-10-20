@@ -13,6 +13,22 @@ type Paddle = {
 	indice: number
 }
 
+type endScreenProps = {
+	score1: number,
+	score2: number
+}
+
+function EndScreen({ score1, score2 } : endScreenProps) {
+	var { masterSocket, setToDisplay } = useContext(AuthContext) as AuthContextType;
+	return (
+		<div id="end_screen">
+			<div> GAME FINISHED </div>
+			<div>{ score1 } VS { score2 }</div>
+			<div id="back_button" onClick={ ()=> setToDisplay("landing") }> Return home </div>
+		</div>
+	)
+}
+
 function Pong() {
 	const height: number = 626;
 	const width: number = 782;
@@ -25,6 +41,8 @@ function Pong() {
 	const [ paddleRight, setPaddleRight ] = useState<Paddle>({ is_left: false, x: width - paddle_margin - 20 / 2, y: height / 2, w: 20, h: 80, indice:0 });
 	const [ paddleLeft, setPaddleLeft ] = useState<Paddle>({ is_left: true, x: paddle_margin + 20 / 2, y: height / 2, w: 20, h: 80, indice:0 });
 	const [ score, setScore ] = useState<number[]>([0, 0]);
+
+	const [ endScreen, setEndScreen ] = useState<boolean>(false);
 	
 	useEffect(() => {
 		masterSocket?.on('game_starting', (data:any) => {
@@ -41,17 +59,20 @@ function Pong() {
 		});
 
 		masterSocket?.on('finish_game', (data:any) => {
-			alert("game finished !");
+			// alert("game finished !");
+			setEndScreen(true);
 			console.log("game finished !");
 		});
 		
 		masterSocket?.on('interrupted_game', (data:any) => {
+			setEndScreen(true);
 			alert("game interrupted !");
 			console.log("game interrupted !");
 		});
 
 		return () => {
-			masterSocket.emit('leave_game', match.id);
+			var id = match ? match.id : matchID;
+			masterSocket.emit('leave_game', id);
 			setMatchID("");
 			setMatch(null);
 		}
@@ -109,8 +130,10 @@ function Pong() {
 		<div id="pong_game">
 			<div className="window_header" >
 				<i className="fas fa-arrow-left back_button" onClick={ ()=> setToDisplay("landing") }/>
-				{ score[0] } MACHIN VS TRUC { score[1] }
+				{ matchID && <>{ score[0] } MACHIN VS TRUC { score[1] }</> }
+				{ matchID ? " GAME START" : "[LOOKING FOR A PLAYER]"}
 			</div>
+			{ endScreen && <EndScreen score1={score[0]} score2={score[1]}/> }
 			<Sketch setup={ setup } draw={ draw } keyPressed={ keyPressed } keyReleased={ keyReleased }/>
 		</div>
 )}
