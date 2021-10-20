@@ -31,6 +31,12 @@ export default class Puck {
         ];
     }
 
+///////////////////////BOOST PART////////////////////
+
+    launchBoost()
+    {
+        
+    }
 
     //boost puck
     boostUp(param: Round) {
@@ -70,6 +76,7 @@ export default class Puck {
     }
 
 
+    launchBoost() {}
 
     update(param: Round) {
         this.x += this.indice * this.x_speed;
@@ -77,8 +84,8 @@ export default class Puck {
         param.paddle_player1.updatePosition();
         param.paddle_player2.updatePosition();
         this.edges(param);
-        if (param.boost_available && param.score_player1 == 1) {
-            this.boost_function[2](param);
+        if (param.boost_available) {
+            this.launchBoost();
         }
     }
 
