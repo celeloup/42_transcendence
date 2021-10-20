@@ -23,7 +23,9 @@ export default class MatchesService {
   ) { }
 
   async getMatchById(id: number) {
-    const match = await this.matchesRepository.findOne(id);
+    const match = await this.matchesRepository.findOne(id, { relations: ['users'], order: {
+      createdDate: "DESC"
+    }});
     if (match) {
       return match;
     }
@@ -33,8 +35,6 @@ export default class MatchesService {
   async createMatch(matchData: CreateMatchDto) {
     const newMatch = await this.matchesRepository.create({
       ...matchData,
-      score_user1: 0,
-      score_user2: 0,
       users: [await this.usersService.getById(matchData.user1_id),
       await this.usersService.getById(matchData.user2_id)]
     });
@@ -90,7 +90,9 @@ export default class MatchesService {
   }
 
   async deleteMatch(match_id: number) {
-    await this.getMatchById(match_id);
+    let match = await this.getMatchById(match_id);
+    match.users = [];
+    await this.matchesRepository.save(match);
     await this.matchesRepository.delete(match_id);
     //Ne rien renvoyer si success ?
   }
