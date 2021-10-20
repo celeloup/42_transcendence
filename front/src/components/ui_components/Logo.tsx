@@ -1,12 +1,17 @@
 import { NavLink } from 'react-router-dom';
+import { useContext } from 'react';
+import { AuthContext, ContextType as AuthContextType} from '../../contexts/AuthContext';
 
-const Logo = () => (
+function Logo() {
+	const { setToDisplay } = useContext(AuthContext) as AuthContextType;
+	return (
 	<div id="logo">
-		<NavLink to='/'>
+		<NavLink to='/' onClick={ ()=> setToDisplay("landing") }>
 			<p>PonG</p>
 			<p>warS</p>
 		</NavLink>
 	</div>
-)
+	)
+}
 
 export default Logo;

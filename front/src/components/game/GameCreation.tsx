@@ -1,35 +1,39 @@
 import { useContext, useState } from 'react';
 import { GameContext, ContextType } from '../../contexts/GameContext';
+import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
 import { Arrow } from '../ui_components/Arrow';
 import { ToggleButton } from '../ui_components/ToggleButton';
 import { Speedometer } from '../ui_components/Speedometer';
+import axios from "axios";
 
 function GameCreation() {
 
-	var { setToDisplay } = useContext(GameContext) as ContextType;
+	var { setMatch } = useContext(GameContext) as ContextType;
+	var { masterSocket, setToDisplay } = useContext(AuthContext) as AuthContextType;
 	const [ goal, setGoal ] = useState(10); // entre 1 et 20
 	const [ speed, setSpeed ] = useState(1); // 0 slow, 1 normal, 2 fast
-	const [ map, setMap ] = useState(3); // 1 space, 2 mario (street fighter ? )
+	const [ map, setMap ] = useState(1); // 1 space, 2 mario (street fighter ? )
 	const [ boost, setBoost ] = useState(false);
+	
 
-	// const create_game = () => {
-	// 	axios.post('/matches', {
-	// 		"friendly": true,
-	// 		"user1_id": 1,
-	// 		"user2_id": 2,
-	// 		"map": 0,
-	// 		"speed": 1,
-	// 		"goal": 10,
-	// 		"boost_available": false
-	// 	  })
-	// 	  .then( res => { 
-	// 		  	// console.log("create match success !", res);
-	// 		  	socket.emit('create_game', res.data);
-	// 			setMatch(res.data)
-	// 		} )
-	// 	  .catch ( err => { console.log("create match fail :(", err); } )
-	// }
-
+	const create_game = () => {
+		axios.post('/matches', {
+			"friendly": true,
+			"user1_id": 1,
+			"user2_id": 2,
+			"map": map,
+			"speed": speed,
+			"goal": goal,
+			"boost_available": boost
+		  })
+		  .then( res => { 
+			  	console.log("create match success !", res.data);
+				setMatch(res.data);
+				masterSocket.emit('create_game', res.data);
+				setToDisplay("pong");
+			} )
+		  .catch ( err => { alert("create match fail :("); console.log(err) } )
+	}
 
 	function updateGoal(direction: string){
 		if (direction === "up" && goal < 20)
@@ -61,18 +65,7 @@ function GameCreation() {
 			setMap(3);
 		else
 			setMap(map - 1);
-		// if (direction === "up" && map < 3)
-		// 	setMap(map + 1);
-		// else if (direction === "down" && map > 1)
-		// 	setMap(map - 1);
 	}
-
-	// function updateMap(direction: string) {
-	// 	if (direction === "up" && boost !== 1)
-			
-	// }
-
-	// console.log("goal, speed, boost, map", goal, speed, boost, map);
 
 	// has a user2 as optional param in case challenge from chat
 	return (
@@ -110,6 +103,7 @@ function GameCreation() {
 					<Arrow direction="down" state={ "active"  } click={ updateMap }/>
 				</div>
 			</div>
+			<div id="create_game_button" onClick={ create_game }>CREATE GAME</div>
 			{/* <div>Send invitation</div> */}
 		</div>
 )}
