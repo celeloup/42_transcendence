@@ -28,7 +28,8 @@ export function Chat() {
 	const [ newMessage, setNewMessage ] = useState("");
 	const [ msgIsLoading, setMsgIsLoading ] = useState(false);
 	const [ blockedUsers, setBlockedUsers ] = useState<any[]>([]);
-	var { displayList, displayAdmin, channel, socket, setSocket } = useContext(ChannelContext) as ContextType;
+	var { displayList, displayAdmin, channel, socket, setSocket, setChannel, setDisplayList } = useContext(ChannelContext) as ContextType;
+	// const [ currentChan, setCurrentChan ] = useState<any>(null);
 	
 	// ---------- SOCKETS
 	useEffect(() : ReturnType<EffectCallback> => {
@@ -41,16 +42,25 @@ export function Chat() {
 		socket?.on('receive_message', (data:any) => {
 			// console.log("RECEIVED :", data);
 			setMessages(oldArray => [...oldArray, data]);
-		})
-	}, [socket])
-	
-	
-	// ---------- GET MESSAGES
-	useEffect(() => {
-		// console.log("CURRENT CHANNEL: ", channel);
-		if (channel) {
+		});
+		socket?.on('room_join', (data:any) => {
+			console.log("JOINED ROOM", data);
+			setDisplayList(false);
 			setMsgIsLoading(true);
-			axios.get(`/channel/messages/${channel.id}`)
+			if (!channel || data !== channel.id)
+			{
+				// setMsgIsLoading(true);
+				axios.get(`channel/${ data }`)
+				.then( res => {
+					// console.log(res.data);
+					setChannel(res.data);
+				})
+				.catch (err => {
+					console.log("Error:", err);
+					setMsgIsLoading(false);
+				})
+			}
+			axios.get(`/channel/messages/${ data }`)
 			.then( res => {
 				// console.log("GET MESSAGES", res);
 				setMessages(res.data);
@@ -60,7 +70,11 @@ export function Chat() {
 				console.log("Error:", err);
 				setMsgIsLoading(false);
 			})
-		}
+		});
+	}, [socket])
+	
+	// ---------- GET MESSAGES
+	useEffect(() => {
 		axios.get(`/users/infos/me`)
 			.then( res => {
 				// console.log("GET infos me", res);

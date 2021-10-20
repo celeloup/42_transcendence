@@ -21,7 +21,7 @@ function Channel({ channelObj } : ChannelProps) {
 	
 	const selectChannel = () => {
 		changeChannel(channelObj);
-		toggleDisplayList();
+		// toggleDisplayList();
 	}
 	
 	var selected:boolean;

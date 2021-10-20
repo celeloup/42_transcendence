@@ -71,11 +71,12 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     }
     //add member to the channel (nothing happen if already ban);
     if (!is_member) {
-      this.channelService.addMember(room, user.id, user.id);
+      await this.channelService.addMember(room, user.id, user.id);
     }
     this.server.in(client.id).socketsJoin(room.toString());
     this.logger.log(`Client ${this.connectedUsers.get(client)} joined room ${room}`);
-  }
+	client.emit('room_join', room);	
+}
 
   @SubscribeMessage('leave_chan')
   async leaveRoom(
