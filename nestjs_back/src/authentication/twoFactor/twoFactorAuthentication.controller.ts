@@ -68,7 +68,7 @@ export default class TwoFactorAuthenticationController {
 
   @UseGuards(JwtTwoFactorGuard)
   @Post('turn-off')
-  @ApiOperation({summary: "Disable the 2fa with the 2fa code"})
+  @ApiOperation({summary: "Disable the 2fa"})
   @HttpCode(200)
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')
@@ -76,18 +76,10 @@ export default class TwoFactorAuthenticationController {
     status: 200,
     description: '2 factor authentication successfully disabled.',
   })
-  @ApiResponse({ status: 401, description: 'Authentication token invalid or Wrong 2fa authentication code.'})
-  async turnOffTwoFactorAuthentication(
-    @Req() request: RequestWithUser,
-    @Body() { twoFactorAuthenticationCode } : TwoFactorAuthenticationCodeDto
-  ) {
-    const isCodeValid = this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
-      twoFactorAuthenticationCode, request.user
-    );
-    if (!isCodeValid) {
-      throw new UnauthorizedException('Wrong 2fa authentication code');
-    }
-    await this.usersService.turnOffTwoFactorAuthentication(request.user.id);
+  @ApiResponse({ status: 401, description: 'Authentication token invalid.'})
+  async turnOffTwoFactorAuthentication(@Req() request: RequestWithUser) {
+    const { user } = request;
+    await this.usersService.turnOffTwoFactorAuthentication(user.id);
   }
 
   @UseGuards(JwtAuthenticationGuard)
@@ -106,13 +98,13 @@ export default class TwoFactorAuthenticationController {
     @Req() request: RequestWithUser,
     @Body() { twoFactorAuthenticationCode } : TwoFactorAuthenticationCodeDto
   ): Promise<AuthInfos> {
+    const { user } = request;
     const isCodeValid = this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
-      twoFactorAuthenticationCode, request.user
+      twoFactorAuthenticationCode, user
     );
     if (!isCodeValid) {
       throw new UnauthorizedException('Wrong 2fa authentication code');
     }
-    const { user } = request;
     const accessJwt = this.authenticationService.getJwtToken(user.id, true);
     const { accessTokenCookie, accessTokenExpiration } = this.authenticationService.getCookieForJwtToken(accessJwt);
     const refreshJwt = await this.authenticationService.getJwtRefreshToken(user.id, true);
