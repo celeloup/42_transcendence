@@ -59,7 +59,8 @@ export default class AuthenticationController {
       authentication: accessJwt.token,
       refresh: refreshJwt.token,
       accessTokenExpiration,
-      refreshTokenExpiration
+      refreshTokenExpiration,
+      isTwoFactorAuthenticationEnabled: user.isTwoFactorAuthenticationEnabled
     };
   }
 
@@ -176,7 +177,8 @@ export default class AuthenticationController {
       authentication: accessJwt.token,
       refresh: refreshJwt.token,
       accessTokenExpiration,
-      refreshTokenExpiration
+      refreshTokenExpiration,
+      isTwoFactorAuthenticationEnabled: fakeUser.isTwoFactorAuthenticationEnabled
     };
   }
 
