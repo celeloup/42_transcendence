@@ -1,0 +1,61 @@
+$background-color: #232323;
+$text-color: white;
+$accent_color: #FFCD27;
+$mod_accent_color: #64A1E9;
+$ban_accent_color: #BF3030;
+$light-gray: #E3E3E3;
+$dark-gray: #919191;
+$darker-gray: #3E3E3E;
+
+.wrapper {
+	display: flex;
+	position: absolute;
+    flex-direction: column;
+	height: 100%;
+	width: 100%;
+	background-color: $background-color;
+	outline: 4px solid $background-color;
+	color: $background-color;
+	z-index: 1;
+	text-align: left;
+	color: white;
+
+    .search_bar {
+        display: flex;
+        width: calc(100% - 45px);
+        height: 25px;
+        margin: 15px 10px 10px 10px;
+        background-color: $background-color;
+        border: 2px solid $accent_color;
+        border-radius: 5px;
+        padding: 5px 10px;
+
+        .search_input {
+            flex-grow: 2;
+            font-size: 14px;	
+            outline: none;
+            font-family: "Fira Mono";
+            color: white;
+            background-color: $background-color;
+            border: none;
+
+            &::placeholder {
+                color: $light-gray;
+            }
+        }
+
+        .search_button {
+            padding-top: 2px;
+            padding-left: 5px;
+            font-size: 20px;
+            color: #ababab;
+        }
+    }
+
+    .list {
+        height: calc(100% - 80px);
+        padding: 10px 0 10px 10px;
+        overflow-y: scroll;
+        position: relative;
+    }
+}
