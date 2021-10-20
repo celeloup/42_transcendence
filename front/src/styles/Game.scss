@@ -62,7 +62,6 @@ $green: #81A439;
 
 #game_creation {
 
-	
 	.back_button {
 		font-size: 26px;
 		cursor: pointer;
@@ -246,5 +245,31 @@ $green: #81A439;
 		font-size: 25px;
 		font-family: "Dogica";
 		font-weight: bold;
+	}
+}
+
+#pong_game {
+	position: relative;
+	
+	#end_screen {
+		border: 4px solid $accent_color;
+		position: absolute;
+		padding: 20px;
+		top: 40%;
+		left: 35%;
+		width: 200px;
+		// height: 200px;
+		background-color: $background-color;
+
+		#back_button {
+			background-color: $accent_color;
+			color: $background-color;
+			cursor: pointer;
+			width: 150px;
+			height: 30px;
+			margin: auto;
+			margin-top: 20px;
+			border-radius: 5px;
+		}
 	}
 }
