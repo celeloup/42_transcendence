@@ -1,5 +1,4 @@
 import { Injectable, HttpException, HttpStatus } from '@nestjs/common';
-import AuthenticationService from '../authentication/authentication.service';
 import Message from './message.entity';
 import User from '../users/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -8,6 +7,7 @@ import Channel from './channel.entity';
 import CreateChannelDto from './dto/createChannel.dto';
 import UsersService from '../users/users.service';
 import NewPasswordDto from './dto/newPassword.dto';
+import muteObj from './mute.entity';
 
 @Injectable()
 export default class ChannelService {
@@ -16,6 +16,8 @@ export default class ChannelService {
     private messagesRepository: Repository<Message>,
     @InjectRepository(Channel)
     private channelRepository: Repository<Channel>,
+    @InjectRepository(muteObj)
+    private muteObjRepository: Repository<muteObj>,
     private usersService: UsersService,
   ) {
   }
@@ -47,6 +49,7 @@ export default class ChannelService {
 
   async getMessagesByChannelId(channel_id: number, user_id: number) {
     const channel = await this.channelRepository.findOne({ id: channel_id });
+    await this.checkMuteTime(channel);
     if ((await this.isAMember(channel_id, user_id) || (await this.usersService.isSiteAdmin(user_id)))) {
       return await this.getMessageByChannel(channel);
     }
@@ -58,24 +61,61 @@ export default class ChannelService {
     return await this.messagesRepository.find();
   }
 
+  async getNextExpiredMuteDate(muteObjs: muteObj[]) {
+    if (!muteObjs || !muteObjs[0])
+      return null;
+    let next = muteObjs[0].silencedUntil;
+    for (var muteObj of muteObjs) {
+      if (muteObj.silencedUntil < next)
+        next = muteObj.silencedUntil;
+    }
+    return next;
+  }
+
+  async refreshMutedUsers(channel: & Channel) {
+    let date = await this.getNextExpiredMuteDate(channel.muteDates);
+    while (date !== null && BigInt(date) < BigInt(Date.now())) {
+      let dateIndex = channel.muteDates.findIndex(muteObj => muteObj.silencedUntil === date);
+      let user_id = channel.muteDates[dateIndex].userId;
+      let userIndex = channel.muted.findIndex(user => user.id === user_id);
+      channel.muteDates.splice(dateIndex, 1);
+      channel.muted.splice(userIndex, 1);
+      date = await this.getNextExpiredMuteDate(channel.muteDates);
+    }
+    channel.next_unmute_date = date;
+    await this.channelRepository.save(channel);
+    return channel;
+  }
+
+  async checkMuteTime(channel: & Channel) {
+    if (channel
+      && channel.next_unmute_date
+      && channel.next_unmute_date < String(Date.now()))
+      (await this.refreshMutedUsers(channel));
+  }
+
   async getAllChannels() {
-    const channels = await this.channelRepository.find({ relations: ["historic"] });
+    let channels = await this.channelRepository.find({ relations: ['historic', 'members', 'muted', 'muteDates', 'admins', 'owner'] });
     if (channels) {
+      for (var channel of channels)
+        await this.checkMuteTime(channel);
+      channels = await this.channelRepository.find({ relations: ['historic', 'members', 'muted', 'muteDates', 'admins', 'owner'] });
       return channels;
     }
     throw new HttpException('No channel has been created yet', HttpStatus.NOT_FOUND);
   }
 
   async getChannelById(id: number) {
-    const channel = await this.channelRepository.findOne(id);
+    let channel = await this.channelRepository.findOne(id);
     if (channel) {
+      await this.checkMuteTime(channel);
       return channel;
     }
     throw new HttpException('Channel with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
   async getOwnerByChannelId(id: number) {
-    const channel = await this.channelRepository.findOne(id, { relations: ['owner'] });
+    let channel = await this.channelRepository.findOne(id, { relations: ['owner'] });
     if (channel) {
       return channel.owner;
     }
@@ -83,7 +123,7 @@ export default class ChannelService {
   }
 
   async getMembersByChannelId(id: number) {
-    const channel = await this.channelRepository.findOne(id, { relations: ['members'] });
+    let channel = await this.channelRepository.findOne(id, { relations: ['members'] });
     if (channel) {
       return channel.members;
     }
@@ -91,7 +131,7 @@ export default class ChannelService {
   }
 
   async getAdminsByChannelId(id: number) {
-    const channel = await this.channelRepository.findOne(id, { relations: ['admins'] });
+    let channel = await this.channelRepository.findOne(id, { relations: ['admins'] });
     if (channel) {
       return channel.admins;
     }
@@ -99,8 +139,9 @@ export default class ChannelService {
   }
 
   async getAllInfosByChannelId(id: number) {
-    const channel = await this.channelRepository.findOne(id, { relations: ['members', 'owner', 'admins', 'banned', 'muted', 'historic'] });
+    let channel = await this.channelRepository.findOne(id, { relations: ['members', 'owner', 'admins', 'banned', 'muted', 'historic', 'muteDates'] });
     if (channel) {
+      await this.checkMuteTime(channel);
       return channel;
     }
     throw new HttpException('Channel with this id does not exist', HttpStatus.NOT_FOUND);
@@ -142,10 +183,29 @@ export default class ChannelService {
     return false;
   }
 
+  async muteStillUpToDate(channel: Channel, user_id: number) {
+    let indexUsers = channel.muted.findIndex(element => element.id === user_id);
+    if (indexUsers === -1)
+      return false;
+    let indexDates = channel.muteDates.findIndex(element => element.userId === user_id);
+    if (indexDates !== -1) {
+      if (channel.muteDates[indexDates].silencedUntil > String(Date.now())) {
+        return true;
+      }
+      else {
+        await this.refreshMutedUsers(channel);
+        return false;
+      }
+    }
+    await this.refreshMutedUsers(channel);
+    return false;
+  }
+
   async isMuted(channel_id: number, user_id: number) {
     const channel = await this.getAllInfosByChannelId(channel_id);
     let user = await this.usersService.getById(user_id);
-    if ((await channel.muted.findIndex(element => element.id === user_id)) !== -1)
+    if (channel.next_unmute_date && channel.next_unmute_date > String(Date.now())
+      && ((await this.muteStillUpToDate(channel, user_id))))
       return true;
     return false;
   }
@@ -315,14 +375,25 @@ export default class ChannelService {
     throw new HttpException('Your rights in this channel are too low', HttpStatus.FORBIDDEN);
   }
 
-  async muteAMember(channel_id: number, other_id: number, user_id: number) {
+  async muteAMember(channel_id: number, other_id: number, time: bigint, user_id: number) {
     if ((await this.isAMember(channel_id, other_id))) {
       if ((await this.hasChannelRightsOverMember(channel_id, user_id, other_id))) {
         if (!(await this.isMuted(channel_id, other_id))) {
           let channel = await this.getAllInfosByChannelId(channel_id);
           let newMuted = await this.usersService.getById(other_id);
           await channel.muted.push(newMuted);
+          let newMuteObj = await this.muteObjRepository.create({
+            id: 0,
+            userId: other_id,
+            silencedUntil: String((Date.now()) + Number(time)),
+            channel: channel
+          })
+          await this.muteObjRepository.save(newMuteObj);
+          await channel.muteDates.push(newMuteObj);
+          if (!channel.next_unmute_date || channel.next_unmute_date > newMuteObj.silencedUntil)
+            channel.next_unmute_date = newMuteObj.silencedUntil;
           await this.channelRepository.save(channel);
+          channel = await this.getAllInfosByChannelId(channel_id);
           return channel;
         }
         throw new HttpException('User with this id is already muted', HttpStatus.OK);
@@ -332,14 +403,17 @@ export default class ChannelService {
     throw new HttpException('User with this id is not a member of this channel', HttpStatus.NOT_FOUND);
   }
 
+  async unmuteChecksOK(channel_id: number, other_id: number) {
+    let channel = await this.getAllInfosByChannelId(channel_id);
+    await this.refreshMutedUsers(channel);
+    await this.channelRepository.save(channel);
+    return channel;
+  }
+
   async unmuteAMember(channel_id: number, other_id: number, user_id: number) {
-    if ((await this.hasChannelRightsOverMember(channel_id, user_id, other_id))) {
+    if (user_id === -1 || (await this.hasChannelRightsOverMember(channel_id, user_id, other_id))) {
       if ((await this.isMuted(channel_id, other_id))) {
-        let channel = await this.getAllInfosByChannelId(channel_id);
-        let index = channel.muted.findIndex(element => element.id === other_id);
-        await channel.muted.splice(index, 1);
-        await this.channelRepository.save(channel);
-        return channel;
+        return (await this.unmuteChecksOK(channel_id, other_id))
       }
       throw new HttpException('User with this id has not been muted', HttpStatus.NOT_FOUND);
     }
@@ -385,7 +459,7 @@ export default class ChannelService {
       members: [channelOwner],
       admins: [channelOwner],
       banned: [],
-      muted: []
+      muted: [],
     });
     if (newChannel.type === 3) {
       let newMember = await this.usersService.getById(channelData.otherUserIdForPrivateMessage);
