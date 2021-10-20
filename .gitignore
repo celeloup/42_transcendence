@@ -6,5 +6,5 @@ websocket_client/node_modules
 postgres_data
 .DS_Store
 todo_list
+init_docker.sh
 pgadmin
-initdocker.sh

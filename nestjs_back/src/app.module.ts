@@ -11,6 +11,7 @@ import ChannelModule from './channel/channel.module';
 import AchievementsModule from './achievements/achievements.module';
 import GameModule from './game/game.module';
 import { MulterModule } from '@nestjs/platform-express';
+import muteObjModule from './channel/muteObj.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { MulterModule } from '@nestjs/platform-express';
     MatchesModule,
     AchievementsModule,
     ChannelModule,
+    muteObjModule,
     AuthenticationModule,
     GameModule,
     MulterModule.registerAsync({

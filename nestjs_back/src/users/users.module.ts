@@ -9,6 +9,7 @@ import UsersController from './users.controller';
 import AchievementsModule from '../achievements/achievements.module';
 import Achievement from '../achievements/achievement.entity';
 import Match from 'src/matches/match.entity';
+import { truncate } from 'fs';
  
 @Module({
   imports: [
@@ -47,7 +48,7 @@ export default class UsersModule {
         id42: 2,
         site_owner: true,
         site_banned: false,
-        site_moderator: false
+        site_moderator: true
       },
       {
         name: 'casper',
