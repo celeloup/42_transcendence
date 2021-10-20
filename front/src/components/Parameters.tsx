@@ -7,6 +7,7 @@ import '../styles/Parameters.scss';
 
 function Parameters() {
 	const { logout } = React.useContext(AuthContext) as ContextType;
+	const [modalVisible, setModalVisible] = React.useState<boolean>(false);
 	const [is2FA, setIs2FA] = React.useState<boolean>(false);
 	const [nameWasChanged, setNameWasChanged] = React.useState<boolean>(false);
 	const [nameNotChanged, setNameNotChanged] = React.useState<boolean>(false);
@@ -15,7 +16,10 @@ function Parameters() {
 	const [newUsername, setNewUsername] = React.useState<string>("");
 	const [userId, setUserId] = React.useState<number>(-1);
 	const [avatar, setAvatar] = React.useState<string>("");
+	const [qrCode, setQrCode] = React.useState<string>("");
+	const [twofaCode, setTwofaCode] = React.useState<string>("");
 	const history = useHistory();
+	const coderef = React.createRef<HTMLInputElement>();
 
 	useEffect(() => {
 		axios.get("/users/infos/me")
@@ -69,10 +73,32 @@ function Parameters() {
 	}
 
 	const toggle2FA = () : void => {
-		// axios.put("/2fa/turn-on")
-		// .then(response => { setIs2FA(!is2FA); })
-		// .catch(error => { console.log(error.response); });
-		setIs2FA(!is2FA);
+		setModalVisible(true);
+
+		axios.post("/2fa/generate")
+		.then( response => { setQrCode(response.data); })
+		.catch( error => { console.log(error.reponse); })
+	}
+
+	const sendCode = (code : string) : void => {
+		setTwofaCode(code);
+		if (code.length === 6)
+		{
+			const node = coderef.current;
+			if (node)
+				node.blur();
+
+			if (is2FA) {
+				axios.post("/2fa/turn-off", { twoFactorAuthenticationCode: code })
+				.then(response => { setModalVisible(false); setIs2FA(false); setTwofaCode(""); })
+				.catch(error => { console.log(error.response); setTwofaCode(""); });
+			}
+			else {
+				axios.post("/2fa/turn-on", { twoFactorAuthenticationCode: code })
+				.then(response => { setModalVisible(false); setIs2FA(true); setTwofaCode(""); })
+				.catch(error => { setTwofaCode(""); });
+			}
+		}
 	}
 
 	const proPicStyle = (id: number, avatar: string) => {
@@ -85,12 +111,11 @@ function Parameters() {
 		return {}
 	};
 
-
 	return (
 		<div className="parameters">
-			{/* <div className="param_container">
+			<div className="param_container">
 				<h1 className="param_h1">Parameters</h1>
-			</div> */}
+			</div>
 			<div className="param_container">
 				<div className="param_subcontainer left">
 					<div className="pic_wrapper">
@@ -139,6 +164,22 @@ function Parameters() {
 					<i id="open_door" className="fas fa-door-open fa-lg"></i>
 					<span id="logout_text"> Log out</span>
 				</button>
+			</div>
+			<div className={"modal" + (modalVisible ? " visible" : "" )} /*onClick={() => {setModalVisible(false)}}*/>
+				<div className={"modal_content" + (modalVisible ? " visible" : "" )}>
+					<img className="qr_code" src={qrCode} alt="2FA QR Code"></img>
+					<p>Scan the QR Code with Google Authenticator</p>
+					<p>and type the code you get below</p>
+					<input
+							className="twofa_code"
+							type="text"
+							value={twofaCode}
+							onChange={e => sendCode(e.target.value)}
+							ref={coderef}
+							maxLength={6}>
+					</input>
+					<button id="close_button" className="fas fa-times fa-3x" onClick={() => { setModalVisible(false); setTwofaCode(""); }}></button>
+				</div>
 			</div>
 		</div>
 	);

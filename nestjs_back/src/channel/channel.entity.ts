@@ -1,9 +1,9 @@
 import { ExecSyncOptionsWithBufferEncoding } from 'child_process';
-import { Column, Entity, ManyToOne, ManyToMany, PrimaryGeneratedColumn, OneToMany, JoinTable, UpdateDateColumn } from 'typeorm';
+import { Column, Entity, ManyToOne, ManyToMany, PrimaryGeneratedColumn, OneToMany, JoinTable, UpdateDateColumn, Long } from 'typeorm';
 import { Type } from 'class-transformer';
 import User from '../users/user.entity';
 import Message from './message.entity';
-import muteObj from './interface/mute.interface';
+import muteObj from './mute.entity';
 
 @Entity()
 class Channel {
@@ -51,12 +51,13 @@ class Channel {
   @ManyToMany(() => User, (muted: User) => muted.chan_muted)
   @JoinTable()
   public muted: User[];
-  
-  // @Column("simple-array", {array: true, nullable: true, default: [{}]})
-  // public muteDates: muteObj[];
 
-  @Column({nullable: true, default: null})
-  public next_unmute_date: number;
+  @OneToMany(() => muteObj, (muteDates: muteObj) => muteDates.channel) 
+  @JoinTable()
+  public muteDates: muteObj[];
+
+	@Column({type: 'bigint', nullable: true})
+  public next_unmute_date: string;
 }
 
 export default Channel;
