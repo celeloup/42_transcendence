@@ -1,7 +1,5 @@
-import { ConsoleLogger } from '@nestjs/common';
-import { getDefaultSettings } from 'http2';
-import { runInThisContext } from 'vm';
 import { height, width, paddle_margin } from '../game.settings'
+import Boost from './boost.class';
 import Round from './round.class';
 
 export default class Puck {
@@ -16,7 +14,14 @@ export default class Puck {
 
     boost_function: any[];
     boost_on: boolean = false;
-    boost_id: number;
+    boost_sensor: { id: number, x: number, y: number }[] = [
+        { "id": 0, "x": 0, "y": 1 },
+        { "id": 1, "x": 0, "y": 1 },
+        { "id": 2, "x": 0, "y": 1 },
+        { "id": 3, "x": 0, "y": 1 },
+        { "id": 4, "x": 0, "y": 1 }
+    ];
+    boost_activated: Map<number, Boost> = new Map();
 
     constructor(speed: number) {
         if (speed == 0) {
@@ -84,11 +89,15 @@ export default class Puck {
         param.paddle_player2.h = 80;
     }
 
+    checkSensor() {
+        
+    }
 
     setBoost(param: Round) {
+        checkSensor();
         if (!this.boost_on) {
-            this.boost_id = this.getRandomInt(0, 6);
-            this.boost_function[this.boost_id] (param);
+            // this.boost_id = this.getRandomInt(0, 6);
+            // this.boost_function[this.boost_id] (param);
             this.boost_on = true;
         }
     }
