@@ -29,7 +29,6 @@ import muteObjModule from './channel/muteObj.module';
         OAUTH_URL: Joi.string().required(),
         OAUTH_CLIENT_ID: Joi.string().required(),
         OAUTH_CLIENT_SECRET: Joi.string().required(),
-        OAUTH_CALLBACK_PARAM: Joi.string().required(),
         OAUTH_CALLBACK_URL: Joi.string().required(),
         OAUTH_SCOPE: Joi.string().required(),
         OAUTH_ME_URL: Joi.string().required(),
