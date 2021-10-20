@@ -1,11 +1,11 @@
-import { useState, useContext } from 'react';
+import { useContext, useEffect } from 'react';
 import WindowBorder from '../ui_components/WindowBorder';
 import { GameContext, ContextType } from '../../contexts/GameContext';
-
-import axios from "axios";
+import { AuthContext, ContextType as AuthContextType} from '../../contexts/AuthContext';
 import '../../styles/Game.scss';
 import Landing from './Landing';
 import GameCreation from './GameCreation';
+import Pong from './Pong';
 
 
 // type GameSettings = {
@@ -25,10 +25,14 @@ import GameCreation from './GameCreation';
 
 
 function Game() {
-	var { toDisplay } = useContext(GameContext) as ContextType;
-	const [ match, setMatch ] = useState<any>(null);
-	const [ matchID, setMatchID ] = useState<string>("");
+	var { toDisplay, setToDisplay } = useContext(AuthContext) as AuthContextType;
 
+	useEffect(
+		() => {
+		  setToDisplay("false");
+		},
+		[]);
+	
 	// const matchmaking = () => {
 	// 	socket.emit('match_player');
 	// }
@@ -36,6 +40,8 @@ function Game() {
 	var content;
 	if (toDisplay === "create")
 		content = <GameCreation />
+	else if (toDisplay === "pong")
+		content = <Pong />
 	else
 		content = <Landing />
 

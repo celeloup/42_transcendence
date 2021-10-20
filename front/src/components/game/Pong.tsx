@@ -1,4 +1,6 @@
-import { useState, KeyboardEvent } from 'react';
+import { useContext, useState, useEffect } from 'react';
+import { GameContext, ContextType } from '../../contexts/GameContext';
+import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
 import p5Types from "p5";
 import Sketch from "react-p5";
 
@@ -16,34 +18,44 @@ function Pong() {
 	const width: number = 782;
 	const paddle_margin: number = 10;
 
+	var { masterSocket, setToDisplay } = useContext(AuthContext) as AuthContextType;
+	var { matchID, setMatchID, setMatch, match } = useContext(GameContext) as ContextType;
+
 	const [ puck, setPuck ] = useState<{x: number, y: number, r: number}>({ x: width / 2, y: height/ 2, r: 12 });
 	const [ paddleRight, setPaddleRight ] = useState<Paddle>({ is_left: false, x: width - paddle_margin - 20 / 2, y: height / 2, w: 20, h: 80, indice:0 });
 	const [ paddleLeft, setPaddleLeft ] = useState<Paddle>({ is_left: true, x: paddle_margin + 20 / 2, y: height / 2, w: 20, h: 80, indice:0 });
 	const [ score, setScore ] = useState<number[]>([0, 0]);
 	
-	// useEffect(() => {
-	// 	socket?.on('new_frame', (data:any) => {
-	// 		// console.log("new frame :", data);
-	// 		setPuck(data.puck);
-	// 		setPaddleLeft(data.paddle_player1);
-	// 		setPaddleRight(data.paddle_player2);
-	// 		setScore([data.score_player1, data.score_player2]);
-	// 	})
+	useEffect(() => {
+		masterSocket?.on('game_starting', (data:any) => {
+			console.log("game starting !", data);
+			setMatchID(data);
+		});
+		
+		masterSocket?.on('new_frame', (data:any) => {
+			// console.log("new frame :", data);
+			setPuck(data.puck);
+			setPaddleLeft(data.paddle_player1);
+			setPaddleRight(data.paddle_player2);
+			setScore([data.score_player1, data.score_player2]);
+		});
 
-	// 	socket?.on('finish_game', (data:any) => {
-	// 		alert("game finished !");
-	// 		console.log("game finished !");
-	// 	})
-	// 	socket?.on('interrupted_game', (data:any) => {
-	// 		alert("game interrupted !");
-	// 		console.log("game interrupted !");
-	// 	})
+		masterSocket?.on('finish_game', (data:any) => {
+			alert("game finished !");
+			console.log("game finished !");
+		});
+		
+		masterSocket?.on('interrupted_game', (data:any) => {
+			alert("game interrupted !");
+			console.log("game interrupted !");
+		});
 
-	// 	socket?.on('game_starting', (data:any) => {
-	// 		console.log("game starting !", data);
-	// 		setMatchID(data);
-	// 	})
-	// }, [socket])
+		return () => {
+			masterSocket.emit('leave_game', match.id);
+			setMatchID("");
+			setMatch(null);
+		}
+	}, [masterSocket])
 
 	// ------------- CANVAS
 
@@ -53,7 +65,6 @@ function Pong() {
 		for (let it = 15; it < height; it += 35)
 		{
 			p5.fill(255);
-			// p5.rectMode(p5.CENTER);
 			p5.rect(width / 2, it, wd, hd);
 		}
 	}
@@ -73,24 +84,34 @@ function Pong() {
 	};
 
 	const keyPressed = (p5: p5Types) => {
-		if (p5.key === "ArrowUp") {
-			// console.log("up", matchID);
-			// socket.emit('paddle_movement', { id_game: matchID, move: "up"})
-		} else if (p5.key === "ArrowDown") {
-			// console.log("down", matchID);
-			// socket.emit('paddle_movement', { id_game: matchID, move: "down"})
+        if (p5.key === "ArrowUp") {
+            // console.log("up", matchID);
+            masterSocket.emit('paddle_movement', { id_game: matchID, move: "up"})
+        } else if (p5.key === "ArrowDown") {
+            // console.log("down", matchID);
+            masterSocket.emit('paddle_movement', { id_game: matchID, move: "down"})
+        }
+    };
+
+    const keyReleased = (p5: p5Types) => {
+        if (p5.key === "ArrowUp") {
+            // console.log("up", matchID);
+            masterSocket.emit('paddle_movement', { id_game: matchID, move: "stop"})
+        } else if (p5.key === "ArrowDown") {
+            // console.log("down", matchID);
+            masterSocket.emit('paddle_movement', { id_game: matchID, move: "stop"})
 		}
 	};
 
-	const keyDown = (e: KeyboardEvent<HTMLImageElement>) => {
-		e.preventDefault();
-		console.log("keyDown");
-	  };
+	// console.log("matchID = ", matchID);
 
 	return (
 		<div id="pong_game">
-			{ score[0] } MACHIN VS TRUC { score[1] }
-			<Sketch setup={ setup } draw={ draw } keyPressed={ keyPressed }/>
+			<div className="window_header" >
+				<i className="fas fa-arrow-left back_button" onClick={ ()=> setToDisplay("landing") }/>
+				{ score[0] } MACHIN VS TRUC { score[1] }
+			</div>
+			<Sketch setup={ setup } draw={ draw } keyPressed={ keyPressed } keyReleased={ keyReleased }/>
 		</div>
 )}
 

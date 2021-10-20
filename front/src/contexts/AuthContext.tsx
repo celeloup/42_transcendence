@@ -17,7 +17,9 @@ export type ContextType = {
 	logout: () => void,
 	user: User | null,
 	setUser: (user:User) => void,
-	masterSocket: any
+	masterSocket: any,
+	setToDisplay: (page:string) => void,
+	toDisplay: string
   }
 
 interface Props {
@@ -32,6 +34,7 @@ export const AuthProvider= ({ children } : Props) => {
 	const [ user, setUser ] = useState<User | null>();
 	const [ socket, setSocket ] = useState<any>(null);
 	const [ connect, setConnect ] = useState<boolean>(false);
+	const [ toDisplay, setToDisplay ] = useState<string>("landing");
 
 	useEffect(() : ReturnType<EffectCallback> => {
 		if (connect) {
@@ -61,7 +64,10 @@ export const AuthProvider= ({ children } : Props) => {
 			logout: logoutContext, 
 			user: user, 
 			setUser:setUser, 
-			masterSocket: socket }}>
+			masterSocket: socket,
+			toDisplay: toDisplay,
+			setToDisplay: setToDisplay
+			}}>
 				{ children }
 		</AuthContext.Provider> );
 }
