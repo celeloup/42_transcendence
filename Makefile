@@ -1,10 +1,11 @@
 NAME := transcendance
 DC := docker-compose
+DS := docker stack
 
 all: up logs
 
 up:
-	#if [ -d "postgres_data" ]; then mkdir postgres_data; fi
+	if [ ! -d "postgres_data" ]; then mkdir postgres_data; fi
 	$(DC) --project-name $(NAME) up --detach
 logs:
 	$(DC) --project-name $(NAME) logs --follow front back postgres
@@ -40,3 +41,25 @@ clean:
 	rm -fr ./front/node_modules
 	rm -fr ./websocket_client/node_modules
 	rm -fr ./postgres_data
+# ONLINE VERSION RULES - WIP
+stack.up:
+	if [ ! -d "postgres_data" ]; then mkdir postgres_data; fi
+	$(DS) deploy -c stack.yml $(NAME)
+stack.rm:
+	$(DS) remove $(NAME)
+stack.ps:
+	$(DS) ps $(NAME) --no-trunc
+stack.logs.front:
+	docker service logs -f $(NAME)_front
+stack.logs.back:
+	docker service logs -f $(NAME)_back
+stack.logs.db:
+	docker service logs -f $(NAME)_postgres
+stack.clean:
+	sudo rm -fr ./nestjs_back/dist
+	sudo rm -fr ./nestjs_back/node_modules
+	sudo rm -fr ./front/dist
+	sudo rm -fr ./front/node_modules
+	sudo rm -fr ./websocket_client/node_modules
+	sudo rm -fr ./postgres_data
+

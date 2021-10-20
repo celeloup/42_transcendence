@@ -1,0 +1,90 @@
+version: '3.8'
+
+services:
+
+  front:
+    image: node:14.17.6-alpine3.12
+    command: sh -c "npm install && npm start"
+    deploy:
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.labels.server == true
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.services.transcendance-front.loadbalancer.server.port=3000"
+        - "traefik.http.routers.transcendance-front.rule=Host(`pong-wars.cyberduck.blog`)"
+        - "traefik.http.routers.transcendance-front.entrypoints=websecure"
+        - "traefik.http.routers.transcendance-front.priority=1"
+        - "traefik.http.routers.transcendance-front.tls=true"
+        - "traefik.http.routers.transcendance-front.tls.certresolver=letsencryptresolver"
+    environment:
+      HOST: 0.0.0.0
+    volumes:
+      - ./front/.:/usr/src/app
+    working_dir: /usr/src/app
+    networks:
+      - net
+      - traefik-public
+
+  back:
+    image: node:15.14.0-alpine3.12
+    command: sh -c "npm install && npm run start:dev"
+    deploy:
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.labels.server == true
+      resources:
+        limits:
+          memory: 2G
+        reservations:
+          memory: 512M
+      labels:
+        - "traefik.enable=true"
+        - "traefik.http.services.transcendance-back.loadbalancer.server.port=8080"
+        - "traefik.http.routers.transcendance-back.rule=Host(`pong-wars.cyberduck.blog`) && (PathPrefix(`/api`) || PathPrefix(`/docs`) || PathPrefix(`/socket.io`))"
+        - "traefik.http.routers.transcendance-back.entrypoints=websecure"
+        - "traefik.http.routers.transcendance-back.priority=2"
+        - "traefik.http.routers.transcendance-back.tls=true"
+        - "traefik.http.routers.transcendance-back.tls.certresolver=letsencryptresolver"
+    volumes:
+      - ./nestjs_back/.:/usr/src/app
+    working_dir: /usr/src/app
+    networks:
+      - net
+      - traefik-public
+
+  postgres:
+    image: postgres:latest
+    deploy:
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.labels.server == true
+      resources:
+        limits:
+            memory: 512M
+        reservations:
+            memory: 256M
+    volumes:
+      - ./postgres-entrypoint:/docker-entrypoint-initdb.d
+      - ./postgres_data:/var/lib/postgresql/data
+    env_file:
+      - docker.env
+    networks:
+      - net
+
+networks:
+  net:
+    driver: overlay
+  traefik-public:
+    external: true
