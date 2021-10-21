@@ -1,0 +1,88 @@
+$background-color: #232323;
+$text-color: white;
+$accent_color: #FFCD27;
+$logout_accent_color: #BF3030;
+$light-gray: #E3E3E3;
+$dark-gray: #919191;
+$darker-gray: #3E3E3E;
+
+.name_wrapper {
+	display: block;
+	margin: 50px 50px 0px 50px;
+	width: 276px;
+	height: 25px;
+	background-color: $background-color;
+	border: 3px solid $accent_color;
+	border-radius: 0px 5px 5px 5px;
+	padding: 5px 10px;
+}
+
+.name_wrapper:before {
+	content:"your username_";
+	font-family: "Dogica";
+	position: relative;
+	top: -27px;
+	left: -36px;
+	background-color: $accent_color;
+	color: white;
+	height: 20px;
+	width: 1000px;
+	padding: 5px 20px;
+	border-radius: 5px 5px 0px 0px;
+}
+
+.name_changebar {
+	display: inline-block;
+	position: relative;
+	top: -24px;
+	left: -10px;
+	width: 275px;
+	height: 25px;
+	background-color: $background-color;
+	color: $text-color;
+	font-family: "Fira Mono";
+	font-size: 1em;
+	padding: 5px 10px;
+	border: none;
+	outline: none;
+}
+
+.field_changed {
+	display: inline-block;
+	font-family: "Fira Mono";
+	width: 400px;
+	margin-top: 20px;
+}
+
+.namechange {
+	color: $accent_color;
+	font-family: "Dogica";
+	font-size: 1em;
+	width: 200px;
+	height: 50px;
+	margin: 20px 101px;
+	border: 3px solid $accent_color;
+	border-radius: 5px;
+}
+
+.namechange:hover {
+    color: $background-color;
+	background-color: $accent_color;
+}
+
+.namechange_disabled {
+	color: $dark-gray;
+	font-family: "Dogica";
+	font-size: 1em;
+	width: 200px;
+	height: 50px;
+	margin: 20px 101px;
+	border: 3px solid $dark-gray;
+	border-radius: 5px;
+}
+
+.namechange_disabled:hover {
+	pointer-events: none;
+	color: $dark-gray;
+	cursor: not-allowed; // <= this does nothing because of pointer-events none
+}

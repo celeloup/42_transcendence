@@ -1,0 +1,40 @@
+$background-color: #232323;
+$text-color: white;
+$accent_color: #FFCD27;
+$mod_accent_color: #64A1E9;
+$ban_accent_color: #BF3030;
+$light-gray: #E3E3E3;
+$dark-gray: #919191;
+$darker-gray: #3E3E3E;
+
+.toggler {
+	font-size: 14px;
+	display: flex;
+	width: 90%;
+	margin-left: 10px;
+	margin-top: 5px;
+	padding-bottom: 10px;
+	cursor: pointer;
+	-webkit-user-select: none; /* Safari */        
+	-moz-user-select: none; /* Firefox */
+	-ms-user-select: none; /* IE10+/Edge */
+	user-select: none; /* Standard */
+
+    div:first-child {
+        color: $dark-gray;
+
+        &:hover {
+            color: white;
+        }
+    }
+
+    .text {
+        font-size: 18px;
+        margin-left: 5px;
+        color: $accent_color;
+    }
+}
+
+.users {
+	margin-bottom: 20px;
+}
