@@ -56,14 +56,28 @@ export default class TwoFactorAuthenticationController {
   async turnOnTwoFactorAuthentication(
     @Req() request: RequestWithUser,
     @Body() { twoFactorAuthenticationCode } : TwoFactorAuthenticationCodeDto
-  ) {
+  ): Promise<AuthInfos> {
+    const { user } = request;
     const isCodeValid = this.twoFactorAuthenticationService.isTwoFactorAuthenticationCodeValid(
-      twoFactorAuthenticationCode, request.user
+      twoFactorAuthenticationCode, user
     );
     if (!isCodeValid) {
       throw new UnauthorizedException('Wrong authentication code');
     }
-    await this.usersService.turnOnTwoFactorAuthentication(request.user.id);
+    await this.usersService.turnOnTwoFactorAuthentication(user.id);
+    const accessJwt = this.authenticationService.getJwtToken(user.id, true);
+    const { accessTokenCookie, accessTokenExpiration } = this.authenticationService.getCookieForJwtToken(accessJwt);
+    const refreshJwt = await this.authenticationService.getJwtRefreshToken(user.id, true);
+    const { refreshTokenCookie, refreshTokenExpiration } = this.authenticationService.getCookieForJwtRefreshToken(refreshJwt);
+    request.res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie]);
+    return {
+      id: user.id,
+      name: user.name,
+      authentication: accessJwt.token,
+      refresh: refreshJwt.token,
+      accessTokenExpiration,
+      refreshTokenExpiration
+    };
   }
 
   @UseGuards(JwtTwoFactorGuard)
