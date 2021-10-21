@@ -5,7 +5,7 @@ import { ChannelAdmin } from './ChannelAdmin';
 import { Message } from './Message';
 import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
 import { io } from "socket.io-client";
-import '../../styles/Chat.scss';
+import '../../styles/Chat/Chat.scss';
 import axios from 'axios';
 
 function ChatHeader() {

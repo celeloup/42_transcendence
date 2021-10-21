@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useState, useEffect, useContext } from 'react';
-import '../../styles/ChatList.scss';
+import '../../styles/Chat/ChatList.scss';
 import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
 import CreateChan from './CreateChan';
 import React from 'react';
