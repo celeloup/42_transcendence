@@ -1,6 +1,6 @@
 import WindowBorder from "../ui_components/WindowBorder";
 import React, { useEffect, useState } from 'react';
-import axios from "axios";
+import axios from 'axios';
 import UserCategory from './UserCategory';
 import '../../styles/admin/UserList.scss';
 
