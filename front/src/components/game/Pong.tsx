@@ -13,6 +13,13 @@ type Paddle = {
 	indice: number
 }
 
+type Puck = {
+	x: number,
+	y: number,
+	r: number,
+	boost_activated:any[]
+}
+
 type endScreenProps = {
 	score1: number,
 	score2: number
@@ -37,7 +44,7 @@ function Pong() {
 	var { masterSocket, setToDisplay } = useContext(AuthContext) as AuthContextType;
 	var { matchID, setMatchID, setMatch, match } = useContext(GameContext) as ContextType;
 
-	const [ puck, setPuck ] = useState<{x: number, y: number, r: number}>({ x: width / 2, y: height/ 2, r: 12 });
+	const [ puck, setPuck ] = useState<Puck>({ x: width / 2, y: height/ 2, r: 12, boost_activated: [] });
 	const [ paddleRight, setPaddleRight ] = useState<Paddle>({ is_left: false, x: width - paddle_margin - 20 / 2, y: height / 2, w: 20, h: 80, indice:0 });
 	const [ paddleLeft, setPaddleLeft ] = useState<Paddle>({ is_left: true, x: paddle_margin + 20 / 2, y: height / 2, w: 20, h: 80, indice:0 });
 	const [ score, setScore ] = useState<number[]>([0, 0]);
@@ -100,6 +107,11 @@ function Pong() {
 		p5.background('#232323');
 		separation(p5);
 		p5.ellipse(puck.x, puck.y, puck.r * 2, puck.r * 2);
+		p5.fill(255,0,0);
+		puck.boost_activated.forEach(sensor => {
+			p5.ellipse(sensor.x, sensor.y, puck.r * 2, puck.r *2);
+		});
+		p5.fill(255);
 		p5.rect(paddleLeft.x, paddleLeft.y, paddleLeft.w, paddleLeft.h);
 		p5.rect(paddleRight.x, paddleRight.y, paddleRight.w, paddleRight.h);
 	};

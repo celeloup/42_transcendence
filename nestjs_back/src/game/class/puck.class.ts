@@ -14,14 +14,9 @@ export default class Puck {
 
     boost_function: any[];
     boost_on: boolean = false;
-    boost_sensor: { id: number, x: number, y: number }[] = [
-        { "id": 0, "x": 0, "y": 1 },
-        { "id": 1, "x": 0, "y": 1 },
-        { "id": 2, "x": 0, "y": 1 },
-        { "id": 3, "x": 0, "y": 1 },
-        { "id": 4, "x": 0, "y": 1 }
-    ];
-    boost_activated: Map<number, Boost> = new Map();
+    // boost_activated: Boost[] = [];
+    boost_activated: {"x": number, "y":number, "type": number} [] = [];
+    boost_launched: {"stop_id": number, "score1":number, "score2": number} [] = [];
 
     constructor(speed: number) {
         if (speed == 0) {
@@ -40,8 +35,11 @@ export default class Puck {
             this.boostDownPaddle2,
             this.boostUp,
             this.boostDown,
+            this.boostStopPaddle1,
+            this.boostStopPaddle2,
+            this.boostStop
         ];
-    }
+   }
 
 
     ///tools
@@ -59,7 +57,7 @@ export default class Puck {
     boostDown(param: Round) {
         param.puck.indice = 0.5;
     }
-    endBoost(param: Round) {
+    boostStop(param: Round) {
         param.puck.indice = 1;
     }
 
@@ -89,16 +87,67 @@ export default class Puck {
         param.paddle_player2.h = 80;
     }
 
-    checkSensor() {
-        
+    activateBoost() {
+        if (this.x % 25 == 0 && this.y % 5 == 0) {
+            this.boost_activated.push( 
+                new Boost(this.getRandomInt(80, 703), this.getRandomInt(80, 547), this.getRandomInt(0,7)
+            ));
+            if (this.boost_activated.length > 5 ) {
+                this.boost_activated.shift();
+            }
+        }
     }
 
-    setBoost(param: Round) {
-        checkSensor();
-        if (!this.boost_on) {
-            // this.boost_id = this.getRandomInt(0, 6);
-            // this.boost_function[this.boost_id] (param);
-            this.boost_on = true;
+    launchBoost(param : Round) {
+        let r_boost = this.r;
+        for( var i = 0; i < this.boost_activated.length; i++) { 
+            let boost = this.boost_activated[i];
+            if (this.x - this.r < boost.x + r_boost && this.x + this.r > boost.x - r_boost) {
+               if (this.y - this.r < boost.y + r_boost && this.y + this.r > boost.y - r_boost) {
+                this.setLaunchedBoost(param, boost);
+                this.boost_activated.splice(i, 1);      
+                return ;
+            }
+           }
+        };
+    }
+
+    setLaunchedBoost(param: Round, boost: {"x": number, "y": number,"type": number}) {
+        let score1 = param.score_player1;
+        let score2 = param.score_player2;
+        let ending: number;
+        if (boost.type == 0) {
+           ending = 6;
+           score2 += 1;
+        }
+        else if (boost.type == 1) {
+           ending = 6;
+           score1 += 1;
+        }
+        else if (boost.type == 2) {
+           ending = 7;
+           score1 += 1;
+        }
+        else if (boost.type == 3) {
+           ending = 7;
+           score2 += 1;
+        }
+        else {
+            ending = 8;
+            score1 += 1;
+            score2 += 1;
+        }
+        this.boost_launched.push({"stop_id": ending, "score1": score1, "score2": score2 }); 
+        this.boost_function[boost.type] (param);
+    }
+
+    stopBoost(param: Round) {
+        for( var i = 0; i < this.boost_launched.length; i++) { 
+            let boost = this.boost_launched[i];
+            if (param.score_player1 >= boost.score1 && param.score_player2 >= boost.score2) {
+                this.boost_function[boost.stop_id] (param);
+                this.boost_launched.splice(i, 1);
+            }
         }
     }
 
@@ -109,7 +158,9 @@ export default class Puck {
         param.paddle_player2.updatePosition();
         this.edges(param);
         if (param.boost_available) {
-            this.setBoost(param);
+            this.activateBoost();
+            this.launchBoost(param);
+            this.stopBoost(param);
         }
     }
 
