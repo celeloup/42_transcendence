@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 import React, { useEffect } from 'react';
 import '../../styles/parameters/Parameters.scss'
 import '../../styles/parameters/NameChange.scss';
@@ -42,7 +42,7 @@ function NameChange () {
 					type="text"
 					value={newUsername}
 					onChange={e => setNewUsername(e.target.value)}
-					maxLength={28}>
+					maxLength={15}>
 				</input>
 			</div>
 			{ nameWasChanged &&
