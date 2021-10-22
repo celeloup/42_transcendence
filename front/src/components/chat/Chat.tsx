@@ -28,7 +28,7 @@ export function Chat() {
 	const [ newMessage, setNewMessage ] = useState("");
 	const [ msgIsLoading, setMsgIsLoading ] = useState(false);
 	const [ blockedUsers, setBlockedUsers ] = useState<any[]>([]);
-	var { displayList, displayAdmin, channel, socket, setSocket, setChannel, setDisplayList } = useContext(ChannelContext) as ContextType;
+	var { displayList, displayAdmin, channel, socket, setSocket, setChannel, setDisplayList, changeChannel, toggleDisplayAdmin } = useContext(ChannelContext) as ContextType;
 	// const [ currentChan, setCurrentChan ] = useState<any>(null);
 	
 	// ---------- SOCKETS
@@ -71,6 +71,16 @@ export function Chat() {
 				setMsgIsLoading(false);
 			})
 		});
+		socket?.on('user_banned', (data:any) => {
+			console.log("I HAVE BEEN BANNED", data);
+			if (channel?.id === data)
+			{
+				if (displayAdmin)
+					toggleDisplayAdmin();
+				setDisplayList(true);
+				changeChannel(null);
+			}
+		})
 	}, [socket])
 	
 	// ---------- GET MESSAGES

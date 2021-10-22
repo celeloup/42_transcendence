@@ -58,12 +58,14 @@ function CreateChan({ type, hide, socket } : CreateChanProps) {
 		let nameRegex = /^([a-zA-Z0-9_-]+([ ]?[a-zA-Z0-9_-]+)?)+$/;
 		let passwordRegex = /[ -~]/;
 		
-		errors.pop();
+		var temp_errors = [];
 		if (nameRegex.test(chanName) === false)
-			errors.push({key:"name", value:"The channel's name must not contain special characters or whitespaces at the extremities."});
+			temp_errors.push({key:"name", value:"The channel's name must not contain special characters or whitespaces at the extremities."});
+		if (chanName.length > 20)
+			temp_errors.push({ key: "name_length", value:"The channel's name must be between 2 and 15 characters long"});
 		if (chanPassword !== "" && passwordRegex.test(chanPassword) === false)
-			errors.push({key:"password", value:"The password cannot contain non printable characters."});
-		if (errors.length === 0)
+			temp_errors.push({key:"password", value:"The password cannot contain non printable characters."});
+		if (temp_errors.length === 0)
 		{
 			// console.log(errors);
 			var chanSettings:channelSettings = {
@@ -90,6 +92,8 @@ function CreateChan({ type, hide, socket } : CreateChanProps) {
 			};
 			submitNewChannel();
 		}
+		else
+			setErrors(temp_errors);
 	};
 	// ---------- ??
 	var chanInfo;
