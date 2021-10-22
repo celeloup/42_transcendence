@@ -3,7 +3,8 @@ import { useState, createContext } from "react";
 export type Channel = {
 	id: number,
 	name: string,
-	type: number
+	type: number,
+	owner: any
 }
 
 export type ContextType = {
@@ -14,7 +15,7 @@ export type ContextType = {
 	setDisplayList: (set:boolean) => void,
 	displayAdmin: boolean,
 	toggleDisplayAdmin: () => void,
-	changeChannel: (chan:Channel) => void,
+	changeChannel: (chan:Channel|null) => void,
 	socket: any | null,
 	setSocket: (sok:any) => void
 }
@@ -39,11 +40,12 @@ export const ChannelProvider = ({ children } : Props) => {
 		setDisplayAdmin(!displayAdmin);
 	}
 
-	const changeChannel = (chan: Channel) => {
+	const changeChannel = (chan: Channel | null) => {
 		if (channel)
 			socket.emit('leave_chan', channel.id);
 		setChannel(chan);
-		socket.emit('join_chan', chan.id);
+		if (chan)
+			socket.emit('join_chan', chan.id);
 		// toggleDisplayList();
 	}
 

@@ -114,15 +114,20 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
 
   @SubscribeMessage('ban_user')
   async banUser(
-    @MessageBody() data: { channel: Channel, member: User },
+    @MessageBody() data: { channelID: number, memberID: number },
     @ConnectedSocket() client: Socket,
   ) {
+	function getByValue(map:Map<User, Socket>, searchValue: number) {
+		for (let [key, value] of map.entries()) {
+		  if (key.id === searchValue)
+			return value;
+		}
+	  }
     const user: User = await this.authenticationService.getUserFromSocket(client);
-    const memberSocket: Socket = this.listSocket.get(data.member);
-    
+	const memberSocket: Socket = getByValue(this.listSocket, data.memberID);
     if (user) {
-      memberSocket.leave(data.channel.id.toString());
-      memberSocket.emit('user_banned');
+		memberSocket.emit('user_banned', data.channelID);
+    	memberSocket.leave(data.channelID.toString());
     }
   }
 
