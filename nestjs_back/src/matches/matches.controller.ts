@@ -16,6 +16,12 @@ export default class MatchesController {
     private readonly matchesService: MatchesService
   ) {}
 
+  @Get()
+  @ApiOperation({summary: "Get all matches / open route - only for admins at the end"})
+  getAllMatches() {
+    return this.matchesService.getAllMatches();
+  }
+
   @ApiParam({name: 'id', type: Number, description: 'match id'})
   @Get(':id')
   @ApiOperation({summary: "Get a match"})

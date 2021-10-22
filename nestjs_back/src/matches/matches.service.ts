@@ -22,6 +22,16 @@ export default class MatchesService {
 
   ) { }
 
+  async getAllMatches() {
+    const match = await this.matchesRepository.find({ relations: ['users'], order: {
+      createdDate: "DESC"
+    }});
+    if (match) {
+      return match;
+    }
+    throw new HttpException('No matches found', HttpStatus.NOT_FOUND);
+  }
+
   async getMatchById(id: number) {
     const match = await this.matchesRepository.findOne(id, { relations: ['users'], order: {
       createdDate: "DESC"

@@ -44,6 +44,19 @@ export default class UsersController {
     return this.userService.changeName(req.user.id, user);
   }
 
+  @ApiOperation({ summary: "Get all the users sorted by scores" })
+  @ApiResponse({
+    status: 200,
+    type: [userInfos]
+  })
+  @SerializeOptions({
+    groups: ['infos']
+  })
+  @Get('/ranked')
+  GetRankedUsers() {
+    return this.userService.getRankedUsers();
+  }
+
   @ApiOperation({ summary: "Get all the users" })
   @ApiResponse({
     status: 200,
@@ -248,7 +261,7 @@ export default class UsersController {
   @ApiOperation({ summary: "Revoke a moderator" })
   @ApiResponse({
     status: 200,
-    description: 'User successfully promoted moderator',
+    description: 'User successfully demoted',
     type: [User]
   })
   @ApiResponse({
@@ -265,7 +278,24 @@ export default class UsersController {
   @ApiOperation({ summary: "Ban a user from website" })
   @ApiResponse({
     status: 200,
-    description: 'User successfully promoted moderator',
+    description: 'User successfully banned from the website',
+    type: [User]
+  }) 
+  @ApiResponse({
+    status: 404,
+    description: 'User not found for this id'
+  })
+  @UseGuards(JwtTwoFactorGuard)
+  @Put('ban/me')
+  banUser(@Req() req: RequestWithUser, @Body() otherUser: AddUserDto) {
+    const { user } = req;
+    return this.userService.banUser(user.id, otherUser.userId);
+  }
+
+  @ApiOperation({ summary: "Unban a user from website" })
+  @ApiResponse({
+    status: 200,
+    description: 'User successfully unbanned from the website',
     type: [User]
   })
   @ApiResponse({
@@ -273,10 +303,10 @@ export default class UsersController {
     description: 'User not found for this id'
   })
   @UseGuards(JwtTwoFactorGuard)
-  @Delete('block/me')
-  banUser(@Req() req: RequestWithUser, @Body() otherUser: AddUserDto) {
+  @Delete('unban/me')
+  unbanUser(@Req() req: RequestWithUser, @Body() otherUser: AddUserDto) {
     const { user } = req;
-    return this.userService.banUser(user.id, otherUser.userId);
+    return this.userService.unbanUser(user.id, otherUser.userId);
   }
 
   // Delete account not in subject? 
@@ -322,7 +352,7 @@ export default class UsersController {
   )
   async uploadAvatar(@Req() req: RequestWithUser, @UploadedFile() file: Express.Multer.File) {
     const { user } = req;
-    return this.userService.setAvatar(user.id, file.path); 
+    return this.userService.setAvatar(user.id, file.path);
   }
 
   @Get('avatar/:id')
