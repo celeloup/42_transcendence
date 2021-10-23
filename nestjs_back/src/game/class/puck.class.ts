@@ -6,27 +6,28 @@ export default class Puck {
     x: number = width / 2;
     y: number = height / 2;
     r: number = 12;
-    x_speed: number = 6;
-    y_speed: number = 6;
+	speed: number = 10;
+    x_speed: number;
+    y_speed: number;
     x_direction: number = 1;
     y_direction: number = 1;
     indice: number = 1;
 
     boost_function: any[];
     boost_on: boolean = false;
-    // boost_activated: Boost[] = [];
     boost_activated: {"x": number, "y":number, "type": number} [] = [];
     boost_launched: {"stop_id": number, "score1":number, "score2": number} [] = [];
 
     constructor(speed: number) {
+		let angle = Math.random() * 2 * Math.PI;
         if (speed == 0) {
-            this.x_speed = 3;
-            this.y_speed = 3;
+            this.speed = 5;
         }
         if (speed == 2) {
-            this.x_speed = 9;
-            this.y_speed = 9;
+            this.speed = 15;
         }
+		this.x_speed = this.speed * Math.cos(angle);
+		this.y_speed = this.speed * Math.sin(angle);
 
         this.boost_function = [
             this.boostUpPaddle1,
@@ -199,7 +200,10 @@ export default class Puck {
         }
 
         if (puck_left < paddle1_right && puck_top < paddle1_bottom && puck_bottom > paddle1_top) {
-            this.x_direction = 1;
+            if (this.x > param.paddle_player1.x) {
+				this.x_direction = 1;
+			}
+			/*
             if (puck_left < param.paddle_player1.x + param.paddle_player1.w / 4)
             {
                 if (puck_bottom < param.paddle_player1.y)
@@ -207,10 +211,15 @@ export default class Puck {
                 else
                     this.y = paddle1_bottom + this.r;
             }
+		   */
         }
 
-        if (puck_right > paddle2_left && puck_top < paddle2_bottom && puck_bottom > paddle2_top) {
-            this.x_direction = -1;
+		else if (puck_right > paddle2_left && puck_top < paddle2_bottom && puck_bottom > paddle2_top) {
+			if (this.x < param.paddle_player2.x) {
+				this.x_direction = -1;
+			}
+
+			/*
             if (puck_right > param.paddle_player2.x - param.paddle_player2.w / 4)
             {
                 if (puck_bottom < param.paddle_player2.y)
@@ -218,23 +227,30 @@ export default class Puck {
                 else
                     this.y = paddle2_bottom + this.r;
             }
+		   */
         }
 
         if (this.x < 0) {
+	//	else if (puck_left < 0) {
             param.score_player2++;
             this.reset();
         }
 
-        if (this.x > width) {
+       	if (this.x > width) {
+	//	else if (puck_right > width) {
             param.score_player1++;
             this.reset();
         }
     }
 
     reset() {
-        this.x = width / 2;
+		let angle = Math.random() * ( Math.PI / 4 - (-Math.PI / 4) ) + (-Math.PI /4);
+		//Math.random() * (max - min)) + min;
+
+		this.x = width / 2;
         this.y = this.getRandomInt(40, height - 40);
-        this.x_direction *= -1;
-        this.y_direction *= -1;
-    }
+		this.x_speed = this.speed * Math.cos(angle);
+		this.y_speed = this.speed * Math.sin(angle);
+    	this.x_direction *= -1;
+	}
 }
