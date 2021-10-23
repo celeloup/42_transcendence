@@ -1,6 +1,5 @@
 import WindowBorder from "../ui_components/WindowBorder";
 import '../../styles/Profile.scss';
-import React, { useState } from 'react';
 
 type StatusDisplayProps = {
     state: string;
@@ -25,20 +24,18 @@ export function StatusDisplay ( { state }: StatusDisplayProps) {
 }
 
 function UserCard ({ user_name, user_id, has_avatar, nb_matches, nb_victories, nb_points }: UserCardProps) {
-	const [online, setOnline] = useState(true);
-	const status = online ? <StatusDisplay state='online' /> : <StatusDisplay state='offline'/>;
-
     return (
         <WindowBorder id='user_window' w='319' h='208'>
             <div id='user_card'>
                 <div id='row_top'>
                    <div className="profile_display">
                         <span>{ user_name.charAt(0) }</span>
-                        { has_avatar && <img src={ process.env.REACT_APP_BACK_URL + "/api/users/avatar/" + user_id }/> }
+                        { has_avatar && <img src={ process.env.REACT_APP_BACK_URL + "/api/users/avatar/" + user_id } alt="user avatar"/> }
                     </div>
                     <div className="column_right">
                         <span className="name">{user_name}</span>
-                        <StatusDisplay state={online ? 'online' : 'offline'} />
+                        <span>[status ?]</span>
+                        {/* <StatusDisplay state={online ? 'online' : 'offline'} /> */}
                         <div className="rank">
                             <span>RANK</span>
                             <span>#?</span>

@@ -65,9 +65,9 @@ function Profile() {
 		.catch(error => { console.log(error.response); })
 
 		axios.get("/users/friends/" + user!.id)
-		.then(response => { console.log(response.data); setFriends(response.data); })
+		.then(response => { setFriends(response.data); })
 		.catch(error => { console.log(error.response); });
-	}, []);
+	}, [user]);
 
 	return (
 			<div className="profile">
@@ -77,7 +77,7 @@ function Profile() {
 					<Friends friends={friends}/>
 				</div>
 				<div id="column_right">
-					<MatchHistory matches={matches}/>
+					<MatchHistory matches={matches} my_id={userId}/>
 					<Achievements />
 				</div>
 			</div>
