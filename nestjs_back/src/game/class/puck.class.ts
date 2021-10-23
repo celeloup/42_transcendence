@@ -42,7 +42,7 @@ export default class Puck {
    }
 
 
-    ///tools
+//////tools
     getRandomInt(min: number, max: number) {
             return Math.floor(Math.random() * (max - min)) + min;
         }
@@ -87,9 +87,11 @@ export default class Puck {
         param.paddle_player2.h = 80;
     }
 
+
+	//check if bost can appear on the screen and been catch
     activateBoost() {
         if (this.x % 25 == 0 && this.y % 5 == 0) {
-            this.boost_activated.push( 
+            this.boost_activated.push(
                 new Boost(this.getRandomInt(80, 703), this.getRandomInt(80, 547), this.getRandomInt(0,7)
             ));
             if (this.boost_activated.length > 5 ) {
@@ -98,20 +100,23 @@ export default class Puck {
         }
     }
 
+
+	//check if the boost I've been catch and start the effect of the boost
     launchBoost(param : Round) {
         let r_boost = this.r;
-        for( var i = 0; i < this.boost_activated.length; i++) { 
+        for( var i = 0; i < this.boost_activated.length; i++) {
             let boost = this.boost_activated[i];
             if (this.x - this.r < boost.x + r_boost && this.x + this.r > boost.x - r_boost) {
                if (this.y - this.r < boost.y + r_boost && this.y + this.r > boost.y - r_boost) {
                 this.setLaunchedBoost(param, boost);
-                this.boost_activated.splice(i, 1);      
+                this.boost_activated.splice(i, 1);
                 return ;
             }
            }
         };
     }
 
+	//set up ending conditions of the boost and start the effects
     setLaunchedBoost(param: Round, boost: {"x": number, "y": number,"type": number}) {
         let score1 = param.score_player1;
         let score2 = param.score_player2;
@@ -137,12 +142,13 @@ export default class Puck {
             score1 += 1;
             score2 += 1;
         }
-        this.boost_launched.push({"stop_id": ending, "score1": score1, "score2": score2 }); 
+        this.boost_launched.push({"stop_id": ending, "score1": score1, "score2": score2 });
         this.boost_function[boost.type] (param);
     }
 
+	//check the ending condition of the boost
     stopBoost(param: Round) {
-        for( var i = 0; i < this.boost_launched.length; i++) { 
+        for( var i = 0; i < this.boost_launched.length; i++) {
             let boost = this.boost_launched[i];
             if (param.score_player1 >= boost.score1 && param.score_player2 >= boost.score2) {
                 this.boost_function[boost.stop_id] (param);
@@ -151,7 +157,12 @@ export default class Puck {
         }
     }
 
-    update(param: Round) {
+//////////////////END OF BOOST PART//////////////
+
+
+
+
+	update(param: Round) {
         this.x += this.x_direction * this.indice * this.x_speed;
         this.y += this.y_direction * this.indice * this.y_speed;
         param.paddle_player1.updatePosition();
@@ -221,8 +232,6 @@ export default class Puck {
     }
 
     reset() {
-        
-
         this.x = width / 2;
         this.y = this.getRandomInt(40, height - 40);
         this.x_direction *= -1;
