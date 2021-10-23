@@ -7,14 +7,12 @@ $light-gray: #E3E3E3;
 $dark-gray: #919191;
 $darker-gray: #3E3E3E;
 
-$scheme1: admin $accent_color;
-$scheme2: not-admin $accent_color;
-$scheme3: mod $mod_accent_color;
-$scheme4: not-mod $mod_accent_color;
-$scheme5: ban $ban_accent_color;
-$scheme6: unban green;
+$scheme1: mod $accent_color;
+$scheme2: not-mod $accent_color;
+$scheme3: ban $ban_accent_color;
+$scheme4: unban green;
 
-$schemes: $scheme1 $scheme2 $scheme3 $scheme4 $scheme5 $scheme6;
+$schemes: $scheme1 $scheme2 $scheme3 $scheme4;
 
 .userLine {
 	font-size: 17px;

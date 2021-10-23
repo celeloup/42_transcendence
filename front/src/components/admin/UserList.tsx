@@ -1,6 +1,6 @@
 import WindowBorder from "../ui_components/WindowBorder";
 import React, { useEffect, useState } from 'react';
-import axios from "axios";
+import axios from 'axios';
 import UserCategory from './UserCategory';
 import '../../styles/admin/UserList.scss';
 
@@ -48,27 +48,9 @@ function UserList () {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
-	const makeAdmin : Button = {
-		class: "admin",
-		icon: "crown",
-		text: "Make admin",
-		function: (id : number) => {
-			// Route doesn't exist (yet ?)
-		}
-	}
-
-	const removeAdmin : Button = {
-		class: "not-admin",
-		icon: "user-slash",
-		text: "Remove admin",
-		function: (id : number) => {
-			// Route doesn't exist (yet ?)
-		}
-	}
-
 	const makeMod : Button = {
 		class: "mod",
-		icon: "wrench",
+		icon: "crown",
 		text: "Make mod",
 		function: (id : number) => {
 			axios.put('/users/moderator/me', { userId: id })
@@ -104,7 +86,9 @@ function UserList () {
 		icon: "plus-circle",
 		text: "Unban user",
 		function: (id : number) => {
-			// Route doesn't exist (yet ?)
+			axios.put('/users/unblock/me', { userId: id })
+			.then (response => { console.log("successfully unbanned user"); } )
+			.catch (error => { console.log(error.response); });
 		}
 	}
 
@@ -125,9 +109,9 @@ function UserList () {
 					<UserCategory list={admins} type="admins" search={searched}
 						buttons={[]}/>
 					<UserCategory list={moderators} type="moderators" search={searched}
-						buttons={[makeAdmin, removeMod, banUser]}/>
+						buttons={[removeMod, banUser]}/>
 					<UserCategory list={others} type="users" search={searched}
-						buttons={[makeAdmin, makeMod, banUser]}/>
+						buttons={[makeMod, banUser]}/>
 					<UserCategory list={banned} type="banned" search={searched}
 						buttons={[unbanUser]}/>
 				</div>

@@ -1,5 +1,5 @@
 import * as api from '../API';
-import axios from 'axios';
+import axios from "axios";
 import React, { useEffect } from 'react';
 import { AuthContext, ContextType} from '../contexts/AuthContext';
 import { useHistory } from "react-router-dom";
@@ -28,11 +28,18 @@ function Parameters() {
 	}
 
 	const showModal = () : void => {
-		setModalVisible(true);
-
-		axios.post("/2fa/generate")
-		.then( response => { setQrCode(response.data); })
-		.catch( error => { console.log(error.reponse); })
+		if (!is2FA)
+		{
+			axios.post("/2fa/generate")
+			.then( response => { setQrCode(response.data); })
+			.catch( error => { console.log(error.reponse); })
+			setModalVisible(true);
+		}
+		else {
+			axios.post("/2fa/turn-off")
+			.then( response => { console.log("successfully turned off 2fa")})
+			.catch( error => { console.log(error.reponse); })
+		}
 	}
 
 	return (
