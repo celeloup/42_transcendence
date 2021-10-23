@@ -3,7 +3,7 @@ import '../../styles/Profile.scss';
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-type Friend = {
+type FriendType = {
 	id: number;
 	name: string;
 	site_owner: boolean;
@@ -12,33 +12,33 @@ type Friend = {
 }
 
 type Prop = {
-    infos: Friend;
+    infos: FriendType;
 }
 
 type Props = {
-    friends: Friend[];
+    friends: FriendType[];
 }
 
 function Friend ( { infos } : Prop) {
-	const [online, setOnline] = useState(false);
     const [hasAvatar, setHasAvatar] = useState(false);
 
     useEffect(() => {
-		axios.get("/users/avatar/" + infos.id)
-		.then(response => { setHasAvatar(true); })
-		.catch(error => { setHasAvatar(false); });
-	}, []);
+		axios.get("/users/infos/" + infos.id)
+		.then(response => { setHasAvatar(response.data.avatar !== null); })
+		.catch(error => { console.log(error.response); });
+	}, [infos.id]);
 
     return (
-        <div className ='friends_info'>
-            <div className="profile_display">
-                <span>{ infos.name.charAt(0) }</span>
-                { hasAvatar && <img src={ process.env.REACT_APP_BACK_URL + "/api/users/avatar/" + infos.id }/> }
-            </div>
-			<p>{ infos.name }</p>
-	    	<div className={`dot_status ${online ? 'online': 'offline'}`} ></div>
-			{/* div:hover */}
-	    </div>
+        <a href={"profile"}>
+            <div className ='friends_info'>
+                <div className="profile_display">
+                    <span>{ infos.name.charAt(0) }</span>
+                    { hasAvatar && <img src={ process.env.REACT_APP_BACK_URL + "/api/users/avatar/" + infos.id } alt="user avatar"/> }
+                </div>
+		    	<p>{ infos.name }</p>
+	        	<div className={`dot_status ${true ? 'online': 'offline'}`} ></div>
+	        </div>
+        </a>
     )
 }
 
