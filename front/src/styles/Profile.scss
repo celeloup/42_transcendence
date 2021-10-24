@@ -440,5 +440,11 @@ $schemes: $scheme1 $scheme2;
 		}
 	}
 
-
+	.empty {
+		position: relative;
+		top: 50px;
+		font-family: "Fira Mono";
+		font-size: 18px;
+		font-style: italic;
+	}
 }

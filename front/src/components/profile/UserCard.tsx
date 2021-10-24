@@ -9,6 +9,7 @@ type UserCardProps = {
 	user_name: string,
     user_id: number,
     has_avatar: boolean,
+    rank: number,
     nb_matches: number,
     nb_victories: number,
     nb_points: number,
@@ -23,7 +24,7 @@ export function StatusDisplay ( { state }: StatusDisplayProps) {
     )
 }
 
-function UserCard ({ user_name, user_id, has_avatar, nb_matches, nb_victories, nb_points }: UserCardProps) {
+function UserCard ({ user_name, user_id, has_avatar, rank, nb_matches, nb_victories, nb_points }: UserCardProps) {
     return (
         <WindowBorder id='user_window' w='319' h='208'>
             <div id='user_card'>
@@ -38,7 +39,7 @@ function UserCard ({ user_name, user_id, has_avatar, nb_matches, nb_victories, n
                         {/* <StatusDisplay state={online ? 'online' : 'offline'} /> */}
                         <div className="rank">
                             <span>RANK</span>
-                            <span>#?</span>
+                            <span>#{ rank + 1 }</span>
                         </div>
                     </div>
                 </div>

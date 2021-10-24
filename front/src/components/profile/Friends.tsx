@@ -29,7 +29,7 @@ function Friend ( { infos } : Prop) {
 	}, [infos.id]);
 
     return (
-        <a href={"profile"}>
+        <a href={ "profile/" + infos.id }>
             <div className ='friends_info'>
                 <div className="profile_display">
                     <span>{ infos.name.charAt(0) }</span>
@@ -49,7 +49,8 @@ function Friends (  {friends} : Props) {
         <WindowBorder w='318' h='451' id="friend_window" >
             <div id ='friends_card'>
                 <div className="window_header header_title"><i>_</i>friends_</div>
-                <div id='list_friends'>{ friend_divs }</div>
+                { friend_divs.length > 0 && <div id='list_friends'>{ friend_divs }</div>}
+                { friend_divs.length === 0 && <span className="empty">No friends to show...</span>}
             </div>
         </WindowBorder>
     )
