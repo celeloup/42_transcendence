@@ -37,7 +37,7 @@ function Parameters() {
 		}
 		else {
 			axios.post("/2fa/turn-off")
-			.then( response => { console.log("successfully turned off 2fa")})
+			.then( response => { console.log("successfully turned off 2fa"); setIs2FA(false); })
 			.catch( error => { console.log(error.reponse); })
 		}
 	}

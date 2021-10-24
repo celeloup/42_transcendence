@@ -1,6 +1,5 @@
 import React, { useEffect } from 'react';
-import axios from 'axios';
-import { AuthContext, ContextType} from '../contexts/AuthContext';
+import axios from "axios";
 import UserCard from './profile/UserCard';
 import Friends from './profile/Friends';
 import MatchHistory from './profile/MatchHistory';
@@ -30,33 +29,31 @@ type Friend = {
 	site_banned: boolean;
 }
 
-function Profile() {
-	const { user } = React.useContext(AuthContext) as ContextType;
+function Profile (props : any) {
 	const [username, setUsername] = React.useState<string>("");
-	const [userId, setUserId] = React.useState<number>(-1);
 	const [hasAvatar, setHasAvatar] = React.useState<boolean>(false);
 	const [matches, setMatches] = React.useState<Match[]>([]);
 	const [nbMatches, setNbMatches] = React.useState<number>(0);
 	const [nbVictories, setNbVictories] = React.useState<number>(0);
 	const [nbPoints, setNbPoints] = React.useState<number>(0);
+	const [rank, setRank] = React.useState<number>(0);
 	const [friends, setFriends] = React.useState<Friend[]>([]);
 
 	useEffect(() => {
-		axios.get("/users/infos/me")
+		axios.get("/users/infos/" + props.match.params.id)
 		.then(response => { setUsername(response.data.name);
-							setUserId(response.data.id);
 							setHasAvatar(response.data.avatar !== null)
 						})
 		.catch(error => { console.log(error.response); });
 
-		axios.get("/users/matches/" + user!.id)
+		axios.get("/users/matches/" + props.match.params.id)
 		.then(response => { setMatches(response.data);
 							setNbMatches(response.data.length);
 							setNbVictories(response.data.filter(function(match : Match) {
-								return (match.winner === user!.id);
+								return (match.winner === props.match.params.id);
 							}).length);
 							setNbPoints(response.data.map(function(match : Match) {
-								if (match.user1_id === user!.id)
+								if (match.user1_id === props.match.params.id)
 									return (match.score_user1);
 								else
 									return (match.score_user2);
@@ -64,20 +61,24 @@ function Profile() {
 		})
 		.catch(error => { console.log(error.response); })
 
-		axios.get("/users/friends/" + user!.id)
+		axios.get("/users/friends/" + props.match.params.id)
 		.then(response => { setFriends(response.data); })
 		.catch(error => { console.log(error.response); });
-	}, [user]);
+
+		axios.get("/users/ranked")
+		.then(response => { setRank(response.data.map((e : any) => e.id).indexOf(props.match.params.id)); })
+		.catch(error => { console.log(error.response); })
+	}, [props.match.params.id]);
 
 	return (
 			<div className="profile">
 				<div id="column_left">
-					<UserCard user_name={username} user_id={userId} has_avatar={hasAvatar}
+					<UserCard user_name={username} user_id={props.match.params.id} has_avatar={hasAvatar} rank={rank}
 						nb_matches={nbMatches} nb_victories={nbVictories} nb_points={nbPoints}/>
 					<Friends friends={friends}/>
 				</div>
 				<div id="column_right">
-					<MatchHistory matches={matches} my_id={userId}/>
+					<MatchHistory matches={matches} my_id={props.match.params.id}/>
 					<Achievements />
 				</div>
 			</div>

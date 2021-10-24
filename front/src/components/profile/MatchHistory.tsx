@@ -57,22 +57,26 @@ function Match ( { data, my_id, focus, setFocus } : MatchProps ) {
     });
 
     useEffect(() => {
-        axios.get("/users/infos/" + player1.id)
-		.then(response => { setPlayer1({...player1,
-                                    name: response.data.name,
-                                    hasAvatar: response.data.avatar !== null
-                                });
+        axios.get("/users/infos/" + data.user1_id)
+		.then(response => { setPlayer1({ id: data.user1_id,
+                                        name: response.data.name,
+                                        hasAvatar: response.data.avatar !== null,
+                                        score: data.score_user1,
+                                        winner: data.winner === data.user1_id
+                                    });
 						})
 		.catch(error => { console.log(error.response); });
 
-		axios.get("/users/infos/" + player2.id)
-		.then(response => { setPlayer2({...player2,
-                                    name: response.data.name,
-                                    hasAvatar: response.data.avatar !== null
-                                });
+		axios.get("/users/infos/" + data.user2_id)
+		.then(response => { setPlayer2({ id: data.user2_id,
+                                        name: response.data.name,
+                                        hasAvatar: response.data.avatar !== null,
+                                        score: data.score_user2,
+                                        winner: data.winner === data.user2_id
+                                    });
 						})
 		.catch(error => { console.log(error.response); });
-	}, [player1, player2]);
+	}, [data]);
 
     let me, them;
     if (my_id === player1.id) {
@@ -85,7 +89,7 @@ function Match ( { data, my_id, focus, setFocus } : MatchProps ) {
     }
 
     const speeds = ["slow", "normal", "fast"];
-    const maps = ["basic"];
+    const maps = ["", "space", "mario", "street fighter"];
 
     return (
         <div className={"match_wrapper" + ( focus ? "_focus" : "" )} onClick={() => { setFocus(data.id); }}>
@@ -148,7 +152,8 @@ function MatchHistory ( { matches, my_id } : HistoryProps ) {
         <WindowBorder id='history_window' w='620' h='480'>
             <div>
                 <div className="window_header header_title"><i>_</i>match_history_</div>
-                <div id='list_matches'>{ match_divs }</div>
+                { match_divs.length > 0 && <div id='list_matches'>{ match_divs }</div>}
+                { match_divs.length === 0 && <span className="empty">No matches to show...</span>}
             </div>
         </WindowBorder>
     )
