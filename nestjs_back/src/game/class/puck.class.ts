@@ -191,19 +191,17 @@ export default class Puck {
         let paddle2_top = param.paddle_player2.y - param.paddle_player2.h / 2;
         let paddle2_bottom = param.paddle_player2.y + param.paddle_player2.h / 2;
 
-        if (puck_top < 0) {
-            this.y_direction = 1;
+        if (puck_top < 0 || puck_bottom > height) {
+            this.y_speed *= -1;
         }
-        else if (puck_bottom > height) {
-
-            this.y_direction = -1;
-        }
+        // if (puck_bottom > height) {
+        //     this.y_speed *= -1;
+        // }
 
         if (puck_left < paddle1_right && puck_top < paddle1_bottom && puck_bottom > paddle1_top) {
             if (this.x > param.paddle_player1.x) {
-				this.x_direction = 1;
+				this.x_speed *= -1;
 			}
-			/*
             if (puck_left < param.paddle_player1.x + param.paddle_player1.w / 4)
             {
                 if (puck_bottom < param.paddle_player1.y)
@@ -211,15 +209,13 @@ export default class Puck {
                 else
                     this.y = paddle1_bottom + this.r;
             }
-		   */
+		   
         }
 
-		else if (puck_right > paddle2_left && puck_top < paddle2_bottom && puck_bottom > paddle2_top) {
+		if (puck_right > paddle2_left && puck_top < paddle2_bottom && puck_bottom > paddle2_top) {
 			if (this.x < param.paddle_player2.x) {
-				this.x_direction = -1;
+				this.x_speed *= -1;
 			}
-
-			/*
             if (puck_right > param.paddle_player2.x - param.paddle_player2.w / 4)
             {
                 if (puck_bottom < param.paddle_player2.y)
@@ -227,17 +223,14 @@ export default class Puck {
                 else
                     this.y = paddle2_bottom + this.r;
             }
-		   */
         }
-
-        if (this.x < 0) {
-	//	else if (puck_left < 0) {
+        
+        if (puck_left < 0) {
             param.score_player2++;
             this.reset();
         }
 
-       	if (this.x > width) {
-	//	else if (puck_right > width) {
+        if (puck_right > width) {
             param.score_player1++;
             this.reset();
         }
@@ -251,6 +244,6 @@ export default class Puck {
         this.y = this.getRandomInt(40, height - 40);
 		this.x_speed = this.speed * Math.cos(angle);
 		this.y_speed = this.speed * Math.sin(angle);
-    	this.x_direction *= -1;
+    //	this.x_direction *= -1;
 	}
 }
