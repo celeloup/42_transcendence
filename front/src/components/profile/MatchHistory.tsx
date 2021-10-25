@@ -79,7 +79,7 @@ function Match ( { data, my_id, focus, setFocus } : MatchProps ) {
 	}, [data]);
 
     let me, them;
-    if (my_id === player1.id) {
+    if (my_id === data.user1_id) {
         me = player1;
         them = player2;
     }

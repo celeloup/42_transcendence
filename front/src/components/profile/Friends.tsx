@@ -29,7 +29,7 @@ function Friend ( { infos } : Prop) {
 	}, [infos.id]);
 
     return (
-        <a href={ "profile/" + infos.id }>
+        <a href={ "/profile/" + infos.id }>
             <div className ='friends_info'>
                 <div className="profile_display">
                     <span>{ infos.name.charAt(0) }</span>
