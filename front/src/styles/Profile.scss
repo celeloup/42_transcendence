@@ -225,7 +225,34 @@ $schemes: $scheme1 $scheme2;
 			}
 		}
 	}
-	
+
+	.buttons {
+
+		div {
+			height: 50px;
+			display: flex;
+
+			button {
+				flex: 1;
+				padding: 13px 0px;
+				border: none;
+				border-radius: 5px;
+				margin: 4px;
+				font-family: "Fira Mono";
+				font-size: 15px;
+				cursor: pointer;
+
+				&:hover {
+					transform: scale(1.05);
+				}
+
+				i {
+					margin-right: 10px;
+					margin-left: 10px;
+				}
+			}
+		}
+	}
 
     #friend_window {
         flex-grow: 2;
@@ -233,7 +260,6 @@ $schemes: $scheme1 $scheme2;
 		#list_friends {
 			position: relative;
 			top: 4px;
-			height: 320px;
 			width: 295px;
 			overflow-y: scroll;
 			padding: 8px 0px 0px 5px;
