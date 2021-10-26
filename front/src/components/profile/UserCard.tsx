@@ -13,6 +13,7 @@ type UserCardProps = {
     nb_matches: number,
     nb_victories: number,
     nb_points: number,
+    online: boolean,
 }
 
 export function StatusDisplay ( { state }: StatusDisplayProps) {
@@ -24,7 +25,7 @@ export function StatusDisplay ( { state }: StatusDisplayProps) {
     )
 }
 
-function UserCard ({ user_name, user_id, has_avatar, rank, nb_matches, nb_victories, nb_points }: UserCardProps) {
+function UserCard ({ user_name, user_id, has_avatar, rank, nb_matches, nb_victories, nb_points, online }: UserCardProps) {
     return (
         <WindowBorder id='user_window' w='319' h='208'>
             <div id='user_card'>
@@ -35,8 +36,7 @@ function UserCard ({ user_name, user_id, has_avatar, rank, nb_matches, nb_victor
                     </div>
                     <div className="column_right">
                         <span className="name">{user_name}</span>
-                        <span>[status ?]</span>
-                        {/* <StatusDisplay state={online ? 'online' : 'offline'} /> */}
+                        <StatusDisplay state={online ? 'online' : 'offline'} />
                         <div className="rank">
                             <span>RANK</span>
                             <span>#{ rank + 1 }</span>

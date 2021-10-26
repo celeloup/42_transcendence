@@ -13,13 +13,15 @@ type FriendType = {
 
 type Prop = {
     infos: FriendType;
+    online: boolean;
 }
 
 type Props = {
     friends: FriendType[];
+    online: number[];
 }
 
-function Friend ( { infos } : Prop) {
+function Friend ( { infos, online } : Prop) {
     const [hasAvatar, setHasAvatar] = useState(false);
 
     useEffect(() => {
@@ -36,14 +38,14 @@ function Friend ( { infos } : Prop) {
                     { hasAvatar && <img src={ process.env.REACT_APP_BACK_URL + "/api/users/avatar/" + infos.id } alt="user avatar"/> }
                 </div>
 		    	<p>{ infos.name }</p>
-	        	<div className={`dot_status ${true ? 'online': 'offline'}`} ></div>
+	        	<div className={`dot_status ${online ? 'online': 'offline'}`} ></div>
 	        </div>
         </a>
     )
 }
 
-function Friends (  {friends} : Props) {
-    const friend_divs = friends.map((friend) => <Friend key={friend.id} infos={friend}/>)
+function Friends (  { friends, online } : Props) {
+    const friend_divs = friends.map((friend) => <Friend key={friend.id} infos={friend} online={ online.includes(friend.id) }/>)
 
     return (
         <WindowBorder w='318' h='451' id="friend_window" >
