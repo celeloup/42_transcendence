@@ -19,12 +19,18 @@ type Button = {
 	function: (id: number) => void;
 }
 
-function UserList () {
+type Props = {
+	setStatus: (p: any) => void;
+	setMessage: (p: any) => void;
+}
+
+function UserList ( { setStatus, setMessage } : Props) {
 	const [admins, setAdmins] = useState<User[]>([]);
 	const [moderators, setModerators] = useState<User[]>([]);
 	const [others, setOthers] = useState<User[]>([]);
 	const [banned, setBanned] = useState<User[]>([]);
 	const [searched, setSearched] = useState<string>("");
+	const [rerender, setRerender] = useState<boolean>(true);
 
 	useEffect(() => {
 		axios.get('/users')
@@ -46,7 +52,7 @@ function UserList () {
 			console.log(error.response); 
 		})
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, []);
+	}, [rerender]);
 
 	const makeMod : Button = {
 		class: "mod",
@@ -54,8 +60,16 @@ function UserList () {
 		text: "Make mod",
 		function: (id : number) => {
 			axios.put('/users/moderator/me', { userId: id })
-			.then (response => { console.log("successfully made mod"); } )
-			.catch (error => { console.log(error.response); });
+			.then (response => {
+				setStatus(<p className="stats"><i>Success</i> ✔️</p>);
+				setMessage(<p className="stats">Made user <i>moderator</i>.</p>);
+				setRerender(!rerender);
+			} )
+			.catch (error => {
+				setStatus(<p className="stats"><i>Failure</i> ❌</p>);
+				setMessage(<p className="stats">Couldn't make user <i>moderator</i>.</p>);
+				setRerender(!rerender);
+			});
 		}
 	}
 
@@ -65,8 +79,16 @@ function UserList () {
 		text: "Remove mod",
 		function: (id : number) => {
 			axios.delete('/users/moderator/me', { data: { userId: id } })
-			.then (response => { console.log("successfully revoked mod"); } )
-			.catch (error => { console.log(error.response); });
+			.then (response => {
+				setStatus(<p className="stats"><i>Success</i> ✔️</p>);
+				setMessage(<p className="stats"><i>Revoked</i> moderator status.</p>);
+				setRerender(!rerender);
+			} )
+			.catch (error => {
+				setStatus(<p className="stats"><i>Failure</i> ❌</p>);
+				setMessage(<p className="stats">Couldn't <i>revoke</i> moderator.</p>);
+				setRerender(!rerender);
+			});
 		}
 	}
 
@@ -75,9 +97,17 @@ function UserList () {
 		icon: "times-circle",
 		text: "Ban user",
 		function: (id : number) => {
-			axios.put('/users/block/me', { userId: id })
-			.then (response => { console.log("successfully banned user"); } )
-			.catch (error => { console.log(error.response); });
+			axios.put('/users/ban/me', { userId: id })
+			.then (response => {
+				setStatus(<p className="stats"><i>Success</i> ✔️</p>);
+				setMessage(<p className="stats">User was <i>banned</i>.</p>);
+				setRerender(!rerender);
+			} )
+			.catch (error => {
+				setStatus(<p className="stats"><i>Failure</i> ❌</p>);
+				setMessage(<p className="stats">Couldn't <i>ban</i> user.</p>);
+				setRerender(!rerender);
+			});
 		}
 	}
 
@@ -86,9 +116,17 @@ function UserList () {
 		icon: "plus-circle",
 		text: "Unban user",
 		function: (id : number) => {
-			axios.put('/users/unblock/me', { userId: id })
-			.then (response => { console.log("successfully unbanned user"); } )
-			.catch (error => { console.log(error.response); });
+			axios.delete('/users/unban/me', { data: { userId: id } })
+			.then (response => {
+				setStatus(<p className="stats"><i>Success</i> ✔️</p>);
+				setMessage(<p className="stats">User was <i>unbanned</i>.</p>);
+				setRerender(!rerender);
+			} )
+			.catch (error => {
+				setStatus(<p className="stats"><i>Failure</i> ❌</p>);
+				setMessage(<p className="stats">Couldn't <i>unban</i> user.</p>);
+				setRerender(!rerender);
+			});
 		}
 	}
 

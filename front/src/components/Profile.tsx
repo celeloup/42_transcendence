@@ -1,11 +1,11 @@
-import React, { useEffect } from 'react';
-import axios from 'axios';
-import { AuthContext, ContextType} from '../contexts/AuthContext';
+import React, { useEffect, useContext } from 'react';
+import axios from "axios";
 import UserCard from './profile/UserCard';
 import Friends from './profile/Friends';
 import MatchHistory from './profile/MatchHistory';
 import Achievements from './profile/Achievements';
 import '../styles/Profile.scss';
+import { AuthContext, ContextType as AuthContextType } from '../contexts/AuthContext';
 
 type Match = {
 	boost_available: boolean;
@@ -30,33 +30,35 @@ type Friend = {
 	site_banned: boolean;
 }
 
-function Profile() {
-	const { user } = React.useContext(AuthContext) as ContextType;
+function Profile (props : any) {
 	const [username, setUsername] = React.useState<string>("");
-	const [userId, setUserId] = React.useState<number>(-1);
 	const [hasAvatar, setHasAvatar] = React.useState<boolean>(false);
 	const [matches, setMatches] = React.useState<Match[]>([]);
 	const [nbMatches, setNbMatches] = React.useState<number>(0);
 	const [nbVictories, setNbVictories] = React.useState<number>(0);
 	const [nbPoints, setNbPoints] = React.useState<number>(0);
+	const [rank, setRank] = React.useState<number>(0);
 	const [friends, setFriends] = React.useState<Friend[]>([]);
+	const [online, setOnline] = React.useState<number[]>([]);
+	var { masterSocket } = useContext(AuthContext) as AuthContextType;
+	
+	const userId = +props.match.params.id;
 
 	useEffect(() => {
-		axios.get("/users/infos/me")
+		axios.get("/users/infos/" + userId)
 		.then(response => { setUsername(response.data.name);
-							setUserId(response.data.id);
 							setHasAvatar(response.data.avatar !== null)
 						})
 		.catch(error => { console.log(error.response); });
 
-		axios.get("/users/matches/" + user!.id)
+		axios.get("/users/matches/" + userId)
 		.then(response => { setMatches(response.data);
 							setNbMatches(response.data.length);
 							setNbVictories(response.data.filter(function(match : Match) {
-								return (match.winner === user!.id);
+								return (match.winner === userId);
 							}).length);
 							setNbPoints(response.data.map(function(match : Match) {
-								if (match.user1_id === user!.id)
+								if (match.user1_id === userId)
 									return (match.score_user1);
 								else
 									return (match.score_user2);
@@ -64,17 +66,26 @@ function Profile() {
 		})
 		.catch(error => { console.log(error.response); })
 
-		axios.get("/users/friends/" + user!.id)
+		axios.get("/users/friends/" + userId)
 		.then(response => { setFriends(response.data); })
 		.catch(error => { console.log(error.response); });
-	}, [user]);
+
+		axios.get("/users/ranked")
+		.then(response => { setRank(response.data.map((e : any) => e.id).indexOf(userId)); })
+		.catch(error => { console.log(error.response); })
+
+		masterSocket.emit("get_users");
+		masterSocket?.on("connected_users", (data : any) => {
+			setOnline(data);
+		});
+	}, [userId, masterSocket]);
 
 	return (
 			<div className="profile">
 				<div id="column_left">
-					<UserCard user_name={username} user_id={userId} has_avatar={hasAvatar}
-						nb_matches={nbMatches} nb_victories={nbVictories} nb_points={nbPoints}/>
-					<Friends friends={friends}/>
+					<UserCard user_name={username} user_id={userId} has_avatar={hasAvatar} rank={rank}
+						nb_matches={nbMatches} nb_victories={nbVictories} nb_points={nbPoints} online={ online.includes(userId) }/>
+					<Friends friends={friends} online={online}/>
 				</div>
 				<div id="column_right">
 					<MatchHistory matches={matches} my_id={userId}/>

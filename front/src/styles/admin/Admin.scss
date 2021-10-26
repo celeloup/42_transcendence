@@ -43,9 +43,11 @@ $darker-gray: #3E3E3E;
 			.stats {
 				font-family: "Dogica";
 				font-size: 18px;
-				margin: 25px;
+				height: 30px;
+				padding: 11px;
 
-				.special {
+				i {
+					font-style: normal;
 					color: $accent_color;
 				}
 			}
