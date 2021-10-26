@@ -1,10 +1,11 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useContext } from 'react';
 import axios from "axios";
 import UserCard from './profile/UserCard';
 import Friends from './profile/Friends';
 import MatchHistory from './profile/MatchHistory';
 import Achievements from './profile/Achievements';
 import '../styles/Profile.scss';
+import { AuthContext, ContextType as AuthContextType } from '../contexts/AuthContext';
 
 type Match = {
 	boost_available: boolean;
@@ -38,6 +39,8 @@ function Profile (props : any) {
 	const [nbPoints, setNbPoints] = React.useState<number>(0);
 	const [rank, setRank] = React.useState<number>(0);
 	const [friends, setFriends] = React.useState<Friend[]>([]);
+	const [online, setOnline] = React.useState<number[]>([]);
+	var { masterSocket } = useContext(AuthContext) as AuthContextType;
 	
 	const userId = +props.match.params.id;
 
@@ -70,14 +73,19 @@ function Profile (props : any) {
 		axios.get("/users/ranked")
 		.then(response => { setRank(response.data.map((e : any) => e.id).indexOf(userId)); })
 		.catch(error => { console.log(error.response); })
-	}, [userId]);
+
+		masterSocket.emit("get_users");
+		masterSocket?.on("connected_users", (data : any) => {
+			setOnline(data);
+		});
+	}, [userId, masterSocket]);
 
 	return (
 			<div className="profile">
 				<div id="column_left">
 					<UserCard user_name={username} user_id={userId} has_avatar={hasAvatar} rank={rank}
-						nb_matches={nbMatches} nb_victories={nbVictories} nb_points={nbPoints}/>
-					<Friends friends={friends}/>
+						nb_matches={nbMatches} nb_victories={nbVictories} nb_points={nbPoints} online={ online.includes(userId) }/>
+					<Friends friends={friends} online={online}/>
 				</div>
 				<div id="column_right">
 					<MatchHistory matches={matches} my_id={userId}/>
