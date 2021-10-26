@@ -117,12 +117,6 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     @MessageBody() data: { channelID: number, memberID: number },
     @ConnectedSocket() client: Socket,
   ) {
-	// function getByValue(map:Map<User, Socket>, searchValue: number) {
-	// 	for (let [key, value] of map.entries()) {
-	// 	  if (key.id === searchValue)
-	// 		return value;
-	// 	}
-	//   }
     const user: User = await this.authenticationService.getUserFromSocket(client);
 	var memberSocket: Socket;
 	for (let [key, value] of this.listSocket.entries()) {
@@ -130,11 +124,8 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
 			memberSocket = value;
 		}
 	  }
-	//  = getByValue(this.listSocket, data.memberID);
     if (user) {
-		console.log("**** Emitting ban user", data.channelID);
 		memberSocket.emit('user_banned', data.channelID);
-    	// memberSocket.leave(data.channelID.toString());
     }
   }
 
