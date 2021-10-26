@@ -1,19 +1,22 @@
-import { useState, createContext } from "react";
+import { useState, useEffect, createContext } from "react";
 
 export type Channel = {
 	id: number,
 	name: string,
-	type: number
+	type: number,
+	owner: any,
+	password: string
 }
 
 export type ContextType = {
 	channel: Channel | null,
-	setChannel: (chan:Channel) => void,
+	setChannel: (chan:Channel | null) => void,
 	displayList: boolean,
 	toggleDisplayList: () => void,
+	setDisplayList: (set:boolean) => void,
 	displayAdmin: boolean,
 	toggleDisplayAdmin: () => void,
-	changeChannel: (chan:Channel) => void,
+	changeChannel: (chan:Channel|null) => void,
 	socket: any | null,
 	setSocket: (sok:any) => void
 }
@@ -38,12 +41,20 @@ export const ChannelProvider = ({ children } : Props) => {
 		setDisplayAdmin(!displayAdmin);
 	}
 
-	const changeChannel = (chan: Channel) => {
+	const changeChannel = (chan: Channel | null) => {
 		if (channel)
 			socket.emit('leave_chan', channel.id);
 		setChannel(chan);
-		socket.emit('join_chan', chan.id);
+		if (chan)
+			socket.emit('join_chan', chan.id);
+		// toggleDisplayList();
 	}
+
+	// useEffect(() => {
+		
+	// 	if (channel)
+	// 		socket.emit('join_chan', channel.id);
+	// }, [channel])
 
 	return ( <ChannelContext.Provider 
 			value={{ 
@@ -51,6 +62,7 @@ export const ChannelProvider = ({ children } : Props) => {
 				setChannel: setChannel,
 				displayList: displayList,
 				toggleDisplayList: toggleDisplayList,
+				setDisplayList: setDisplayList,
 				changeChannel: changeChannel,
 				socket: socket,
 				setSocket: setSocket,

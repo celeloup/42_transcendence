@@ -61,21 +61,22 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     @MessageBody() room: number,
     @ConnectedSocket() client: Socket,
   ) {
-    const user: User = await this.authenticationService.getUserFromSocket(client);
-    const is_member: boolean = await this.channelService.isAMember(room, user.id);
-    const is_ban: boolean = await this.channelService.isBanned(room, user.id);
+    // const user: User = await this.authenticationService.getUserFromSocket(client);
+    // const is_member: boolean = await this.channelService.isAMember(room, user.id);
+    // const is_ban: boolean = await this.channelService.isBanned(room, user.id);
 
-    if (is_member && is_ban) {
-      this.logger.log('User has been ban');
-      return ;
-    }
+    // if (is_member && is_ban) {
+    //   this.logger.log('User has been ban');
+    //   return ;
+    // }
     //add member to the channel (nothing happen if already ban);
-    if (!is_member) {
-      this.channelService.addMember(room, user.id, user.id);
-    }
+    // if (!is_member) {
+    //   await this.channelService.addMember(room, user.id, user.id);
+    // }
     this.server.in(client.id).socketsJoin(room.toString());
     this.logger.log(`Client ${this.connectedUsers.get(client)} joined room ${room}`);
-  }
+	client.emit('room_join', room);	
+}
 
   @SubscribeMessage('leave_chan')
   async leaveRoom(
@@ -113,15 +114,27 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
 
   @SubscribeMessage('ban_user')
   async banUser(
-    @MessageBody() data: { channel: Channel, member: User },
+    @MessageBody() data: { channelID: number, memberID: number },
     @ConnectedSocket() client: Socket,
   ) {
+	// function getByValue(map:Map<User, Socket>, searchValue: number) {
+	// 	for (let [key, value] of map.entries()) {
+	// 	  if (key.id === searchValue)
+	// 		return value;
+	// 	}
+	//   }
     const user: User = await this.authenticationService.getUserFromSocket(client);
-    const memberSocket: Socket = this.listSocket.get(data.member);
-    
+	var memberSocket: Socket;
+	for (let [key, value] of this.listSocket.entries()) {
+		if (key.id === data.memberID) {
+			memberSocket = value;
+		}
+	  }
+	//  = getByValue(this.listSocket, data.memberID);
     if (user) {
-      memberSocket.leave(data.channel.id.toString());
-      memberSocket.emit('user_banned');
+		console.log("**** Emitting ban user", data.channelID);
+		memberSocket.emit('user_banned', data.channelID);
+    	// memberSocket.leave(data.channelID.toString());
     }
   }
 
