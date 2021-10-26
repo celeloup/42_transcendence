@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { useState, useEffect, useContext } from 'react';
-import '../../styles/ChatList.scss';
+import '../../styles/Chat/ChatList.scss';
 import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
 import CreateChan from './CreateChan';
 import React from 'react';
@@ -17,10 +17,13 @@ type ChannelProps = {
 }
 
 function Channel({ channelObj } : ChannelProps) {
-	var { channel, changeChannel, toggleDisplayList } = useContext(ChannelContext) as ContextType;
+	var { channel, setChannel, socket, changeChannel, toggleDisplayList } = useContext(ChannelContext) as ContextType;
 	
 	const selectChannel = () => {
-		changeChannel(channelObj);
+		// changeChannel(channelObj);
+		if (channel)
+			socket.emit('leave_chan', channel.id);
+		setChannel(channelObj);
 		toggleDisplayList();
 	}
 	
@@ -82,7 +85,7 @@ function ChannelCategory({ channelList, type, search, setDisplayCreateChan } : C
 	)
 }
 
-function ChannelList (socket:any) {
+function ChannelList () {
 	const [ channels, setChannels ] = useState([]);
 	const [ isLoading, setIsLoading ] = useState(true);
 	const [ displayCreateChan, setDisplayCreateChan ] = useState<number>(0);
@@ -93,6 +96,7 @@ function ChannelList (socket:any) {
 	useEffect(() => {
 		axios.get(`/channel/`)
 		.then( res => {
+			// console.log("CHANNEL LIST GET: ", res.data);
 			setChannels(res.data);
 			setIsLoading(false);
 		})
@@ -106,7 +110,7 @@ function ChannelList (socket:any) {
 	
 	return (
 	<div id="channelList" >
-		{ displayCreateChan !== 0 && <CreateChan type={ displayCreateChan } hide={ setDisplayCreateChan } socket={socket}/> }
+		{ displayCreateChan !== 0 && <CreateChan type={ displayCreateChan } hide={ setDisplayCreateChan }/> }
 		<div className="channelListWrapper">
 			<i className="fas fa-times closeIcon" onClick={ toggleDisplayList }></i>
 			<div className="channelSearchBar">
