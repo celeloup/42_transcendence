@@ -97,7 +97,7 @@ function UserList ( { setStatus, setMessage } : Props) {
 		icon: "times-circle",
 		text: "Ban user",
 		function: (id : number) => {
-			axios.put('/users/block/me', { userId: id })
+			axios.put('/users/ban/me', { userId: id })
 			.then (response => {
 				setStatus(<p className="stats"><i>Success</i> ✔️</p>);
 				setMessage(<p className="stats">User was <i>banned</i>.</p>);
@@ -116,7 +116,7 @@ function UserList ( { setStatus, setMessage } : Props) {
 		icon: "plus-circle",
 		text: "Unban user",
 		function: (id : number) => {
-			axios.put('/users/unblock/me', { userId: id })
+			axios.delete('/users/unban/me', { data: { userId: id } })
 			.then (response => {
 				setStatus(<p className="stats"><i>Success</i> ✔️</p>);
 				setMessage(<p className="stats">User was <i>unbanned</i>.</p>);
