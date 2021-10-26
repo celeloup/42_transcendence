@@ -1,15 +1,16 @@
-import { useState, createContext } from "react";
+import { useState, useEffect, createContext } from "react";
 
 export type Channel = {
 	id: number,
 	name: string,
 	type: number,
-	owner: any
+	owner: any,
+	password: string
 }
 
 export type ContextType = {
 	channel: Channel | null,
-	setChannel: (chan:Channel) => void,
+	setChannel: (chan:Channel | null) => void,
 	displayList: boolean,
 	toggleDisplayList: () => void,
 	setDisplayList: (set:boolean) => void,
@@ -48,6 +49,12 @@ export const ChannelProvider = ({ children } : Props) => {
 			socket.emit('join_chan', chan.id);
 		// toggleDisplayList();
 	}
+
+	// useEffect(() => {
+		
+	// 	if (channel)
+	// 		socket.emit('join_chan', channel.id);
+	// }, [channel])
 
 	return ( <ChannelContext.Provider 
 			value={{ 

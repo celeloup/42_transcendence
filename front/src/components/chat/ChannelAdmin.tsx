@@ -285,13 +285,23 @@ export function ChannelAdmin () {
 			})
 		}
 	}
+
+	var description;
+	if (channel && channel.type === 1)
+		description = "This channel is public. Everyone can join it.";
+	else if (channel && channel.type === 2 && channel.password === "")
+		description = "This channel is private. Nobody except the added members can see this channel. Add a password to make it visible to everyone and restrict access.";
+	else if (channel && channel.type === 2 && channel.password !== "")
+		description = "This channel is private. Everyone can try to access it by providing a password. Remove the password to hide the channel to any non-member."
+	else
+		description = "This is a private conversation. Only you and your correspondant can see it."
 	
 	return (
 		<div id="channel_admin">
 			<i className="fas fa-times close_icon" onClick={ toggleDisplayAdmin }></i>
 			<div id="name_description">
 				<i className="fas fa-user-friends"></i> { channel?.name }
-				<p>This channel is public. Everyone can join it.</p>
+				<p>{ description }</p>
 			</div>
 			<div id="info_members">
 				<i className="fas fa-info-circle"></i>

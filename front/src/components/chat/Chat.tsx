@@ -4,9 +4,26 @@ import ChannelList from '../chat/ChannelList';
 import { ChannelAdmin } from './ChannelAdmin';
 import { Message } from './Message';
 import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
+import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
 import { io } from "socket.io-client";
 import '../../styles/Chat/Chat.scss';
 import axios from 'axios';
+
+type BanPopUpProps = {
+	channel: string,
+	close: (val:number) => void
+}
+
+function BanPopup({ channel, close } : BanPopUpProps) {
+	return (
+		<div id="ban_pop_up">
+			{/* <i className="fas fa-times close_icon" onClick={ () => close(-1) }></i> */}
+			<i className="fas fa-book-dead" />
+			<p>You have been banned from <span className="chan" >{ channel }</span>. <br/>Shame on you.<br/>You can no longer join again until an admin forgives your sins and unban you.</p>
+			<div id="back_button" onClick={ () => close(-1) }><i className="fas fa-arrow-left" />go back</div>
+		</div>
+	)
+}
 
 function ChatHeader() {
 	var { channel, toggleDisplayList, toggleDisplayAdmin } = useContext(ChannelContext) as ContextType;
@@ -29,7 +46,8 @@ export function Chat() {
 	const [ msgIsLoading, setMsgIsLoading ] = useState(false);
 	const [ blockedUsers, setBlockedUsers ] = useState<any[]>([]);
 	var { displayList, displayAdmin, channel, socket, setSocket, setChannel, setDisplayList, changeChannel, toggleDisplayAdmin } = useContext(ChannelContext) as ContextType;
-	// const [ currentChan, setCurrentChan ] = useState<any>(null);
+	var{ user } = useContext(AuthContext) as AuthContextType;
+	const [ hasBeenBanned, setHasBeenBanned ] = useState<Number>(-1);
 	
 	// ---------- SOCKETS
 	useEffect(() : ReturnType<EffectCallback> => {
@@ -43,23 +61,11 @@ export function Chat() {
 			// console.log("RECEIVED :", data);
 			setMessages(oldArray => [...oldArray, data]);
 		});
+
 		socket?.on('room_join', (data:any) => {
-			console.log("JOINED ROOM", data);
+			// console.log("JOINED ROOM", data, channel);
 			setDisplayList(false);
 			setMsgIsLoading(true);
-			if (!channel || data !== channel.id)
-			{
-				// setMsgIsLoading(true);
-				axios.get(`channel/${ data }`)
-				.then( res => {
-					// console.log(res.data);
-					setChannel(res.data);
-				})
-				.catch (err => {
-					console.log("Error:", err);
-					setMsgIsLoading(false);
-				})
-			}
 			axios.get(`/channel/messages/${ data }`)
 			.then( res => {
 				// console.log("GET MESSAGES", res);
@@ -71,20 +77,61 @@ export function Chat() {
 				setMsgIsLoading(false);
 			})
 		});
+		
 		socket?.on('user_banned', (data:any) => {
-			console.log("I HAVE BEEN BANNED", data);
-			if (channel?.id === data)
-			{
-				if (displayAdmin)
-					toggleDisplayAdmin();
-				setDisplayList(true);
-				changeChannel(null);
-			}
+			console.log("I HAVE BEEN BANNED", data, channel);
+			setHasBeenBanned(data);
 		})
 	}, [socket])
-	
-	// ---------- GET MESSAGES
+
 	useEffect(() => {
+		// console.log(channel);
+		if (hasBeenBanned !== -1 && channel && channel.id === hasBeenBanned)
+		{
+			// console.log(channel?.id, data);
+			if (displayAdmin)
+				toggleDisplayAdmin();
+			socket.emit('leave_chan', channel.id);
+			// setDisplayList(true);
+			// setChannel(null);
+		}
+	}, [hasBeenBanned])
+	
+	// ---------- JOIN && GET BLOCKED USERS
+	useEffect(() => {
+		// console.log("CHAN:", channel);
+		if (channel)
+		{
+			axios.get(`/channel/infos/${ channel.id }`)
+			.then( res => {
+				var blocked = res.data.banned.some((ban:any) => ban.id === user?.id) ? true : false;
+				var member = res.data.members.some((mem:any) => mem.id === user?.id) ? true : false;
+				if (blocked)
+				{
+					if (channel)
+						setHasBeenBanned(channel.id);
+					// setChannel(null);
+					// setDisplayList(true);
+				}
+				else if (!member)
+				{
+					axios.put(`/channel/members/${ channel?.id }`, { "userId": user?.id })
+					.then( res => {
+						socket.emit('join_chan', channel?.id);
+					})
+					.catch (err => {
+						console.log("Error:", err);
+					})
+				}
+				else
+					socket.emit('join_chan', channel?.id);
+			})
+			.catch (err => {
+				console.log("Error:", err);
+			})
+		}
+		setMsgIsLoading(true);
+		
 		axios.get(`/users/infos/me`)
 			.then( res => {
 				// console.log("GET infos me", res);
@@ -94,6 +141,12 @@ export function Chat() {
 				console.log("Error:", err);
 			})
 	}, [channel])
+
+	const closeBan = () => {
+		setHasBeenBanned(-1);
+		setChannel(null);
+		setDisplayList(true);
+	}
 
 	// ---------- SCROLL
 	const messagesEndRef = useRef<any>(null);
@@ -138,13 +191,13 @@ export function Chat() {
 	else
 		messageList = <p className="no_msg">No message yet.</p>
 
-	
 	return (
 		<WindowBorder w='382px' h='670px'>
 			<div id="chat">
-				{ displayList && <ChannelList socket={socket}/> }
+				{ displayList && <ChannelList/> }
 				{ displayAdmin && <ChannelAdmin/> }
 				<ChatHeader />
+				{ channel && hasBeenBanned === channel.id && <BanPopup channel={ channel ? channel.name : "" } close={ closeBan }/> }
 				<div id="chat_messages">
 					{ channel === null && 
 						<div className="no_chan_msg">
