@@ -68,7 +68,7 @@ const App = () => {
 						<Route
 							typeOfRoute="protected"
 							exact={true}
-							path='/profile'
+							path='/profile/:id'
 							component={ Profile }
 						/>
 						<Route
