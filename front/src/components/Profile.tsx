@@ -1,6 +1,7 @@
 import React, { useEffect, useContext } from 'react';
 import axios from "axios";
 import UserCard from './profile/UserCard';
+import Buttons from './profile/Buttons';
 import Friends from './profile/Friends';
 import MatchHistory from './profile/MatchHistory';
 import Achievements from './profile/Achievements';
@@ -40,7 +41,7 @@ function Profile (props : any) {
 	const [rank, setRank] = React.useState<number>(0);
 	const [friends, setFriends] = React.useState<Friend[]>([]);
 	const [online, setOnline] = React.useState<number[]>([]);
-	var { masterSocket } = useContext(AuthContext) as AuthContextType;
+	const { masterSocket, user } = useContext(AuthContext) as AuthContextType;
 	
 	const userId = +props.match.params.id;
 
@@ -85,6 +86,7 @@ function Profile (props : any) {
 				<div id="column_left">
 					<UserCard user_name={username} user_id={userId} has_avatar={hasAvatar} rank={rank}
 						nb_matches={nbMatches} nb_victories={nbVictories} nb_points={nbPoints} online={ online.includes(userId) }/>
+					{ user!.id !== userId && <Buttons id={userId}/>}
 					<Friends friends={friends} online={online}/>
 				</div>
 				<div id="column_right">
