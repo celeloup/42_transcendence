@@ -23,7 +23,7 @@ type CreateChanProps = {
 
 function CreateChan({ type, hide } : CreateChanProps) {
 	// const { user } = useContext(AuthContext) as AuthContextType; // might remove once create chan change
-	var { changeChannel, toggleDisplayList, channel, setChannel, socket } = useContext(ChannelContext) as ContextType;
+	var { toggleDisplayList, channel, setChannel, socket } = useContext(ChannelContext) as ContextType;
 	const [ isLoading, setIsLoading ] = useState(false);
 	// -------- List users
 	// const [users, setUsers] = useState<User[]>([]);

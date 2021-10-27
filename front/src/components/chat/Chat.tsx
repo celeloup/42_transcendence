@@ -17,10 +17,66 @@ type BanPopUpProps = {
 function BanPopup({ channel, close } : BanPopUpProps) {
 	return (
 		<div id="ban_pop_up">
-			{/* <i className="fas fa-times close_icon" onClick={ () => close(-1) }></i> */}
 			<i className="fas fa-book-dead" />
 			<p>You have been banned from <span className="chan" >{ channel }</span>. <br/>Shame on you.<br/>You can no longer join again until an admin forgives your sins and unban you.</p>
 			<div id="back_button" onClick={ () => close(-1) }><i className="fas fa-arrow-left" />go back</div>
+		</div>
+	)
+}
+
+type AskPasswordProps = {
+	channel: string,
+	password: string,
+	join: () => void,
+	setAskPassword: (val:boolean) => void
+}
+
+function AskPassword({ channel, password, join, setAskPassword } : AskPasswordProps) {
+	const [ typePassword, setTypePassword ] = useState(true);
+	const [ chanPassword, setChanPassword ] = useState<string>("");
+	const [ isLoading, setIsLoading ] = useState(false);
+	const [ imsg, setimsg ] = useState(-1);
+
+	var erroMsg = ["Wrong password.", "Nope.", "Try again.", "Want a hint ?", "You really suck at it.", "Just give up."];
+
+	const handleSubmit = (e:any) => {
+		e.preventDefault();
+		if (password === chanPassword)
+		{
+			console.log("WELCOME");
+			setIsLoading(true);
+			join();
+			setAskPassword(false);
+		}
+		else
+		{
+			setimsg(imsg + 1);
+			console.log("NOPE");
+		}
+	}
+
+	return (
+		<div id="ask_password">
+			{ imsg !== -1 && <div id="error_msg"><i className="fas fa-exclamation-triangle" />{ erroMsg[imsg < 6 ? imsg : 0 ] }</div> }
+			<span className="chan" >{ channel }</span> is a private channel and requires a password to join.
+			<form onSubmit={ handleSubmit }>
+				<label id="passwordLabel">
+					<input
+						autoFocus={ true }
+						autoComplete="off"
+						className={ typePassword ? "passwordInput" : ""} 
+						type="text"
+						value={ chanPassword }
+						onChange={ (e) => setChanPassword(e.target.value) }
+					/>
+					<i className={ typePassword ? "fas fa-eye-slash" : "fas fa-eye" } onClick={ () => setTypePassword(!typePassword)}></i>
+				</label>
+				<input 
+						className={ chanPassword !== "" ? "readyToSubmit" : "" }
+						type="submit" 
+						value={ isLoading ? "Loading..." : "Submit" }
+					/>
+			</form>
 		</div>
 	)
 }
@@ -45,9 +101,20 @@ export function Chat() {
 	const [ newMessage, setNewMessage ] = useState("");
 	const [ msgIsLoading, setMsgIsLoading ] = useState(false);
 	const [ blockedUsers, setBlockedUsers ] = useState<any[]>([]);
-	var { displayList, displayAdmin, channel, socket, setSocket, setChannel, setDisplayList, changeChannel, toggleDisplayAdmin } = useContext(ChannelContext) as ContextType;
-	var{ user } = useContext(AuthContext) as AuthContextType;
+	var { displayList, displayAdmin, channel, socket, setSocket, setChannel, setDisplayList, toggleDisplayAdmin } = useContext(ChannelContext) as ContextType;
+	var { user } = useContext(AuthContext) as AuthContextType;
 	const [ hasBeenBanned, setHasBeenBanned ] = useState<Number>(-1);
+	const [ askPassword, setAskPassword ] = useState(false);
+
+	const joinChan = () => {
+		axios.put(`/channel/members/${ channel?.id }`, { "userId": user?.id })
+		.then( res => {
+			socket.emit('join_chan', channel?.id);
+		})
+		.catch (err => {
+			console.log("Error:", err);
+		})
+	}
 	
 	// ---------- SOCKETS
 	useEffect(() : ReturnType<EffectCallback> => {
@@ -82,7 +149,7 @@ export function Chat() {
 			console.log("I HAVE BEEN BANNED", data, channel);
 			setHasBeenBanned(data);
 		})
-	}, [socket])
+	}, [socket]) // eslint-disable-line
 
 	useEffect(() => {
 		// console.log(channel);
@@ -92,36 +159,31 @@ export function Chat() {
 			if (displayAdmin)
 				toggleDisplayAdmin();
 			socket.emit('leave_chan', channel.id);
-			// setDisplayList(true);
-			// setChannel(null);
 		}
-	}, [hasBeenBanned])
+	}, [hasBeenBanned]) // eslint-disable-line
 	
 	// ---------- JOIN && GET BLOCKED USERS
 	useEffect(() => {
+		setAskPassword(false);
+		setHasBeenBanned(-1);
 		// console.log("CHAN:", channel);
 		if (channel)
 		{
 			axios.get(`/channel/infos/${ channel.id }`)
 			.then( res => {
-				var blocked = res.data.banned.some((ban:any) => ban.id === user?.id) ? true : false;
+				var banned = res.data.banned.some((ban:any) => ban.id === user?.id) ? true : false;
 				var member = res.data.members.some((mem:any) => mem.id === user?.id) ? true : false;
-				if (blocked)
+				if (banned)
 				{
 					if (channel)
 						setHasBeenBanned(channel.id);
-					// setChannel(null);
-					// setDisplayList(true);
 				}
 				else if (!member)
 				{
-					axios.put(`/channel/members/${ channel?.id }`, { "userId": user?.id })
-					.then( res => {
-						socket.emit('join_chan', channel?.id);
-					})
-					.catch (err => {
-						console.log("Error:", err);
-					})
+					if (channel && channel.type === 1)
+						joinChan();
+					else if (channel && channel.type === 2)
+						setAskPassword(true);
 				}
 				else
 					socket.emit('join_chan', channel?.id);
@@ -140,7 +202,7 @@ export function Chat() {
 			.catch (err => {
 				console.log("Error:", err);
 			})
-	}, [channel])
+	}, [channel]) // eslint-disable-line
 
 	const closeBan = () => {
 		setHasBeenBanned(-1);
@@ -198,6 +260,7 @@ export function Chat() {
 				{ displayAdmin && <ChannelAdmin/> }
 				<ChatHeader />
 				{ channel && hasBeenBanned === channel.id && <BanPopup channel={ channel ? channel.name : "" } close={ closeBan }/> }
+				{ channel && askPassword && <AskPassword channel={ channel.name } password={ channel.password } join={ joinChan } setAskPassword={ setAskPassword }/> }
 				<div id="chat_messages">
 					{ channel === null && 
 						<div className="no_chan_msg">
@@ -205,7 +268,7 @@ export function Chat() {
 							Select a channel to start chatting
 						</div>
 					}
-					{ channel && 
+					{ channel && !askPassword && hasBeenBanned === -1 &&
 						<div>
 							{ msgIsLoading ? "Loading..." : messageList }
 							<div ref={messagesEndRef} />

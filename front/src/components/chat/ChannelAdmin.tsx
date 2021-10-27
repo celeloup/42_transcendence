@@ -3,7 +3,7 @@ import axios from 'axios';
 import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
 import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
 import '../../styles/Chat/ChatAdmin.scss';
-import { Socket } from 'socket.io-client';
+import SearchUser from 'components/ui_components/SearchUser';
 
 type Member = {
 	id: number,
@@ -13,8 +13,7 @@ type Member = {
 	admin: boolean,
 	banned: boolean,
 	muted: boolean,
-	me: number,
-	full_member: any
+	me: number
 }
 
 type MemberCardProps = {
@@ -73,8 +72,8 @@ function BannedCard({ banMember, refresh, setRefresh, channelID } : BannedCardPr
 }
 
 function MemberCard ( { member, channelID, setRefresh, refresh, hasRights, ownerID } : MemberCardProps) {
-	var { socket, channel } = useContext(ChannelContext) as ContextType;
-	const { name, id, admin, site_admin, banned, muted, me, owner, full_member } = member;
+	var { socket } = useContext(ChannelContext) as ContextType;
+	const { name, id, admin, site_admin, banned, muted, me, owner } = member;
 	const [ adminState, setAdminState ] = useState<string>("");
 	const [ bannedState, setBannedState ] = useState<string>("");
 	const [ mutedState, setMutedState ] = useState<string>("");
@@ -194,22 +193,139 @@ function MemberCard ( { member, channelID, setRefresh, refresh, hasRights, owner
 	)
 }
 
+type EditPasswordProps = {
+	password: string,
+	chan: number,
+	display: (val:boolean) => void,
+	refresh: boolean,
+	setRefresh: (val:boolean) => void
+}
+
+const EditPassword = ({ password, chan, display, setRefresh, refresh,} : EditPasswordProps) => {
+	const [ pass, setPass ] = useState(password);
+	const [ typePassword, setTypePassword ] = useState(true);
+	const [ isLoading, setIsLoading ] = useState(false);
+
+	const changePass = (passw:string) => {
+		setIsLoading(true);
+		axios.put(`/channel/password/${ chan }`, { "password": passw })
+		.then( res => {
+			console.log("RES change password", res);
+			setRefresh(!refresh);
+			display(false);
+		})
+		.catch (err => {
+			console.log("Error:", err);
+			setIsLoading(false);
+		})
+	}
+
+	const handleSubmit = (e:any) => {
+		e.preventDefault();
+		let passwordRegex = /[ -~]/;
+		if (passwordRegex.test(pass) === false)
+			console.log("WRONG");
+		else
+			changePass(pass);
+			// temp_errors.push({key:"password", value:"The password cannot contain non printable characters."});
+	}
+	return (
+		<div id="edit_password_popup">
+			<i className="fas fa-times" onClick={ () => display(false) }/>
+			Add, edit or remove the password.
+			<form onSubmit={ handleSubmit }>
+				<label id="passwordLabel">
+					<input
+						autoFocus={ true }
+						autoComplete="off"
+						className={ typePassword ? "passwordInput" : ""} 
+						type="text"
+						value={ pass }
+						onChange={ (e) => setPass(e.target.value) }
+					/>
+					<i className={ typePassword ? "fas fa-eye-slash" : "fas fa-eye" } onClick={ () => setTypePassword(!typePassword)}></i>
+				</label>
+				<input 
+						className={ (pass !== "" && pass !== password) ? "readyToSubmit" : "" }
+						type="submit" 
+						value={ isLoading ? "Loading..." : "Submit" }
+					/>
+			</form>
+			{ password !== "" && <div id="remove_password" onClick={ () => { changePass(""); }}><i className="fas fa-trash" />Remove password</div> }
+		</div>
+	)
+}
+
+type AddMemberProps = {
+	chan: number,
+	display: (val:boolean) => void,
+	refresh: boolean,
+	setRefresh: (val:boolean) => void
+}
+
+const AddMember = ({ chan, display, refresh, setRefresh } : AddMemberProps) => {
+	const [ isLoading, setIsLoading ] = useState(false);
+	const [ missingMembers, setMissingMembers ] = useState<any[]>([]);
+	const [ user, setUser ] = useState(0);
+
+	useEffect(() => {
+		axios.get(`/users`)
+		.then( res => {
+			// console.log(res.data);
+			setMissingMembers(res.data);
+		})
+		.catch( err => {
+			console.log(err);
+		})
+	});
+
+	const handleSubmit = () => {
+		if (user !== 0)
+		{
+			setIsLoading(true);
+			axios.put(`/channel/members/${ chan }`, { "userId": user })
+			.then( res => {
+				setRefresh(!refresh);
+				display(false);
+			})
+			.catch (err => {
+				console.log("Error:", err);
+			})
+		}
+	}
+
+	return (
+		<div id="add_member_popup">
+			{/* <div id="modal_bg" onClick={ (e:any) => { if (e.target.id === "modal_bg") display(false)}}></div> */}
+			<i className="fas fa-times" onClick={ () => display(false) }/>
+			[ select a user ]
+			<SearchUser theme="yo" list={ missingMembers } select={ setUser }/>
+			<div id="submit" onClick={ handleSubmit }>{ isLoading ? "Loading..." : "Submit" }</div>
+		</div>
+	)
+}
+
 export function ChannelAdmin () {
-	const [ hasRights, setHasRights ] = useState<boolean>(false);
-	var { toggleDisplayAdmin, channel, socket, toggleDisplayList, changeChannel } = useContext(ChannelContext) as ContextType;
+	var { toggleDisplayAdmin, channel, toggleDisplayList, changeChannel } = useContext(ChannelContext) as ContextType;
 	var { user } = useContext(AuthContext) as AuthContextType;
+	
+	const [ hasRights, setHasRights ] = useState<boolean>(false);
 	const [ list, setList ] = useState<string[]>(["members"]);
 	const [ members, setMembers ] = useState<any>(null);
 	const [ banned, setBanned ] = useState<any>(null);
 	const [ refresh, setRefresh ] = useState<boolean>(false);
 	const [ ownerID, setOwnerID ] = useState<number>(-1);
 	const [ loadingLeave, setLoadingLeave ] = useState(false);
+	const [ displayEditPassword, setDisplayEditPassword ] = useState(false);
+	const [ password, setPassword ] = useState("");
+	const [ displayAddMember, setDisplayAddMember ] = useState(false);
 	
 	useEffect(() => {
 		if (channel)
 		{
 			axios.get(`/channel/infos/${ channel.id }`)
 			.then( res => {
+				setPassword(res.data.password);
 				// console.log("RES chan infos", res);
 				// ********* SET MEMBERS LIST
 				var memb = res.data.members.map( (m:any) => {
@@ -221,8 +337,7 @@ export function ChannelAdmin () {
 						admin: res.data.admins.some((adm:any) => adm.id === m.id) ? true : false,
 						banned: res.data.banned.some((ban:any) => ban.id === m.id) ? true : false,
 						muted: res.data.muted.some((mut:any) => mut.id === m.id) ? true : false,
-						me: user?.id,
-						full_member: m
+						me: user?.id
 					});
 				})
 				// console.log(memb);
@@ -266,7 +381,7 @@ export function ChannelAdmin () {
 				console.log("Error:", err);
 			})
 		}
-	}, [refresh]);
+	}, [refresh]); // eslint-disable-line
 
 	function leave_chan() {
 		if (channel && !loadingLeave)
@@ -289,15 +404,34 @@ export function ChannelAdmin () {
 	var description;
 	if (channel && channel.type === 1)
 		description = "This channel is public. Everyone can join it.";
-	else if (channel && channel.type === 2 && channel.password === "")
+	else if (channel && channel.type === 2 && password === "")
 		description = "This channel is private. Nobody except the added members can see this channel. Add a password to make it visible to everyone and restrict access.";
-	else if (channel && channel.type === 2 && channel.password !== "")
+	else if (channel && channel.type === 2 && password !== "")
 		description = "This channel is private. Everyone can try to access it by providing a password. Remove the password to hide the channel to any non-member."
 	else
 		description = "This is a private conversation. Only you and your correspondant can see it."
 	
 	return (
 		<div id="channel_admin">
+			{ channel && displayEditPassword && 
+				<EditPassword
+					password={ password }
+					chan={ channel.id }
+					display={ setDisplayEditPassword }
+					refresh={ refresh }
+					setRefresh={ setRefresh }
+				/>
+			}
+			{ channel && displayAddMember &&
+				<div id="card_modal" onClick={ (e:any) => { if (e.target.id === "card_modal") setDisplayAddMember(false)}}>
+				<AddMember
+					chan={ channel.id }
+					display={ setDisplayAddMember }
+					refresh={ refresh }
+					setRefresh={ setRefresh }
+				/>
+				</div>
+			}
 			<i className="fas fa-times close_icon" onClick={ toggleDisplayAdmin }></i>
 			<div id="name_description">
 				<i className="fas fa-user-friends"></i> { channel?.name }
@@ -334,13 +468,19 @@ export function ChannelAdmin () {
 					</div> }
 				</div>
 			</div>
-			<div id="add_member_button">
-				<i className="fas fa-user-plus"></i>
+			<div id="add_member_button" onClick={ () => setDisplayAddMember(true) }>
+				<i className="fas fa-user-plus" />
 				Add a member
 			</div>
+			{ channel?.type === 2 && user?.id === ownerID && 
+				<div id="password_button" onClick={ () => setDisplayEditPassword(true) }>
+					<i className="fas fa-key" />
+					{ password ? "Edit password" : "Add a password" }
+				</div>
+			}
 			<div id="leave_button" onClick={ leave_chan } >
-				<i className="fas fa-door-closed"></i>
-				<i className="fas fa-door-open"></i>
+				<i className="fas fa-door-closed" />
+				<i className="fas fa-door-open" />
 				{ loadingLeave ? "Loading..." : "Leave the channel" }
 			</div>
 		</div>
