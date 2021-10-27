@@ -6,7 +6,7 @@ export default class Puck {
     x: number = width / 2;
     y: number = height / 2;
     r: number = 12;
-	speed: number = 10;
+	speed: number = 5;
     x_speed: number;
     x_direction: number;
     y_speed: number;
@@ -20,10 +20,10 @@ export default class Puck {
     constructor(speed: number) {
 		let angle = Math.random() * ( Math.PI / 3 + Math.PI / 3 ) - Math.PI / 3;
         if (speed == 0) {
-            this.speed = 5;
+            this.speed = 3;
         }
         if (speed == 2) {
-            this.speed = 20;
+            this.speed = 10;
         }
         if (Math.random() < 0.5)
            this.x_direction = -1;
@@ -204,7 +204,7 @@ export default class Puck {
         if (puck_left < paddle1_right && puck_top < paddle1_bottom && puck_bottom > paddle1_top) {
             if (this.x > param.paddle_player1.x) {
                 let diff = this.y - paddle1_top;
-                let angle = this.map(diff, 0, param.paddle_player1.h, - Math.PI / 3, Math.PI / 3);
+                let angle = this.map(diff, 0, param.paddle_player1.h, Math.PI / 4, - Math.PI / 4);
                 this.x_speed = this.speed * Math.cos(angle);
                 this.y_speed = this.speed * Math.sin(angle);
                 this.x = param.paddle_player1.x + param.paddle_player1.w/2 + this.r;
@@ -224,13 +224,11 @@ export default class Puck {
 
 		if (puck_right > paddle2_left && puck_top < paddle2_bottom && puck_bottom > paddle2_top) {
 			if (this.x < param.paddle_player2.x) {
-				this.x_speed *= -1;
                 let diff = this.y - paddle2_top;
-                let angle = this.map(diff, 0, param.paddle_player2.h, 2 * Math.PI / 3, - 2 * Math.PI / 3);
+                let angle = this.map(diff, 0, param.paddle_player2.h, -5 * Math.PI / 4, 5 * Math.PI / 4);
                 this.x_speed = this.speed * Math.cos(angle);
                 this.y_speed = this.speed * Math.sin(angle);
-                this.x = param.paddle_player2.x + param.paddle_player2.w/2 + this.r;
-
+            //    this.x = param.paddle_player2.x - param.paddle_player2.w/2 - this.r;
 			}
             else
                 this.y_speed *= -1;
