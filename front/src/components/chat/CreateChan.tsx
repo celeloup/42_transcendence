@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useState, useContext } from 'react';
 // import { AuthContext, ContextType as AuthContextType }  from '../../contexts/AuthContext';
-import '../../styles/CreateChan.scss';
+import '../../styles/Chat/CreateChan.scss';
 import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
 
 // type User = {
@@ -18,13 +18,12 @@ type channelSettings = {
 
 type CreateChanProps = {
 	type : number,
-	hide : (type: number) => void,
-	socket: any
+	hide : (type: number) => void
 };
 
-function CreateChan({ type, hide, socket } : CreateChanProps) {
+function CreateChan({ type, hide } : CreateChanProps) {
 	// const { user } = useContext(AuthContext) as AuthContextType; // might remove once create chan change
-	var { changeChannel, toggleDisplayList } = useContext(ChannelContext) as ContextType;
+	var { changeChannel, toggleDisplayList, channel, setChannel, socket } = useContext(ChannelContext) as ContextType;
 	const [ isLoading, setIsLoading ] = useState(false);
 	// -------- List users
 	// const [users, setUsers] = useState<User[]>([]);
@@ -58,12 +57,14 @@ function CreateChan({ type, hide, socket } : CreateChanProps) {
 		let nameRegex = /^([a-zA-Z0-9_-]+([ ]?[a-zA-Z0-9_-]+)?)+$/;
 		let passwordRegex = /[ -~]/;
 		
-		errors.pop();
+		var temp_errors = [];
 		if (nameRegex.test(chanName) === false)
-			errors.push({key:"name", value:"The channel's name must not contain special characters or whitespaces at the extremities."});
+			temp_errors.push({key:"name", value:"The channel's name must not contain special characters or whitespaces at the extremities."});
+		if (chanName.length > 20)
+			temp_errors.push({ key: "name_length", value:"The channel's name must be between 2 and 15 characters long"});
 		if (chanPassword !== "" && passwordRegex.test(chanPassword) === false)
-			errors.push({key:"password", value:"The password cannot contain non printable characters."});
-		if (errors.length === 0)
+			temp_errors.push({key:"password", value:"The password cannot contain non printable characters."});
+		if (temp_errors.length === 0)
 		{
 			// console.log(errors);
 			var chanSettings:channelSettings = {
@@ -78,10 +79,14 @@ function CreateChan({ type, hide, socket } : CreateChanProps) {
 				axios.post('/channel', chanSettings)
 				.then( res => {
 					// console.log ("RES post new chan", res);
-					changeChannel(res.data);
+					if (channel)
+						socket.emit('leave_chan', channel.id);
+					setChannel(res.data);
 					hide(0);
 					toggleDisplayList();
-					setIsLoading(false);
+					// changeChannel(res.data);
+					// toggleDisplayList();
+					// setIsLoading(false);
 				})
 				.catch (err => {
 					console.log(err);
@@ -90,6 +95,8 @@ function CreateChan({ type, hide, socket } : CreateChanProps) {
 			};
 			submitNewChannel();
 		}
+		else
+			setErrors(temp_errors);
 	};
 	// ---------- ??
 	var chanInfo;

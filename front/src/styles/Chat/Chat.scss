@@ -268,7 +268,7 @@ $green: #81A439;
 		text-decoration: underline;
 	}
 
-	.stats {
+	.stats_profile_card {
 		display: block;
 		font-size: 13px;
 		text-align: left;
@@ -312,5 +312,50 @@ $green: #81A439;
 
 	#profile_button {
 		margin-top: 20px;
+	}
+}
+
+#ban_pop_up {
+	background-color: $accent_color;
+	color: $background-color;
+	padding: 20px;
+	width: 205px;
+	position: absolute;
+	border-radius: 5px;
+	top: 150px;
+	left: 70px;
+	font-size: 15px;
+	text-align: left;
+
+	.chan {
+		display: inline-block;
+		font-size: 20px;
+		font-family: "Dogica";
+		margin: 5px 0;
+	}
+
+	// .close_icon {
+	// 	font-size: 30px;
+	// 	position: absolute;
+	// 	right: 10px;
+	// 	top: 5px;
+	// }
+
+	.fa-book-dead {
+		font-size: 60px;
+		float: left;
+		margin-right: 20px;
+	}
+
+	#back_button {
+		background-color: $background-color;
+		color: $accent_color;
+		cursor: pointer;
+		padding: 10px;
+		margin-top: 10px;
+
+		i {
+			margin-right: 10px;
+		}
 	}
 }

@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios from "axios";
 import React, { useEffect } from 'react';
 import '../../styles/parameters/AvatarChange.scss';
 import '../../styles/parameters/Parameters.scss';

@@ -27,6 +27,14 @@ export default class UsersService {
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
+  async getRankedUsers(): Promise<User[]> {
+    const users = await this.usersRepository.find({ order: { points: "DESC" }});
+    if (users) {
+      return users;
+    }
+    throw new HttpException('No user registered yet', HttpStatus.NOT_FOUND);
+  }
+
   async getAllUsers(): Promise<User[]> {
     const users = await this.usersRepository.find();
     if (users) {
@@ -351,6 +359,17 @@ export default class UsersService {
       return await this.usersRepository.save(leper);
     }
     throw new HttpException('User does not have the rights to ban this member', HttpStatus.FORBIDDEN);
+  }
+
+  public async unbanUser(user_id: number, leper_id: number) {
+    const user = await this.getAllInfosByUserId(user_id);
+    const leper = await this.getAllInfosByUserId(leper_id);
+    if ((await this.isSiteAdmin(user_id)) && !(leper.site_owner || (user.site_moderator && leper.site_moderator))) {
+      leper.site_moderator = false;
+      leper.site_banned = false;
+      return await this.usersRepository.save(leper);
+    }
+    throw new HttpException('User does not have the rights to unban this member', HttpStatus.FORBIDDEN);
   }
 
   // Off topic

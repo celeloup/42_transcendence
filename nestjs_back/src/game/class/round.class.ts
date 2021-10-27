@@ -1,5 +1,3 @@
-import GameService from '../game.service';
-import {height, width, paddle_margin} from '../game.settings'
 import Paddle from './paddle.class';
 import Puck from './puck.class';
 
