@@ -2,6 +2,7 @@ import axios from 'axios';
 import { useState, useEffect, useContext } from 'react';
 import '../../styles/Chat/ChatList.scss';
 import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
+import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
 import CreateChan from './CreateChan';
 import React from 'react';
 
@@ -17,10 +18,9 @@ type ChannelProps = {
 }
 
 function Channel({ channelObj } : ChannelProps) {
-	var { channel, setChannel, socket, changeChannel, toggleDisplayList } = useContext(ChannelContext) as ContextType;
+	var { channel, setChannel, socket, toggleDisplayList } = useContext(ChannelContext) as ContextType;
 	
 	const selectChannel = () => {
-		// changeChannel(channelObj);
 		if (channel)
 			socket.emit('leave_chan', channel.id);
 		setChannel(channelObj);
@@ -86,19 +86,37 @@ function ChannelCategory({ channelList, type, search, setDisplayCreateChan } : C
 }
 
 function ChannelList () {
-	const [ channels, setChannels ] = useState([]);
+	const [ channels, setChannels ] = useState<any[]>([]);
 	const [ isLoading, setIsLoading ] = useState(true);
 	const [ displayCreateChan, setDisplayCreateChan ] = useState<number>(0);
 	const [search, setSearch] = useState<string>("");
 
 	var { toggleDisplayList } = useContext(ChannelContext) as ContextType;
+	var { user } = useContext(AuthContext) as AuthContextType;
 
 	useEffect(() => {
 		axios.get(`/channel/`)
 		.then( res => {
-			// console.log("CHANNEL LIST GET: ", res.data);
-			setChannels(res.data);
-			setIsLoading(false);
+			var chans = res.data.filter((c:any) => {
+				if (c.type === 1)
+					return (true);
+				else if (c.type === 2 && c.password !== "")
+					return (c.members.some((mem:any) => mem.id === user?.id) ? false : true)
+			});
+			// console.log("List not accessible: ", chans);
+
+			axios.get(`/users/channels/${ user?.id }`)
+			.then( res => {
+				// console.log("Channel of user", res.data);
+				var chans2 = res.data.filter((c:any) => c.type !== 1);
+				// console.log("List member: ", chans);
+				// console.log("total = ", chans.concat(chans2));
+				setChannels(chans.concat(chans2));
+				setIsLoading(false);
+			})
+			.catch (err => {
+				console.log("Error:", err);
+			})
 		})
 		.catch (err => {
 			console.log("Error:", err);
