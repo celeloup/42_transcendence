@@ -97,7 +97,7 @@ export default class Puck {
 
 	//check if bost can appear on the screen and been catch
     activateBoost() {
-        if (this.x % 25 == 0 && this.y % 5 == 0) {
+        if (Math.floor(this.x) % 25 == 0 && Math.floor(this.y) % 5 == 0) {
             this.boost_activated.push(
                 new Boost(this.getRandomInt(80, 703), this.getRandomInt(80, 547), this.getRandomInt(0,7)
             ));
@@ -234,7 +234,7 @@ export default class Puck {
         let paddle2_bottom = param.paddle_player2.y + param.paddle_player2.h / 2;
 
         if (puck_left < paddle1_right && puck_top < paddle1_bottom && puck_bottom > paddle1_top) {
-            if (this.x > param.paddle_player1.x) {
+            if (this.x > paddle1_right - param.paddle_player1.w / 4) {
                 let diff = this.y - paddle1_top;
                 // let angle = this.map(diff, 0, param.paddle_player1.h, -Math.PI / 4, Math.PI / 4);    
                 let angle = this.getAnglePaddle1(diff, param.paddle_player1.h);
@@ -242,31 +242,45 @@ export default class Puck {
                 this.y_speed = this.speed * Math.sin(angle);
                 this.x = param.paddle_player1.x + param.paddle_player1.w/2 + this.r;
             }
-            else    
+            else 
+            {
                 this.y_speed *= -1;
+                if (this.y < param.paddle_player1.y)
+                    this.y = paddle1_top;
+                else
+                    this.y = paddle1_top;
+            }
             return ;
         }
 
 		if (puck_right > paddle2_left && puck_top < paddle2_bottom && puck_bottom > paddle2_top) {
-			if (this.x < param.paddle_player2.x) {
+			if (this.x < paddle2_left + param.paddle_player2.w / 4) {
                 let diff = this.y - paddle2_top;
-                let angle = this.getAnglePaddle2(diff, param.paddle_player1.h);
+                let angle = this.getAnglePaddle2(diff, param.paddle_player2.h);
                 this.x_speed = this.speed * Math.cos(angle);
                 this.y_speed = this.speed * Math.sin(angle);
                 this.x = param.paddle_player2.x - param.paddle_player2.w/2 - this.r;
 			}
-            else
+            else {
                 this.y_speed *= -1;
+                if (this.y < param.paddle_player2.y)
+                    this.y = paddle2_top;
+                else
+                    this.y = paddle2_top;
+
+            }
             return ;
         }
         
-        if (this.x <= param.paddle_player1.x) {
-            param.score_player2++;
+     //   if (this.x <= param.paddle_player1.x) {
+        if (this.x < 0) {
+           param.score_player2++;
             this.reset();
             return ;
         }
 
-        if (this.x >= param.paddle_player2.x) {
+        // if (this.x >= param.paddle_player2.x) {
+        if (this.x > width) {
             param.score_player1++;
             this.reset();
             return ;
@@ -279,14 +293,6 @@ export default class Puck {
     }
 
     reset() {
-//		let angle = Math.random() * ( Math.PI / 4 - (-Math.PI / 4) ) + (-Math.PI /4);
-		//Math.random() * (max - min)) + min;
-  
-        //pourquoi langle ne fait pas un 360 ?
-       // if (Math.random() < 0.5)
-//            angle *= -1;
-
-		// let angle = Math.random() * 2 * Math.PI;
 		let angle = Math.random() * ( Math.PI / 3 + Math.PI / 3 ) - Math.PI / 3;
 		this.x = width / 2;
         this.y = this.getRandomInt(40, height - 40);
