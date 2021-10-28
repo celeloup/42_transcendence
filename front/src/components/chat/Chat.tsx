@@ -88,7 +88,16 @@ type ChatHeaderProps = {
 
 function ChatHeader({ hasBeenBanned, askPassword} : ChatHeaderProps) {
 	var { channel, toggleDisplayList, toggleDisplayAdmin } = useContext(ChannelContext) as ContextType;
-	var name = channel ? channel.name : "chat_";
+	var { user } = useContext(AuthContext) as AuthContextType;
+
+	var name;
+	if (channel && channel.type !== 3)
+		name = channel.name;
+	else if (channel && channel.type === 3)
+		name = channel.members[0].id === user?.id ? channel.members[1].name : channel.members[0].name
+	else
+		name = "chat_";
+		
 	return (
 		<div className="window_header chat_header">
 			<i className="fas fa-bars header_button" onClick={ toggleDisplayList }></i>
@@ -96,7 +105,6 @@ function ChatHeader({ hasBeenBanned, askPassword} : ChatHeaderProps) {
 				<i className="fas fa-user-friends"></i>{ name }
 			</div>
 			{ channel && !askPassword && hasBeenBanned !== channel.id && <i className="fas fa-cog header_button" onClick={ toggleDisplayAdmin }></i> }
-			{/* <i className="fas fa-comment-alt"></i> */}
 		</div>
 	)
 }
