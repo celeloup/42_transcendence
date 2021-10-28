@@ -97,26 +97,32 @@ function ChannelList () {
 	useEffect(() => {
 		axios.get(`/channel/`)
 		.then( res => {
-			var chans = res.data.filter((c:any) => {
+			var admin = user?.site_owner || user?.site_moderator;
+			if (!admin)
+			{
+				// Filter to get all inaccessible
+				var chans = res.data.filter((c:any) => {
 				if (c.type === 1)
 					return (true);
 				else if (c.type === 2 && c.password !== "")
 					return (c.members.some((mem:any) => mem.id === user?.id) ? false : true)
-			});
-			// console.log("List not accessible: ", chans);
-
-			axios.get(`/users/channels/${ user?.id }`)
-			.then( res => {
-				// console.log("Channel of user", res.data);
-				var chans2 = res.data.filter((c:any) => c.type !== 1);
-				// console.log("List member: ", chans);
-				// console.log("total = ", chans.concat(chans2));
-				setChannels(chans.concat(chans2));
+				});
+				// Get channels user is already in
+				axios.get(`/users/channels/${ user?.id }`)
+				.then( res => {
+					var chans2 = res.data.filter((c:any) => c.type !== 1);
+					setChannels(chans.concat(chans2));
+					setIsLoading(false);
+				})
+				.catch (err => {
+					console.log("Error:", err);
+				})
+			}
+			else
+			{
+				setChannels(res.data);
 				setIsLoading(false);
-			})
-			.catch (err => {
-				console.log("Error:", err);
-			})
+			}
 		})
 		.catch (err => {
 			console.log("Error:", err);

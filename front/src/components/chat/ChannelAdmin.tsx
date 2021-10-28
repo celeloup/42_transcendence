@@ -257,7 +257,7 @@ const EditPassword = ({ password, chan, display, setRefresh, refresh,} : EditPas
 }
 
 type AddMemberProps = {
-	chan: number,
+	chan: any,
 	display: (val:boolean) => void,
 	refresh: boolean,
 	setRefresh: (val:boolean) => void
@@ -267,6 +267,7 @@ const AddMember = ({ chan, display, refresh, setRefresh } : AddMemberProps) => {
 	const [ isLoading, setIsLoading ] = useState(false);
 	const [ missingMembers, setMissingMembers ] = useState<any[]>([]);
 	const [ user, setUser ] = useState(0);
+	const [ error, setError ] = useState<string>("");
 
 	useEffect(() => {
 		axios.get(`/users`)
@@ -277,30 +278,42 @@ const AddMember = ({ chan, display, refresh, setRefresh } : AddMemberProps) => {
 		.catch( err => {
 			console.log(err);
 		})
-	});
+	}, []);
 
 	const handleSubmit = () => {
 		if (user !== 0)
 		{
 			setIsLoading(true);
-			axios.put(`/channel/members/${ chan }`, { "userId": user })
+			axios.put(`/channel/members/${ chan.id }`, { "userId": user })
 			.then( res => {
-				setRefresh(!refresh);
-				display(false);
+				// console.log(res.data);
+				if (res.data.message === "User is already a member of this channel") {
+					setError("User is already a member of this channel");
+					setIsLoading(false);
+				}
+				else {
+					setRefresh(!refresh);
+					display(false);
+				}
 			})
 			.catch (err => {
+				if (err.response.status === 403)
+					setError("You don't have the rights to add this member");
+				else if (err.response.status === 404)
+					setError("This user doesn't exist");
 				console.log("Error:", err);
+				setIsLoading(false);
 			})
 		}
 	}
 
 	return (
 		<div id="add_member_popup">
-			{/* <div id="modal_bg" onClick={ (e:any) => { if (e.target.id === "modal_bg") display(false)}}></div> */}
+			{ error !== "" && <div id="add_member_error"><i className="fas fa-exclamation-triangle" /> { error }</div> }
 			<i className="fas fa-times" onClick={ () => display(false) }/>
 			[ select a user ]
 			<SearchUser theme="yo" list={ missingMembers } select={ setUser }/>
-			<div id="submit" onClick={ handleSubmit }>{ isLoading ? "Loading..." : "Submit" }</div>
+			<div className={ user !== 0 ? "ready" : "" } id="submit" onClick={ handleSubmit }>{ isLoading ? "Loading..." : "Submit" }</div>
 		</div>
 	)
 }
@@ -425,7 +438,7 @@ export function ChannelAdmin () {
 			{ channel && displayAddMember &&
 				<div id="card_modal" onClick={ (e:any) => { if (e.target.id === "card_modal") setDisplayAddMember(false)}}>
 				<AddMember
-					chan={ channel.id }
+					chan={ channel }
 					display={ setDisplayAddMember }
 					refresh={ refresh }
 					setRefresh={ setRefresh }
@@ -468,10 +481,12 @@ export function ChannelAdmin () {
 					</div> }
 				</div>
 			</div>
-			<div id="add_member_button" onClick={ () => setDisplayAddMember(true) }>
-				<i className="fas fa-user-plus" />
-				Add a member
-			</div>
+			{ channel?.type === 2 && hasRights &&
+				<div id="add_member_button" onClick={ () => setDisplayAddMember(true) }>
+					<i className="fas fa-user-plus" />
+					Add a member
+				</div>
+			}
 			{ channel?.type === 2 && user?.id === ownerID && 
 				<div id="password_button" onClick={ () => setDisplayEditPassword(true) }>
 					<i className="fas fa-key" />

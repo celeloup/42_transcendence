@@ -81,7 +81,12 @@ function AskPassword({ channel, password, join, setAskPassword } : AskPasswordPr
 	)
 }
 
-function ChatHeader() {
+type ChatHeaderProps = {
+	hasBeenBanned: Number,
+	askPassword: boolean
+}
+
+function ChatHeader({ hasBeenBanned, askPassword} : ChatHeaderProps) {
 	var { channel, toggleDisplayList, toggleDisplayAdmin } = useContext(ChannelContext) as ContextType;
 	var name = channel ? channel.name : "chat_";
 	return (
@@ -90,7 +95,7 @@ function ChatHeader() {
 			<div className="header_title">
 				<i className="fas fa-user-friends"></i>{ name }
 			</div>
-			{ channel && <i className="fas fa-cog header_button" onClick={ toggleDisplayAdmin }></i> }
+			{ channel && !askPassword && hasBeenBanned !== channel.id && <i className="fas fa-cog header_button" onClick={ toggleDisplayAdmin }></i> }
 			{/* <i className="fas fa-comment-alt"></i> */}
 		</div>
 	)
@@ -180,7 +185,9 @@ export function Chat() {
 				}
 				else if (!member)
 				{
-					if (channel && channel.type === 1)
+					if (user?.site_owner || user?.site_moderator)
+						joinChan();
+					else if (channel && channel.type === 1)
 						joinChan();
 					else if (channel && channel.type === 2)
 						setAskPassword(true);
@@ -258,7 +265,7 @@ export function Chat() {
 			<div id="chat">
 				{ displayList && <ChannelList/> }
 				{ displayAdmin && <ChannelAdmin/> }
-				<ChatHeader />
+				<ChatHeader hasBeenBanned={ hasBeenBanned } askPassword={ askPassword }/>
 				{ channel && hasBeenBanned === channel.id && <BanPopup channel={ channel ? channel.name : "" } close={ closeBan }/> }
 				{ channel && askPassword && <AskPassword channel={ channel.name } password={ channel.password } join={ joinChan } setAskPassword={ setAskPassword }/> }
 				<div id="chat_messages">
