@@ -250,7 +250,7 @@ export default class Puck {
                 else
                     this.y = paddle1_top;
             }
-            return ;
+//            return ;
         }
 
 		if (puck_right > paddle2_left && puck_top < paddle2_bottom && puck_bottom > paddle2_top) {
@@ -269,18 +269,18 @@ export default class Puck {
                     this.y = paddle2_top;
 
             }
-            return ;
+//            return ;
         }
         
      //   if (this.x <= param.paddle_player1.x) {
-        if (this.x < 0) {
+        if (puck_right < 0) {
            param.score_player2++;
             this.reset();
             return ;
         }
 
         // if (this.x >= param.paddle_player2.x) {
-        if (this.x > width) {
+        if (puck_left > width) {
             param.score_player1++;
             this.reset();
             return ;
