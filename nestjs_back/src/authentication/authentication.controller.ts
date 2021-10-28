@@ -60,7 +60,9 @@ export default class AuthenticationController {
       refresh: refreshJwt.token,
       accessTokenExpiration,
       refreshTokenExpiration,
-      isTwoFactorAuthenticationEnabled: user.isTwoFactorAuthenticationEnabled
+      isTwoFactorAuthenticationEnabled: user.isTwoFactorAuthenticationEnabled,
+      site_owner: user.site_owner,
+      site_moderator: user.site_moderator,
     };
   }
 
@@ -132,15 +134,15 @@ export default class AuthenticationController {
     type: AuthInfos
   })
   async register(@Body() registrationData: RegisterDto, @Req() req: Request): Promise<AuthInfos> {
-    const fakeUser = await this.authenticationService.register(registrationData);
-    const accessJwt = this.authenticationService.getJwtToken(fakeUser.id);
+    const user = await this.authenticationService.register(registrationData);
+    const accessJwt = this.authenticationService.getJwtToken(user.id);
     const { accessTokenCookie, accessTokenExpiration } = this.authenticationService.getCookieForJwtToken(accessJwt);
-    const refreshJwt = await this.authenticationService.getJwtRefreshToken(fakeUser.id);
+    const refreshJwt = await this.authenticationService.getJwtRefreshToken(user.id);
     const { refreshTokenCookie, refreshTokenExpiration } = this.authenticationService.getCookieForJwtRefreshToken(refreshJwt);
     req.res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie]);
     return {
-      id: fakeUser.id,
-      name: fakeUser.name,
+      id: user.id,
+      name: user.name,
       authentication: accessJwt.token,
       refresh: refreshJwt.token,
       accessTokenExpiration,
@@ -159,26 +161,28 @@ export default class AuthenticationController {
   @ApiResponse({ status: 404, description: 'User not found with this 42id.'})
   @ApiResponse({ status: 403, description: 'The user is banned.'})
   async login(@Body() loginData: LoginDto, @Req() req: Request): Promise<AuthInfos> {
-    const fakeUser = await this.authenticationService.findUserFrom42Id(loginData.id42)
-    if (!fakeUser) {
+    const user = await this.authenticationService.findUserFrom42Id(loginData.id42)
+    if (!user) {
       throw new HttpException('User not found with this 42id', HttpStatus.NOT_FOUND);
     }
-    if (fakeUser.site_banned) {
+    if (user.site_banned) {
       throw new HttpException('You have been banned', HttpStatus.FORBIDDEN);
     }
-    const accessJwt = this.authenticationService.getJwtToken(fakeUser.id);
+    const accessJwt = this.authenticationService.getJwtToken(user.id);
     const { accessTokenCookie, accessTokenExpiration } = this.authenticationService.getCookieForJwtToken(accessJwt);
-    const refreshJwt = await this.authenticationService.getJwtRefreshToken(fakeUser.id);
+    const refreshJwt = await this.authenticationService.getJwtRefreshToken(user.id);
     const { refreshTokenCookie, refreshTokenExpiration } = this.authenticationService.getCookieForJwtRefreshToken(refreshJwt);
     req.res.setHeader('Set-Cookie', [accessTokenCookie, refreshTokenCookie]);
     return {
-      id: fakeUser.id,
-      name: fakeUser.name,
+      id: user.id,
+      name: user.name,
       authentication: accessJwt.token,
       refresh: refreshJwt.token,
       accessTokenExpiration,
       refreshTokenExpiration,
-      isTwoFactorAuthenticationEnabled: fakeUser.isTwoFactorAuthenticationEnabled
+      isTwoFactorAuthenticationEnabled: user.isTwoFactorAuthenticationEnabled,
+      site_owner: user.site_owner,
+      site_moderator: user.site_moderator,
     };
   }
 
