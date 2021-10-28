@@ -44,6 +44,17 @@ $dark-gray: #919191;
 		color: $dark-gray;
 	}
 
+	#select_user {
+		width: 250px;
+		margin: auto;
+		margin-bottom: 10px;
+		input{
+			margin: 0;
+			border: none;
+			width: 80%;
+		}
+	}
+
 	form {
 		label {
 			display: inline-block;

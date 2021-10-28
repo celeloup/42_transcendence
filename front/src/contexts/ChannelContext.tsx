@@ -5,7 +5,8 @@ export type Channel = {
 	name: string,
 	type: number,
 	owner: any,
-	password: string
+	password: string,
+	members: any
 }
 
 export type ContextType = {

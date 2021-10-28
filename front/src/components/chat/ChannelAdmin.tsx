@@ -232,7 +232,7 @@ const EditPassword = ({ password, chan, display, setRefresh, refresh,} : EditPas
 	return (
 		<div id="edit_password_popup">
 			<i className="fas fa-times" onClick={ () => display(false) }/>
-			Add, edit or remove the password.
+			[ Add, edit or remove the password. ]
 			<form onSubmit={ handleSubmit }>
 				<label id="passwordLabel">
 					<input
@@ -384,8 +384,10 @@ export function ChannelAdmin () {
 
 				// ******* HAS RIGHTS TO SEE STUFF
 				var admin = res.data.admins.some((adm:any) => adm.id === user?.id) ? true : false;
-				if (user?.site_owner === true || user?.site_moderator === true || admin === true)
+				if (res.data.type !== 3 && (user?.site_owner === true || user?.site_moderator === true || admin === true))
 					admin = true;
+				else
+					admin = false;
 				setHasRights(admin);
 				if (admin && res.data.banned.length !== 0)
 					setList(["members", "banned"]);
@@ -424,9 +426,16 @@ export function ChannelAdmin () {
 	else
 		description = "This is a private conversation. Only you and your correspondant can see it."
 	
+	var name;
+	if (channel && channel.type !== 3)
+		name = channel.name;
+	else if (channel && channel.type === 3)
+		name = channel.members[0].id === user?.id ? channel.members[1].name : channel.members[0].name
+
 	return (
 		<div id="channel_admin">
 			{ channel && displayEditPassword && 
+				<div id="card_modal" onClick={ (e:any) => { if (e.target.id === "card_modal") setDisplayEditPassword(false)}}>
 				<EditPassword
 					password={ password }
 					chan={ channel.id }
@@ -434,6 +443,7 @@ export function ChannelAdmin () {
 					refresh={ refresh }
 					setRefresh={ setRefresh }
 				/>
+				</div>
 			}
 			{ channel && displayAddMember &&
 				<div id="card_modal" onClick={ (e:any) => { if (e.target.id === "card_modal") setDisplayAddMember(false)}}>
@@ -447,10 +457,10 @@ export function ChannelAdmin () {
 			}
 			<i className="fas fa-times close_icon" onClick={ toggleDisplayAdmin }></i>
 			<div id="name_description">
-				<i className="fas fa-user-friends"></i> { channel?.name }
+				<i className="fas fa-user-friends"></i> { name }
 				<p>{ description }</p>
 			</div>
-			<div id="info_members">
+			<div id="info_members" style={ channel?.type === 3 ? {"marginTop": "30px"} : {} }>
 				<i className="fas fa-info-circle"></i>
 				<div>
 					<span><i className="fas fa-crown"></i>Owner</span>
@@ -460,7 +470,7 @@ export function ChannelAdmin () {
 					<span><i className="fas fa-user-slash"></i>Banned</span>
 				</div>
 			</div>
-			<div id="lists">
+			<div id="lists" style={ channel?.type === 3 ? {"marginTop": "30px"} : {} }>
 				<div className="tab" onClick={() => setList(["members", "banned"])}>members_</div>
 				{ (list[1] === "banned" || list[0] === "banned") && 
 					<div className="tab" onClick={() => setList(["banned", "members"])}>banned_</div> }
