@@ -162,6 +162,16 @@ export function Chat() {
 			console.log("I HAVE BEEN BANNED", data, channel);
 			setHasBeenBanned(data);
 		})
+
+		socket?.on('user_muted', (data:any) => {
+			console.log("I HAVE BEEN MUTED", data, channel);
+			// setHasBeenBanned(data);
+		})
+
+		socket?.on('user_unmuted', (data:any) => {
+			console.log("I HAVE BEEN UNMUTED", data, channel);
+			// setHasBeenBanned(data);
+		})
 	}, [socket]) // eslint-disable-line
 
 	useEffect(() => {

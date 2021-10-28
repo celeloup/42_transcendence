@@ -155,13 +155,17 @@ function ChannelList () {
 
 	var publicChans = channels.filter((chan:any) => chan.type === 1);
 	var privateChans = channels.filter((chan:any) => chan.type === 2);
-	var dms = channels.filter((chan:any) => chan.type === 3);
-	dms = dms.filter((chan:any) => { 
-		const test = chan.members.some((m:any)=> blockedUsers.includes(m));
-		if (test)
-			return (false);
-		else
-			return (true);
+	var dms = channels.filter((chan:any) => {
+		if (chan.type === 3)
+		{
+			var m = chan.members[0].id === user?.id ? chan.members[1] : chan.members[0];
+			var ret = blockedUsers.every((b, i) => {
+				if (b.id === m.id)
+					return false;
+			})
+			return (ret);
+		}
+		return (false);
 	});
 	
 	return (
