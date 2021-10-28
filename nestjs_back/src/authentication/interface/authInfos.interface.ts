@@ -21,4 +21,10 @@ export default class AuthInfos {
 
   @ApiPropertyOptional()
   isTwoFactorAuthenticationEnabled?: boolean;
+
+  @ApiPropertyOptional()
+  site_owner?: boolean;
+
+  @ApiPropertyOptional()
+  site_moderator?: boolean;
 }
