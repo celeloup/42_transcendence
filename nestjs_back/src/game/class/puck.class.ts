@@ -6,7 +6,7 @@ export default class Puck {
     x: number = width / 2;
     y: number = height / 2;
     r: number = 12;
-	speed: number = 5;
+	speed: number = 8;
     x_speed: number;
     x_direction: number;
     y_speed: number;
@@ -20,10 +20,10 @@ export default class Puck {
     constructor(speed: number) {
 		let angle = Math.random() * ( Math.PI / 3 + Math.PI / 3 ) - Math.PI / 3;
         if (speed == 0) {
-            this.speed = 3;
+            this.speed = 5;
         }
         if (speed == 2) {
-            this.speed = 10;
+            this.speed = 12;
         }
         if (Math.random() < 0.5)
            this.x_direction = -1;
@@ -182,6 +182,42 @@ export default class Puck {
         }
     }
 
+    getAnglePaddle1(diff: number, paddle_height: number) {
+        let segment_size = paddle_height / 8;
+        let segment = Math.floor(diff/segment_size);
+        if (segment == 0 || diff <= 0)
+            return -(45 * Math.PI) / 180;
+        if (segment == 1)
+            return -(30 * Math.PI) / 180;
+         if (segment == 2)
+            return -(15 * Math.PI) / 180;
+        if (segment == 5)
+            return 15 * Math.PI / 180;
+        if (segment == 6)
+            return 30 * Math.PI / 180;
+         if (segment >= 7)
+            return 45 * Math.PI / 180;
+        return 0;
+    }
+
+    getAnglePaddle2(diff: number, paddle_height: number) {
+        let segment_size = paddle_height / 8;
+        let segment = Math.floor(diff/segment_size);
+        if (segment == 0 || diff <= 0)
+            return -(135 * Math.PI) / 180;
+        if (segment == 1)
+            return -(150 * Math.PI) / 180;
+         if (segment == 2)
+            return -(165 * Math.PI) / 180;
+        if (segment == 5)
+            return 165 * Math.PI / 180;
+        if (segment == 6)
+            return 150 * Math.PI / 180;
+         if (segment >= 7)
+            return 135 * Math.PI / 180;
+        return Math.PI;
+    }
+
     edges(param: Round) {
 
         let puck_left = this.x - this.r;
@@ -197,60 +233,48 @@ export default class Puck {
         let paddle2_top = param.paddle_player2.y - param.paddle_player2.h / 2;
         let paddle2_bottom = param.paddle_player2.y + param.paddle_player2.h / 2;
 
-        if (puck_top < 0 || puck_bottom > height) {
-            this.y_speed *= -1;
-        }
-
         if (puck_left < paddle1_right && puck_top < paddle1_bottom && puck_bottom > paddle1_top) {
             if (this.x > param.paddle_player1.x) {
                 let diff = this.y - paddle1_top;
-                let angle = this.map(diff, 0, param.paddle_player1.h, Math.PI / 4, - Math.PI / 4);
+                // let angle = this.map(diff, 0, param.paddle_player1.h, -Math.PI / 4, Math.PI / 4);    
+                let angle = this.getAnglePaddle1(diff, param.paddle_player1.h);
                 this.x_speed = this.speed * Math.cos(angle);
                 this.y_speed = this.speed * Math.sin(angle);
                 this.x = param.paddle_player1.x + param.paddle_player1.w/2 + this.r;
-			}
+            }
             else    
                 this.y_speed *= -1;
-            //tester sans avec une bonne co
-    /*        if (puck_left < param.paddle_player1.x + param.paddle_player1.w / 4)
-            {
-                if (puck_bottom < param.paddle_player1.y)
-                    this.y = paddle1_top - this.r;
-                else
-                    this.y = paddle1_bottom + this.r;
-            }
-   */
+            return ;
         }
 
 		if (puck_right > paddle2_left && puck_top < paddle2_bottom && puck_bottom > paddle2_top) {
 			if (this.x < param.paddle_player2.x) {
                 let diff = this.y - paddle2_top;
-                let angle = this.map(diff, 0, param.paddle_player2.h, -5 * Math.PI / 4, 5 * Math.PI / 4);
+                let angle = this.getAnglePaddle2(diff, param.paddle_player1.h);
                 this.x_speed = this.speed * Math.cos(angle);
                 this.y_speed = this.speed * Math.sin(angle);
-            //    this.x = param.paddle_player2.x - param.paddle_player2.w/2 - this.r;
+                this.x = param.paddle_player2.x - param.paddle_player2.w/2 - this.r;
 			}
             else
                 this.y_speed *= -1;
-            //tester sans avec une bonne co
-        /*    if (puck_right > param.paddle_player2.x - param.paddle_player2.w / 4)
-            {
-                if (puck_bottom < param.paddle_player2.y)
-                    this.y = paddle2_top - this.r;
-                else
-                    this.y = paddle2_bottom + this.r;
-            }
- */
+            return ;
         }
         
-        if (this.x < 0 + paddle_margin) {
+        if (this.x <= param.paddle_player1.x) {
             param.score_player2++;
             this.reset();
+            return ;
         }
 
-        if (this.x > width - paddle_margin) {
+        if (this.x >= param.paddle_player2.x) {
             param.score_player1++;
             this.reset();
+            return ;
+        }
+        
+        if (puck_top < 0 || puck_bottom > height) {
+            this.y_speed *= -1;
+            //est-ce qu'on reeloigne du bord pour eviter les pb ?
         }
     }
 
