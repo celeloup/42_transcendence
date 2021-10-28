@@ -149,24 +149,53 @@ function MemberCard ( { member, channelID, setRefresh, refresh, hasRights, owner
 				setBannedState("inactive");
 			})
 		}
-		// else {
-		// 	setBannedState("loading");
-		// 	axios.put(`/channel/unban/${ channelID }`, { "userId": id })
-		// 	.then( res => {
-		// 		console.log("RES delete ban", res);
-		// 		setRefresh(!refresh);
-		// 		setBannedState("inactive");
-		// 	})
-		// 	.catch (err => {
-		// 		if (err.response.status === 403)
-		// 		{
-		// 			console.log("You don't have the rights to perform this action !");
-		// 			setRefresh(!refresh);
-		// 		}
-		// 		console.log("Error:", err);
-		// 		setBannedState("active");
-		// 	})
-		// }
+	}
+
+	function muteUpadte(muted:string) {
+		if (muted === "inactive")
+		{
+			setMutedState("loading");
+			axios.put(`/channel/mute/${ channelID }`, { "userId": id, "timeInMilliseconds": 100000 })
+			.then( res => {
+				console.log("RES put mute", res);
+				socket.emit("mute_user", {channelID: channelID, memberID: id});
+				setRefresh(!refresh);
+				setMutedState("active");
+			})
+			.catch (err => {
+				if (err.response.status === 403)
+				{
+					console.log("You don't have the rights to perform this action !");
+					setRefresh(!refresh);
+				}
+				else if (err.response.status === 404)
+				{
+					console.log("This user is not a member of the channel.")
+					setRefresh(!refresh);
+				}
+				console.log("Error:", err);
+				setMutedState("inactive");
+			})
+		}
+		else {
+			setMutedState("loading");
+			axios.put(`/channel/unmute/${ channelID }`, { "userId": id })
+			.then( res => {
+				console.log("RES unmute", res);
+				socket.emit("unmute_user", {channelID: channelID, memberID: id});
+				setRefresh(!refresh);
+				setMutedState("inactive");
+			})
+			.catch (err => {
+				if (err.response.status === 403)
+				{
+					console.log("You don't have the rights to perform this action !");
+					setRefresh(!refresh);
+				}
+				console.log("Error:", err);
+				setMutedState("active");
+			})
+		}
 	}
 
 	return (
@@ -178,7 +207,7 @@ function MemberCard ( { member, channelID, setRefresh, refresh, hasRights, owner
 					{ !owner && <>
 						<i className={ `fas fa-shield-alt ${ adminState } ` + ((adminState === "inactive") || (me === ownerID) ? `action good ` : "") } onClick={ () => adminUpdate(adminState) } />
 						<i className={ `fas fa-user-slash action bad ${ bannedState }` } onClick={ () => banUpdate(bannedState) } />
-						<i className={ `fas fa-comment-slash action bad ${ mutedState }` } />
+						<i className={ `fas fa-comment-slash action bad ${ mutedState }` } onClick={ () => muteUpadte(mutedState) } />
 					</>}
 				</>}
 				{ (!hasRights || id === me) && <>

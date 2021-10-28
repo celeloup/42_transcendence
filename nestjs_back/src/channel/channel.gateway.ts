@@ -100,15 +100,44 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
   //   }
   // }
 
-  @SubscribeMessage('unmute_user')
-  async unmuteUser(
-    @MessageBody() data: { channel: Channel, member: User },
+  @SubscribeMessage('mute_user')
+  async muteUser(
+    @MessageBody() data: { channelID: number, memberID: number },
     @ConnectedSocket() client: Socket,
   ) {
     const user: User = await this.authenticationService.getUserFromSocket(client);
-    const memberSocket: Socket = this.listSocket.get(data.member);
+	var memberSocket: Socket;
+	for (let [key, value] of this.listSocket.entries()) {
+		if (key.id === data.memberID) {
+			memberSocket = value;
+		}
+	  }
     if (user) {
-      memberSocket.emit('user_unmuted');
+		console.log("**** Emitting mute user", data.channelID);
+		memberSocket.emit('user_muted', data.channelID);
+    }
+  }
+
+  @SubscribeMessage('unmute_user')
+  async unmuteUser(
+    @MessageBody() data: { channelID: number, memberID: number },
+    @ConnectedSocket() client: Socket,
+  ) {
+    // const user: User = await this.authenticationService.getUserFromSocket(client);
+    // const memberSocket: Socket = this.listSocket.get(data.member);
+    // if (user) {
+	//   memberSocket.emit('user_unmuted');
+	// }
+	const user: User = await this.authenticationService.getUserFromSocket(client);
+	var memberSocket: Socket;
+	for (let [key, value] of this.listSocket.entries()) {
+		if (key.id === data.memberID) {
+			memberSocket = value;
+		}
+	  }
+    if (user) {
+		console.log("**** Emitting unmute user", data.channelID);
+		memberSocket.emit('user_unmuted', data.channelID);
     }
   }
 
@@ -117,12 +146,6 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     @MessageBody() data: { channelID: number, memberID: number },
     @ConnectedSocket() client: Socket,
   ) {
-	// function getByValue(map:Map<User, Socket>, searchValue: number) {
-	// 	for (let [key, value] of map.entries()) {
-	// 	  if (key.id === searchValue)
-	// 		return value;
-	// 	}
-	//   }
     const user: User = await this.authenticationService.getUserFromSocket(client);
 	var memberSocket: Socket;
 	for (let [key, value] of this.listSocket.entries()) {
@@ -130,11 +153,9 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
 			memberSocket = value;
 		}
 	  }
-	//  = getByValue(this.listSocket, data.memberID);
     if (user) {
 		console.log("**** Emitting ban user", data.channelID);
 		memberSocket.emit('user_banned', data.channelID);
-    	// memberSocket.leave(data.channelID.toString());
     }
   }
 
