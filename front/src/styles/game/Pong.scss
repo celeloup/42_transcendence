@@ -1,0 +1,85 @@
+$background-color: #232323;
+$text-color: white;
+$accent_color: #FFCD27;
+$light-gray: #E3E3E3;
+$dark-gray: #919191;
+$green: #81A439;
+
+
+#pong_game {
+	position: relative;
+
+	.flex {
+		display: flex;
+		justify-content: space-evenly;
+	}
+	
+	#end_screen {
+		border: 4px solid $accent_color;
+		position: absolute;
+		padding: 20px;
+		top: 40%;
+		left: 35%;
+		width: 200px;
+		// height: 200px;
+		background-color: $background-color;
+
+		#back_button {
+			background-color: $accent_color;
+			color: $background-color;
+			cursor: pointer;
+			width: 150px;
+			height: 30px;
+			margin: auto;
+			margin-top: 20px;
+			border-radius: 5px;
+		}
+	}
+
+	#no_pending_game {
+		width: 400px;
+		border: 4px solid $accent_color;
+		margin: auto;
+		margin-top: 50px;
+		padding: 20px;
+		border-radius: 5px;
+
+		#create_game_button {
+			background-color: $accent_color;
+			padding: 10px;
+			margin-top: 20px;
+			width: 150px;
+			cursor: pointer;
+			color: $background-color;
+			border-radius: 5px;
+		}
+
+		#back_button {
+			background-color: $dark-gray;
+			padding: 10px;
+			margin-top: 20px;
+			width: 150px;
+			cursor: pointer;
+			color: $background-color;
+			border-radius: 5px;
+
+			i{ margin-right: 10px;}
+		}
+	}
+
+	#waiting {
+		margin-top: 200px;
+	}
+
+	.fa-spinner {
+		font-size: 56px;
+		margin: 20px;
+		color: $accent_color;
+		animation: spin 2s steps(5, end) infinite;
+	}
+	
+	@keyframes spin {
+		0% { transform: rotate(0deg); }
+		100% { transform: rotate(360deg); }
+	}
+}
