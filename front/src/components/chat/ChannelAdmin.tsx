@@ -3,213 +3,156 @@ import axios from 'axios';
 import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
 import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
 import '../../styles/Chat/ChatAdmin.scss';
-import { Socket } from 'socket.io-client';
+import SearchUser from 'components/ui_components/SearchUser';
+import { MemberCard, BannedCard } from './ChannelAdminMemberCard';
 
-type Member = {
-	id: number,
-	name: string,
-	owner: boolean,
-	site_admin: boolean,
-	admin: boolean,
-	banned: boolean,
-	muted: boolean,
-	me: number,
-	full_member: any
-}
-
-type MemberCardProps = {
-	hasRights: boolean,
-	member:Member,
-	channelID?: number,
-	setRefresh: (val:boolean) => void,
+type EditPasswordProps = {
+	password: string,
+	chan: number,
+	display: (val:boolean) => void,
 	refresh: boolean,
-	ownerID: number
+	setRefresh: (val:boolean) => void
 }
 
-type BannedCardProps = {
-	banMember: any,
-	refresh: boolean,
-	setRefresh: (val:boolean) => void,
-	channelID?: number
-}
+const EditPassword = ({ password, chan, display, setRefresh, refresh,} : EditPasswordProps) => {
+	const [ pass, setPass ] = useState(password);
+	const [ typePassword, setTypePassword ] = useState(true);
+	const [ isLoading, setIsLoading ] = useState(false);
 
-function BannedCard({ banMember, refresh, setRefresh, channelID } : BannedCardProps) {
-
-	const [ banState, setBanState ] = useState("active");
-	const { name, id } = banMember;
-
-	function unban(){
-		setBanState("loading");
-		axios.put(`/channel/unban/${ channelID }`, { "userId": id })
+	const changePass = (passw:string) => {
+		setIsLoading(true);
+		axios.put(`/channel/password/${ chan }`, { "password": passw })
 		.then( res => {
-			// console.log("RES delete ban", res);
+			console.log("RES change password", res);
 			setRefresh(!refresh);
-			setBanState("");
+			display(false);
 		})
 		.catch (err => {
-			if (err.response.status === 403)
-			{
-				console.log("You don't have the rights to perform this action !");
-				setRefresh(!refresh);
-			}
-			else if (err.response.status === 404)
-			{
-				console.log("No current banned user correspond to this user.");
-				setRefresh(!refresh);
-			}
 			console.log("Error:", err);
-			setBanState("");
+			setIsLoading(false);
 		})
 	}
 
+	const handleSubmit = (e:any) => {
+		e.preventDefault();
+		let passwordRegex = /[ -~]/;
+		if (passwordRegex.test(pass) === false)
+			console.log("WRONG");
+		else
+			changePass(pass);
+			// temp_errors.push({key:"password", value:"The password cannot contain non printable characters."});
+	}
 	return (
-		<div className="member_card">
-			<p>{ name }</p>
-			<div className="member_status">
-				<span onClick={ unban } className="unban_button"><i className={ `fas fa-user-slash ${ banState }` } />unban</span>
-			</div>
+		<div id="edit_password_popup">
+			<i className="fas fa-times" onClick={ () => display(false) }/>
+			[ Add, edit or remove the password. ]
+			<form onSubmit={ handleSubmit }>
+				<label id="passwordLabel">
+					<input
+						autoFocus={ true }
+						autoComplete="off"
+						className={ typePassword ? "passwordInput" : ""} 
+						type="text"
+						value={ pass }
+						onChange={ (e) => setPass(e.target.value) }
+					/>
+					<i className={ typePassword ? "fas fa-eye-slash" : "fas fa-eye" } onClick={ () => setTypePassword(!typePassword)}></i>
+				</label>
+				<input 
+						className={ (pass !== "" && pass !== password) ? "readyToSubmit" : "" }
+						type="submit" 
+						value={ isLoading ? "Loading..." : "Submit" }
+					/>
+			</form>
+			{ password !== "" && <div id="remove_password" onClick={ () => { changePass(""); }}><i className="fas fa-trash" />Remove password</div> }
 		</div>
 	)
 }
 
-function MemberCard ( { member, channelID, setRefresh, refresh, hasRights, ownerID } : MemberCardProps) {
-	var { socket, channel } = useContext(ChannelContext) as ContextType;
-	const { name, id, admin, site_admin, banned, muted, me, owner, full_member } = member;
-	const [ adminState, setAdminState ] = useState<string>("");
-	const [ bannedState, setBannedState ] = useState<string>("");
-	const [ mutedState, setMutedState ] = useState<string>("");
+type AddMemberProps = {
+	chan: any,
+	display: (val:boolean) => void,
+	refresh: boolean,
+	setRefresh: (val:boolean) => void
+}
+
+const AddMember = ({ chan, display, refresh, setRefresh } : AddMemberProps) => {
+	const [ isLoading, setIsLoading ] = useState(false);
+	const [ missingMembers, setMissingMembers ] = useState<any[]>([]);
+	const [ user, setUser ] = useState(0);
+	const [ error, setError ] = useState<string>("");
 
 	useEffect(() => {
-		admin ? setAdminState("active") : setAdminState("inactive");
-		banned ? setBannedState("active") : setBannedState("inactive");
-		muted ? setMutedState("active") : setMutedState("inactive");
-	}, [admin, banned, muted])
+		axios.get(`/users`)
+		.then( res => {
+			// console.log(res.data);
+			setMissingMembers(res.data);
+		})
+		.catch( err => {
+			console.log(err);
+		})
+	}, []);
 
-	function adminUpdate(admin:string) {
-		if (admin === "inactive")
+	const handleSubmit = () => {
+		if (user !== 0)
 		{
-			setAdminState("loading");
-			axios.put(`/channel/admins/${ channelID }`, { "userId": id })
+			setIsLoading(true);
+			axios.put(`/channel/members/${ chan.id }`, { "userId": user })
 			.then( res => {
-				// console.log("RES put admin", res);
-				setAdminState("active");
+				// console.log(res.data);
+				if (res.data.message === "User is already a member of this channel") {
+					setError("User is already a member of this channel");
+					setIsLoading(false);
+				}
+				else {
+					setRefresh(!refresh);
+					display(false);
+				}
 			})
 			.catch (err => {
 				if (err.response.status === 403)
-				{
-					console.log("You don't have the rights to perform this action !");
-					setRefresh(!refresh);
-				}
-				else
-					console.log("Error:", err);
-				setAdminState("inactive");
-			})
-		}
-		else {
-			setAdminState("loading");
-			axios.delete(`/channel/admins/${ channelID }`, { data: { userId: id}})
-			.then( res => {
-				// console.log("RES delete admin", res);
-				setAdminState("inactive");
-			})
-			.catch (err => {
-				if (err.response.status === 403)
-				{
-					console.log("You don't have the rights to perform this action !");
-					setRefresh(!refresh);
-				}
-				console.log("Error:", err);
-				setAdminState("active");
-			})
-		}
-	}
-
-	function banUpdate(banned:string) {
-		if (banned === "inactive")
-		{
-			setBannedState("loading");
-			axios.put(`/channel/ban/${ channelID }`, { "userId": id })
-			.then( res => {
-				// console.log("RES put ban", res);
-				socket.emit("ban_user", {channelID: channelID, memberID: id});
-				setRefresh(!refresh);
-				setBannedState("active");
-			})
-			.catch (err => {
-				if (err.response.status === 403)
-				{
-					console.log("You don't have the rights to perform this action !");
-					setRefresh(!refresh);
-				}
+					setError("You don't have the rights to add this member");
 				else if (err.response.status === 404)
-				{
-					console.log("This user is not a member of the channel.")
-					setRefresh(!refresh);
-				}
+					setError("This user doesn't exist");
 				console.log("Error:", err);
-				setBannedState("inactive");
+				setIsLoading(false);
 			})
 		}
-		// else {
-		// 	setBannedState("loading");
-		// 	axios.put(`/channel/unban/${ channelID }`, { "userId": id })
-		// 	.then( res => {
-		// 		console.log("RES delete ban", res);
-		// 		setRefresh(!refresh);
-		// 		setBannedState("inactive");
-		// 	})
-		// 	.catch (err => {
-		// 		if (err.response.status === 403)
-		// 		{
-		// 			console.log("You don't have the rights to perform this action !");
-		// 			setRefresh(!refresh);
-		// 		}
-		// 		console.log("Error:", err);
-		// 		setBannedState("active");
-		// 	})
-		// }
 	}
 
 	return (
-		<div className="member_card">
-			<p>{ name }</p>
-			<div className="member_status">
-				{ hasRights && id !== me && !site_admin &&<>
-					{ owner && <i className="fas fa-crown" /> }
-					{ !owner && <>
-						<i className={ `fas fa-shield-alt ${ adminState } ` + ((adminState === "inactive") || (me === ownerID) ? `action good ` : "") } onClick={ () => adminUpdate(adminState) } />
-						<i className={ `fas fa-user-slash action bad ${ bannedState }` } onClick={ () => banUpdate(bannedState) } />
-						<i className={ `fas fa-comment-slash action bad ${ mutedState }` } />
-					</>}
-				</>}
-				{ (!hasRights || id === me) && <>
-					{ owner && <i className="fas fa-crown" /> }
-					{ !owner && (adminState ==="active") && <i className={ `fas fa-shield-alt` } /> }
-					{ !owner &&  (bannedState ==="active") && <i className={ `fas fa-user-slash` } /> }
-					{ !owner && (mutedState ==="active") && <i className={ `fas fa-comment-slash` } /> }
-				</>}
-				{ site_admin && <i className="fas fa-user-shield" /> }
-			</div>
+		<div id="add_member_popup">
+			{ error !== "" && <div id="add_member_error"><i className="fas fa-exclamation-triangle" /> { error }</div> }
+			<i className="fas fa-times" onClick={ () => display(false) }/>
+			[ select a user ]
+			<SearchUser theme="yo" list={ missingMembers } select={ setUser }/>
+			<div className={ user !== 0 ? "ready" : "" } id="submit" onClick={ handleSubmit }>{ isLoading ? "Loading..." : "Submit" }</div>
 		</div>
 	)
 }
 
 export function ChannelAdmin () {
-	const [ hasRights, setHasRights ] = useState<boolean>(false);
-	var { toggleDisplayAdmin, channel, socket, toggleDisplayList, changeChannel } = useContext(ChannelContext) as ContextType;
+	var { toggleDisplayAdmin, channel, toggleDisplayList, changeChannel } = useContext(ChannelContext) as ContextType;
 	var { user } = useContext(AuthContext) as AuthContextType;
+	
+	const [ hasRights, setHasRights ] = useState<boolean>(false);
 	const [ list, setList ] = useState<string[]>(["members"]);
 	const [ members, setMembers ] = useState<any>(null);
 	const [ banned, setBanned ] = useState<any>(null);
 	const [ refresh, setRefresh ] = useState<boolean>(false);
 	const [ ownerID, setOwnerID ] = useState<number>(-1);
 	const [ loadingLeave, setLoadingLeave ] = useState(false);
+	const [ displayEditPassword, setDisplayEditPassword ] = useState(false);
+	const [ password, setPassword ] = useState("");
+	const [ displayAddMember, setDisplayAddMember ] = useState(false);
+	const [ error, setError ] = useState<string>("");
 	
 	useEffect(() => {
 		if (channel)
 		{
 			axios.get(`/channel/infos/${ channel.id }`)
 			.then( res => {
+				setPassword(res.data.password);
 				// console.log("RES chan infos", res);
 				// ********* SET MEMBERS LIST
 				var memb = res.data.members.map( (m:any) => {
@@ -221,12 +164,11 @@ export function ChannelAdmin () {
 						admin: res.data.admins.some((adm:any) => adm.id === m.id) ? true : false,
 						banned: res.data.banned.some((ban:any) => ban.id === m.id) ? true : false,
 						muted: res.data.muted.some((mut:any) => mut.id === m.id) ? true : false,
-						me: user?.id,
-						full_member: m
+						me: user?.id
 					});
 				})
 				// console.log(memb);
-				memb.sort((a:Member, b:Member) => {
+				memb.sort((a:any, b:any) => {
 					if (a.owner || b.owner)
 						return (1)
 					if ((a.admin || a.site_admin) && (b.admin || b.site_admin))
@@ -256,8 +198,10 @@ export function ChannelAdmin () {
 
 				// ******* HAS RIGHTS TO SEE STUFF
 				var admin = res.data.admins.some((adm:any) => adm.id === user?.id) ? true : false;
-				if (user?.site_owner === true || user?.site_moderator === true || admin === true)
+				if (res.data.type !== 3 && (user?.site_owner === true || user?.site_moderator === true || admin === true))
 					admin = true;
+				else
+					admin = false;
 				setHasRights(admin);
 				if (admin && res.data.banned.length !== 0)
 					setList(["members", "banned"]);
@@ -266,7 +210,7 @@ export function ChannelAdmin () {
 				console.log("Error:", err);
 			})
 		}
-	}, [refresh]);
+	}, [refresh]); // eslint-disable-line
 
 	function leave_chan() {
 		if (channel && !loadingLeave)
@@ -289,21 +233,53 @@ export function ChannelAdmin () {
 	var description;
 	if (channel && channel.type === 1)
 		description = "This channel is public. Everyone can join it.";
-	else if (channel && channel.type === 2 && channel.password === "")
+	else if (channel && channel.type === 2 && password === "")
 		description = "This channel is private. Nobody except the added members can see this channel. Add a password to make it visible to everyone and restrict access.";
-	else if (channel && channel.type === 2 && channel.password !== "")
+	else if (channel && channel.type === 2 && password !== "")
 		description = "This channel is private. Everyone can try to access it by providing a password. Remove the password to hide the channel to any non-member."
 	else
 		description = "This is a private conversation. Only you and your correspondant can see it."
 	
+	var name;
+	if (channel && channel.type !== 3)
+		name = channel.name;
+	else if (channel && channel.type === 3)
+		name = channel.members[0].id === user?.id ? channel.members[1].name : channel.members[0].name
+
 	return (
 		<div id="channel_admin">
+			{ channel && displayEditPassword && 
+				<div id="card_modal" onClick={ (e:any) => { if (e.target.id === "card_modal") setDisplayEditPassword(false)}}>
+				<EditPassword
+					password={ password }
+					chan={ channel.id }
+					display={ setDisplayEditPassword }
+					refresh={ refresh }
+					setRefresh={ setRefresh }
+				/>
+				</div>
+			}
+			{ channel && displayAddMember &&
+				<div id="card_modal" onClick={ (e:any) => { if (e.target.id === "card_modal") setDisplayAddMember(false)}}>
+				<AddMember
+					chan={ channel }
+					display={ setDisplayAddMember }
+					refresh={ refresh }
+					setRefresh={ setRefresh }
+				/>
+				</div>
+			}
 			<i className="fas fa-times close_icon" onClick={ toggleDisplayAdmin }></i>
 			<div id="name_description">
-				<i className="fas fa-user-friends"></i> { channel?.name }
+				<i className="fas fa-user-friends"></i> { name }
 				<p>{ description }</p>
 			</div>
-			<div id="info_members">
+			{ error !== "" && 
+				<div id="error">
+					<i className="fas fa-exclamation-triangle" /> { error }<i className="fas fa-times" onClick={ () => setError("") }/>
+				</div>
+			}
+			<div id="info_members" style={ channel?.type === 3 ? {"marginTop": "30px"} : {} }>
 				<i className="fas fa-info-circle"></i>
 				<div>
 					<span><i className="fas fa-crown"></i>Owner</span>
@@ -313,7 +289,7 @@ export function ChannelAdmin () {
 					<span><i className="fas fa-user-slash"></i>Banned</span>
 				</div>
 			</div>
-			<div id="lists">
+			<div id="lists" style={ channel?.type === 3 ? {"marginTop": "30px"} : {} }>
 				<div className="tab" onClick={() => setList(["members", "banned"])}>members_</div>
 				{ (list[1] === "banned" || list[0] === "banned") && 
 					<div className="tab" onClick={() => setList(["banned", "members"])}>banned_</div> }
@@ -321,26 +297,50 @@ export function ChannelAdmin () {
 					{ list[0] === "members" && 
 					<div className="member_list">
 						{ members
-							? members.map((m:any) => <MemberCard key={ m.id } hasRights={ hasRights} member={ m } channelID={ channel?.id } ownerID={ ownerID } setRefresh={ setRefresh } refresh={ refresh }/>)
+							? members.map((m:any) => 
+								<MemberCard 
+									key={ m.id }
+									hasRights={ hasRights}
+									member={ m }
+									channelID={ channel?.id }
+									ownerID={ ownerID }
+									setRefresh={ setRefresh }
+									refresh={ refresh }
+									setError={ setError }/>)
 							: <p>Loading ...</p> }
 					</div> }
 					{ hasRights && list[0] === "banned" && 
 					<div className="member_list" id="banned_list">
 						{ banned
 							? ( banned.length !== 0 ? 
-								banned.map((m:any) => <BannedCard key={ m.id } banMember={ m } setRefresh={ setRefresh } refresh={ refresh } channelID={ channel?.id }/>) 
+								banned.map((m:any) => 
+									<BannedCard
+										key={ m.id }
+										banMember={ m }
+										setRefresh={ setRefresh }
+										refresh={ refresh }
+										channelID={ channel?.id }
+										setError={ setError }/>) 
 								: <p>No banned user</p> )
 							: <p>Loading ...</p> }
 					</div> }
 				</div>
 			</div>
-			<div id="add_member_button">
-				<i className="fas fa-user-plus"></i>
-				Add a member
-			</div>
+			{ channel?.type === 2 && hasRights &&
+				<div id="add_member_button" onClick={ () => setDisplayAddMember(true) }>
+					<i className="fas fa-user-plus" />
+					Add a member
+				</div>
+			}
+			{ channel?.type === 2 && user?.id === ownerID && 
+				<div id="password_button" onClick={ () => setDisplayEditPassword(true) }>
+					<i className="fas fa-key" />
+					{ password ? "Edit password" : "Add a password" }
+				</div>
+			}
 			<div id="leave_button" onClick={ leave_chan } >
-				<i className="fas fa-door-closed"></i>
-				<i className="fas fa-door-open"></i>
+				<i className="fas fa-door-closed" />
+				<i className="fas fa-door-open" />
 				{ loadingLeave ? "Loading..." : "Leave the channel" }
 			</div>
 		</div>
