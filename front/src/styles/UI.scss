@@ -205,6 +205,60 @@ $accent_color: #FFCD27;
 	border-radius: 4px;
 }
 
+#search_user {
+	margin-top: 10px;
+	background-color: $accent_color;
+	color: $background-color;
+	padding: 10px;
+	border-radius: 5px;
+
+	.search_bar {
+		background-color: white;
+		color: $background-color;
+		padding: 5px 0;
+		border-radius: 5px;
+		position: relative;
+
+		input {
+			margin-left: 0;
+			padding: 2px;
+			background-color: white;
+			color: $background-color;
+			&::placeholder {
+				color: $background-color;
+			}
+		}
+		i {
+			font-size: 16px;
+			color: $background-color;
+			cursor: pointer;
+		}
+	}
+
+	#list {
+		margin-top: 10px;
+		height: 130px;
+		overflow-y: scroll;
+
+		div {
+			padding: 10px;
+			font-family: "Dogica";
+			font-size: 14px;
+
+			&:hover {
+				background-color: white;
+				color: $background-color;
+				cursor: pointer;
+			}
+
+			&.selected {
+				background-color: $background-color;
+				color: $accent_color;
+			}
+		}
+	}
+}
+
 // @media (max-height: 1000px) { 
 
 // 	#navBar {
@@ -215,4 +269,7 @@ $accent_color: #FFCD27;
 // 		margin-top: 0;
 // 	}
 // }
+
+// ********** USER SEARCH
+
 

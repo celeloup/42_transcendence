@@ -1,11 +1,12 @@
-import { useState, useEffect, createContext } from "react";
+import { useState, createContext } from "react";
 
 export type Channel = {
 	id: number,
 	name: string,
 	type: number,
 	owner: any,
-	password: string
+	password: string,
+	members: any
 }
 
 export type ContextType = {
