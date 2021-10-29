@@ -4,223 +4,7 @@ import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
 import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
 import '../../styles/Chat/ChatAdmin.scss';
 import SearchUser from 'components/ui_components/SearchUser';
-
-type Member = {
-	id: number,
-	name: string,
-	owner: boolean,
-	site_admin: boolean,
-	admin: boolean,
-	banned: boolean,
-	muted: boolean,
-	me: number
-}
-
-type MemberCardProps = {
-	hasRights: boolean,
-	member:Member,
-	channelID?: number,
-	setRefresh: (val:boolean) => void,
-	refresh: boolean,
-	ownerID: number
-}
-
-type BannedCardProps = {
-	banMember: any,
-	refresh: boolean,
-	setRefresh: (val:boolean) => void,
-	channelID?: number
-}
-
-function BannedCard({ banMember, refresh, setRefresh, channelID } : BannedCardProps) {
-
-	const [ banState, setBanState ] = useState("active");
-	const { name, id } = banMember;
-
-	function unban(){
-		setBanState("loading");
-		axios.put(`/channel/unban/${ channelID }`, { "userId": id })
-		.then( res => {
-			// console.log("RES delete ban", res);
-			setRefresh(!refresh);
-			setBanState("");
-		})
-		.catch (err => {
-			if (err.response.status === 403)
-			{
-				console.log("You don't have the rights to perform this action !");
-				setRefresh(!refresh);
-			}
-			else if (err.response.status === 404)
-			{
-				console.log("No current banned user correspond to this user.");
-				setRefresh(!refresh);
-			}
-			console.log("Error:", err);
-			setBanState("");
-		})
-	}
-
-	return (
-		<div className="member_card">
-			<p>{ name }</p>
-			<div className="member_status">
-				<span onClick={ unban } className="unban_button"><i className={ `fas fa-user-slash ${ banState }` } />unban</span>
-			</div>
-		</div>
-	)
-}
-
-function MemberCard ( { member, channelID, setRefresh, refresh, hasRights, ownerID } : MemberCardProps) {
-	var { socket } = useContext(ChannelContext) as ContextType;
-	const { name, id, admin, site_admin, banned, muted, me, owner } = member;
-	const [ adminState, setAdminState ] = useState<string>("");
-	const [ bannedState, setBannedState ] = useState<string>("");
-	const [ mutedState, setMutedState ] = useState<string>("");
-
-	useEffect(() => {
-		admin ? setAdminState("active") : setAdminState("inactive");
-		banned ? setBannedState("active") : setBannedState("inactive");
-		muted ? setMutedState("active") : setMutedState("inactive");
-	}, [admin, banned, muted])
-
-	function adminUpdate(admin:string) {
-		if (admin === "inactive")
-		{
-			setAdminState("loading");
-			axios.put(`/channel/admins/${ channelID }`, { "userId": id })
-			.then( res => {
-				// console.log("RES put admin", res);
-				setAdminState("active");
-			})
-			.catch (err => {
-				if (err.response.status === 403)
-				{
-					console.log("You don't have the rights to perform this action !");
-					setRefresh(!refresh);
-				}
-				else
-					console.log("Error:", err);
-				setAdminState("inactive");
-			})
-		}
-		else {
-			setAdminState("loading");
-			axios.delete(`/channel/admins/${ channelID }`, { data: { userId: id}})
-			.then( res => {
-				// console.log("RES delete admin", res);
-				setAdminState("inactive");
-			})
-			.catch (err => {
-				if (err.response.status === 403)
-				{
-					console.log("You don't have the rights to perform this action !");
-					setRefresh(!refresh);
-				}
-				console.log("Error:", err);
-				setAdminState("active");
-			})
-		}
-	}
-
-	function banUpdate(banned:string) {
-		if (banned === "inactive")
-		{
-			setBannedState("loading");
-			axios.put(`/channel/ban/${ channelID }`, { "userId": id })
-			.then( res => {
-				// console.log("RES put ban", res);
-				socket.emit("ban_user", {channelID: channelID, memberID: id});
-				setRefresh(!refresh);
-				setBannedState("active");
-			})
-			.catch (err => {
-				if (err.response.status === 403)
-				{
-					console.log("You don't have the rights to perform this action !");
-					setRefresh(!refresh);
-				}
-				else if (err.response.status === 404)
-				{
-					console.log("This user is not a member of the channel.")
-					setRefresh(!refresh);
-				}
-				console.log("Error:", err);
-				setBannedState("inactive");
-			})
-		}
-	}
-
-	function muteUpadte(muted:string) {
-		if (muted === "inactive")
-		{
-			setMutedState("loading");
-			axios.put(`/channel/mute/${ channelID }`, { "userId": id, "timeInMilliseconds": 100000 })
-			.then( res => {
-				console.log("RES put mute", res);
-				socket.emit("mute_user", {channelID: channelID, memberID: id});
-				setRefresh(!refresh);
-				setMutedState("active");
-			})
-			.catch (err => {
-				if (err.response.status === 403)
-				{
-					console.log("You don't have the rights to perform this action !");
-					setRefresh(!refresh);
-				}
-				else if (err.response.status === 404)
-				{
-					console.log("This user is not a member of the channel.")
-					setRefresh(!refresh);
-				}
-				console.log("Error:", err);
-				setMutedState("inactive");
-			})
-		}
-		else {
-			setMutedState("loading");
-			axios.put(`/channel/unmute/${ channelID }`, { "userId": id })
-			.then( res => {
-				console.log("RES unmute", res);
-				socket.emit("unmute_user", {channelID: channelID, memberID: id});
-				setRefresh(!refresh);
-				setMutedState("inactive");
-			})
-			.catch (err => {
-				if (err.response.status === 403)
-				{
-					console.log("You don't have the rights to perform this action !");
-					setRefresh(!refresh);
-				}
-				console.log("Error:", err);
-				setMutedState("active");
-			})
-		}
-	}
-
-	return (
-		<div className="member_card">
-			<p>{ name }</p>
-			<div className="member_status">
-				{ hasRights && id !== me && !site_admin &&<>
-					{ owner && <i className="fas fa-crown" /> }
-					{ !owner && <>
-						<i className={ `fas fa-shield-alt ${ adminState } ` + ((adminState === "inactive") || (me === ownerID) ? `action good ` : "") } onClick={ () => adminUpdate(adminState) } />
-						<i className={ `fas fa-user-slash action bad ${ bannedState }` } onClick={ () => banUpdate(bannedState) } />
-						<i className={ `fas fa-comment-slash action bad ${ mutedState }` } onClick={ () => muteUpadte(mutedState) } />
-					</>}
-				</>}
-				{ (!hasRights || id === me) && <>
-					{ owner && <i className="fas fa-crown" /> }
-					{ !owner && (adminState ==="active") && <i className={ `fas fa-shield-alt` } /> }
-					{ !owner &&  (bannedState ==="active") && <i className={ `fas fa-user-slash` } /> }
-					{ !owner && (mutedState ==="active") && <i className={ `fas fa-comment-slash` } /> }
-				</>}
-				{ site_admin && <i className="fas fa-user-shield" /> }
-			</div>
-		</div>
-	)
-}
+import { MemberCard, BannedCard } from './ChannelAdminMemberCard';
 
 type EditPasswordProps = {
 	password: string,
@@ -361,6 +145,7 @@ export function ChannelAdmin () {
 	const [ displayEditPassword, setDisplayEditPassword ] = useState(false);
 	const [ password, setPassword ] = useState("");
 	const [ displayAddMember, setDisplayAddMember ] = useState(false);
+	const [ error, setError ] = useState<string>("");
 	
 	useEffect(() => {
 		if (channel)
@@ -383,7 +168,7 @@ export function ChannelAdmin () {
 					});
 				})
 				// console.log(memb);
-				memb.sort((a:Member, b:Member) => {
+				memb.sort((a:any, b:any) => {
 					if (a.owner || b.owner)
 						return (1)
 					if ((a.admin || a.site_admin) && (b.admin || b.site_admin))
@@ -489,6 +274,11 @@ export function ChannelAdmin () {
 				<i className="fas fa-user-friends"></i> { name }
 				<p>{ description }</p>
 			</div>
+			{ error !== "" && 
+				<div id="error">
+					<i className="fas fa-exclamation-triangle" /> { error }<i className="fas fa-times" onClick={ () => setError("") }/>
+				</div>
+			}
 			<div id="info_members" style={ channel?.type === 3 ? {"marginTop": "30px"} : {} }>
 				<i className="fas fa-info-circle"></i>
 				<div>
@@ -507,14 +297,30 @@ export function ChannelAdmin () {
 					{ list[0] === "members" && 
 					<div className="member_list">
 						{ members
-							? members.map((m:any) => <MemberCard key={ m.id } hasRights={ hasRights} member={ m } channelID={ channel?.id } ownerID={ ownerID } setRefresh={ setRefresh } refresh={ refresh }/>)
+							? members.map((m:any) => 
+								<MemberCard 
+									key={ m.id }
+									hasRights={ hasRights}
+									member={ m }
+									channelID={ channel?.id }
+									ownerID={ ownerID }
+									setRefresh={ setRefresh }
+									refresh={ refresh }
+									setError={ setError }/>)
 							: <p>Loading ...</p> }
 					</div> }
 					{ hasRights && list[0] === "banned" && 
 					<div className="member_list" id="banned_list">
 						{ banned
 							? ( banned.length !== 0 ? 
-								banned.map((m:any) => <BannedCard key={ m.id } banMember={ m } setRefresh={ setRefresh } refresh={ refresh } channelID={ channel?.id }/>) 
+								banned.map((m:any) => 
+									<BannedCard
+										key={ m.id }
+										banMember={ m }
+										setRefresh={ setRefresh }
+										refresh={ refresh }
+										channelID={ channel?.id }
+										setError={ setError }/>) 
 								: <p>No banned user</p> )
 							: <p>Loading ...</p> }
 					</div> }
