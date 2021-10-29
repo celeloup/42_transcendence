@@ -1,28 +1,11 @@
 import { useContext, useEffect } from 'react';
 import WindowBorder from '../ui_components/WindowBorder';
-import { GameContext, ContextType } from '../../contexts/GameContext';
+// import { GameContext, ContextType } from '../../contexts/GameContext';
 import { AuthContext, ContextType as AuthContextType} from '../../contexts/AuthContext';
-import '../../styles/Game.scss';
+import '../../styles/game/Game.scss';
 import Landing from './Landing';
 import GameCreation from './GameCreation';
 import Pong from './Pong';
-
-
-// type GameSettings = {
-// 	friendly: boolean, 
-// 	user1_id: number,
-// 	user2_id: number,
-// 	score_user1: number,
-// 	score_user2: number,
-// 	winner?: number,
-// 	createDate: any
-// }
-
-// type RoundSettings = {
-// 	id_player1: number
-// }
-
-
 
 function Game() {
 	var { toDisplay, setToDisplay } = useContext(AuthContext) as AuthContextType;
@@ -31,7 +14,7 @@ function Game() {
 		() => {
 		  setToDisplay("false");
 		},
-		[]);
+	[setToDisplay]);
 	
 	// const matchmaking = () => {
 	// 	socket.emit('match_player');

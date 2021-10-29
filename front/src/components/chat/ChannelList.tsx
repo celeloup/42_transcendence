@@ -5,7 +5,6 @@ import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
 import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
 import CreateChan from './CreateChan';
 import React from 'react';
-import { isBlock } from 'typescript';
 
 type ChannelCategoryProps = {
 	channelList: any,
@@ -89,16 +88,6 @@ function ChannelCategory({ channelList, type, search, setDisplayCreateChan } : C
 	)
 }
 
-function IsBlocked(blocked:any[], members:any[])
-{
-	members.forEach(m => {
-		var test = blocked.some((block:any) => block.id === m.id) ? true : false;
-		if (test)
-			return (true);
-	});
-	return false;
-}
-
 function ChannelList () {
 	const [ channels, setChannels ] = useState<any[]>([]);
 	const [ isLoading, setIsLoading ] = useState(true);
@@ -130,6 +119,8 @@ function ChannelList () {
 						return (true);
 					else if (c.type === 2 && c.password !== "")
 						return (c.members.some((mem:any) => mem.id === user?.id) ? false : true)
+					else
+						return (false);
 				});
 				// Get channels user is already in
 				axios.get(`/users/channels/${ user?.id }`)
@@ -151,7 +142,7 @@ function ChannelList () {
 		.catch (err => {
 			console.log("Error:", err);
 		})
-	}, []);
+	}, []); // eslint-disable-line
 
 	var publicChans = channels.filter((chan:any) => chan.type === 1);
 	var privateChans = channels.filter((chan:any) => chan.type === 2);
@@ -162,6 +153,7 @@ function ChannelList () {
 			var ret = blockedUsers.every((b, i) => {
 				if (b.id === m.id)
 					return false;
+				return (true);
 			})
 			return (ret);
 		}

@@ -5,6 +5,7 @@ import { Arrow } from '../ui_components/Arrow';
 import { ToggleButton } from '../ui_components/ToggleButton';
 import { Speedometer } from '../ui_components/Speedometer';
 import axios from "axios";
+import '../../styles/game/Creation.scss';
 
 function GameCreation() {
 
@@ -14,7 +15,6 @@ function GameCreation() {
 	const [ speed, setSpeed ] = useState(1); // 0 slow, 1 normal, 2 fast
 	const [ map, setMap ] = useState(1); // 1 space, 2 mario (street fighter ? )
 	const [ boost, setBoost ] = useState(false);
-	
 
 	const create_game = () => {
 		axios.post('/matches', {
@@ -104,7 +104,7 @@ function GameCreation() {
 				</div>
 			</div>
 			<div id="create_game_button" onClick={ create_game }>CREATE GAME</div>
-			{/* <div>Send invitation</div> */}
+			<div>Send invitation</div>
 		</div>
 )}
 
