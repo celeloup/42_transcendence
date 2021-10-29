@@ -26,6 +26,8 @@ function SearchUser({ theme, list, select } : SearchUserProps) {
 				{ list.map((user:any) => {
 					if (user.name.includes(search))
 						return <div onClick={ () => pick(user.id) } key={ user.id } className={ selected === user.id ? "selected" : "" }>{ user.name }</div>
+					else
+						return <></>
 					} ) }
 			</div>
 		</div>
