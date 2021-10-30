@@ -1,8 +1,10 @@
+import Avatar from "../profile/Avatar";
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 type MessageProps = {
 	id: number,
+	online: boolean,
 	username: string,
 	message: string,
 	setBlockedUsers: (blocked:any) => void,
@@ -12,11 +14,12 @@ type MessageProps = {
 
 type CardProps = {
 	id: number,
+	online: boolean,
 	setDisplayCard: (set:boolean) => void,
 	setBlockedUsers: (blocked:any) => void
 }
 
-function ProfileCard( {id, setDisplayCard, setBlockedUsers }: CardProps) {
+function ProfileCard( {id, online, setDisplayCard, setBlockedUsers }: CardProps) {
 	const [ user, setUser ] = useState<any>(null);
 	const [ me, setMe ] = useState<any>(null);
 	const [ isFriend, setIsFriend ] = useState(false);
@@ -119,7 +122,7 @@ function ProfileCard( {id, setDisplayCard, setBlockedUsers }: CardProps) {
 		}
 	}
 
-	var myself = <div className="button" id="profile_button">See my profile</div>
+	var myself = <a href={"/profile/" + id}><div className="button" id="profile_button">See my profile</div></a>
 	var someone = <> 
 		<div className="flex">
 			<div className="button" onClick={ FriendUser }>
@@ -144,14 +147,24 @@ function ProfileCard( {id, setDisplayCard, setBlockedUsers }: CardProps) {
 	
 	return (
 		<div className="profile_card">
-			 <i className="fas fa-times close_icon" onClick={()=> setDisplayCard(false)}> </i> 
+			<i className="fas fa-times close_icon" onClick={()=> setDisplayCard(false)}> </i> 
 			{ user && me && <>
-				<div className="profile_pic">
-					{ user.name.charAt(0) }
-					<div className="user_status online"></div>
+				<div>
+					<a href={"/profile/" + user.id}>
+						<Avatar size={"medium"} id={id} />
+						<div className={"user_status " + ( online ? "online" : "offline" )}></div>
+					</a>
+					<div>
+						<a href={"/profile/" + user.id}>
+							<div className="username">
+								{ user.name }
+							</div>
+						</a>
+						<div className="stats_profile_card">
+							 { user.victories } victories | { user.defeats } defeats
+						</div>
+					</div>
 				</div>
-				<div className="username">{ user.name }</div>
-				<div className="stats_profile_card"> { user.victories } victories | { user.defeats } defeat</div>
 				{ user.id === me.id ? myself : someone }
 			</>}
 			{ !user && <span>Loading...</span> }
@@ -159,9 +172,15 @@ function ProfileCard( {id, setDisplayCard, setBlockedUsers }: CardProps) {
 	)
 }
 
-export function Message ({ id, username, message, setBlockedUsers, blocked }: MessageProps) {
-	
+export function Message ({ id, online, username, message, setBlockedUsers, blocked }: MessageProps) {
 	const [ displayCard, setDisplayCard ] = useState(false);
+	const [ hasAvatar, setHasAvatar ] = useState<boolean>(false);
+
+	useEffect(() => {
+		axios.get("/users/infos/" + id)
+		.then( response => { setHasAvatar(response.data.avatar !== null); })
+		.catch( error => { console.log(error); })
+	}, [id]);
 	
 	const closeCard = (event: any) => {
 		const id = event.target.id;
@@ -173,8 +192,9 @@ export function Message ({ id, username, message, setBlockedUsers, blocked }: Me
 
 	return (
 		<div className={ blocked ? "chat_message blocked" : "chat_message" }>
-			<div className="profile_pic" onClick={ () => setDisplayCard(true)}>
-				{ username.charAt(0) }
+			<div className="pic" onClick={ () => setDisplayCard(true)}>
+				<Avatar size={"small"} id={id}/>
+				<div className={"user_status " + ( online ? "online" : "offline" )}></div>
 			</div>
 			<div className="content">
 				<div className="username" onClick={ () => setDisplayCard(true)}>{ username }</div>
@@ -182,7 +202,7 @@ export function Message ({ id, username, message, setBlockedUsers, blocked }: Me
 			</div>
 			{ displayCard &&
 				<div id="card_modal" onClick={ closeCard }>
-					<ProfileCard id={ id } setDisplayCard={ setDisplayCard } setBlockedUsers={ setBlockedUsers }/>
+					<ProfileCard id={ id } online={ online } setDisplayCard={ setDisplayCard } setBlockedUsers={ setBlockedUsers }/>
 				</div>
 			}
 		</div>

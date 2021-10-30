@@ -3,6 +3,7 @@ $text-color: white;
 $accent_color: #FFCD27;
 $light-gray: #E3E3E3;
 $dark-gray: #919191;
+$profile-gray: #3E3E3E;
 $green: #81A439;
 
 #chat
@@ -80,21 +81,27 @@ $green: #81A439;
 	display: flex;
 	padding: 10px 10px 15px 15px;
 	justify-content: space-around;
-	
-	.profile_pic {
-		width: 30px;
-		height: 30px;
-		background-color: $light-gray;
-		border: 2px solid white;
-		border-radius: 6px;
-		margin-right: -15px;
-		margin-top: 0px;
-		color: $dark-gray;
-		font-family: "Dogica", "Fira Mono";
-		font-size: 30px;
-		padding: 5px;
-		user-select: none;
+
+	.pic {
+		height: 50px;
 		cursor: pointer;
+
+		.user_status {
+			position: relative;
+			bottom: 8px;
+			right: -38px;
+			width: 15px;
+			height: 15px;
+			border-radius: 50%;
+
+			&.offline {
+				background-color: $dark-gray;
+			}
+
+			&.online {
+				background-color: $green;
+			}
+		}
 	}
 
 	.content {
@@ -118,21 +125,22 @@ $green: #81A439;
 		margin-top: 3px;
 		overflow-wrap: break-word;
 	}
+
+	&.blocked {
+		.username, .text{
+			color: $dark-gray;
+		}
+		.text {
+			font-size: 14px;
+		}
+		.text i {
+			margin-right: 5px;
+		}
+	}
 }
 
-.chat_message.blocked {
-	.username, .text{
-		color: $dark-gray;
-	}
-	.text {
-		font-size: 14px;
-	}
-	.text i {
-		margin-right: 5px;
-	}
-}
 
-// ********** CHAT INPUT
+//********** CHAT INPUT
 
 #chat_input {
 	height: 46px;
@@ -190,6 +198,7 @@ $green: #81A439;
 	left:0;
 	width: 370px;
 	height: 570px;
+	z-index: 1;
 }
 
 .profile_card {
@@ -214,65 +223,67 @@ $green: #81A439;
 		cursor: pointer;
 	}
 
-	.profile_pic {
-		width: 40px;
-		height: 40px;
-		background-color: $light-gray;
-		border: 2px solid white;
-		border-radius: 6px;
-		color: $dark-gray;
-		font-family: "Dogica", "Fira Mono";
-		font-size: 38px;
-		text-align: center;
-		padding: 5px;
-		user-select: none;
-		cursor: pointer;
-		float: left;
-		position: relative;
-		
-		.user_status {
-			position: absolute;
-			bottom: -5px;
-			right: -5px;
-			width: 15px;
-			height: 15px;
-			border-radius: 50%;
+	div {
+		display: flex;
+		flex-direction: row;
+
+		a {
+			height: 60px;
+
+			.user_status {
+				position: relative;
+				bottom: 8px;
+				right: -48px; // only change compared to above
+				width: 15px;
+				height: 15px;
+				border-radius: 50%;
+	
+				&.offline {
+					background-color: $dark-gray;
+				}
+	
+				&.online {
+					background-color: $green;
+				}
+			}
 		}
 
-		.offline {
-			background-color: $dark-gray;
+		div {
+			display: flex;
+			flex-direction: column;
+
+			a {
+				height: 30px;
+
+				.username {
+					font-family: "Dogica";
+					color: $background-color !important;
+					display: inline-block;
+					text-align: left;
+					margin: 5px;
+					position: relative;
+					font-size: 23px;
+					margin-bottom: 5px;
+					cursor: pointer;
+					width: 200px;
+					height: 25px;
+					overflow: hidden;
+					white-space: nowrap;
+					text-overflow: ellipsis;
+				
+					&:hover {
+						text-decoration: underline;
+					}
+				}
+			}
+
+			.stats_profile_card {
+				display: block;
+				font-size: 13px;
+				text-align: center;
+				margin: 5px;
+			}
 		}
-
-		.online {
-			background-color: $green;
-		}
-	}
-
-	.username {
-		font-family: "Dogica";
-		color: $background-color !important;
-		display: inline-block;
-		text-align: left;
-		margin: 6px 0 5px 28px;
-		position: relative;
-		font-size: 23px;
-		margin-bottom: 5px;
-		cursor: pointer;
-		width: 200px;
-		overflow: hidden;
-		white-space: nowrap;
-		text-overflow: ellipsis;
-	}
-
-	.username:hover {
-		text-decoration: underline;
-	}
-
-	.stats_profile_card {
-		display: block;
-		font-size: 13px;
-		text-align: left;
-		margin-left: 70px;
 	}
 	
 	.flex {
@@ -283,6 +294,7 @@ $green: #81A439;
 	}
 
 	.button {
+		display: block;
 		float: clear;
 		background-color: white;
 		width: 100%;
@@ -291,13 +303,15 @@ $green: #81A439;
 		border-radius: 5px;
 		font-size: 15px;
 		cursor: pointer;
+		color: black;
+
+		&:hover {
+			transform: scale(1.05);
+		}
+
 		i {
 			margin-right: 10px;
 		}
-	}
-	
-	.button:hover {
-		transform: scale(1.05);
 	}
 
 	#challenge_button {

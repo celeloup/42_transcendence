@@ -1,4 +1,5 @@
 import WindowBorder from "../ui_components/WindowBorder";
+import Avatar from "./Avatar"
 import React, { useEffect } from "react";
 import axios from "axios";
 import Sabers from '../../assets/img/sabers.svg';
@@ -23,7 +24,6 @@ type MatchType = {
 type Player = {
     id: number;
     name: string;
-    hasAvatar: boolean;
     score: number;
     winner: boolean;
 }
@@ -44,14 +44,12 @@ function Match ( { data, my_id, focus, setFocus } : MatchProps ) {
     const [player1, setPlayer1] = React.useState<Player>({
         id: data.user1_id,
         name: "",
-        hasAvatar: false,
         score: data.score_user1,
         winner: data.winner === data.user1_id
     });
     const [player2, setPlayer2] = React.useState<Player>({
         id: data.user2_id,
         name: "",
-        hasAvatar: false,
         score: data.score_user2,
         winner: data.winner === data.user2_id
     });
@@ -60,7 +58,6 @@ function Match ( { data, my_id, focus, setFocus } : MatchProps ) {
         axios.get("/users/infos/" + data.user1_id)
 		.then(response => { setPlayer1({ id: data.user1_id,
                                         name: response.data.name,
-                                        hasAvatar: response.data.avatar !== null,
                                         score: data.score_user1,
                                         winner: data.winner === data.user1_id
                                     });
@@ -70,7 +67,6 @@ function Match ( { data, my_id, focus, setFocus } : MatchProps ) {
 		axios.get("/users/infos/" + data.user2_id)
 		.then(response => { setPlayer2({ id: data.user2_id,
                                         name: response.data.name,
-                                        hasAvatar: response.data.avatar !== null,
                                         score: data.score_user2,
                                         winner: data.winner === data.user2_id
                                     });
@@ -94,10 +90,7 @@ function Match ( { data, my_id, focus, setFocus } : MatchProps ) {
     return (
         <div className={"match_wrapper" + ( focus ? "_focus" : "" )} onClick={() => { setFocus(data.id); }}>
             <div className="match_info">
-                <div className="profile_display">
-                    <span>{ me.name.charAt(0) }</span>
-                    { me.hasAvatar && <img src={ process.env.REACT_APP_BACK_URL + "/api/users/avatar/" + me.id } alt="user avatar"/> }
-                </div>
+                <Avatar size={"medium"} id={me.id}/>
                 <div className="name_display">
                     { me.winner && <i className="fas fa-crown"></i>}
                     <span>{ me.name }</span>
@@ -115,10 +108,7 @@ function Match ( { data, my_id, focus, setFocus } : MatchProps ) {
                     { them.winner && <i className="fas fa-crown"></i>}
                     <span>{ them.name }</span>
                 </div>
-                <div className="profile_display">
-                    <span>{ them.name.charAt(0) }</span>
-                    { them.hasAvatar && <img src={ process.env.REACT_APP_BACK_URL + "/api/users/avatar/" + them.id } alt="user avatar"/> }
-                </div>
+                <Avatar size={"medium"} id={them.id}/>
             </div>
             { focus && 
                 <div className="match_focus">

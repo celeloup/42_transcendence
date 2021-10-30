@@ -33,22 +33,6 @@ $darker-gray: #3E3E3E;
 	border-radius: 5px 5px 0px 0px;
 }
 
-.pic_base {
-	position: relative;
-	top: -19px;
-	width: 231px;
-	height: 230px;
-	background-color: $darker-gray;
-	color: white;
-	font-family: "Dogica", "Fira Mono";
-	font-size: 200px;
-}
-
-.pic_base_text {
-	position: relative;
-	top: 20px;
-}
-
 .pic_input {
 	position: absolute;
 	top: -1px;
@@ -58,10 +42,30 @@ $darker-gray: #3E3E3E;
 	cursor: pointer;
 	user-select: none;
 	color: transparent;
+
+	&::file-selector-button {
+		visibility: hidden;
+	}
 }
 
-.pic_input::-webkit-file-upload-button {
-	visibility: hidden;
+.pic_base_text {
+	position: relative;
+	top: -20px;
+	width: 231px;
+	height: 231px;
+	background-color: $darker-gray;
+	color: white;
+	font-family: "Dogica", "Fira Mono";
+	font-size: 180px;
+
+	span {
+		position: relative;
+		top: 30px;
+
+		@supports (-moz-appearance:none) {
+			top: -20px;
+		}
+	}
 }
 
 .pic_pencil {

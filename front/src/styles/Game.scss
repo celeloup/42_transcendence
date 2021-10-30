@@ -245,6 +245,10 @@ $green: #81A439;
 		font-size: 25px;
 		font-family: "Dogica";
 		font-weight: bold;
+
+		&::selection {
+			color: $background-color;
+		}
 	}
 }
 
