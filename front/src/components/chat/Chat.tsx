@@ -6,7 +6,8 @@ import { Message } from './Message';
 import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
 import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
 import { io } from "socket.io-client";
-import '../../styles/Chat/Chat.scss';
+import '../../styles/chat/Chat.scss';
+
 import axios from 'axios';
 
 type BanPopUpProps = {
