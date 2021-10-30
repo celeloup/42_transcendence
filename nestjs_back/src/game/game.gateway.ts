@@ -67,7 +67,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		@MessageBody() room: number,
 		@ConnectedSocket() client: Socket,
 	) {
-		this.gameService.leaveRoom(room.toString(), client);
+		this.gameService.leaveRoom(room.toString(), client, true);
 	}
 
 	//envoie une invation pour jouer a un user

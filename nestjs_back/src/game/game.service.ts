@@ -82,7 +82,7 @@ export default class GameService {
             server.in(idGame).emit('cancel_game', idGame);
             return 1;
         }
-        server.in(idGame).emit('game_starting', idGame);
+        server.in(idGame).emit('game_starting', idGame, param.map);
         
         //on ajoute les joueurs a la liste des users en cours de jeu et on attend laisse une pause avant de lancer la partie;
         inGame.push(param.id_player1);
