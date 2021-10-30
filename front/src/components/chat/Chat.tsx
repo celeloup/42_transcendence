@@ -4,6 +4,7 @@ import ChannelList from '../chat/ChannelList';
 import { ChannelAdmin } from './ChannelAdmin';
 import { Message } from './Message';
 import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
+import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
 import { io } from "socket.io-client";
 import '../../styles/Chat.scss';
 import axios from 'axios';
@@ -29,6 +30,8 @@ export function Chat() {
 	const [ msgIsLoading, setMsgIsLoading ] = useState(false);
 	const [ blockedUsers, setBlockedUsers ] = useState<any[]>([]);
 	var { displayList, displayAdmin, channel, socket, setSocket } = useContext(ChannelContext) as ContextType;
+	const { masterSocket } = useContext(AuthContext) as AuthContextType;
+	const [ usersOnline, setUsersOnline ] = useState<any[]>([]);
 	
 	// ---------- SOCKETS
 	useEffect(() : ReturnType<EffectCallback> => {
@@ -43,6 +46,12 @@ export function Chat() {
 			setMessages(oldArray => [...oldArray, data]);
 		})
 	}, [socket])
+
+	// ---------- USERS ONLINE
+	useEffect(() => {
+		masterSocket.emit("get_users");
+		masterSocket?.on("connected_users", (data : any) => { setUsersOnline(data); });
+	}, [masterSocket]);
 	
 	
 	// ---------- GET MESSAGES
@@ -106,6 +115,7 @@ export function Chat() {
 			<Message 
 			key={ mes.id }
 			id={ mes.author.id }
+			online={ usersOnline.includes(mes.author.id) }
 			username={ mes.author.name }
 			message={ mes.content }
 			setBlockedUsers={ setBlockedUsers }

@@ -40,12 +40,20 @@ $accent_color: #FFCD27;
 .border_top, .border_bottom {
 	height: 4px;
 	width: 100%;
+
+	&.double {
+		height: 8px;
+	}
 }
 
 .border_right, .border_left {
 	height: 100%;
 	width: 4px;
 	top: 0px;
+
+	&.double {
+		width: 8px;
+	}
 }
 
 .border_bottom {
@@ -95,7 +103,7 @@ $accent_color: #FFCD27;
 	width: 4px;
 	height: 4px;
 	left: -4px;
-	top: -4px;
+	top: 0px;
 	z-index: 2;
 }
 
@@ -106,7 +114,7 @@ $accent_color: #FFCD27;
 	width: 4px;
 	height: 4px;
 	right: -4px;
-	top: -4px;
+	top: 0px;
 	z-index: 2;
 }
 

@@ -127,6 +127,18 @@ $red: #BF3030;
 		&:hover {
 			background-color: $accent_color;
 			color: $background-color;
+
+			a {
+				color: black;
+			}
+		}
+
+		a {
+			color: white;
+
+			&:hover {
+				text-decoration: underline;
+			}
 		}
 
 		.member_status i {

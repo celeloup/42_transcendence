@@ -22,7 +22,9 @@ function MemberCard ( { member, channel } : MemberCardProps) {
 
 	return (
 		<div className="member_card">
-			{ name }
+			<a href={ "/profile/" + id }>
+				{ name }
+			</a>
 			<div className="member_status">
 				{ owner && <i className="fas fa-crown"></i> }
 				{ !owner && <i className={ `fas fa-shield-alt action good ${ admin }` }></i> }
@@ -43,7 +45,7 @@ export function ChannelAdmin () {
 		{
 			axios.get(`/channel/infos/${ channel.id }`)
 			.then( res => {
-				// console.log("RES chan infos", res);
+				console.log("RES chan infos", res);
 				setChan(res.data);
 			})
 			.catch (err => {
@@ -63,7 +65,8 @@ export function ChannelAdmin () {
 			<i className="fas fa-times close_icon" onClick={ toggleDisplayAdmin }></i>
 			<div id="name_description">
 				<i className="fas fa-user-friends"></i> { channel?.name }
-				<p>This channel is public. Everyone can join it.</p>
+				{ chan && chan.type === 1 && <p>This channel is public. Everyone can join it.</p> }
+				{ chan && chan.type === 2 && <p>This channel is private. Only users with the password can join it.</p> }
 			</div>
 			<div id="info_members">
 				<i className="fas fa-info-circle"></i>
