@@ -5,6 +5,8 @@ import p5Types from "p5";
 import Sketch from "react-p5";
 import '../../styles/game/Pong.scss';
 
+import Coin from '../../assets/img/coin.png';
+
 type Paddle = {
 	is_left: boolean,
 	x: number,
@@ -50,19 +52,52 @@ function NoPendingGame() {
 	)
 }
 
+// function Space() {
+
+// }
+
+type MarioProps = {
+	p1: string,
+	p2: string,
+	scoreP1: number,
+	scoreP2: number
+}
+
+function Mario({ p1, p2, scoreP1, scoreP2 }: MarioProps) {
+	return (
+		<div className="game_background" id="mario">
+			<div id="p1">
+				<span className="name">{ p1 }</span>
+				<img src={ Coin } alt="Coin from Mario."/>
+				<span >x{ scoreP1 < 10 ? "0" + scoreP1 : scoreP1 }</span>
+			</div>
+			<div id="p2">
+				<img src={ Coin } alt="Coin from Mario."/>
+				<span>x{ scoreP2 < 10 ? "0" + scoreP2 : scoreP2 }</span>
+				<span className="name">{ p2 }</span>
+			</div>
+		</div>
+	)
+}
+
+// function StreetFighter() {
+
+// }
+
 function Pong() {
 	const height: number = 626;
 	const width: number = 782;
 	const paddle_margin: number = 10;
 
-	var { masterSocket, setToDisplay } = useContext(AuthContext) as AuthContextType;
-	var { matchID, setMatchID, setMatch, match } = useContext(GameContext) as ContextType;
+	let { masterSocket, setToDisplay } = useContext(AuthContext) as AuthContextType;
+	let { matchID, setMatchID, setMatch, match } = useContext(GameContext) as ContextType;
 
 	// GAME OBJECTS
 	const [ puck, setPuck ] = useState<Puck>({ x: width / 2, y: height/ 2, r: 12, boost_activated: [] });
 	const [ paddleRight, setPaddleRight ] = useState<Paddle>({ is_left: false, x: width - paddle_margin - 20 / 2, y: height / 2, w: 20, h: 80, indice:0 });
 	const [ paddleLeft, setPaddleLeft ] = useState<Paddle>({ is_left: true, x: paddle_margin + 20 / 2, y: height / 2, w: 20, h: 80, indice:0 });
 	const [ score, setScore ] = useState<number[]>([0, 0]);
+	const [ map, setMap ] = useState<number>(2);
 
 	// GAME POPUP
 	const [ endScreen, setEndScreen ] = useState<boolean>(false);
@@ -70,7 +105,7 @@ function Pong() {
 	const [ waiting, setWaiting ] = useState<boolean>(true);
 	
 	useEffect(() => {
-		var id:number;
+		let id:number;
 		masterSocket?.on('game_starting', (data:any) => {
 			// console.log("game starting !", data);
 			setMatchID(data);
@@ -84,6 +119,7 @@ function Pong() {
 			setPaddleLeft(data.paddle_player1);
 			setPaddleRight(data.paddle_player2);
 			setScore([data.score_player1, data.score_player2]);
+			setMap(data.map);
 		});
 
 		masterSocket?.on('finish_game', (data:any) => {
@@ -94,11 +130,11 @@ function Pong() {
 		
 		masterSocket?.on('interrupted_game', (data:any) => {
 			setEndScreen(true);
-			alert("game interrupted !");
+			// alert("game interrupted !");
 			// console.log("game interrupted !");
 		});
 
-		var nopending = false;
+		let nopending = false;
 
 		masterSocket?.on('no_pending_game', (data:any) => {
 			setNoPending(true);
@@ -119,13 +155,20 @@ function Pong() {
 	
 	// ------------- CANVAS
 	function separation(p5: p5Types) {
-		let wd = 5;
-		let hd = 20;
-		for (let it = 15; it < height; it += 35)
-		{
-			p5.fill(255);
-			p5.rect(width / 2, it, wd, hd);
-		}
+		// let wd = 6;
+		// let hd = 20;
+		// for (let it = 15; it < height; it += 35)
+		// {
+		// 	p5.fill(255);
+		// 	p5.rect(width / 2, it, wd, hd);
+		// }
+		// let wd = 8;
+		// let hd = 30;
+		// for (let it = 40; it < height; it += 55)
+		// {
+		// 	p5.fill(255);
+		// 	p5.rect(width / 2, it, wd, hd);
+		// }
 	}
 
 	const setup = (p5: p5Types, canvasParentRef: Element) => {
@@ -135,7 +178,12 @@ function Pong() {
 	};
 
 	const draw = (p5: p5Types) => {
-		p5.background('#232323');
+		// p5.background('#232323');
+		if (map === 2)
+			p5.strokeWeight(2.3);
+		else
+			p5.noStroke();
+		p5.clear();
 		separation(p5);
 		p5.ellipse(puck.x, puck.y, puck.r * 2, puck.r * 2);
 		p5.fill(255,0,0);
@@ -148,21 +196,17 @@ function Pong() {
 	};
 
 	const keyPressed = (p5: p5Types) => {
-        if (p5.key === "ArrowUp") {
-            // console.log("up", matchID);
+        if (p5.key === "ArrowUp" && !waiting) {
             masterSocket.emit('paddle_movement', { id_game: matchID, move: "up"})
-        } else if (p5.key === "ArrowDown") {
-            // console.log("down", matchID);
+        } else if (p5.key === "ArrowDown" && !waiting) {
             masterSocket.emit('paddle_movement', { id_game: matchID, move: "down"})
         }
     };
 
     const keyReleased = (p5: p5Types) => {
-        if (p5.key === "ArrowUp") {
-            // console.log("up", matchID);
+        if (p5.key === "ArrowUp" && !waiting) {
             masterSocket.emit('paddle_movement', { id_game: matchID, move: "stop"})
-        } else if (p5.key === "ArrowDown") {
-            // console.log("down", matchID);
+        } else if (p5.key === "ArrowDown" && !waiting) {
             masterSocket.emit('paddle_movement', { id_game: matchID, move: "stop"})
 		}
 	};
@@ -176,7 +220,8 @@ function Pong() {
 			</div>
 			{ endScreen && <EndScreen score1={score[0]} score2={score[1]}/> }
 			{ noPending && <NoPendingGame /> }
-			{ !noPending && !waiting && <Sketch setup={ setup } draw={ draw } keyPressed={ keyPressed } keyReleased={ keyReleased }/> }
+			{ map === 2 && <Mario p1="mario" p2="luigi" scoreP1={score[0]} scoreP2={score[1]}/>}
+			{ !noPending && <Sketch setup={ setup } draw={ draw } keyPressed={ keyPressed } keyReleased={ keyReleased }/> }
 			{ waiting && !noPending && <div id="waiting">
 				<i className="fas fa-spinner" />
 				<p>Waiting for a second player ...</p>

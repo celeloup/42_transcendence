@@ -2,7 +2,7 @@ import { useEffect, useContext, useState } from 'react';
 import axios from 'axios';
 import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
 import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
-import '../../styles/Chat/ChatAdmin.scss';
+import '../../styles/chat/ChatAdmin.scss';
 import SearchUser from 'components/ui_components/SearchUser';
 import { MemberCard, BannedCard } from './ChannelAdminMemberCard';
 

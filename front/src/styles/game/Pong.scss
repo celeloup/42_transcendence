@@ -71,6 +71,43 @@ $green: #81A439;
 		margin-top: 200px;
 	}
 
+	.game_background {
+		position: absolute;
+		height: 632px;
+		width: 790px;
+		top: 42px;
+		left: -4px;
+		z-index: -1;
+		background-size: 100%;
+		background-repeat: no-repeat;
+		background-position: 65% 50% ;
+
+		&#mario {
+			background-image: url(../../assets/img/mario_bg.jpeg);
+			display: flex;
+			justify-content: space-between;
+
+			#p1, #p2{
+				margin: 20px;
+				font-family: "Dogica";
+				font-size: 18px;
+				display: flex;
+				align-content: center;
+
+				img {
+					height: 18px;
+					margin: 0 5px;
+				}
+			}
+
+			.name {
+				text-transform: uppercase;
+				font-weight: 600;
+				margin: 0 20px;
+			}
+		}
+	}
+
 	.fa-spinner {
 		font-size: 56px;
 		margin: 20px;
