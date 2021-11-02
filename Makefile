@@ -5,7 +5,7 @@ all: up logs
 
 up:
 	#if [ -d "postgres_data" ]; then mkdir postgres_data; fi
-	$(DC) --project-name $(NAME) up --detach
+	$(DC) --project-name $(NAME) up -d
 logs:
 	$(DC) --project-name $(NAME) logs --follow front back postgres
 front.logs:

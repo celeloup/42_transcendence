@@ -106,6 +106,12 @@ $green: #81A439;
 				margin: 0 20px;
 			}
 		}
+
+		&#street {
+			background-image: url(../../assets/img/street_fighter_bg.jpeg);
+			background-size: cover;
+			background-position: 20% 20%;
+		}
 	}
 
 	.fa-spinner {
