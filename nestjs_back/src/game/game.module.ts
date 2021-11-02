@@ -7,7 +7,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import Match from "src/matches/match.entity";
 
 @Module({
-	imports: [AuthenticationModule, MatchesModule, TypeOrmModule.forFeature([Match]),],
+	imports: [AuthenticationModule, MatchesModule],
 	providers: [GameGateway, GameService],
 })
 export default class GameModule {}

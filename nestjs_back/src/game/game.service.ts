@@ -3,22 +3,17 @@ import Round from './class/round.class';
 import { Server, Socket } from 'socket.io';
 import Match from 'src/matches/match.entity';
 import MatchService from '../matches/matches.service';
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
 
 @Injectable()
 export default class GameService {
 
     constructor(
-        private readonly matchService: MatchService,
-        @InjectRepository(Match)
-        private matchesRepository: Repository<Match>
+        private readonly matchService: MatchService
     ) { }
     private logger: Logger = new Logger("GameService");
 
     private usersRoom: Map<Socket, string> = new Map();
     private currentGames: Map<number, Round> = new Map();
-    // private currentGames: Round[] = [];
     private playingUsers: number[] = [];
 
     getCurrentGames() {
@@ -76,17 +71,6 @@ export default class GameService {
         this.currentGames.delete(match.id);
     }
 
-    // RoundToMatch(match: & Match, param: Round) {
-    //     match.id = Number(param.id_game);
-    //     match.friendly = param.friendly;
-    //     match.user1_id = param.id_player1;
-    //     match.user2_id = param.id_player2;
-    //     match.goal = param.goal;
-    //     match.score_user1 = param.score_player1;
-    //     match.score_user2 = param.score_player2;
-    //     return match;
-    // }
-
     async startGame(server: Server, param: Round, users: Map<number, Socket>, inGame: Array<number>) {
         let idGame = param.id_game;
         let socketPlayer1 = users.get(param.id_player1);
@@ -117,9 +101,6 @@ export default class GameService {
         }
 
         if (param.victory != -1) {
-            // let match = await this.matchesRepository.findOne(param.id_game);
-            // match = await this.RoundToMatch(match, param);
-            // await this.matchService.weHaveAWinner(match);
             server.in(idGame).emit('finish_game', param);
             return 0;
         }
