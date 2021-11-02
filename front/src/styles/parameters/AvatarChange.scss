@@ -61,6 +61,7 @@ $darker-gray: #3E3E3E;
 	span {
 		position: relative;
 		top: 30px;
+		pointer-events: none;
 
 		@supports (-moz-appearance:none) {
 			top: -20px;

@@ -24,42 +24,6 @@ $green: #81A439;
 	width: 100%;
 }
 
-#landing_game {
-
-	.window_header i {
-		font-size: 22px;
-   		margin: -2px 10px 0 30px;
-	}
-
-	#game_start_buttons {
-		display: flex;
-		width: 100%;
-		justify-content: space-evenly;
-		margin: 50px 0;
-
-		div {
-			width: 250px;
-			height: 100px;
-			background-color: $accent_color;
-			color: $background-color;
-			cursor: pointer;
-			padding: 20px;
-
-			
-			&:hover {
-				transform: scale(1.1);
-			}
-		}
-	}
-
-	#current_game_list {
-		width: 80%;
-		height: 300px;
-		margin:auto;
-		background-color: gray;
-	}
-}
-
 #game_creation {
 
 	.back_button {

@@ -103,8 +103,12 @@ $accent_color: #FFCD27;
 	width: 4px;
 	height: 4px;
 	left: -4px;
-	top: 0px;
+	top: -4px;
 	z-index: 2;
+}
+
+.border_bottom.double:after {
+	top: 0px;
 }
 
 .border_bottom:before {
@@ -114,8 +118,12 @@ $accent_color: #FFCD27;
 	width: 4px;
 	height: 4px;
 	right: -4px;
-	top: 0px;
+	top: -4px;
 	z-index: 2;
+}
+
+.border_bottom.double:before {
+	top: 0px;
 }
 
 // ************ WINDOW HEADER
