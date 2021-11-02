@@ -9,6 +9,7 @@ export default class MuteUserDto {
     userId: number;
 
     @ApiProperty()
-    @IsNotEmpty()
+    @IsNotEmpty()   
+    @IsNumber()
     timeInMilliseconds: bigint;
 }

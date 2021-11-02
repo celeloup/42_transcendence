@@ -6,22 +6,19 @@ class Match {
   @PrimaryGeneratedColumn()
   public id: number;
 
-  @Column({default: true})
-  public friendly: boolean;
-
   @ManyToMany(() => User, (user: User) => user.matches)
   public users: User[];
 
-  @Column({nullable: true})
+  @Column({ nullable: true })
   public user1_id: number;
 
   @Column()
   public user2_id: number;
 
-  @Column({default: 0})
+  @Column({ default: 0 })
   public score_user1: number;
 
-  @Column({default: 0})
+  @Column({ default: 0 })
   public score_user2: number;
 
   @Column({ nullable: true })
@@ -33,10 +30,10 @@ class Match {
   @Column({ default: 10 })
   public goal: number;
 
-  @Column({nullable: true, default: false})
+  @Column({ nullable: true, default: false })
   public boost_available: boolean;
 
-  @Column({default: 1})
+  @Column({ default: 1 })
   public map: number;
 
   @CreateDateColumn()
