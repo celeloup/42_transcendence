@@ -5,7 +5,7 @@ import p5Types from "p5";
 import Sketch from "react-p5";
 import '../../styles/game/Pong.scss';
 
-import Coin from '../../assets/img/coin.png';
+import Coin from '../../assets/img/coin.svg';
 
 type Paddle = {
 	is_left: boolean,
@@ -73,6 +73,23 @@ function Mario({ p1, p2, scoreP1, scoreP2 }: MarioProps) {
 			</div>
 			<div id="p2">
 				<img src={ Coin } alt="Coin from Mario."/>
+				<span>x{ scoreP2 < 10 ? "0" + scoreP2 : scoreP2 }</span>
+				<span className="name">{ p2 }</span>
+			</div>
+		</div>
+	)
+}
+
+function Street({ p1, p2, scoreP1, scoreP2 }: MarioProps) {
+	return (
+		<div className="game_background" id="street">
+			<div id="p1">
+				<span className="name">{ p1 }</span>
+				
+				<span >x{ scoreP1 < 10 ? "0" + scoreP1 : scoreP1 }</span>
+			</div>
+			<div id="p2">
+				
 				<span>x{ scoreP2 < 10 ? "0" + scoreP2 : scoreP2 }</span>
 				<span className="name">{ p2 }</span>
 			</div>
@@ -175,14 +192,17 @@ function Pong() {
 		p5.rectMode(p5.CENTER);
 		p5.ellipseMode(p5.CENTER);
 		p5.createCanvas(width, height).parent(canvasParentRef);
-	};
-
-	const draw = (p5: p5Types) => {
-		// p5.background('#232323');
+		p5.disableFriendlyErrors = true;
 		if (map === 2)
 			p5.strokeWeight(2.3);
 		else
 			p5.noStroke();
+		p5.frameRate(50);
+	};
+
+	const draw = (p5: p5Types) => {
+		// p5.background('#232323');
+		
 		p5.clear();
 		separation(p5);
 		p5.ellipse(puck.x, puck.y, puck.r * 2, puck.r * 2);
@@ -221,6 +241,7 @@ function Pong() {
 			{ endScreen && <EndScreen score1={score[0]} score2={score[1]}/> }
 			{ noPending && <NoPendingGame /> }
 			{ map === 2 && <Mario p1="mario" p2="luigi" scoreP1={score[0]} scoreP2={score[1]}/>}
+			{ map === 3 && <Street p1="mario" p2="luigi" scoreP1={score[0]} scoreP2={score[1]}/>}
 			{ !noPending && <Sketch setup={ setup } draw={ draw } keyPressed={ keyPressed } keyReleased={ keyReleased }/> }
 			{ waiting && !noPending && <div id="waiting">
 				<i className="fas fa-spinner" />

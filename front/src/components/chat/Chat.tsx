@@ -25,6 +25,7 @@ function BanPopup({ channel, close } : BanPopUpProps) {
 	)
 }
 
+
 type AskPasswordProps = {
 	channel: string,
 	password: string,
