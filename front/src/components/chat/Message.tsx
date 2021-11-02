@@ -174,13 +174,6 @@ function ProfileCard( {id, online, setDisplayCard, setBlockedUsers }: CardProps)
 
 export function Message ({ id, online, username, message, setBlockedUsers, blocked }: MessageProps) {
 	const [ displayCard, setDisplayCard ] = useState(false);
-	const [ hasAvatar, setHasAvatar ] = useState<boolean>(false);
-
-	useEffect(() => {
-		axios.get("/users/infos/" + id)
-		.then( response => { setHasAvatar(response.data.avatar !== null); })
-		.catch( error => { console.log(error); })
-	}, [id]);
 	
 	const closeCard = (event: any) => {
 		const id = event.target.id;

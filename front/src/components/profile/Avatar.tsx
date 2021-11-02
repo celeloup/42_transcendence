@@ -15,11 +15,11 @@ function Avatar ({ size, id } : Props) {
         axios.get("/users/infos/" + id)
         .then( response => { setHasAvatar(response.data.avatar !== null); setUsername(response.data.name); } )
         .catch( error => { console.log(error.response); })
-	}, []);
+	}, [id]);
 
     return (
         <div className={"avatar " + size}>
-            { hasAvatar && <img src={ process.env.REACT_APP_BACK_URL + "/api/users/avatar/" + id } alt="user avatar"/> }
+            { hasAvatar && <img src={ process.env.REACT_APP_BACK_URL + "/api/users/avatar/" + id } alt="avtr"/> }
             { !hasAvatar && <span>{ username.charAt(0) }</span> }
         </div>
     )
