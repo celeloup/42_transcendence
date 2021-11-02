@@ -11,8 +11,7 @@ class muteObj {
 	@Column()
 	userId: number;
 
-
-	@Column({type: 'bigint'})
+	@Column()
 	silencedUntil: string;//date in milliseconds since 1970
 
 	@Type(() => Channel)

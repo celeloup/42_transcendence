@@ -19,6 +19,7 @@ export default class AchievementsController {
     if (!achievement) {
       throw new HttpException('Achievement with this id does not exist', HttpStatus.NOT_FOUND);
     }
+    return achievement;
   }
 
   @Post()

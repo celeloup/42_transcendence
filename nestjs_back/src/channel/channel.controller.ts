@@ -58,12 +58,21 @@ export default class ChannelController {
     return this.channelService.getAllInfosByChannelId(Number(id));
   }
 
+  @Get('nextunmutedate/:id')
+  @ApiOperation({summary: "Get next unmute date of a channel"})
+  @ApiParam({name: 'id', type: Number, description: 'channel id'})
+  getNextUnmuteDate(@Param() { id }: FindOneParams) {
+    return this.channelService.getNextUnmuteDate(Number(id));
+  }
+
   //Change for site admins at the end
   @Get('messages')
   @ApiOperation({summary: "Get all messages // open route for now; for site admins only in the end"})
   getAllMessages() {
     return this.channelService.getAllMessagesOfAllChannels();
   }
+
+
 
   @Post()
   @ApiOperation({ summary: "Create a channel with the authenticated user / 1 for public, 2 for private, 3 for MP" })
