@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useState, useContext, useEffect } from 'react';
 // import { AuthContext, ContextType as AuthContextType }  from '../../contexts/AuthContext';
-import '../../styles/Chat/CreateChan.scss';
+import '../../styles/chat/CreateChan.scss';
 import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
 import SearchUser from 'components/ui_components/SearchUser';
 
