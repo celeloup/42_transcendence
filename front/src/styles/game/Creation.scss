@@ -5,6 +5,25 @@ $light-gray: #E3E3E3;
 $dark-gray: #919191;
 $green: #81A439;
 
+// #game
+// {
+// 	.window_header {
+// 		margin-bottom: 4px;
+// 		display: flex;
+// 		align-content: center;
+// 		justify-content: left;
+// 		padding-top: 8px;
+// 		height: 30px
+// 	}
+// }
+
+// #game_window
+// {
+// 	display: inline-block;
+// 	height: 100%;
+// 	width: 100%;
+// }
+
 #game_creation {
 
 	.back_button {
@@ -228,5 +247,9 @@ $green: #81A439;
 		font-size: 25px;
 		font-family: "Dogica";
 		font-weight: bold;
+
+		&::selection {
+			color: $background-color;
+		}
 	}
 }

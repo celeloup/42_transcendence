@@ -9,7 +9,7 @@ import Fusibles from './Fusibles';
 import HistogramBar from '../../assets/img/histogram_bar.svg';
 import Squares from '../../assets/img/little_squares.svg';
 import Radar from '../../assets/img/radar.svg';
-import Temp from '../../assets/img/temp.svg';
+import Time from './Time';
 import Viseur from '../../assets/img/viseur.svg';
 
 type Props = {
@@ -22,7 +22,7 @@ function PageWrapper( { children }: Props) {
 		<>
 		{ isAuth && <header className="App-header">
 			<img className="square" src={ Squares } alt="Decoration (squares)"/>
-			<img className="temp" src={ Temp } alt="Decoration (squares)"/>
+			<Time />
 			<div id="logo_wrapper">
 				<Logo />
 				<img className="viseur" src={ Viseur } alt="Decoration (viseur)"/>

@@ -111,6 +111,21 @@ $green: #81A439;
 			background-image: url(../../assets/img/street_fighter_bg.jpeg);
 			background-size: cover;
 			background-position: 20% 20%;
+			#first_line, #last_line {
+				display: flex;
+				justify-content: space-between;
+			}
+
+			#last_line {
+				margin: 0 50px;
+			}
+
+			#p1, #p2{
+				margin: 15px 20px 20px 20px;
+				img:first-child{
+					margin-right: 50px;
+				}
+			}
 		}
 	}
 

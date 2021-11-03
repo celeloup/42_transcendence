@@ -83,15 +83,19 @@ function Mario({ p1, p2, scoreP1, scoreP2 }: MarioProps) {
 function Street({ p1, p2, scoreP1, scoreP2 }: MarioProps) {
 	return (
 		<div className="game_background" id="street">
-			<div id="p1">
-				<span className="name">{ p1 }</span>
-				
-				<span >x{ scoreP1 < 10 ? "0" + scoreP1 : scoreP1 }</span>
+			<div id="first_line">
+				<div id="p1">
+					<img src="https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-1P"/>
+					<img src="https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-00252"/>
+				</div>
+				<div id="p2">
+					<img src="https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-2P"/>
+					<img src="https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-00040"/>
+				</div>
 			</div>
-			<div id="p2">
-				
-				<span>x{ scoreP2 < 10 ? "0" + scoreP2 : scoreP2 }</span>
-				<span className="name">{ p2 }</span>
+			<div id="last_line">
+				<img className="name" src={"https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-" + p1.toUpperCase()}/>
+				<img className="name" src={"https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-" + p2.toUpperCase()}/>
 			</div>
 		</div>
 	)
@@ -114,7 +118,7 @@ function Pong() {
 	const [ paddleRight, setPaddleRight ] = useState<Paddle>({ is_left: false, x: width - paddle_margin - 20 / 2, y: height / 2, w: 20, h: 80, indice:0 });
 	const [ paddleLeft, setPaddleLeft ] = useState<Paddle>({ is_left: true, x: paddle_margin + 20 / 2, y: height / 2, w: 20, h: 80, indice:0 });
 	const [ score, setScore ] = useState<number[]>([0, 0]);
-	const [ map, setMap ] = useState<number>(2);
+	const [ map, setMap ] = useState<number>(3);
 
 	// GAME POPUP
 	const [ endScreen, setEndScreen ] = useState<boolean>(false);
@@ -193,7 +197,7 @@ function Pong() {
 		p5.ellipseMode(p5.CENTER);
 		p5.createCanvas(width, height).parent(canvasParentRef);
 		p5.disableFriendlyErrors = true;
-		if (map === 2)
+		if (map !== 1)
 			p5.strokeWeight(2.3);
 		else
 			p5.noStroke();

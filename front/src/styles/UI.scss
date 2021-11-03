@@ -40,12 +40,20 @@ $accent_color: #FFCD27;
 .border_top, .border_bottom {
 	height: 4px;
 	width: 100%;
+
+	&.double {
+		height: 8px;
+	}
 }
 
 .border_right, .border_left {
 	height: 100%;
 	width: 4px;
 	top: 0px;
+
+	&.double {
+		width: 8px;
+	}
 }
 
 .border_bottom {
@@ -99,6 +107,10 @@ $accent_color: #FFCD27;
 	z-index: 2;
 }
 
+.border_bottom.double:after {
+	top: 0px;
+}
+
 .border_bottom:before {
 	content: "";
 	position: absolute;
@@ -108,6 +120,10 @@ $accent_color: #FFCD27;
 	right: -4px;
 	top: -4px;
 	z-index: 2;
+}
+
+.border_bottom.double:before {
+	top: 0px;
 }
 
 // ************ WINDOW HEADER
@@ -256,6 +272,27 @@ $accent_color: #FFCD27;
 				color: $accent_color;
 			}
 		}
+	}
+}
+
+#fusibles {
+	display: flex;
+	width: 140px;
+	gap: 6px;
+}
+
+#time {
+	width: 145px;
+	position: relative;
+
+	div{
+		font-family: "Dogica";
+		font-size: 32px;
+		position: absolute;
+		top: 24px;
+		left: 17px;
+		letter-spacing: -3px;
+		user-select: none;
 	}
 }
 
