@@ -33,7 +33,6 @@ type Friend = {
 
 function Profile (props : any) {
 	const [username, setUsername] = React.useState<string>("");
-	const [hasAvatar, setHasAvatar] = React.useState<boolean>(false);
 	const [matches, setMatches] = React.useState<Match[]>([]);
 	const [nbMatches, setNbMatches] = React.useState<number>(0);
 	const [nbVictories, setNbVictories] = React.useState<number>(0);
@@ -48,7 +47,6 @@ function Profile (props : any) {
 	useEffect(() => {
 		axios.get("/users/infos/" + userId)
 		.then(response => { setUsername(response.data.name);
-							setHasAvatar(response.data.avatar !== null)
 						})
 		.catch(error => { console.log(error.response); });
 
@@ -84,7 +82,7 @@ function Profile (props : any) {
 	return (
 			<div className="profile">
 				<div id="column_left">
-					<UserCard user_name={username} user_id={userId} has_avatar={hasAvatar} rank={rank}
+					<UserCard user_name={username} user_id={userId} rank={rank}
 						nb_matches={nbMatches} nb_victories={nbVictories} nb_points={nbPoints} online={ online.includes(userId) }/>
 					{ user!.id !== userId && <Buttons id={userId}/>}
 					<Friends friends={friends} online={online}/>

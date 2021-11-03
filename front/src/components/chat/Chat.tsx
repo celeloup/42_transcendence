@@ -7,7 +7,6 @@ import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
 import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
 import { io } from "socket.io-client";
 import '../../styles/chat/Chat.scss';
-
 import axios from 'axios';
 
 type BanPopUpProps = {
@@ -120,6 +119,8 @@ export function Chat() {
 	var { user } = useContext(AuthContext) as AuthContextType;
 	const [ hasBeenBanned, setHasBeenBanned ] = useState<Number>(-1);
 	const [ askPassword, setAskPassword ] = useState(false);
+	const { masterSocket } = useContext(AuthContext) as AuthContextType;
+	const [ usersOnline, setUsersOnline ] = useState<any[]>([]);
 
 	const joinChan = () => {
 		axios.put(`/channel/members/${ channel?.id }`, { "userId": user?.id })
@@ -231,6 +232,12 @@ export function Chat() {
 			})
 	}, [channel]) // eslint-disable-line
 
+	// ----------- USERS ONLINE
+	useEffect(() => {
+		masterSocket.emit("get_users");
+		masterSocket?.on("connected_users", (data : any) => { setUsersOnline(data); });
+	}, [masterSocket]);
+
 	const closeBan = () => {
 		setHasBeenBanned(-1);
 		setChannel(null);
@@ -272,6 +279,7 @@ export function Chat() {
 			<Message 
 			key={ mes.id }
 			id={ mes.author.id }
+			online={ usersOnline.includes(mes.author.id) }
 			username={ mes.author.name }
 			message={ mes.content }
 			setBlockedUsers={ setBlockedUsers }

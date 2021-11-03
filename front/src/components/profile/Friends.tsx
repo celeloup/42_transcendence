@@ -1,7 +1,6 @@
 import WindowBorder from "../ui_components/WindowBorder";
+import Avatar from "./Avatar";
 import '../../styles/Profile.scss';
-import { useState, useEffect } from "react";
-import axios from "axios";
 
 type FriendType = {
 	id: number;
@@ -22,21 +21,10 @@ type Props = {
 }
 
 function Friend ( { infos, online } : Prop) {
-    const [hasAvatar, setHasAvatar] = useState(false);
-
-    useEffect(() => {
-		axios.get("/users/infos/" + infos.id)
-		.then(response => { setHasAvatar(response.data.avatar !== null); })
-		.catch(error => { console.log(error.response); });
-	}, [infos.id]);
-
     return (
         <a href={ "/profile/" + infos.id }>
             <div className ='friends_info'>
-                <div className="profile_display">
-                    <span>{ infos.name.charAt(0) }</span>
-                    { hasAvatar && <img src={ process.env.REACT_APP_BACK_URL + "/api/users/avatar/" + infos.id } alt="user avatar"/> }
-                </div>
+                <Avatar size={"medium"} id={infos.id}/>
 		    	<p>{ infos.name }</p>
 	        	<div className={`dot_status ${online ? 'online': 'offline'}`} ></div>
 	        </div>
