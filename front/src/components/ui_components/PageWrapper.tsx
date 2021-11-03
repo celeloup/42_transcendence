@@ -5,7 +5,7 @@ import { useContext } from 'react';
 import { AuthContext, ContextType } from '../../contexts/AuthContext';
 
 import Arrows from '../../assets/img/arrows.svg';
-import Fusibles from '../../assets/img/fusibles.svg';
+import Fusibles from './Fusibles';
 import HistogramBar from '../../assets/img/histogram_bar.svg';
 import Squares from '../../assets/img/little_squares.svg';
 import Radar from '../../assets/img/radar.svg';
@@ -41,7 +41,7 @@ function PageWrapper( { children }: Props) {
 		{ isAuth && <footer>
 			<img className="arrows flip" src={ Arrows } alt="Decoration (arrows)"/>
 			<img className="histogram" src={ HistogramBar } alt="Decoration (Histogram)" />
-			<img className="fusibles" src={ Fusibles } alt="Decoration (fusibles)"/>
+			<Fusibles />
 			<img className="arrows" src={ Arrows } alt="Decoration (arrows)"/>
 		</footer>}
 		</>
