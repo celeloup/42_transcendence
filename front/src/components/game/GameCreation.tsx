@@ -14,39 +14,39 @@ type SelectInviteProps = {
 	setInvitedUser: (user:any) => void
 }
 
-const SelectInvite = ({ display, setInvitedUser } : SelectInviteProps) => {
-	// const [ isLoading, setIsLoading ] = useState(false);
-	const [ users, setUsers ] = useState<any[]>([]);
-	const [ user, setUser ] = useState(0);
-	const [ error, setError ] = useState<string>("");
-	var { masterSocket, setToDisplay } = useContext(AuthContext) as AuthContextType;
+// const SelectInvite = ({ display, setInvitedUser } : SelectInviteProps) => {
+// 	// const [ isLoading, setIsLoading ] = useState(false);
+// 	const [ users, setUsers ] = useState<any[]>([]);
+// 	const [ user, setUser ] = useState(0);
+// 	const [ error, setError ] = useState<string>("");
+// 	var { masterSocket, setToDisplay } = useContext(AuthContext) as AuthContextType;
 
-	useEffect(() => {
-		axios.get(`/users`)
-		.then( res => {
-			// console.log(res.data);
-			setUsers(res.data);
-		})
-		.catch( err => {
-			console.log(err);
-		})
-	}, []);
+// 	useEffect(() => {
+// 		axios.get(`/users`)
+// 		.then( res => {
+// 			// console.log(res.data);
+// 			setUsers(res.data);
+// 		})
+// 		.catch( err => {
+// 			console.log(err);
+// 		})
+// 	}, []);
 
-	const handleSubmit = () => {
-		if (user !== 0)
-			setInvitedUser(user);
-	}
+// 	const handleSubmit = () => {
+// 		if (user !== 0)
+// 			setInvitedUser(user);
+// 	}
 
-	return (
-		<div id="add_member_popup">
-			{ error !== "" && <div id="add_member_error"><i className="fas fa-exclamation-triangle" /> { error }</div> }
-			<i className="fas fa-times" onClick={ () => display(false) }/>
-			[ select a user ]
-			<SearchUser theme="yo" list={ users } select={ setUser }/>
-			<div className={ user !== 0 ? "ready" : "" } id="submit" onClick={ handleSubmit }>Select</div>
-		</div>
-	)
-}
+// 	return (
+// 		<div id="add_member_popup">
+// 			{ error !== "" && <div id="add_member_error"><i className="fas fa-exclamation-triangle" /> { error }</div> }
+// 			<i className="fas fa-times" onClick={ () => display(false) }/>
+// 			[ select a user ]
+// 			<SearchUser theme="yo" list={ users } select={ setUser }/>
+// 			<div className={ user !== 0 ? "ready" : "" } id="submit" onClick={ handleSubmit }>Select</div>
+// 		</div>
+// 	)
+// }
 
 function GameCreation() {
 
@@ -149,7 +149,7 @@ function GameCreation() {
 					<div className="explanation">Personnalize your game with our <span style={{"color": "#919191", "textDecoration": "line-through"}}>never seen before</span>, i mean cool maps.</div>
 				</div>
 			</div>
-			<div id="challenge_button">CHALLENGE A USER</div>
+			{/* <div id="challenge_button">CHALLENGE A USER</div> */}
 			<div id="create_game_button" onClick={ create_game }>CREATE GAME</div>
 		</div>
 )}
