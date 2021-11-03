@@ -23,9 +23,8 @@ export default class Round {
   puck: Puck;
   
 
-  constructor(id: string, friendly: boolean, id1: number, id2: number, speed: number, goal: number, boost: boolean, map: number) {
+  constructor(id: string, id1: number, id2: number, speed: number, goal: number, boost: boolean, map: number) {
     this.id_game = id;
-    this.friendly = friendly;
     this.id_player1 = id1;
     this.id_player2 = id2;
     
