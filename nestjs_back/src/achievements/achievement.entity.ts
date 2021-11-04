@@ -16,9 +16,11 @@ class Achievement {
   public description: string;
 
   @Column()
+  @ApiProperty()
   public level: number;
 
   @Column()
+  @ApiProperty()
   public type: number;
 
   @ManyToMany(() => User, (user: User) => user.achievements)
