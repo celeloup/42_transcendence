@@ -51,40 +51,73 @@ export default class MatchesService {
       await this.usersService.getById(matchData.user2_id)]
     });
     await this.matchesRepository.save(newMatch);
+
+    const user1 = await this.usersService.getById(matchData.user1_id);
+    let achievement = null;
+    if (user1.matches.length === 1) {
+      achievement = await this.achievementsService.getAchievementByName("Newbie");
+    } else if (user1.matches.length === 10) {
+      achievement = await this.achievementsService.getAchievementByName("Casual");
+    } else if (user1.matches.length === 100) {
+      achievement = await this.achievementsService.getAchievementByName("Nolife");
+    }
+    if (achievement) {
+      user1.achievements.push(achievement);
+      await this.usersRepository.save(user1);
+    }
+    
+    const user2 = await this.usersService.getById(matchData.user2_id);
+    achievement = null;
+    if (user2.matches.length === 1) {
+      achievement = await this.achievementsService.getAchievementByName("Newbie");
+    } else if (user2.matches.length === 10) {
+      achievement = await this.achievementsService.getAchievementByName("Casual");
+    } else if (user2.matches.length === 100) {
+      achievement = await this.achievementsService.getAchievementByName("Nolife");
+    }
+    if (achievement) {
+      user2.achievements.push(achievement);
+      await this.usersRepository.save(user2);
+    }
     return newMatch;
   }
 
   async weHaveAWinner(match: & Match) {
     const user1 = await this.usersService.getAllInfosByUserId(match.user1_id);
     const user2 = await this.usersService.getAllInfosByUserId(match.user2_id);
-    if (!user1.achievements)
-      user1.achievements = new Array;
-    if (!user2.achievements)
-      user2.achievements = new Array;
-    const aHundredPoints = await this.achievementsService.getAchievementById(2);
-    const tenVictories = await this.achievementsService.getAchievementById(3);
     user1.points += match.score_user1;
-    if (user1.points >= 100 && user1.points < (100 + match.goal))
-      user1.achievements.push(aHundredPoints);
     user2.points += match.score_user2;
-    if (user2.points >= 100 && user2.points < (100 + match.goal))
-      user2.achievements.push(aHundredPoints);
     if (match.score_user1 === match.goal) {
       user1.victories++;
-      if (user1.victories === 10)
-        user1.achievements.push(tenVictories);
+      let achievement = null;
+      if (user1.victories === 1) {
+        achievement = await this.achievementsService.getAchievementByName("Must Be Luck");
+      } else if (user1.victories === 10) {
+        achievement = await this.achievementsService.getAchievementByName("Getting there");
+      } else if (user1.victories === 100) {
+        achievement = await this.achievementsService.getAchievementByName("Pro Gamer");
+      }
+      if (achievement) {
+        user1.achievements.push(achievement);
+      }
       user2.defeats++;
-    }
-    else {
+    } else {
       user2.victories++;
-      if (user2.victories === 10)
-        user2.achievements.push(tenVictories);
+      let achievement = null;
+      if (user2.victories === 1) {
+        achievement = await this.achievementsService.getAchievementByName("Must Be Luck");
+      } else if (user2.victories === 10) {
+        achievement = await this.achievementsService.getAchievementByName("Getting there");
+      } else if (user2.victories === 100) {
+        achievement = await this.achievementsService.getAchievementByName("Pro Gamer");
+      }
+      if (achievement) {
+        user2.achievements.push(achievement);
+      }
       user1.defeats++;
     }
-    if (match.score_user1 === match.goal)
-      match.winner = match.user1_id;
-    else
-      match.winner = match.user2_id;
+    const user1win = match.score_user1 === match.goal
+    match.winner = user1win ? match.user1_id : match.user2_id;
     await this.matchesRepository.save(match);
     await this.usersRepository.save(user1);
     await this.usersRepository.save(user2);
