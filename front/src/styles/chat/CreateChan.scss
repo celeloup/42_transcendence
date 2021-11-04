@@ -44,6 +44,17 @@ $dark-gray: #919191;
 		color: $dark-gray;
 	}
 
+	#select_user {
+		width: 250px;
+		margin: auto;
+		margin-bottom: 10px;
+		input{
+			margin: 0;
+			border: none;
+			width: 80%;
+		}
+	}
+
 	form {
 		label {
 			display: inline-block;
@@ -141,7 +152,7 @@ $dark-gray: #919191;
 }
 
 #addChan:before {
-	content:"Create new channel_";
+	content:"create_new_channel_";
 	position: absolute;
 	top: -30px;
 	left: -4px;

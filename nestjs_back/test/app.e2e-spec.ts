@@ -101,7 +101,7 @@ describe('AppController (e2e)', () => {
   let amartinCookies: Array<string>;
   let amartinBearers: Array<string>;
 
-  const cookies_regex = /Authentication=.*; HttpOnly; Path=\/; SameSite=Strict; Expires=.*,Refresh=.*; HttpOnly; Path=\/; SameSite=Strict; Expires=.*/;
+  const cookies_regex = /Authentication=.*; HttpOnly; Path=\/; SameSite=Lax; Expires=.*,Refresh=.*; HttpOnly; Path=\/; SameSite=Lax; Expires=.*/;
   describe('Authentication', () => {
     describe('registering users for tests', () => {
       it('fhenrion', async () => {
@@ -553,7 +553,7 @@ describe('AppController (e2e)', () => {
     */
 
     describe('logout', () => {
-      const empty_cookies = 'Authentication=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0,Refresh=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0';
+      const empty_cookies = 'Authentication=; HttpOnly; Path=/; SameSite=Lax; Max-Age=0,Refresh=; HttpOnly; Path=/; SameSite=Lax; Max-Age=0';
       
       it('should return empty cookies', async () => {
         const res = await request(app.getHttpServer())

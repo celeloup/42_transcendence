@@ -65,7 +65,7 @@ export default class UsersService {
 
   async getMatchesByUserId(id: number) {
     const matches = await this.matchesRepository.find({
-      where: [{ user1_id: id }, { user2_id: id }], order: { createdDate: "DESC" }
+      where: [{ user1_id: id }, { user2_id: id }], order: { createdDate: "DESC" }, relations: ['users']
     });
     if (matches)
       return matches;
