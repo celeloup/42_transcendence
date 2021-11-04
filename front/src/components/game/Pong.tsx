@@ -4,9 +4,11 @@ import { AuthContext, ContextType as AuthContextType } from '../../contexts/Auth
 import p5Types from "p5";
 import Sketch from "react-p5";
 import '../../styles/game/Pong.scss';
+import axios from 'axios';
 
 import Coin from '../../assets/img/coin.svg';
 import KO from '../../assets/img/street_fighter_ko.png';
+import { setUncaughtExceptionCaptureCallback } from 'process';
 
 type Paddle = {
 	is_left: boolean,
@@ -62,7 +64,9 @@ type BackgroundProps = {
 	p2: string,
 	scoreP1: number,
 	scoreP2: number,
-	goal?: number
+	goal?: number,
+	allP1?: number,
+	allP2?: number
 }
 
 function Mario({ p1, p2, scoreP1, scoreP2 }: BackgroundProps) {
@@ -82,7 +86,7 @@ function Mario({ p1, p2, scoreP1, scoreP2 }: BackgroundProps) {
 	)
 }
 
-function Street({ p1, p2, scoreP1, scoreP2, goal }: BackgroundProps) {
+function Street({ p1, p2, scoreP1, scoreP2, allP1, allP2, goal }: BackgroundProps) {
 	let p1_life:number;
 	if (goal)
 		p1_life = 100 - (scoreP2 / goal) * 100;
@@ -98,11 +102,11 @@ function Street({ p1, p2, scoreP1, scoreP2, goal }: BackgroundProps) {
 			<div id="first_line">
 				<div id="p1">
 					<img src="https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-1P"/>
-					<img src="https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-00252"/>
+					<img src={ "https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-" + allP1?.toString().padStart(5, '0') }/>
 				</div>
 				<div id="p2">
 					<img src="https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-2P"/>
-					<img src="https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-00040"/>
+					<img src={ "https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-" + allP2?.toString().padStart(5, '0') }/>
 				</div>
 			</div>
 			<div id="life_bar">
@@ -133,6 +137,7 @@ function Pong() {
 	const [ score, setScore ] = useState<number[]>([0, 0]);
 	const [ map, setMap ] = useState<number>(3);
 	const [ goal, setGoal ] = useState<number>(10);
+	const [ user2, setUser2 ] = useState<any>(null);
 
 	// GAME POPUP
 	const [ endScreen, setEndScreen ] = useState<boolean>(false);
@@ -143,9 +148,18 @@ function Pong() {
 		let id:number;
 		masterSocket?.on('game_starting', (data:any) => {
 			// console.log("game starting !", data);
-			setMatchID(data);
-			setWaiting(false);
-			id = data;
+			axios.get(`/users/infos/${ data.user2_id}`)
+			.then (res => {
+				setMatch(data);
+				setMap(data.map);
+				setGoal(data.goal);
+				console.log(res.data);
+				setMatchID(data.id);
+				setUser2(res.data);
+				setWaiting(false);
+				id = data;
+			})
+			.catch( err => console.log(err))
 		});
 		
 		masterSocket?.on('new_frame', (data:any) => {
@@ -258,9 +272,9 @@ function Pong() {
 			</div>
 			{ endScreen && <EndScreen score1={score[0]} score2={score[1]}/> }
 			{ noPending && <NoPendingGame /> }
-			{ map === 2 && <Mario p1="mario" p2="luigi" scoreP1={score[0]} scoreP2={score[1]}/>}
-			{ map === 3 && <Street p1="mario" p2="luigi" scoreP1={score[0]} scoreP2={score[1]} goal={goal}/>}
-			{ !noPending && <Sketch setup={ setup } draw={ draw } keyPressed={ keyPressed } keyReleased={ keyReleased }/> }
+			{ !waiting && map === 2 && <Mario p1={ match.users[0].name } p2={ user2.name } scoreP1={score[0]} scoreP2={score[1]}/>}
+			{ !waiting && map === 3 && <Street p1={ match.users[0].name } p2={ user2.name } scoreP1={score[0]} scoreP2={score[1]} goal={goal} allP1={ match.users[0].points } allP2={ user2.points }/>}
+			{ !waiting && !noPending && <Sketch setup={ setup } draw={ draw } keyPressed={ keyPressed } keyReleased={ keyReleased }/> }
 			{ waiting && !noPending && <div id="waiting">
 				<i className="fas fa-spinner" />
 				<p>Waiting for a second player ...</p>

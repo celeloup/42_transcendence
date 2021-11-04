@@ -51,7 +51,7 @@ type SelectInviteProps = {
 function GameCreation() {
 
 	var { setMatch } = useContext(GameContext) as ContextType;
-	var { masterSocket, setToDisplay } = useContext(AuthContext) as AuthContextType;
+	var { masterSocket, setToDisplay, user } = useContext(AuthContext) as AuthContextType;
 	const [ goal, setGoal ] = useState(10); // entre 1 et 20
 	const [ speed, setSpeed ] = useState(1); // 0 slow, 1 normal, 2 fast
 	const [ map, setMap ] = useState(1); // 1 space, 2 mario (street fighter ? )
@@ -61,8 +61,8 @@ function GameCreation() {
 	const create_game = () => {
 		axios.post('/matches', {
 			"friendly": true,
-			"user1_id": 1,
-			"user2_id": 2,
+			"user1_id": user?.id,
+			"user2_id": 1,
 			"map": map,
 			"speed": speed,
 			"goal": goal,
