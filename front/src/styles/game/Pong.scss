@@ -111,17 +111,70 @@ $green: #81A439;
 			background-image: url(../../assets/img/street_fighter_bg.jpeg);
 			background-size: cover;
 			background-position: 20% 20%;
+			
 			#first_line, #last_line {
 				display: flex;
 				justify-content: space-between;
 			}
 
+			#life_bar {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				
+				img {
+					height: 32px;
+				}
+
+				#p1_bar {
+					text-align: right;
+				}
+
+				#p2_bar {
+					text-align: left;
+				}
+
+				#p1_bar, #p2_bar {
+					width: 300px;
+					height: 22px;
+					border-top: 2px solid white;
+					border-bottom: 2px solid white;
+					background-color: #fe0000;
+					position: relative;
+
+					&:before {
+						content: "";
+						background-color: white;
+						position: absolute;
+						width: 2px;
+						height: 22px;
+						top: 0;
+					}
+
+					span {
+						display: inline-block;
+						height: 100%;
+						background-color: #fefe00;
+					}
+
+				}
+
+				#p1_bar:before {
+					left: -2px;
+				}
+
+				#p2_bar:before {
+					right: -2px;
+				}
+			}
+
 			#last_line {
-				margin: 0 50px;
+				margin: 10px 50px;
+				img { transform: scale(0.9) }
 			}
 
 			#p1, #p2{
-				margin: 15px 20px 20px 20px;
+				margin: 10px 20px 5px 20px;
 				img:first-child{
 					margin-right: 50px;
 				}

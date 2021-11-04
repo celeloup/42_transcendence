@@ -6,6 +6,7 @@ import Sketch from "react-p5";
 import '../../styles/game/Pong.scss';
 
 import Coin from '../../assets/img/coin.svg';
+import KO from '../../assets/img/street_fighter_ko.png';
 
 type Paddle = {
 	is_left: boolean,
@@ -56,14 +57,15 @@ function NoPendingGame() {
 
 // }
 
-type MarioProps = {
+type BackgroundProps = {
 	p1: string,
 	p2: string,
 	scoreP1: number,
-	scoreP2: number
+	scoreP2: number,
+	goal?: number
 }
 
-function Mario({ p1, p2, scoreP1, scoreP2 }: MarioProps) {
+function Mario({ p1, p2, scoreP1, scoreP2 }: BackgroundProps) {
 	return (
 		<div className="game_background" id="mario">
 			<div id="p1">
@@ -80,7 +82,17 @@ function Mario({ p1, p2, scoreP1, scoreP2 }: MarioProps) {
 	)
 }
 
-function Street({ p1, p2, scoreP1, scoreP2 }: MarioProps) {
+function Street({ p1, p2, scoreP1, scoreP2, goal }: BackgroundProps) {
+	let p1_life:number;
+	if (goal)
+		p1_life = 100 - (scoreP2 / goal) * 100;
+	else
+		p1_life = 100;
+	let p2_life:number;
+		if (goal)
+			p2_life = 100 - (scoreP1 / goal) * 100;
+		else
+			p2_life = 100;
 	return (
 		<div className="game_background" id="street">
 			<div id="first_line">
@@ -93,6 +105,11 @@ function Street({ p1, p2, scoreP1, scoreP2 }: MarioProps) {
 					<img src="https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-00040"/>
 				</div>
 			</div>
+			<div id="life_bar">
+				<div id="p1_bar"><span style={{"width": p1_life + "%"}}></span></div>
+				<img src={ KO } alt="Street_fighter_ko"/>
+				<div id="p2_bar"><span style={{"width": p2_life + "%"}}></span></div>
+			</div>
 			<div id="last_line">
 				<img className="name" src={"https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-" + p1.toUpperCase()}/>
 				<img className="name" src={"https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-" + p2.toUpperCase()}/>
@@ -100,10 +117,6 @@ function Street({ p1, p2, scoreP1, scoreP2 }: MarioProps) {
 		</div>
 	)
 }
-
-// function StreetFighter() {
-
-// }
 
 function Pong() {
 	const height: number = 626;
@@ -119,6 +132,7 @@ function Pong() {
 	const [ paddleLeft, setPaddleLeft ] = useState<Paddle>({ is_left: true, x: paddle_margin + 20 / 2, y: height / 2, w: 20, h: 80, indice:0 });
 	const [ score, setScore ] = useState<number[]>([0, 0]);
 	const [ map, setMap ] = useState<number>(3);
+	const [ goal, setGoal ] = useState<number>(10);
 
 	// GAME POPUP
 	const [ endScreen, setEndScreen ] = useState<boolean>(false);
@@ -245,7 +259,7 @@ function Pong() {
 			{ endScreen && <EndScreen score1={score[0]} score2={score[1]}/> }
 			{ noPending && <NoPendingGame /> }
 			{ map === 2 && <Mario p1="mario" p2="luigi" scoreP1={score[0]} scoreP2={score[1]}/>}
-			{ map === 3 && <Street p1="mario" p2="luigi" scoreP1={score[0]} scoreP2={score[1]}/>}
+			{ map === 3 && <Street p1="mario" p2="luigi" scoreP1={score[0]} scoreP2={score[1]} goal={goal}/>}
 			{ !noPending && <Sketch setup={ setup } draw={ draw } keyPressed={ keyPressed } keyReleased={ keyReleased }/> }
 			{ waiting && !noPending && <div id="waiting">
 				<i className="fas fa-spinner" />
