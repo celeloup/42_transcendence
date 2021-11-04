@@ -6,7 +6,7 @@ import UserDto from './dto/User.dto';
 import { ApiOperation, ApiParam, ApiTags, ApiBearerAuth, ApiCookieAuth } from '@nestjs/swagger';
 import JwtTwoFactorGuard from 'src/authentication/guard/jwtTwoFactor.guard';
 import RequestWithUser from 'src/authentication/interface/requestWithUser.interface';
-import NewPasswordDto from './dto/newPassword.dto';
+import PasswordDto from './dto/password.dto';
 import MuteUserDto from './dto/muteUser';
 
 @ApiTags('channel')
@@ -92,13 +92,24 @@ export default class ChannelController {
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')
   @UseGuards(JwtTwoFactorGuard)
-  async changePassword(@Req() req: RequestWithUser, @Param() { id }: FindOneParams, @Body() password: NewPasswordDto){
+  async changePassword(@Req() req: RequestWithUser, @Param() { id }: FindOneParams, @Body() password: PasswordDto){
     const { user } = req;
     return this.channelService.changePassword(Number(id), user.id, password);
+  } 
+
+  @Put('join/:id')
+  @ApiOperation({summary: "Join a public channel"})
+  @ApiParam({name: 'id', type: Number, description: 'channel id'})
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  joinChannel(@Req() req: RequestWithUser, @Param() { id }: FindOneParams, @Body() password: PasswordDto) {
+    const { user } = req;
+    return this.channelService.joinChannel(Number(id), user.id, password.password);
   }
 
   @Put('members/:id')
-  @ApiOperation({summary: "Join channel/Add new member to a channel"})
+  @ApiOperation({summary: "Add new member to a private channel"})
   @ApiParam({name: 'id', type: Number, description: 'channel id'})
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')
@@ -107,7 +118,6 @@ export default class ChannelController {
     const { user } = req;
     return this.channelService.addMember(Number(id), member.userId, user.id);
   }
-
   @Put('admins/:id')
   @ApiOperation({summary: "Add new admin to a channel"})
   @ApiParam({name: 'id', type: Number, description: 'channel id'})

@@ -6,7 +6,7 @@ import { Repository } from 'typeorm';
 import Channel from './channel.entity';
 import CreateChannelDto from './dto/createChannel.dto';
 import UsersService from '../users/users.service';
-import NewPasswordDto from './dto/newPassword.dto';
+import PasswordDto from './dto/password.dto';
 import muteObj from './mute.entity';
 
 @Injectable()
@@ -147,9 +147,10 @@ export default class ChannelService {
     throw new HttpException('Channel with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
-  async changePassword(channel_id: number, owner_id: number, password: NewPasswordDto) {
+  async changePassword(channel_id: number, owner_id: number, password: PasswordDto) {
     const channel = await this.getAllInfosByChannelId(channel_id);
     if ((await this.isOwner(channel_id, owner_id))) {
+      //Flavien laisse libre cours à ta créativité
       return (await this.channelRepository.update(channel_id, password));
     }
     throw new HttpException('Only the owner of a channel can change its password', HttpStatus.NOT_FOUND);
@@ -231,11 +232,31 @@ export default class ChannelService {
     return false;
   }
 
+  async passwordOK(channel: Channel, password: string){
+    if(!channel.password || channel.password === "")
+      return true;
+    else
+      return true; //Flavien, as philosopher David Guetta would say, the world is yours
+  }
+
+  async joinChannel(channel_id: number, user_id: number, password: string) {
+    let channel = await this.getAllInfosByChannelId(channel_id);
+    let newMember = await this.usersService.getAllInfosByUserId(user_id);
+    if (channel.type === 1 /* public */ && await this.passwordOK(channel, password)) {
+      if (!(await this.isAMember(channel_id, user_id))) {
+        channel.members.push(newMember);
+        await this.channelRepository.save(channel);
+        return channel;
+      }
+      throw new HttpException('User is already a member of this channel', HttpStatus.OK);
+    }
+    throw new HttpException('You can only join a public channel by yourself', HttpStatus.FORBIDDEN);
+  }
+
   async addMember(channel_id: number, other_id: number, user_id: number) {
     let channel = await this.getAllInfosByChannelId(channel_id);
     let newMember = await this.usersService.getAllInfosByUserId(other_id);
-    if (channel.type !== 3 && (other_id === user_id
-      || (channel.type === 2 && (await this.canAddMemberInAPrivateChannel(channel_id, other_id, user_id))))) {
+    if (channel.type === 2 /* private */ && (await this.canAddMemberInAPrivateChannel(channel_id, other_id, user_id))) {
       if (!(await this.isAMember(channel_id, other_id))) {
         channel.members.push(newMember);
         await this.channelRepository.save(channel);
