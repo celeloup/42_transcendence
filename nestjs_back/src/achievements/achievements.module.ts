@@ -18,16 +18,58 @@ export default class AchievementsModule {
   constructor(private readonly achievementsService: AchievementsService) {
     const achievements = [
       {
-        name: 'first_friend',
-        description: 'Congratulations, you made a friend ! You are not alone anymore in this big universe ...'
+        name: "Newbie",
+        description: "Play your first game",
+        type: 1,
+        level: 1
       },
       {
-        name: '10_victories',
-        description: '10 victories ? You are on a roll !'
+        name: "Casual",
+        description: "Play 10 games",
+        type: 1,
+        level: 2
       },
       {
-        name: '100_victories',
-        description: 'A HUNDRED POINTS ?! You are a real pro gamer ! GG !'
+        name: "Nolife",
+        description: "Play 100 games",
+        type: 1,
+        level: 3
+      },
+      {
+        name: "Must Be Luck",
+        description: "Win your first game",
+        type: 2,
+        level: 1
+      },
+      {
+        name: "Getting there",
+        description: "Win 10 games",
+        type: 2,
+        level: 2
+      },
+      {
+        name: "Pro Gamer",
+        description: "Win 50 games",
+        type: 2,
+        level: 3
+      },
+      {
+        name: "So Alone...",
+        description: "Make your first friend",
+        type: 3,
+        level: 1
+      },
+      {
+        name: "Not So Alone",
+        description: "Make 5 friends",
+        type: 3,
+        level: 2
+      },
+      {
+        name: "Social Butterfly",
+        description: "Make 10 friends",
+        type: 3,
+        level: 3
       }
     ]
     for (const achievement of achievements) {
