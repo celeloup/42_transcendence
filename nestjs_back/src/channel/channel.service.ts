@@ -156,6 +156,7 @@ export default class ChannelService {
     const channel = await this.getAllInfosByChannelId(channel_id);
     if ((await this.isOwner(channel_id, owner_id))) {
       //Flavien laisse libre cours à ta créativité
+      channel.password = password.password;
       channel.passwordSet = true;
       return (await this.channelRepository.save(channel));
     }
@@ -239,7 +240,7 @@ export default class ChannelService {
   }
 
   async passwordOK(channel: Channel, password: string){
-    if(!channel.password || channel.password === "")
+    if(!channel.passwordSet || channel.password === "")
       return true;
     else
       return true; //Flavien, as philosopher David Guetta would say, the world is yours
@@ -248,7 +249,7 @@ export default class ChannelService {
   async joinChannel(channel_id: number, user_id: number, password: string) {
     let channel = await this.getAllInfosByChannelId(channel_id);
     let newMember = await this.usersService.getAllInfosByUserId(user_id);
-    if (channel.type === 1 /* public */ && await this.passwordOK(channel, password)) {
+    if (channel.type === 1 /* public */ || (channel.type === 2 /* private */ && await this.passwordOK(channel, password))) {
       if (!(await this.isAMember(channel_id, user_id))) {
         channel.members.push(newMember);
         await this.channelRepository.save(channel);
@@ -256,7 +257,7 @@ export default class ChannelService {
       }
       throw new HttpException('User is already a member of this channel', HttpStatus.OK);
     }
-    throw new HttpException('You can only join a public channel by yourself', HttpStatus.FORBIDDEN);
+    throw new HttpException('Wrong password' , HttpStatus.FORBIDDEN);
   }
 
   async addMember(channel_id: number, other_id: number, user_id: number) {
@@ -491,7 +492,7 @@ export default class ChannelService {
       banned: [],
       muted: [],
     });
-    if (newChannel.password === "")
+    if (newChannel. type !== 2 || newChannel.password === "")
       newChannel.passwordSet = false;
     else
       newChannel.passwordSet = true;
