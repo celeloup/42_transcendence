@@ -1,0 +1,464 @@
+$background-color: #232323;
+$text-color: white;
+$accent_color: #FFCD27;
+$light-gray: #E3E3E3;
+$dark-gray: #919191;
+$profile-gray: #3E3E3E;
+$green: #81A439;
+
+#chat
+{
+	width: 100%;
+	height: 100%;
+}
+
+// *********** HEADER
+
+.chat_header
+{
+	max-width: 100%;
+	display: flex;
+}
+
+.chat_header .header_button {
+	font-size: 25px;
+	cursor: pointer;
+	padding: 4px 10px;
+}
+
+.chat_header .header_title {
+	flex-grow: 2;
+	text-align: left;
+	padding-top: 8px;
+	overflow: hidden;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+}
+
+.chat_header .header_title i {
+	font-size: 20px;
+	margin: 0 10px 0 15px;
+}
+
+// ********** MESSAGES BOX
+
+#chat_messages {
+	height: 564px;
+    display: flex;
+    flex-direction: column-reverse;
+    overflow-y: scroll;
+	margin-top: 10px;
+	margin-bottom: 10px;
+	// position: relative;
+}
+
+.no_msg {
+	position: relative;
+	margin: auto;
+	color: $dark-gray;
+	width: 200px;
+	padding: 10px;
+	font-size: 14px;
+}
+
+// ********* MESSAGE
+
+.no_chan_msg {
+	position: relative;
+	bottom: 160px;
+	margin: auto;
+	color: $dark-gray;
+	width: 200px;
+	padding: 10px;
+
+	i {
+		font-size: 56px;
+		margin-bottom: 20px;
+	}
+}
+
+.chat_message {
+	display: flex;
+	padding: 10px 10px 15px 15px;
+	justify-content: space-around;
+
+	.pic {
+		height: 50px;
+		cursor: pointer;
+
+		.user_status {
+			position: relative;
+			bottom: 8px;
+			right: -38px;
+			width: 15px;
+			height: 15px;
+			border-radius: 50%;
+
+			&.offline {
+				background-color: $dark-gray;
+			}
+
+			&.online {
+				background-color: $green;
+			}
+		}
+	}
+
+	.content {
+		width: 260px;
+		text-align: left;
+		overflow: wrap;
+	}
+
+	.username {
+		display: inline;
+		color: $accent_color;
+		font-family: "Dogica", "Fira Mono";
+		font-size: 13px;
+		cursor: pointer;
+	}
+	
+	.text {
+		display: block;
+		font-size: 15px;
+		line-height: 140%;
+		margin-top: 3px;
+		overflow-wrap: break-word;
+	}
+
+	&.blocked {
+		.username, .text{
+			color: $dark-gray;
+		}
+		.text {
+			font-size: 14px;
+		}
+		.text i {
+			margin-right: 5px;
+		}
+	}
+}
+
+
+//********** CHAT INPUT
+
+#chat_input {
+	height: 46px;
+	position: relative;
+	display: flex;
+	// border: 1px solid red;
+}
+
+#chat_input form {
+	display: flex;
+	width: 100%;
+	i {
+		cursor: pointer;
+	}
+}
+
+#chat_input:before {
+	content: "";
+	position: absolute;
+	height: 4px;
+	width: 103%;
+	background-color: white;
+	left: -4px;
+	top: -4px;
+}
+
+#chat_input i {
+	padding: 10px;
+	font-size: 22px;
+	margin-top: 2px;
+}
+
+#chat_input input {
+	flex-grow: 2;
+	font-size: 18px;
+	color: white;
+	background: none;
+	outline: none;
+	border:none;
+	font-family: "Fira Mono";
+}
+
+#chat_input.disabled {
+	form i {
+		color: $dark-gray;
+		cursor: auto;
+	}
+}
+
+// ********** CHAT PROFILE CARD
+
+#card_modal {
+	position: absolute;
+	top:0;
+	left:0;
+	width: 382px;
+	height: 670px;
+}
+
+.profile_card {
+	background-color: $accent_color;
+	border-radius: 5px;
+	position: relative;
+	width: 290px;
+	padding: 15px;
+	margin: auto;
+	margin-right: 15px;
+	top: 140px;
+	color: $background-color;
+	text-align: left;
+	min-height: 20px;
+
+	.close_icon {
+		font-size: 30px;
+		color: $background-color;
+		position: absolute;
+		top: 10px;
+		right: 15px;
+		cursor: pointer;
+	}
+
+	div {
+		display: flex;
+		flex-direction: row;
+
+		a {
+			height: 60px;
+
+			.user_status {
+				position: relative;
+				bottom: 8px;
+				right: -48px; // only change compared to above
+				width: 15px;
+				height: 15px;
+				border-radius: 50%;
+	
+				&.offline {
+					background-color: $dark-gray;
+				}
+	
+				&.online {
+					background-color: $green;
+				}
+			}
+		}
+
+		div {
+			display: flex;
+			flex-direction: column;
+
+			a {
+				height: 30px;
+
+				.username {
+					font-family: "Dogica";
+					color: $background-color !important;
+					display: inline-block;
+					text-align: left;
+					margin: 5px;
+					position: relative;
+					font-size: 23px;
+					margin-bottom: 5px;
+					cursor: pointer;
+					width: 200px;
+					height: 25px;
+					overflow: hidden;
+					white-space: nowrap;
+					text-overflow: ellipsis;
+				
+					&:hover {
+						text-decoration: underline;
+					}
+				}
+			}
+
+			.stats_profile_card {
+				display: block;
+				font-size: 13px;
+				text-align: center;
+				margin: 5px;
+			}
+		}
+	}
+	
+	.flex {
+		margin-top: 20px;
+		display: flex;
+		justify-content: space-between;
+		gap: 10px;
+	}
+
+	.button {
+		display: block;
+		float: clear;
+		background-color: white;
+		width: 100%;
+		text-align: center;
+		padding: 13px 0px;
+		border-radius: 5px;
+		font-size: 15px;
+		cursor: pointer;
+		color: black;
+
+		&:hover {
+			transform: scale(1.05);
+		}
+
+		i {
+			margin-right: 10px;
+		}
+	}
+
+	#challenge_button {
+		font-size: 22px;
+		text-align: center;
+		margin-top: 10px;
+		i {
+			margin-left: 12px;
+			margin-right: 0;
+		}
+	}
+
+	#profile_button {
+		margin-top: 20px;
+	}
+}
+
+#ban_pop_up {
+	background-color: $accent_color;
+	color: $background-color;
+	padding: 20px;
+	width: 205px;
+	position: absolute;
+	border-radius: 5px;
+	top: 150px;
+	left: 70px;
+	font-size: 15px;
+	text-align: left;
+
+	.chan {
+		display: inline-block;
+		font-size: 20px;
+		font-family: "Dogica";
+		margin: 5px 0;
+	}
+
+	// .close_icon {
+	// 	font-size: 30px;
+	// 	position: absolute;
+	// 	right: 10px;
+	// 	top: 5px;
+	// }
+
+	.fa-book-dead {
+		font-size: 60px;
+		float: left;
+		margin-right: 20px;
+	}
+
+	#back_button {
+		background-color: $background-color;
+		color: $accent_color;
+		cursor: pointer;
+		padding: 10px;
+		margin-top: 10px;
+
+		i {
+			margin-right: 10px;
+		}
+	}
+}
+
+#ask_password {
+	background-color: $accent_color;
+	color: $background-color;
+	padding: 20px;
+	width: 270px;
+	position: absolute;
+	border-radius: 5px;
+	top: 180px;
+	left: 36px;
+
+	#error_msg {
+		position: absolute;
+		top: -40px;
+		left: -35px;
+		color: $accent_color;
+		width: 375px;
+		// background-color: red;
+		i {
+			margin-right: 10px;
+		}
+	}
+
+	.chan {
+		display: block;
+		font-size: 20px;
+		font-family: "Dogica";
+		margin-bottom: 5px;
+	}
+
+	form {
+		label {
+			display: inline-block;
+			text-align: left;
+		}
+		input {
+			display: inline-block;
+			background-color: $background-color;
+			border: 2px solid $background-color;
+			border-radius: 5px;
+			padding: 10px;
+			width: 200px;
+			font-size: 18px;
+			margin-top: 20px;
+			color: $accent_color;
+			font-family: "Fira Mono";
+			outline: none;
+		}
+
+		#passwordLabel {
+			position: relative;
+			span {
+				position: absolute;
+				top: 5px;
+				right: 50px;
+				font-size: 12px;
+				color: $dark-gray;
+			}
+			input {
+				padding-right: 35px;
+				width: 200px;
+			}
+			i {
+				width: 20px;
+				cursor: pointer;
+				position: absolute;
+				right: 10px;
+				top: 33px;
+				color: $accent_color;
+			}
+		}
+
+		.passwordInput {
+			-webkit-text-security: disc;
+		}
+
+		input[type="submit"] // readysubmit
+		{
+			background-color: $accent_color;
+			color: $background-color;
+		}
+		
+		input[type="submit"].readyToSubmit // readysubmit
+		{
+			background-color: $background-color;
+			color: $accent_color;
+			cursor: pointer;
+		}
+	}
+}

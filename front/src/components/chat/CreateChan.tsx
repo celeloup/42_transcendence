@@ -1,8 +1,9 @@
 import axios from 'axios';
-import { useState, useContext } from 'react';
+import { useState, useContext, useEffect } from 'react';
 // import { AuthContext, ContextType as AuthContextType }  from '../../contexts/AuthContext';
-import '../../styles/CreateChan.scss';
+import '../../styles/chat/CreateChan.scss';
 import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
+import SearchUser from 'components/ui_components/SearchUser';
 
 // type User = {
 // 	id: number,
@@ -18,30 +19,23 @@ type channelSettings = {
 
 type CreateChanProps = {
 	type : number,
-	hide : (type: number) => void,
-	socket: any
+	hide : (type: number) => void
 };
 
-function CreateChan({ type, hide, socket } : CreateChanProps) {
+function CreateChan({ type, hide } : CreateChanProps) {
 	// const { user } = useContext(AuthContext) as AuthContextType; // might remove once create chan change
-	var { changeChannel, toggleDisplayList } = useContext(ChannelContext) as ContextType;
+	var { toggleDisplayList, channel, setChannel, socket } = useContext(ChannelContext) as ContextType;
 	const [ isLoading, setIsLoading ] = useState(false);
 	// -------- List users
-	// const [users, setUsers] = useState<User[]>([]);
-	// useEffect(() => {
-	// 	const getUsers = async () => {
-	// 		try {
-	// 			const res = await axios.get('/users');
-	// 			// console.log(res);
-	// 			setUsers(res.data);
-	// 		} catch (err) { console.log(err); }
-	// 	};
-	// 	getUsers();
-	// }, []);
+	const [users, setUsers] = useState<any[]>([]);
 	
-	// var usersList = users.length !== 0 
-	// 	? users.map((user:any) => <option key={user.id} value={user.name}/>)
-	// 	: <p className="no_chan">No user found.</p>;
+	useEffect(() => {
+		axios.get('/users')
+		.then ( res => {
+			setUsers(res.data);
+		})
+		.catch (err => { console.log(err); })
+	}, []);
 
 	// ------ Style password
 	const [ typePassword, setTypePassword ] = useState(true);
@@ -50,27 +44,30 @@ function CreateChan({ type, hide, socket } : CreateChanProps) {
 	const [ chanType, setChanType ] = useState<number>(type);
 	const [ chanName, setChanName ] = useState<string>("");
 	const [ chanPassword, setChanPassword ] = useState<string>("");
-	// const [ userDM, setUserDM ] = useState<User>();
+	const [ userDM, setUserDM ] = useState(0);
 	const [ errors, setErrors ] = useState<Array<{key:string, value:string}>>([]);
+	
 	const handleSubmit = (e:any) => {
 		e.preventDefault();
 		
 		let nameRegex = /^([a-zA-Z0-9_-]+([ ]?[a-zA-Z0-9_-]+)?)+$/;
 		let passwordRegex = /[ -~]/;
 		
-		errors.pop();
-		if (nameRegex.test(chanName) === false)
-			errors.push({key:"name", value:"The channel's name must not contain special characters or whitespaces at the extremities."});
-		if (chanPassword !== "" && passwordRegex.test(chanPassword) === false)
-			errors.push({key:"password", value:"The password cannot contain non printable characters."});
-		if (errors.length === 0)
+		var temp_errors = [];
+		if (chanType !== 3 && nameRegex.test(chanName) === false)
+			temp_errors.push({key:"name", value:"The channel's name must not contain special characters or whitespaces at the extremities."});
+		if (chanType !== 3 &&  chanName.length > 20)
+			temp_errors.push({ key: "name_length", value:"The channel's name must be between 2 and 15 characters long"});
+		if (chanType !== 3 &&  chanPassword !== "" && passwordRegex.test(chanPassword) === false)
+			temp_errors.push({key:"password", value:"The password cannot contain non printable characters."});
+		if (temp_errors.length === 0)
 		{
 			// console.log(errors);
 			var chanSettings:channelSettings = {
 				type: chanType,
-				name: (chanType === 1 || chanType === 2) ? chanName : "", 
+				name: (chanType === 1 || chanType === 2) ? chanName : "DM", 
 				password: chanType === 2 ? chanPassword : "",
-				otherUserIdForPrivateMessage: 0
+				otherUserIdForPrivateMessage: userDM
 			};
 			// console.log(chanSettings);
 			const submitNewChannel = async () => {
@@ -78,10 +75,11 @@ function CreateChan({ type, hide, socket } : CreateChanProps) {
 				axios.post('/channel', chanSettings)
 				.then( res => {
 					// console.log ("RES post new chan", res);
-					changeChannel(res.data);
+					if (channel)
+						socket.emit('leave_chan', channel.id);
+					setChannel(res.data);
 					hide(0);
 					toggleDisplayList();
-					setIsLoading(false);
 				})
 				.catch (err => {
 					console.log(err);
@@ -90,6 +88,8 @@ function CreateChan({ type, hide, socket } : CreateChanProps) {
 			};
 			submitNewChannel();
 		}
+		else
+			setErrors(temp_errors);
 	};
 	// ---------- ??
 	var chanInfo;
@@ -139,16 +139,8 @@ function CreateChan({ type, hide, socket } : CreateChanProps) {
 	else
 	{
 		chanInfo = "/i\\ Start a private conversation with an other member.";
-		chanForm = <div id="selectUser">
-				ADD USER SELECT HERE
-				{/* <input autoFocus={true} placeholder="Select a user" list="userMp" />
-				<datalist id="userMp">
-					{usersList}
-				</datalist> */}
-				{/* <i className="fas fa-search"></i> */}
-				{/* <div>
-					<ul>{usersList}</ul>
-				</div> */}
+		chanForm = <div id="select_user">
+				<SearchUser theme="yo" list={ users } select={ setUserDM } />
 			</div>
 	}
 
@@ -165,17 +157,17 @@ function CreateChan({ type, hide, socket } : CreateChanProps) {
 				<div id="typeChanSelect">
 					<div
 						className={ chanType === 1 ? "selected" : "" } 
-						onClick={ () => { setChanType(1); setErrors([]); }} >
+						onClick={ () => { setChanType(1); setErrors([]); setUserDM(0); }} >
 						Public
 					</div>
 					<div
 						className={ chanType === 2 ? "selected" : "" } 
-						onClick={ () => { setChanType(2); setErrors([]); }} >
+						onClick={ () => { setChanType(2); setErrors([]); setUserDM(0); }} >
 						Private
 					</div>
 					<div
 						className={ chanType === 3 ? "selected" : "" }
-						onClick={ () => { setChanType(3); setErrors([]); } } >
+						onClick={ () => { setChanType(3); setErrors([]); setUserDM(0); } } >
 						DM
 					</div>
 				</div>
@@ -186,7 +178,7 @@ function CreateChan({ type, hide, socket } : CreateChanProps) {
 					{ chanForm }
 					{ errorList }
 					<input 
-						className={ chanName !== "" ? "readyToSubmit" : "" }
+						className={ (chanType !== 3 && chanName !== "") || userDM !== 0 ? "readyToSubmit" : "" }
 						type="submit" 
 						value={ isLoading ? "Loading..." : "Create channel" }
 					/>

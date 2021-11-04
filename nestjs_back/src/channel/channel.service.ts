@@ -72,6 +72,11 @@ export default class ChannelService {
     return next;
   }
 
+  async getNextUnmuteDate(channel_id: number){
+    let channel = await this.getAllInfosByChannelId(channel_id);
+    return await this.getNextExpiredMuteDate(channel.muteDates);
+  }
+
   async refreshMutedUsers(channel: & Channel) {
     let date = await this.getNextExpiredMuteDate(channel.muteDates);
     while (date !== null && BigInt(date) < BigInt(Date.now())) {
@@ -426,9 +431,12 @@ export default class ChannelService {
 
   async unmuteChecksOK(channel_id: number, other_id: number) {
     let channel = await this.getAllInfosByChannelId(channel_id);
-    await this.refreshMutedUsers(channel);
+    let dateIndex = channel.muteDates.findIndex(muteObj => muteObj.userId === other_id);
+    channel.muteDates.splice(dateIndex, 1);
+    let userIndex = channel.muted.findIndex(user => user.id === other_id);
+    channel.muted.splice(userIndex, 1);
     await this.channelRepository.save(channel);
-    return channel;
+    return await this.refreshMutedUsers(channel);
   }
 
   async unmuteAMember(channel_id: number, other_id: number, user_id: number) {

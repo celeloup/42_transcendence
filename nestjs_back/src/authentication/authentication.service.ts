@@ -83,14 +83,14 @@ export default class AuthenticationService {
   public getCookieForJwtToken(jwt: jwt) {
     const accessTokenExpiration = new Date();
     accessTokenExpiration.setSeconds(accessTokenExpiration.getSeconds() + jwt.expire_time);
-    const accessTokenCookie = `Authentication=${jwt.token}; HttpOnly; Path=/; SameSite=Strict; Expires=${accessTokenExpiration.toUTCString()}`;
+    const accessTokenCookie = `Authentication=${jwt.token}; HttpOnly; Path=/; SameSite=Lax; Expires=${accessTokenExpiration.toUTCString()}`;
     return { accessTokenCookie, accessTokenExpiration };
   }
 
   public getCookieForLogOut() {
     return [
-      'Authentication=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0',
-      'Refresh=; HttpOnly; Path=/; SameSite=Strict; Max-Age=0'
+      'Authentication=; HttpOnly; Path=/; SameSite=Lax; Max-Age=0',
+      'Refresh=; HttpOnly; Path=/; SameSite=Lax; Max-Age=0'
     ];
   }
 
@@ -112,7 +112,7 @@ export default class AuthenticationService {
   public getCookieForJwtRefreshToken(jwt: jwt) {
     const refreshTokenExpiration = new Date();
     refreshTokenExpiration.setSeconds(refreshTokenExpiration.getSeconds() + jwt.expire_time);
-    const refreshTokenCookie = `Refresh=${jwt.token}; HttpOnly; Path=/; SameSite=Strict; Expires=${refreshTokenExpiration.toUTCString()}`;
+    const refreshTokenCookie = `Refresh=${jwt.token}; HttpOnly; Path=/; SameSite=Lax; Expires=${refreshTokenExpiration.toUTCString()}`;
     return { refreshTokenCookie, refreshTokenExpiration };
   }
   
