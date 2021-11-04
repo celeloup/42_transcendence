@@ -156,7 +156,8 @@ export default class ChannelService {
     const channel = await this.getAllInfosByChannelId(channel_id);
     if ((await this.isOwner(channel_id, owner_id))) {
       //Flavien laisse libre cours à ta créativité
-      return (await this.channelRepository.update(channel_id, password));
+      channel.passwordSet = true;
+      return (await this.channelRepository.save(channel));
     }
     throw new HttpException('Only the owner of a channel can change its password', HttpStatus.NOT_FOUND);
   }
@@ -484,12 +485,16 @@ export default class ChannelService {
       name: channelData.name,
       owner: channelOwner,
       type: channelData.type,
-      password: channelData.password,
+      password: channelData.password, //Flavien
       members: [channelOwner],
       admins: [channelOwner],
       banned: [],
       muted: [],
     });
+    if (newChannel.password === "")
+      newChannel.passwordSet = false;
+    else
+      newChannel.passwordSet = true;
     if (newChannel.type === 3) {
       let newMember = await this.usersService.getById(channelData.otherUserIdForPrivateMessage);
       newChannel.members.push(newMember);
