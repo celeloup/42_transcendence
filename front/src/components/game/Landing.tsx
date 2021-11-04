@@ -16,7 +16,7 @@ function Landing() {
 		.then(response => { setLeaderboard(response.data); })
 		.catch(error => { console.log(error.response); })
 
-		masterSocket.emit("get_current_games");
+		masterSocket?.emit("get_current_games");
 		masterSocket?.on("current_games", (data : any) => { console.log(data);
 			setMatches(data);
 		});
