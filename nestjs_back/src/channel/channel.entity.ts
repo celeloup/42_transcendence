@@ -1,6 +1,6 @@
 import { ExecSyncOptionsWithBufferEncoding } from 'child_process';
 import { Column, Entity, ManyToOne, ManyToMany, PrimaryGeneratedColumn, OneToMany, JoinTable, UpdateDateColumn, Long } from 'typeorm';
-import { Type } from 'class-transformer';
+import { Type, Exclude} from 'class-transformer';
 import User from '../users/user.entity';
 import Message from './message.entity';
 import muteObj from './mute.entity';
@@ -16,6 +16,10 @@ class Channel {
   @Column({ default: 1 })
   public type: number;//  (1 = public, 2 = private, 3 = mp)
   
+  @Column()
+  public passwordSet: boolean;
+
+  @Exclude()
   @Column({ default: "" , nullable: true})
   public password: string;
 

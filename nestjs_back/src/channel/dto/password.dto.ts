@@ -1,10 +1,12 @@
-import { IsString } from 'class-validator';
-import { ApiProperty } from '@nestjs/swagger';
+import { IsString, IsOptional} from 'class-validator';
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export default class PasswordDto {
     
     @IsString()
     @ApiProperty()
-    password: string;
+    @ApiPropertyOptional()
+    @IsOptional()
+    password: string; 
     
 }
