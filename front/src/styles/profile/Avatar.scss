@@ -1,0 +1,35 @@
+$dark-gray: #3E3E3E;
+
+$scheme1: small 40;
+$scheme2: medium 50;
+$scheme3: large 100;
+
+$schemes: $scheme1 $scheme2 $scheme3;
+
+@each $scheme in $schemes {
+    .avatar.#{nth($scheme, 1)} {
+    	height: #{nth($scheme, 2)}px;
+    	width: #{nth($scheme, 2)}px;
+    	border: calc(#{nth($scheme, 2)}px * 0.04 + 1px) solid white;
+    	border-radius: calc(#{nth($scheme, 2)}px * 0.05);
+    	background-color: #3E3E3E;
+    	color: white;
+
+    	span {
+    		display: inline-block;
+    		width: #{nth($scheme, 2)}px;
+            height: #{nth($scheme, 2)}px;
+            line-height: #{nth($scheme, 2)}px;
+    		font-family: "Dogica", "Fira Mono";
+    		font-size: calc(#{nth($scheme, 2)}px * 0.6);
+    	}
+
+    	img {
+    		position: relative;
+    		width: #{nth($scheme, 2)}px;
+    		height: #{nth($scheme, 2)}px;
+    		object-fit: cover;
+    		object-position: left;
+    	}
+    }
+}

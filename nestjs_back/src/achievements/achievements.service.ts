@@ -16,7 +16,7 @@ export default class AchievementsService {
   }
 
   async getAchievementById(id: number) {
-    return await this.achievementsRepository.findOne(id);
+    return await this.achievementsRepository.findOne({id});
   }
   
   async createAchievement(achievementData: CreateAchievementDto) {

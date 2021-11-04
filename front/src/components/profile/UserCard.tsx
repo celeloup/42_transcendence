@@ -1,4 +1,5 @@
 import WindowBorder from "../ui_components/WindowBorder";
+import Avatar from './Avatar';
 import '../../styles/Profile.scss';
 
 type StatusDisplayProps = {
@@ -8,7 +9,6 @@ type StatusDisplayProps = {
 type UserCardProps = {
 	user_name: string,
     user_id: number,
-    has_avatar: boolean,
     rank: number,
     nb_matches: number,
     nb_victories: number,
@@ -25,15 +25,12 @@ export function StatusDisplay ( { state }: StatusDisplayProps) {
     )
 }
 
-function UserCard ({ user_name, user_id, has_avatar, rank, nb_matches, nb_victories, nb_points, online }: UserCardProps) {
+function UserCard ({ user_name, user_id, rank, nb_matches, nb_victories, nb_points, online }: UserCardProps) {
     return (
-        <WindowBorder id='user_window' w='319' h='208'>
+        <WindowBorder id='user_window' w='319' h='208' double={true}>
             <div id='user_card'>
                 <div id='row_top'>
-                   <div className="profile_display">
-                        <span>{ user_name.charAt(0) }</span>
-                        { has_avatar && <img src={ process.env.REACT_APP_BACK_URL + "/api/users/avatar/" + user_id } alt="user avatar"/> }
-                    </div>
+                    <Avatar size={"large"} id={user_id}/>
                     <div className="column_right">
                         <span className="name">{user_name}</span>
                         <StatusDisplay state={online ? 'online' : 'offline'} />

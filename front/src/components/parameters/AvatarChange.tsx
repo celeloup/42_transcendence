@@ -43,16 +43,20 @@ function AvatarChange () {
 	return (
 		<div className="subcontainer left">
 			<div className="pic_wrapper">
-				<div className="pic_base">
-					<p className="pic_base_text">
-                        { username.charAt(0) }
-                    </p>
-				</div>
-				<input
+				{ hasAvatar && <input
                     style={proPicPath(userId, hasAvatar)}
                     className="pic_input" type="file"
                     onChange={changePicture}> 
-                </input>
+                </input> }
+				{ !hasAvatar && <>
+					<div className="pic_base_text">
+					<input
+						className="pic_input" type="file"
+						onChange={changePicture}>
+					</input>
+                	    <span>{ username.charAt(0) }</span>
+            		</div>
+				</> }
 				<i className="pic_pencil fas fa-pen"></i>
 			</div>
 			{ avatarNotChanged && 

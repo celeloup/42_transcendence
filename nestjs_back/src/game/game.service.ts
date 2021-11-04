@@ -7,20 +7,19 @@ import MatchService from '../matches/matches.service';
 @Injectable()
 export default class GameService {
 
-	constructor(
-   		private readonly matchService: MatchService
-	) {}
-	private logger: Logger = new Logger("GameService");
-    
+    constructor(
+        private readonly matchService: MatchService
+    ) { }
+    private logger: Logger = new Logger("GameService");
+
     private usersRoom: Map<Socket, string> = new Map();
     private currentGames: Map<number, Round> = new Map();
-    // private currentGames: Round[] = [];
     private playingUsers: number[] = [];
 
     getCurrentGames() {
         return this.currentGames;
     }
-   
+
     setCurrentGames(id: number, param: Round) {
         this.currentGames.set(id, param);
     }
@@ -47,26 +46,26 @@ export default class GameService {
     }
 
     async launchGame(server: Server, match: Match, usersSocket: Map<number, Socket>) {
-        
+
         //on initialise la game avec les parametres de jeu envoye par le front et on l'ajoute aux matchs en cours
-        let round = new Round(match.id.toString(), match.friendly, match.user1_id, match.user2_id, match.speed, match.goal, match.boost_available, match.map);
+        let round = new Round(match.id.toString(), match.user1_id, match.user2_id, match.speed, match.goal, match.boost_available, match.map);
         this.currentGames.set(match.id, round);
         // this.currentGames.push(round);
-        
+
         //on lance le jeu, retourne 1 si la partie a ete annule
         if (await this.startGame(server, round, usersSocket, this.playingUsers)) {
             this.deleteMatchObjet(match.id);
             this.currentGames.delete(match.id);
-            return ;
+            return;
         }
-        
+
         //on met a jour l'objet match
         match.score_user1 = round.score_player1;
         match.score_user2 = round.score_player2;
         match.winner = round.victory;
-        
+
         //on save le game et on retire les infos "en cours";
-        this.matchService.updateMatch(match.id, match);
+        await this.matchService.updateMatch(match.id, match);
         delete this.playingUsers[round.id_player1];
         delete this.playingUsers[round.id_player2];
         this.currentGames.delete(match.id);
@@ -83,11 +82,11 @@ export default class GameService {
             return 1;
         }
         server.in(idGame).emit('game_starting', idGame);
-        
+
         //on ajoute les joueurs a la liste des users en cours de jeu et on attend laisse une pause avant de lancer la partie;
         inGame.push(param.id_player1);
         inGame.push(param.id_player2);
-        
+
         this.logger.log(`Start game ${param.id_game} in 5 seconds`);
         await new Promise(f => setTimeout(f, 5000));
         param.pending = false;
@@ -127,15 +126,15 @@ export default class GameService {
         return 0;
     }
 
-    hasVictory(param: Round) {
-        if (param.score_player1 === param.goal) {
-            param.victory = param.id_player1;
-            return;
-        }
-        if (param.score_player2 === param.goal) {
-            param.victory = param.id_player2;
-            return;
-        }
+    hasVictory(param: Round) {      
+            if (param.score_player1 === param.goal) {
+                param.victory = param.id_player1;
+                return;
+            }
+            if (param.score_player2 === param.goal) {
+                param.victory = param.id_player2;
+                return;
+            }
     }
 
     updateFrame(param: Round) {
