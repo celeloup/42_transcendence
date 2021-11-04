@@ -82,6 +82,7 @@ export default class MatchesService {
     return newMatch;
   }
 
+  //called from a websocket via updateMatch
   async weHaveAWinner(match: & Match) {
     const user1 = await this.usersService.getAllInfosByUserIdNoThrow(match.user1_id);
     const user2 = await this.usersService.getAllInfosByUserIdNoThrow(match.user2_id);
@@ -126,6 +127,7 @@ export default class MatchesService {
     return match;
   }
 
+  //called from a websocket
   async updateMatch(id: number, updatedMatch: & Match) {
     //await this.getMatchById(id);
     if (updatedMatch.score_user1 === updatedMatch.goal || updatedMatch.score_user2 === updatedMatch.goal)
@@ -134,6 +136,7 @@ export default class MatchesService {
       await this.matchesRepository.save(updatedMatch);
   }
 
+  //called from a websocket
   async deleteMatch(match_id: number) {
     const match = await this.matchesRepository.findOne(match_id, {
       relations: ['users'], order: {

@@ -21,6 +21,8 @@ export default class ChannelService {
     private usersService: UsersService,
   ) {
   }
+
+  //called from a websocket
   async saveMessage(content: string, author: User, recipient: Channel) {
     const newMessage = await this.messagesRepository.create({
       content,
