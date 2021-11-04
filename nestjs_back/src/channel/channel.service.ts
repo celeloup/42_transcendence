@@ -22,7 +22,6 @@ export default class ChannelService {
   ) {
   }
   async saveMessage(content: string, author: User, recipient: Channel) {
-    await this.getChannelById(recipient.id);//to check if channel exists
     const newMessage = await this.messagesRepository.create({
       content,
       author,

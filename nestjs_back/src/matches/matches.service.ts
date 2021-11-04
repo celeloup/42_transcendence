@@ -55,8 +55,10 @@ export default class MatchesService {
   }
 
   async weHaveAWinner(match: & Match) {
-    const user1 = await this.usersService.getAllInfosByUserId(match.user1_id);
-    const user2 = await this.usersService.getAllInfosByUserId(match.user2_id);
+    const user1 = await this.usersService.getAllInfosByUserIdNoThrow(match.user1_id);
+    const user2 = await this.usersService.getAllInfosByUserIdNoThrow(match.user2_id);
+    if (!user1 || !user2)
+      return ;
     if (!user1.achievements)
       user1.achievements = new Array;
     if (!user2.achievements)
@@ -100,7 +102,13 @@ export default class MatchesService {
   }
 
   async deleteMatch(match_id: number) {
-    let match = await this.getMatchById(match_id);
+    const match = await this.matchesRepository.findOne(match_id, {
+      relations: ['users'], order: {
+        createdDate: "DESC"
+      }
+    });
+    if (!match)
+      return ;
     match.users = [];
     await this.matchesRepository.save(match);
     await this.matchesRepository.delete(match_id);
