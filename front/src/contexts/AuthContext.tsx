@@ -1,6 +1,25 @@
 import * as React from "react";
 import { EffectCallback, useState, useEffect } from 'react';
 import { io } from "socket.io-client";
+import { ToastContainer, toast } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.min.css';
+
+function InvitationNotification({socket, match}:any) {
+	
+	const accept = () => {
+		socket.emit('accept_match', match);
+	}
+
+	const decline = () => {
+		socket.emit('decline_match', match);
+	}
+	
+	return (<div>
+		<div onClick={ accept }>ACCEPT</div>
+		<div onClick={ decline }>DECLINE</div>
+	</div>
+)}
+
 
 export type User = {
 	id: number,
@@ -44,6 +63,13 @@ export const AuthProvider= ({ children } : Props) => {
 		}
 	}, [setSocket, connect]);
 
+	useEffect(() => {
+		socket?.on('invitation', (data: any) => {
+			console.log("received invitation", data);
+			toast(<InvitationNotification socket={ socket } match={ data } />);
+		})
+	}, [socket])
+
 	const loginContext = (userIN:User) => {
 		// console.log("Context login : ", user);
 		setIsAuth(true);
@@ -69,5 +95,6 @@ export const AuthProvider= ({ children } : Props) => {
 			setToDisplay: setToDisplay
 			}}>
 				{ children }
+				<ToastContainer draggable={false} />
 		</AuthContext.Provider> );
 }

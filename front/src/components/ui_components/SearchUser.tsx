@@ -4,16 +4,20 @@ import { useState } from 'react';
 type SearchUserProps = {
 	theme: string,
 	list: any[],
-	select: (id:number) => void
+	select: (user:any) => void,
+	byID?: boolean
 }
 
-function SearchUser({ theme, list, select } : SearchUserProps) {
+function SearchUser({ theme, list, select, byID = true } : SearchUserProps) {
 	const [ search, setSearch ] = useState("");
 	const [ selected, setSelected ] = useState<number>(0);
 
-	const pick = (id: number) => {
-		setSelected(id);
-		select(id);
+	const pick = (user: any) => {
+		setSelected(user);
+		if (byID)
+			select(user.id);
+		else
+			select(user)
 	}
 
 	return (
@@ -25,7 +29,7 @@ function SearchUser({ theme, list, select } : SearchUserProps) {
 			<div id="list">
 				{ list.map((user:any) => {
 					if (user.name.includes(search))
-						return <div onClick={ () => pick(user.id) } key={ user.id } className={ selected === user.id ? "selected" : "" }>{ user.name }</div>
+						return <div onClick={ () => pick(user) } key={ user.id } className={ selected === user.id ? "selected" : "" }>{ user.name }</div>
 					else
 						return <></>
 					} ) }

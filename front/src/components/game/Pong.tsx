@@ -8,7 +8,6 @@ import axios from 'axios';
 
 import Coin from '../../assets/img/coin.svg';
 import KO from '../../assets/img/street_fighter_ko.png';
-import { setUncaughtExceptionCaptureCallback } from 'process';
 
 type Paddle = {
 	is_left: boolean,
@@ -101,12 +100,12 @@ function Street({ p1, p2, scoreP1, scoreP2, allP1, allP2, goal }: BackgroundProp
 		<div className="game_background" id="street">
 			<div id="first_line">
 				<div id="p1">
-					<img src="https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-1P"/>
-					<img src={ "https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-" + allP1?.toString().padStart(5, '0') }/>
+					<img alt="Player1" src="https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-1P"/>
+					<img alt="Player1 total score" src={ "https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-" + allP1?.toString().padStart(5, '0') }/>
 				</div>
 				<div id="p2">
-					<img src="https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-2P"/>
-					<img src={ "https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-" + allP2?.toString().padStart(5, '0') }/>
+					<img  alt="Player2" src="https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-2P"/>
+					<img  alt="Player2 total score" src={ "https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-" + allP2?.toString().padStart(5, '0') }/>
 				</div>
 			</div>
 			<div id="life_bar">
@@ -115,8 +114,8 @@ function Street({ p1, p2, scoreP1, scoreP2, allP1, allP2, goal }: BackgroundProp
 				<div id="p2_bar"><span style={{"width": p2_life + "%"}}></span></div>
 			</div>
 			<div id="last_line">
-				<img className="name" src={"https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-" + p1.toUpperCase()}/>
-				<img className="name" src={"https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-" + p2.toUpperCase()}/>
+				<img alt="Player1 name" className="name" src={"https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-" + p1.toUpperCase()}/>
+				<img alt="Player2 name" className="name" src={"https://nfggames.com/system/arcade/arcade.php/y-sf2/z-8/dbl-3/x-" + p2.toUpperCase()}/>
 			</div>
 		</div>
 	)
@@ -153,7 +152,7 @@ function Pong() {
 				setMatch(data);
 				setMap(data.map);
 				setGoal(data.goal);
-				console.log(res.data);
+				// console.log(res.data);
 				setMatchID(data.id);
 				setUser2(res.data);
 				setWaiting(false);
@@ -189,6 +188,11 @@ function Pong() {
 			setNoPending(true);
 			nopending = true;
 		});
+
+		masterSocket?.on('invit_decline', (data:any) => {
+			alert("They declined !");
+			setEndScreen(true);
+		})
 
 		return () => {
 			if (nopending === false)
