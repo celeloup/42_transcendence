@@ -128,7 +128,7 @@ function ChannelList () {
 				var chans = res.data.filter((c:any) => {
 					if (c.type === 1)
 						return (true);
-					else if (c.type === 2 && c.password !== "")
+					else if (c.type === 2 && c.passwordSet)
 						return (c.members.some((mem:any) => mem.id === user?.id) ? false : true)
 				});
 				// Get channels user is already in
