@@ -184,7 +184,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 	@SubscribeMessage('get_current_games')
 	async requestCurrentGames(@ConnectedSocket() socket: Socket) {
 		this.logger.log(`List of current games`);
-		socket.emit('connected_users', Array.from(this.gameService.getCurrentGames().keys()));
+		socket.emit('current_games', Array.from(this.gameService.getCurrentGames().keys()));
 	}
 
 	//renvoie la liste des users et des personnes en train de jouer

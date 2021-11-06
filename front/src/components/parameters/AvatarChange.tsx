@@ -1,22 +1,16 @@
 import axios from "axios";
-import React, { useEffect } from 'react';
+import React from 'react';
 import '../../styles/parameters/AvatarChange.scss';
 import '../../styles/parameters/Parameters.scss';
 
-function AvatarChange () {
-	const [avatarNotChanged, setAvatarNotChanged] = React.useState<boolean>(false);
-	const [username, setUsername] = React.useState<string>("");
-	const [userId, setUserId] = React.useState<number>(-1);
-	const [hasAvatar, setHasAvatar] = React.useState<boolean>(false);
+type AvatarProps = {
+	username: string;
+	id: number;
+	hasAvatar: boolean;
+}
 
-	useEffect(() => {
-		axios.get("/users/infos/me")
-		.then(response => { setUsername(response.data.name);
-							setUserId(response.data.id);
-							setHasAvatar(response.data.avatar !== null);
-						})
-		.catch(error => { console.log(error.response); });
-	}, []);
+function AvatarChange ({hasAvatar, username, id} : AvatarProps) {
+	const [avatarNotChanged, setAvatarNotChanged] = React.useState<boolean>(false);
 
 	const changePicture = (e: any) : void => {
 		const formData = new FormData();
@@ -44,7 +38,7 @@ function AvatarChange () {
 		<div className="subcontainer left">
 			<div className="pic_wrapper">
 				{ hasAvatar && <input
-                    style={proPicPath(userId, hasAvatar)}
+                    style={proPicPath(id, hasAvatar)}
                     className="pic_input" type="file"
                     onChange={changePicture}> 
                 </input> }
