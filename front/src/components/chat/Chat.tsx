@@ -233,7 +233,7 @@ export function Chat() {
 
 	// ----------- USERS ONLINE
 	useEffect(() => {
-		masterSocket.emit("get_users");
+		masterSocket?.emit("get_users");
 		masterSocket?.on("connected_users", (data : any) => { setUsersOnline(data); });
 	}, [masterSocket]);
 

@@ -24,23 +24,29 @@ function Buttons ({ id } : Props) {
 	const [ isBlocked, setIsBlocked ] = useState(false);
 
     useEffect(() => {
+		let mounted = true;
+
 		axios.get(`/users/infos/me`)
 		.then( res => {
 			if (id !== res.data.id)
 			{
-				if (res.data.friends.find((x:any) => x.id === id))
-					setIsFriend(true);
-				else
-					setIsFriend(false);
-				if (res.data.blocked.find((x:any) => x.id === id))
-					setIsBlocked(true);
-				else
-					setIsBlocked(false);
+				if (mounted) {
+					if (res.data.friends.find((x:any) => x.id === id))
+						setIsFriend(true);
+					else
+						setIsFriend(false);
+					if (res.data.blocked.find((x:any) => x.id === id))
+						setIsBlocked(true);
+					else
+						setIsBlocked(false);
+				}
 			}
 		})
 		.catch (err => {
 			console.log("Error:", err);
 		})
+
+		return () => { mounted = false };
 	}, [id]);
 	
 	const BlockUser = () => {
