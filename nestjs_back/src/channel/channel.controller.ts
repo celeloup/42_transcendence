@@ -107,14 +107,14 @@ export default class ChannelController {
   }
 
   @Put('join/:id')
-  @ApiOperation({ summary: "Join a public channel" })
+  @ApiOperation({ summary: "Join a channel / no password needed for a public channel" })
   @ApiParam({ name: 'id', type: Number, description: 'channel id' })
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')
   @UseGuards(JwtTwoFactorGuard)
-  joinChannel(@Req() req: RequestWithUser, @Param() { id }: FindOneParams) {
+  joinChannel(@Req() req: RequestWithUser, @Param() { id }: FindOneParams, @Body() password: PasswordDto) {
     const { user } = req;
-    return this.channelService.joinChannel(Number(id), user.id, "");
+    return this.channelService.joinChannel(Number(id), user.id, password.password);
   }
 
   @Put('members/:id')
