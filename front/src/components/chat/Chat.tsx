@@ -122,7 +122,7 @@ export function Chat() {
 	const [ usersOnline, setUsersOnline ] = useState<any[]>([]);
 
 	const joinChan = () => {
-		axios.put(`/channel/members/${ channel?.id }`, { "userId": user?.id })
+		axios.put(`/channel/join/${ channel?.id }`)
 		.then( res => {
 			socket.emit('join_chan', channel?.id);
 		})
@@ -233,7 +233,7 @@ export function Chat() {
 
 	// ----------- USERS ONLINE
 	useEffect(() => {
-		masterSocket.emit("get_users");
+		masterSocket?.emit("get_users");
 		masterSocket?.on("connected_users", (data : any) => { setUsersOnline(data); });
 	}, [masterSocket]);
 
