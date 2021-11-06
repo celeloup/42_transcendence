@@ -11,13 +11,25 @@ function Admin () {
 	const [matches, setMatches] = useState<any[]>([]);
 
 	useEffect(() => {
+		let mounted = true;
+
 		axios.get('/users')
-		.then ( response => { setNbUsers(response.data.length); })
+		.then ( response => {
+			if (mounted) {
+				setNbUsers(response.data.length);
+			}
+		})
 		.catch ( error => { console.log(error.response); })
 
 		axios.get('/matches')
-		.then ( response => { setMatches(response.data); })
+		.then ( response => {
+			if (mounted) {
+				setMatches(response.data);
+			}
+		})
 		.catch ( error => { console.log(error.response); })
+
+		return () => { mounted = false };
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 

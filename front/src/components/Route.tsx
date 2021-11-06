@@ -16,7 +16,7 @@ export function Route({ typeOfRoute, ...routeProps}: RouteProps) {
 		if (routeProps.path !== "/oauth")
 		{
 			axios.get(`/authentication`)
-			.then(response => { 
+			.then(response => {
 				// console.log("RES isAuth", response.data);
 				const user = { 
 					id: response.data.id,
