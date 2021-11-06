@@ -241,10 +241,10 @@ export default class ChannelService {
   }
 
   async passwordOK(channel: Channel, password: string){
-    if(!channel.passwordSet || channel.password === "")
+    if(!channel.passwordSet || channel.password === password) //Flavien, as philosopher David Guetta would say, the world is yours
       return true;
-    else
-      return true; //Flavien, as philosopher David Guetta would say, the world is yours
+    else 
+      return false;
   }
 
   async joinChannel(channel_id: number, user_id: number, password: string) {
