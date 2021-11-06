@@ -26,12 +26,12 @@ function BanPopup({ channel, close } : BanPopUpProps) {
 
 type AskPasswordProps = {
 	channel: string,
-	password: string,
-	join: () => void,
+	chanID: number,
+	socket: any,
 	setAskPassword: (val:boolean) => void
 }
 
-function AskPassword({ channel, password, join, setAskPassword } : AskPasswordProps) {
+function AskPassword({ channel, chanID, socket, setAskPassword } : AskPasswordProps) {
 	const [ typePassword, setTypePassword ] = useState(true);
 	const [ chanPassword, setChanPassword ] = useState<string>("");
 	const [ isLoading, setIsLoading ] = useState(false);
@@ -41,18 +41,31 @@ function AskPassword({ channel, password, join, setAskPassword } : AskPasswordPr
 
 	const handleSubmit = (e:any) => {
 		e.preventDefault();
-		if (password === chanPassword)
-		{
-			console.log("WELCOME");
-			setIsLoading(true);
-			join();
+		setIsLoading(true);
+		console.log(chanPassword);
+		axios.put(`/channel/join/${ chanID }`, { "password": chanPassword })
+		.then( res => {
+			socket.emit('join_chan', chanID);
 			setAskPassword(false);
-		}
-		else
-		{
+		})
+		.catch (err => {
 			setimsg(imsg + 1);
-			console.log("NOPE");
-		}
+			setIsLoading(false);
+			console.log("Error:", err);
+		})
+
+		// if (password === chanPassword)
+		// {
+		// 	console.log("WELCOME");
+		// 	setIsLoading(true);
+		// 	join();
+		// 	setAskPassword(false);
+		// }
+		// else
+		// {
+		// 	setimsg(imsg + 1);
+		// 	console.log("NOPE");
+		// }
 	}
 
 	return (
@@ -294,7 +307,7 @@ export function Chat() {
 				{ displayAdmin && <ChannelAdmin/> }
 				<ChatHeader hasBeenBanned={ hasBeenBanned } askPassword={ askPassword }/>
 				{ channel && hasBeenBanned === channel.id && <BanPopup channel={ channel ? channel.name : "" } close={ closeBan }/> }
-				{ channel && askPassword && <AskPassword channel={ channel.name } password={ channel.password } join={ joinChan } setAskPassword={ setAskPassword }/> }
+				{ channel && askPassword && <AskPassword channel={ channel.name } chanID={ channel.id } socket={ socket } setAskPassword={ setAskPassword }/> }
 				<div id="chat_messages">
 					{ channel === null && 
 						<div className="no_chan_msg">
