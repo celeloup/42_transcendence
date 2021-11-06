@@ -17,7 +17,7 @@ export default function Time() {
     }
     useEffect(() => {
         showTime();
-    }, [])
+    }, []) // eslint-disable-line
     
     return (
         <div id="time">

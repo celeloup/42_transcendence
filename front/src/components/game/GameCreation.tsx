@@ -9,44 +9,45 @@ import '../../styles/game/Creation.scss';
 import SearchUser from 'components/ui_components/SearchUser';
 
 
-type SelectInviteProps = {
+type SelectPlayerProps = {
 	display: (val:boolean) => void,
-	setInvitedUser: (user:any) => void
+	setInvitedPlayer: (user:any) => void
 }
 
-// const SelectInvite = ({ display, setInvitedUser } : SelectInviteProps) => {
-// 	// const [ isLoading, setIsLoading ] = useState(false);
-// 	const [ users, setUsers ] = useState<any[]>([]);
-// 	const [ user, setUser ] = useState(0);
-// 	const [ error, setError ] = useState<string>("");
-// 	var { masterSocket, setToDisplay } = useContext(AuthContext) as AuthContextType;
+const SelectPlayer = ({ display, setInvitedPlayer } : SelectPlayerProps) => {
+	// const [ isLoading, setIsLoading ] = useState(false);
+	const [ users, setUsers ] = useState<any[]>([]);
+	const [ user, setUser ] = useState(0);
+	// var { masterSocket } = useContext(AuthContext) as AuthContextType;
 
-// 	useEffect(() => {
-// 		axios.get(`/users`)
-// 		.then( res => {
-// 			// console.log(res.data);
-// 			setUsers(res.data);
-// 		})
-// 		.catch( err => {
-// 			console.log(err);
-// 		})
-// 	}, []);
+	useEffect(() => {
+		axios.get(`/users`)
+		.then( res => {
+			// console.log(res.data);
+			setUsers(res.data);
+		})
+		.catch( err => {
+			console.log(err);
+		})
+	}, []);
 
-// 	const handleSubmit = () => {
-// 		if (user !== 0)
-// 			setInvitedUser(user);
-// 	}
+	const handleSubmit = () => {
+		if (user !== 0) {
+			// console.log(user);
+			setInvitedPlayer(user);
+			display(false);
+		}
+	}
 
-// 	return (
-// 		<div id="add_member_popup">
-// 			{ error !== "" && <div id="add_member_error"><i className="fas fa-exclamation-triangle" /> { error }</div> }
-// 			<i className="fas fa-times" onClick={ () => display(false) }/>
-// 			[ select a user ]
-// 			<SearchUser theme="yo" list={ users } select={ setUser }/>
-// 			<div className={ user !== 0 ? "ready" : "" } id="submit" onClick={ handleSubmit }>Select</div>
-// 		</div>
-// 	)
-// }
+	return (
+		<div id="choose_player_popup">
+			<i className="fas fa-times" onClick={ () => display(false) }/>
+			[ select a player to challenge ]
+			<SearchUser theme="yo" list={ users } select={ setUser } byID={false}/>
+			<div className={ user !== 0 ? "ready" : "" } id="submit" onClick={ handleSubmit }>Select</div>
+		</div>
+	)
+}
 
 function GameCreation() {
 
@@ -56,22 +57,26 @@ function GameCreation() {
 	const [ speed, setSpeed ] = useState(1); // 0 slow, 1 normal, 2 fast
 	const [ map, setMap ] = useState(1); // 1 space, 2 mario (street fighter ? )
 	const [ boost, setBoost ] = useState(false);
-	const [ userInvit, setUserInvit ] = useState<any>(null);
+	const [ invitedPlayer, setInvitedPlayer ] = useState<any>(null);
+	const [ displayChoosePlayer, setDisplayChoosePlayer ] = useState(false);
 
 	const create_game = () => {
 		axios.post('/matches', {
 			"friendly": true,
 			"user1_id": user?.id,
-			"user2_id": 1,
+			"user2_id": invitedPlayer ? invitedPlayer.id : 1,
 			"map": map,
 			"speed": speed,
 			"goal": goal,
 			"boost_available": boost
 		  })
 		  .then( res => { 
-			  	console.log("create match success !", res.data);
+			  	// console.log("create match success !", res.data);
 				setMatch(res.data);
-				masterSocket.emit('create_game', res.data);
+				if (invitedPlayer)
+					masterSocket.emit('send_invit', res.data);
+				else
+					masterSocket.emit('create_game', res.data);
 				setToDisplay("pong");
 			} )
 		  .catch ( err => { alert("create match fail :("); console.log(err) } )
@@ -115,6 +120,10 @@ function GameCreation() {
 				<i className="fas fa-arrow-left back_button" onClick={ ()=> setToDisplay("landing") }/>
 				<i className="fas fa-meteor" />create_game_
 			</div>
+			{ displayChoosePlayer && 
+			<div id="card_modal" onClick={ (e:any) => { if (e.target.id === "card_modal") setDisplayChoosePlayer(false)}}>
+				<SelectPlayer display={ setDisplayChoosePlayer } setInvitedPlayer={ setInvitedPlayer } /> 
+			</div> }
 			<div id="game_settings_button">
 				<div id="goal">
 					<div>GOAL</div>
@@ -149,8 +158,8 @@ function GameCreation() {
 					<div className="explanation">Personnalize your game with our <span style={{"color": "#919191", "textDecoration": "line-through"}}>never seen before</span>, i mean cool maps.</div>
 				</div>
 			</div>
-			{/* <div id="challenge_button">CHALLENGE A USER</div> */}
-			<div id="create_game_button" onClick={ create_game }>CREATE GAME</div>
+			<div id="challenge_button" className="button" onClick={ () => setDisplayChoosePlayer(true) }>{ invitedPlayer ? "CHALLENGE " + invitedPlayer.name.toUpperCase() : "CHALLENGE A PLAYER" }</div>
+			<br/><div id="create_game_button" className="button" onClick={ create_game }>CREATE GAME</div>
 		</div>
 )}
 
