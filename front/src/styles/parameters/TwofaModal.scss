@@ -6,7 +6,7 @@ $light-gray: #E3E3E3;
 $dark-gray: #919191;
 $darker-gray: #3E3E3E;
 
-.modal {
+.twofa_modal {
 	visibility: hidden;
 	position: fixed;
 	left: 0;
@@ -16,7 +16,7 @@ $darker-gray: #3E3E3E;
 	background-color: rgba(0,0,0,0.4);
 }
 
-.content {
+.twofa_content {
     display: block;
     position: absolute;
     top: calc(50% - 275px);
