@@ -93,8 +93,8 @@ export default class UsersService {
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
-  async getAllInfosByUserId(id: number) {
-    const user = await this.usersRepository.findOne(
+  async getAllInfosByUserIdNoThrow(id: number) {
+    return await this.usersRepository.findOne(
       id, {
       relations: [
         'achievements',
@@ -109,6 +109,10 @@ export default class UsersService {
         'blocked',
         'blockedBy']
     })
+  }
+
+  async getAllInfosByUserId(id: number) {
+    const user = await this.getAllInfosByUserIdNoThrow(id);
     if (user)
       return user;
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
