@@ -10,15 +10,11 @@ import Pong from './Pong';
 function Game() {
 	var { toDisplay, setToDisplay } = useContext(AuthContext) as AuthContextType;
 
-	useEffect(
-		() => {
-		  setToDisplay("false");
-		},
-	[setToDisplay]);
-	
-	// const matchmaking = () => {
-	// 	socket.emit('match_player');
-	// }
+	// useEffect(
+	// 	() => {
+	// 	  setToDisplay("false");
+	// 	},
+	// [setToDisplay]);
 
 	var content;
 	if (toDisplay === "create")
@@ -31,18 +27,6 @@ function Game() {
 	return (
 		<WindowBorder w='782px' h='670px' id="game">
 			{ content }
-			
-			{/* <div id="game">
-				<div className="window_header" >
-					<button onClick={ create_game }>CREATE GAME</button>
-					
-					<button onClick={ matchmaking }>MATCH MAKING</button>
-				</div>
-				
-				<div id="game_window" >
-					
-				</div>
-			</div> */}
 		</WindowBorder>
 	)}
 

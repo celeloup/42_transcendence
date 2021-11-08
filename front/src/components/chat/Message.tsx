@@ -122,6 +122,10 @@ function ProfileCard( {id, online, setDisplayCard, setBlockedUsers }: CardProps)
 		}
 	}
 
+	const Challenge = () => {
+		console.log("challenging ", user);
+	}
+
 	var myself = <a href={"/profile/" + id}><div className="button" id="profile_button">See my profile</div></a>
 	var someone = <> 
 		<div className="flex">
@@ -140,7 +144,7 @@ function ProfileCard( {id, online, setDisplayCard, setBlockedUsers }: CardProps)
 				: <span>Loading...</span>}
 			</div>
 		</div>
-		<div className="button" id="challenge_button">
+		<div className="button" id="challenge_button" onClick={ Challenge }>
 			CHALLENGE<i className="fas fa-rocket"></i>
 		</div>
 		</>

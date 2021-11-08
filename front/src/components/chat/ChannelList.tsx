@@ -111,10 +111,11 @@ function ChannelList () {
 		axios.get(`/channel/`)
 		.then( res => {
 			var admin = user?.site_owner || user?.site_moderator;
+			var chans:any;
 			if (!admin)
 			{
 				// Filter to get all inaccessible
-				var chans = res.data.filter((c:any) => {
+				chans = res.data.filter((c:any) => {
 					if (c.type === 1)
 						return (true);
 					else if (c.type === 2 && c.passwordSet)
@@ -135,11 +136,13 @@ function ChannelList () {
 			}
 			else
 			{
-				var chans = res.data.filter((c:any) => {
+				chans = res.data.filter((c:any) => {
 					if (c.type !== 3)
 						return (true);
 					else if (c.type === 3)
 						return (c.members.some((mem:any) => mem.id === user?.id) ? true : false)
+					else
+						return (false);
 				});
 				setChannels(chans);
 				setIsLoading(false);
