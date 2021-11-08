@@ -63,10 +63,14 @@ function Landing() {
 			<div id="landing_displays">
 				<div className="match_list">
 					{ matches.length === 0 &&
-						<div>
-							<span>No one is playing, or waiting for an opponent.</span>
-							<span>Why not create your own match ?</span>
-						</div>
+						<>
+							<div>
+								<span>No one is playing, or waiting for an opponent.</span>
+							</div>
+							<div>
+								Why not create your own match ?
+							</div>
+						</>
 					}
 					{ matches.length > 0 &&
 						matches.map((match, i) =>
