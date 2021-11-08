@@ -63,12 +63,25 @@ export default class UsersService {
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
+  async userIsInTheMatch(match: Match, user_id: number){
+    var users = match.users
+    if (!users || !users[0] || !users[1] || (users[0].id !== user_id && users[1].id !== user_id))
+      return false;
+    else
+      return true;
+  }
+
   async getMatchesByUserId(id: number) {
-    const matches = await this.matchesRepository.find({
-      where: [{ user1_id: id }, { user2_id: id }], order: { createdDate: "DESC" }, relations: ['users']
+    var matches = await this.matchesRepository.find({
+      order: { createdDate: "DESC" }, relations: ['users']
     });
+    var matches2= [];
     if (matches)
-      return matches;
+      for (var match of matches)
+        if ((await this.userIsInTheMatch(match, id)))
+          await matches2.push(match);
+    if (matches2)
+      return matches2;
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 

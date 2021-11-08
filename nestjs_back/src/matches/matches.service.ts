@@ -54,11 +54,11 @@ export default class MatchesService {
 
     const user1 = await this.usersService.getById(matchData.user1_id);
     let achievement = null;
-    if (user1.matches.length === 1) {
+    if (user1.matches && user1.matches.length === 1) {
       achievement = await this.achievementsService.getAchievementByName("Newbie");
-    } else if (user1.matches.length === 10) {
+    } else if (user1.matches && user1.matches.length === 10) {
       achievement = await this.achievementsService.getAchievementByName("Casual");
-    } else if (user1.matches.length === 100) {
+    } else if (user1.matches && user1.matches.length === 100) {
       achievement = await this.achievementsService.getAchievementByName("Nolife");
     }
     if (achievement) {
@@ -68,11 +68,11 @@ export default class MatchesService {
     
     const user2 = await this.usersService.getById(matchData.user2_id);
     achievement = null;
-    if (user2.matches.length === 1) {
+    if (user2.matches && user2.matches.length === 1) {
       achievement = await this.achievementsService.getAchievementByName("Newbie");
-    } else if (user2.matches.length === 10) {
+    } else if (user2.matches && user2.matches.length === 10) {
       achievement = await this.achievementsService.getAchievementByName("Casual");
-    } else if (user2.matches.length === 100) {
+    } else if (user2.matches && user2.matches.length === 100) {
       achievement = await this.achievementsService.getAchievementByName("Nolife");
     }
     if (achievement) {
