@@ -2,6 +2,8 @@ import { useContext, useEffect, useState } from 'react';
 import { AuthContext, ContextType as AuthContextType} from '../../contexts/AuthContext';
 import axios from "axios";
 import Sabers from '../../assets/img/sabers.svg';
+import Ticket from '../../assets/img/join_game_ticket.svg';
+import Create from '../../assets/img/create_game.svg';
 import "../../styles/game/Landing.scss";
 
 function Landing() {
@@ -57,8 +59,9 @@ function Landing() {
 			<i className="fas fa-rocket"></i>game_
 			</div>
 			<div id="game_start_buttons">
-				<div onClick={ () => setToDisplay("create") }>CREATE GAME <br/>(a changer par image)</div>
-				<div onClick={ find_match }>JOIN GAME <br/>(matchmaking)<br/>(a changer par image)</div>
+				<img src={ Create } alt="Create a game" onClick={ () => setToDisplay("create") } />
+				<span>OR</span>
+				<img src={ Ticket } alt="Join a game" onClick={ find_match } />
 			</div>
 			<div id="landing_displays">
 				<div className="match_list">
@@ -77,7 +80,7 @@ function Landing() {
 							<div key={i}>
 								<span className="name">{ match.name1 }</span>
 								<span className="score">{ match.score1 }</span>
-								<img className="logo" src={ Sabers } alt="sabers"></img>
+								<img className="logo" src={ Sabers } alt="sabers" />
 								<span className="score">{ match.score2 }</span>
 								<span className="name">{ match.name2 }</span>
 							</div>

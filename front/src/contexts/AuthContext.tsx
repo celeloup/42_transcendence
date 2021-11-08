@@ -3,11 +3,14 @@ import { EffectCallback, useState, useEffect } from 'react';
 import { io } from "socket.io-client";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.min.css';
+import { useHistory } from "react-router-dom";
 
-function InvitationNotification({socket, match}:any) {
-	
+function InvitationNotification({socket, match, setToDisplay }:any) {
+	const history = useHistory();
 	const accept = () => {
+		setToDisplay('pong');
 		socket.emit('accept_match', match);
+		history.push("/");
 	}
 
 	const decline = () => {
@@ -66,7 +69,7 @@ export const AuthProvider= ({ children } : Props) => {
 	useEffect(() => {
 		socket?.on('invitation', (data: any) => {
 			console.log("received invitation", data);
-			toast(<InvitationNotification socket={ socket } match={ data } />);
+			toast(<InvitationNotification socket={ socket } match={ data } setToDisplay={ setToDisplay } />);
 		})
 	}, [socket])
 

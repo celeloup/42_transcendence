@@ -61,6 +61,15 @@ function GameCreation() {
 	const [ displayChoosePlayer, setDisplayChoosePlayer ] = useState(false);
 
 	const create_game = () => {
+		// var match = {
+		// 	"user1_id": user?.id,
+		// 	"user2_id": invitedPlayer ? invitedPlayer.id : 1,
+		// 	"map": map,
+		// 	"speed": speed,
+		// 	"goal": goal,
+		// 	"boost_available": boost
+		//   };
+		// console.log(match);
 		axios.post('/matches', {
 			"friendly": true,
 			"user1_id": user?.id,

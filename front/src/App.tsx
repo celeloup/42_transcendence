@@ -54,8 +54,8 @@ function OAuth({ location } : RouteComponentProps) {
 
 const App = () => {
 	return (
-		<AuthProvider>
-			<Router>
+		<Router>
+			<AuthProvider>
 				<div className="App">
 					<PageWrapper>
 					<Switch>
@@ -98,8 +98,8 @@ const App = () => {
 					</Switch>
 					</PageWrapper>
 				</div>
-			</Router>
-		</AuthProvider>
+			</AuthProvider>
+		</Router>
 	)
 }
 
