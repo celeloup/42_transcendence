@@ -1,95 +1,65 @@
 import WindowBorder from "../ui_components/WindowBorder";
-import '../../styles/Profile.scss';
+import { useState, useEffect } from "react";
+import '../../styles/profile/Achievements.scss';
 
 type Achievement = {
-    id: string;
     name: string;
-    desc: string;
-    color: string;
+    description: string;
+    type: number;
+    level: number;
 }
 
-function Achievements () {
+const Hidden : Achievement = {
+    name: "Achievement hidden...",
+    description: "",
+    type: 0,
+    level: 0
+}
 
-    const Played1 : Achievement = {
-        id: "played1",
-        name: "Newbie",
-        desc: "Play your first game",
-        color: "bronze"
+type Props = {
+    achievements: any[];
+}
+
+function Achievements ({ achievements } : Props) {
+    const colors = ["default", "bronze", "silver", "gold"];
+    const icons = ["question-circle", "gamepad", "trophy", "users"];
+
+    const makeAchievement = ( data : any ) => {
+        return (
+        <div className={"achievement " + colors[data.level]}>
+            <i className={"fas fa-" + icons[data.type]}></i>
+            <p>{ data.name }</p>
+            { data.type > 0 && <span>{ data.description }</span> }
+        </div>
+        )
     }
 
-    const Played2 : Achievement = {
-        id: "played2",
-        name: "Casual",
-        desc: "Play 10 games",
-        color: "silver"
-    }
+    const [gamesAchievement, setGamesAchievement] = useState<any>(makeAchievement(Hidden));
+    const [victoriesAchievement, setVictoriesAchievement] = useState<any>(makeAchievement(Hidden));
+    const [friendsAchievement, setFriendsAchievement] = useState<any>(makeAchievement(Hidden));
+    const setTable = [setGamesAchievement, setVictoriesAchievement, setFriendsAchievement];
 
-    const Played3 : Achievement = {
-        id: "played3",
-        name: "Nolife",
-        desc: "Play 100 games",
-        color: "gold"
-    }
-
-    const Won1 : Achievement = {
-        id: "won1",
-        name: "Must Be Luck",
-        desc: "Win your first game",
-        color: "bronze"
-    }
-
-    const Won2 : Achievement = {
-        id: "won2",
-        name: "Getting there",
-        desc: "Win 10 games",
-        color: "silver"
-    }
-
-    const Won3 : Achievement = {
-        id: "won3",
-        name: "Pro Gamer",
-        desc: "Win 50 games",
-        color: "gold"
-    }
-
-    const Friend1 : Achievement = {
-        id: "friend1",
-        name: "So Alone...",
-        desc: "Make your first friend",
-        color: "bronze"
-    }
-
-    const Friend2 : Achievement = {
-        id: "friend2",
-        name: "Not So Alone",
-        desc: "Make 5 friends",
-        color: "silver"
-    }
-
-    const Friend3 : Achievement = {
-        id: "friend3",
-        name: "Social Butterfly",
-        desc: "Make 10 friends",
-        color: "gold"
-    }
+    useEffect(() => {
+        for (let t = 1 ; t < 4 ; t++) {
+            for (let l = 3 ; l > 0 ; l--) {
+                let achievement = achievements.find(a => (a['type'] === t && a['level'] === l));
+                if (achievement) {
+                    setTable[t - 1](makeAchievement(achievement));
+                    break ;
+                }
+            }
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [achievements]);
 
     return (
         <WindowBorder w='620' h='175'>
             <>
                 <div className="window_header header_title" ><i>_</i>achievements_</div>
                 <div id='achievement_imgs'>
-                    <div className="achievement">
-                        <i className="fas fa-question-circle"></i>
-                        <span>Achievement hidden...</span>
-                    </div>
-                    <div className="achievement">
-                        <i className="fas fa-question-circle"></i>
-                        <span>Achievement hidden...</span>
-                    </div>
-                    <div className="achievement">
-                        <i className="fas fa-question-circle"></i>
-                        <span>Achievement hidden...</span>
-                    </div>
+                    { gamesAchievement }
+                    { victoriesAchievement }
+                    { friendsAchievement }
                 </div>
             </>
         </WindowBorder>

@@ -8,14 +8,16 @@ import Admin from './components/Admin';
 import Home from './components/Home';
 import Profile from './components/Profile';
 import Parameters from './components/Parameters';
+import TwoFA from './components/TwoFA';
 import axios from 'axios';
 import PageWrapper from './components/ui_components/PageWrapper';
 
-function OAuth({ location } : RouteComponentProps) {
+function OAuth({ location } : RouteComponentProps) { 
 	const { login } = React.useContext(AuthContext) as ContextType;
 	let code:string = location.search;
 
 	const [loading, setLoading] = React.useState(true);
+	const [isTwoFA, setIsTwoFA] = React.useState(false);
 
 	useEffect(() => {
 		axios.get(`/authentication/oauth${code}`)
@@ -30,7 +32,9 @@ function OAuth({ location } : RouteComponentProps) {
 					isTwoFactorAuth: response.data.isTwoFactorAuthenticationEnabled,
 				}
 				login(user);
+				setIsTwoFA(response.data.isTwoFactorAuthenticationEnabled);
 				setLoading(false);
+
 			})
 			.catch(error => {
 				console.log("Error catch :", error.response);
@@ -40,10 +44,12 @@ function OAuth({ location } : RouteComponentProps) {
 			})
 	}, [code]); // eslint-disable-line
 
-	if (loading === false)
-		return <Redirect to={{ pathname: '/' }} />;
-	else
+	if (loading === true)
 		return <div>Loading ...</div>
+	else if (isTwoFA)
+		return <Redirect to={{ pathname: '/2fa' }} />
+	else
+		return <Redirect to={{ pathname: '/' }} />
 }
 
 const App = () => {
@@ -82,6 +88,12 @@ const App = () => {
 							exact={true}
 							path='/oauth'
 							component={ OAuth }
+						/>
+						<Route
+							typeOfRoute="public"
+							exact={true}
+							path='/2fa'
+							component={ TwoFA }
 						/>
 					</Switch>
 					</PageWrapper>

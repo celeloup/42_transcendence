@@ -8,9 +8,7 @@ import { Reflector } from '@nestjs/core';
 import * as cookieParser from 'cookie-parser';
 import UsersModule from '../src/users/users.module';
 import AuthenticationModule from '../src/authentication/authentication.module';
-import io from 'socket.io-client';
 import ChannelModule from '../src/channel/channel.module';
-import Message from "../src/channel/message.entity";
 
 describe('AppController (e2e)', () => {
   let app: INestApplication;

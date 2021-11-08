@@ -38,7 +38,7 @@ function TwofaModal ( { modalVisible, setModalVisible, is2FA, setIs2FA, qrCode }
 
 	return (
 		<div className={"modal" + (modalVisible ? " visible" : "" )} /*onClick={() => {setModalVisible(false)}}*/>
-			<div className={"modal_content" + (modalVisible ? " visible" : "" )}>
+			<div className={"content" + (modalVisible ? " visible" : "" )}>
 				{qrCode && <img className="qr_code" src={qrCode} alt="2FA QR Code"></img>}
 				{ message === 0 && <p>Scan the QR Code with Google Authenticator<br />and type the code you get below</p>}
 				{ message === 1 && <p>2FA was successfully turned on ✔️</p>}

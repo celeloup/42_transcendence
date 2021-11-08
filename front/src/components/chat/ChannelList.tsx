@@ -117,7 +117,7 @@ function ChannelList () {
 				var chans = res.data.filter((c:any) => {
 					if (c.type === 1)
 						return (true);
-					else if (c.type === 2 && c.password !== "")
+					else if (c.type === 2 && c.passwordSet)
 						return (c.members.some((mem:any) => mem.id === user?.id) ? false : true)
 					else
 						return (false);
@@ -135,7 +135,13 @@ function ChannelList () {
 			}
 			else
 			{
-				setChannels(res.data);
+				var chans = res.data.filter((c:any) => {
+					if (c.type !== 3)
+						return (true);
+					else if (c.type === 3)
+						return (c.members.some((mem:any) => mem.id === user?.id) ? true : false)
+				});
+				setChannels(chans);
 				setIsLoading(false);
 			}
 		})

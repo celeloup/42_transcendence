@@ -1,78 +1,34 @@
 import WindowBorder from "../ui_components/WindowBorder";
 import Avatar from "./Avatar"
-import React, { useEffect } from "react";
-import axios from "axios";
+import React from "react";
 import Sabers from '../../assets/img/sabers.svg';
 import '../../styles/Profile.scss';
 
-
-type MatchType = {
-	boost_available: boolean;
-	createdDate: string;
-	friendly: boolean;
-	goal: number;
-	id: number;
-	map: number;
-	score_user1: number;
-	score_user2: number;
-	speed: number;
-	user1_id: number;
-	user2_id: number;
-	winner: number;
-}
-
-type Player = {
-    id: number;
-    name: string;
-    score: number;
-    winner: boolean;
-}
-
 type MatchProps = {
-    data: MatchType;
+    data: any;
     my_id: number;
     focus: boolean;
     setFocus: (key: number) => void;
 }
 
 type HistoryProps = {
-    matches: MatchType[];
+    matches: any[];
     my_id: number;
 }
 
 function Match ( { data, my_id, focus, setFocus } : MatchProps ) {
-    const [player1, setPlayer1] = React.useState<Player>({
+    const player1 = {
         id: data.user1_id,
-        name: "",
+        name: "data.users[0].name",
         score: data.score_user1,
         winner: data.winner === data.user1_id
-    });
-    const [player2, setPlayer2] = React.useState<Player>({
+    };
+    const player2 = {
         id: data.user2_id,
-        name: "",
+        name: "data.users[1].name",
         score: data.score_user2,
         winner: data.winner === data.user2_id
-    });
-
-    useEffect(() => {
-        axios.get("/users/infos/" + data.user1_id)
-		.then(response => { setPlayer1({ id: data.user1_id,
-                                        name: response.data.name,
-                                        score: data.score_user1,
-                                        winner: data.winner === data.user1_id
-                                    });
-						})
-		.catch(error => { console.log(error.response); });
-
-		axios.get("/users/infos/" + data.user2_id)
-		.then(response => { setPlayer2({ id: data.user2_id,
-                                        name: response.data.name,
-                                        score: data.score_user2,
-                                        winner: data.winner === data.user2_id
-                                    });
-						})
-		.catch(error => { console.log(error.response); });
-	}, [data]);
+    };
 
     let me, them;
     if (my_id === data.user1_id) {
