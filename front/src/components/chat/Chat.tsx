@@ -53,19 +53,6 @@ function AskPassword({ channel, chanID, socket, setAskPassword } : AskPasswordPr
 			setIsLoading(false);
 			console.log("Error:", err);
 		})
-
-		// if (password === chanPassword)
-		// {
-		// 	console.log("WELCOME");
-		// 	setIsLoading(true);
-		// 	join();
-		// 	setAskPassword(false);
-		// }
-		// else
-		// {
-		// 	setimsg(imsg + 1);
-		// 	console.log("NOPE");
-		// }
 	}
 
 	return (
