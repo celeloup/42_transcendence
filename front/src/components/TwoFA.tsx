@@ -27,7 +27,7 @@ function TwoFA () {
 		return <Redirect to={{ pathname: '/' }} />
 	else
 		return (
-			<div style={{ height: "250px", top: "calc(50% - 100px)", }} className="content visible">
+			<div style={{ height: "250px", top: "calc(50% - 100px)", }} className="twofa_content visible">
 				<div style={{ position: "relative", top: "20px" }}>
 					{ message === 0 && <p>Go in Google Authenticator<br />and type the code linked to your account</p>}
 					{ message === 1 && <p>You're successfully authenticated ✔️</p>}
