@@ -159,6 +159,8 @@ export default class ChannelService {
       //Flavien laisse libre cours à ta créativité
       channel.password = password.password;
       channel.passwordSet = true;
+      if (channel.password === "")
+        channel.passwordSet = false;
       return (await this.channelRepository.save(channel));
     }
     throw new HttpException('Only the owner of a channel can change its password', HttpStatus.NOT_FOUND);
