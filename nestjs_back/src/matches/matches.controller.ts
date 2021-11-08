@@ -25,6 +25,9 @@ export default class MatchesController {
   @ApiParam({name: 'id', type: Number, description: 'match id'})
   @Get(':id')
   @ApiOperation({summary: "Get a match"})
+  @SerializeOptions({
+    groups: ['infos']
+  })
   getMatchById(@Param() { id }: FindOneParams) {
     return this.matchesService.getMatchById(Number(id));
   }

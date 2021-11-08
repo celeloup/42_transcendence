@@ -82,9 +82,12 @@ export default class MatchesService {
     return newMatch;
   }
 
+  //called from a websocket via updateMatch
   async weHaveAWinner(match: & Match) {
-    const user1 = await this.usersService.getAllInfosByUserId(match.user1_id);
-    const user2 = await this.usersService.getAllInfosByUserId(match.user2_id);
+    const user1 = await this.usersService.getAllInfosByUserIdNoThrow(match.user1_id);
+    const user2 = await this.usersService.getAllInfosByUserIdNoThrow(match.user2_id);
+    if (!user1 || !user2)
+      return ;
     user1.points += match.score_user1;
     user2.points += match.score_user2;
     if (match.score_user1 === match.goal) {
@@ -124,6 +127,7 @@ export default class MatchesService {
     return match;
   }
 
+  //called from a websocket
   async updateMatch(id: number, updatedMatch: & Match) {
     //await this.getMatchById(id);
     if (updatedMatch.score_user1 === updatedMatch.goal || updatedMatch.score_user2 === updatedMatch.goal)
@@ -132,8 +136,15 @@ export default class MatchesService {
       await this.matchesRepository.save(updatedMatch);
   }
 
+  //called from a websocket
   async deleteMatch(match_id: number) {
-    let match = await this.getMatchById(match_id);
+    const match = await this.matchesRepository.findOne(match_id, {
+      relations: ['users'], order: {
+        createdDate: "DESC"
+      }
+    });
+    if (!match)
+      return ;
     match.users = [];
     await this.matchesRepository.save(match);
     await this.matchesRepository.delete(match_id);

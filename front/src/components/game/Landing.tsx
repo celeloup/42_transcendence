@@ -21,10 +21,15 @@ function Landing() {
 		.catch(error => { console.log(error.response); })
 
 		masterSocket?.emit("get_current_games");
+<<<<<<< HEAD
 		masterSocket?.on("current_games", (data : number[]) => {
 			if (mounted) {
 				resolveMatches(data);
 			}
+=======
+		masterSocket?.on("current_games", (data : any) => { console.log(data);
+			setMatches(data);
+>>>>>>> Antho2
 		});
 
 		return () => { mounted = false };
