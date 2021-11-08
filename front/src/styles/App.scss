@@ -58,8 +58,18 @@ header, footer {
 	width: 145px;
 }
 
+@keyframes radar {
+	100% {
+		background-position: 0 -8192px;
+	}
+}
+
 .radar {
-	width: 143px;
+	width: 148px;
+	height: 128px;
+	background: url('../assets/img/radar_alternate.svg');
+	background-size: cover;
+	animation: radar 3s steps(64) infinite;
 }
 
 .viseur {

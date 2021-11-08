@@ -27,20 +27,21 @@ function TwoFA () {
 		return <Redirect to={{ pathname: '/' }} />
 	else
 		return (
-			<div className="modal visible">
-				<div className="modal_content visible">
-					{ message === 0 && <p>Go on Google Authenticator<br />and type the code linked to your account</p>}
+			<div style={{ height: "250px", top: "calc(50% - 100px)", }} className="content visible">
+				<div style={{ position: "relative", top: "20px" }}>
+					{ message === 0 && <p>Go in Google Authenticator<br />and type the code linked to your account</p>}
 					{ message === 1 && <p>You're successfully authenticated ✔️</p>}
 					{ message === 2 && <p>Couldn't authenticate you, try again ❌</p>}
-					<input
-							className="six_digit_code"
-							type="text"
-							value={twofaCode}
-							onChange={e => sendCode(e.target.value)}
-							ref={coderef}
-							maxLength={6}>
-					</input>
 				</div>
+				<input
+						style={{ position: "relative", top: "30px" }}
+						className="six_digit_code"
+						type="text"
+						value={twofaCode}
+						onChange={e => sendCode(e.target.value)}
+						ref={coderef}
+						maxLength={6}>
+				</input>
 			</div>
 		);
   }

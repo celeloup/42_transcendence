@@ -32,7 +32,7 @@ function OAuth({ location } : RouteComponentProps) {
 					isTwoFactorAuth: response.data.isTwoFactorAuthenticationEnabled,
 				}
 				login(user);
-				// setIsTwoFA(response.data.isTwoFactorAuthenticationEnabled);
+				setIsTwoFA(response.data.isTwoFactorAuthenticationEnabled);
 				setLoading(false);
 
 			})
@@ -46,8 +46,8 @@ function OAuth({ location } : RouteComponentProps) {
 
 	if (loading === true)
 		return <div>Loading ...</div>
-	// else if (isTwoFA)
-	// 	return <Redirect to={{ pathname: '/2FA' }} />
+	else if (isTwoFA)
+		return <Redirect to={{ pathname: '/2fa' }} />
 	else
 		return <Redirect to={{ pathname: '/' }} />
 }
@@ -89,12 +89,12 @@ const App = () => {
 							path='/oauth'
 							component={ OAuth }
 						/>
-						{/* <Route
+						<Route
 							typeOfRoute="public"
 							exact={true}
 							path='/2fa'
 							component={ TwoFA }
-						/> */}
+						/>
 					</Switch>
 					</PageWrapper>
 				</div>
