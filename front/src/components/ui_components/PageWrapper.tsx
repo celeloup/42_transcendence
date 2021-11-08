@@ -8,8 +8,9 @@ import Arrows from '../../assets/img/arrows.svg';
 import Fusibles from './Fusibles';
 import HistogramBar from '../../assets/img/histogram_bar.svg';
 import Squares from '../../assets/img/little_squares.svg';
-import Radar from '../../assets/img/radar.svg';
+// import Radar from '../../assets/img/radar.svg';
 import Time from './Time';
+// import Temp from '../../assets/img/temp.svg';
 import Viseur from '../../assets/img/viseur.svg';
 
 type Props = {
@@ -18,16 +19,18 @@ type Props = {
 
 function PageWrapper( { children }: Props) {
 	var { isAuth, user } = useContext(AuthContext) as ContextType;
+
+	var display : boolean = (isAuth || window.location.pathname === '/2fa');
 	return (
 		<>
-		{ isAuth && <header className="App-header">
+		{ display && <header className="App-header">
 			<img className="square" src={ Squares } alt="Decoration (squares)"/>
 			<Time />
 			<div id="logo_wrapper">
 				<Logo />
 				<img className="viseur" src={ Viseur } alt="Decoration (viseur)"/>
 			</div>
-			<img className="radar" src={ Radar } alt="Decoration (radar)"/>
+			<div className="radar"/>
 			<img className="square flip" src={ Squares } alt="Decoration (squares)"/>
 		</header>}
 		{ isAuth && <div id="navBar" className="rotate_right">
@@ -38,7 +41,7 @@ function PageWrapper( { children }: Props) {
 		<div className="body_wrapper">
 			{ children }
 		</div>
-		{ isAuth && <footer>
+		{ display && <footer>
 			<img className="arrows flip" src={ Arrows } alt="Decoration (arrows)"/>
 			<img className="histogram" src={ HistogramBar } alt="Decoration (Histogram)" />
 			<Fusibles />

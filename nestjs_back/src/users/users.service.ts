@@ -93,8 +93,8 @@ export default class UsersService {
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
-  async getAllInfosByUserId(id: number) {
-    const user = await this.usersRepository.findOne(
+  async getAllInfosByUserIdNoThrow(id: number) {
+    return await this.usersRepository.findOne(
       id, {
       relations: [
         'achievements',
@@ -109,6 +109,10 @@ export default class UsersService {
         'blocked',
         'blockedBy']
     })
+  }
+
+  async getAllInfosByUserId(id: number) {
+    const user = await this.getAllInfosByUserIdNoThrow(id);
     if (user)
       return user;
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
@@ -210,11 +214,18 @@ export default class UsersService {
           if (!(await this.isBlocked(friend_id, user_id))) {
             let user = await this.getAllInfosByUserId(user_id);
             const friend = await this.getById(friend_id);
-            const firstFriend = await this.achievementsService.getAchievementById(1);
-            if (user.friends.length === 0 && user.achievements
-              && user.achievements.findIndex(achievement => achievement.id === 1) !== 1)
-              user.achievements.push(firstFriend);
             user.friends.push(friend);
+            let achievement = null;
+            if (user.friends.length === 1) {
+              achievement = await this.achievementsService.getAchievementByName("So Alone...");
+            } else if (user.friends.length === 10) {
+              achievement = await this.achievementsService.getAchievementByName("Not So Alone");
+            } else if (user.friends.length === 20) {
+              achievement = await this.achievementsService.getAchievementByName("Social Butterfly");
+            }
+            if (achievement) {
+              user.achievements.push(achievement);
+            }
             await this.usersRepository.save(user);
             return user.friends;
           }

@@ -12,9 +12,18 @@ function Avatar ({ size, id } : Props) {
 	const [ username, setUsername ] = useState<string>("");
 
     useEffect(() => {
+        let mounted = true;
+
         axios.get("/users/infos/" + id)
-        .then( response => { setHasAvatar(response.data.avatar !== null); setUsername(response.data.name); } )
+        .then( response => {
+            if (mounted) {
+                setHasAvatar(response.data.avatar !== null);
+                setUsername(response.data.name);
+            }
+        })
         .catch( error => { console.log(error.response); })
+
+        return () => { mounted = false };
 	}, [id]);
 
     return (

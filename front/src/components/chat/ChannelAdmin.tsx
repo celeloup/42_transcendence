@@ -7,15 +7,15 @@ import SearchUser from 'components/ui_components/SearchUser';
 import { MemberCard, BannedCard } from './ChannelAdminMemberCard';
 
 type EditPasswordProps = {
-	password: string,
+	passwordSet: boolean,
 	chan: number,
 	display: (val:boolean) => void,
 	refresh: boolean,
 	setRefresh: (val:boolean) => void
 }
 
-const EditPassword = ({ password, chan, display, setRefresh, refresh,} : EditPasswordProps) => {
-	const [ pass, setPass ] = useState(password);
+const EditPassword = ({ passwordSet, chan, display, setRefresh, refresh,} : EditPasswordProps) => {
+	const [ pass, setPass ] = useState("");
 	const [ typePassword, setTypePassword ] = useState(true);
 	const [ isLoading, setIsLoading ] = useState(false);
 
@@ -45,7 +45,7 @@ const EditPassword = ({ password, chan, display, setRefresh, refresh,} : EditPas
 	return (
 		<div id="edit_password_popup">
 			<i className="fas fa-times" onClick={ () => display(false) }/>
-			[ Add, edit or remove the password. ]
+			[ Edit the password. ]
 			<form onSubmit={ handleSubmit }>
 				<label id="passwordLabel">
 					<input
@@ -59,12 +59,12 @@ const EditPassword = ({ password, chan, display, setRefresh, refresh,} : EditPas
 					<i className={ typePassword ? "fas fa-eye-slash" : "fas fa-eye" } onClick={ () => setTypePassword(!typePassword)}></i>
 				</label>
 				<input 
-						className={ (pass !== "" && pass !== password) ? "readyToSubmit" : "" }
+						className={ (pass !== "") ? "readyToSubmit" : "" }
 						type="submit" 
 						value={ isLoading ? "Loading..." : "Submit" }
 					/>
 			</form>
-			{ password !== "" && <div id="remove_password" onClick={ () => { changePass(""); }}><i className="fas fa-trash" />Remove password</div> }
+			{ passwordSet && <div id="remove_password" onClick={ () => { changePass(""); }}><i className="fas fa-trash" />Remove password</div> }
 		</div>
 	)
 }
@@ -143,7 +143,7 @@ export function ChannelAdmin () {
 	const [ ownerID, setOwnerID ] = useState<number>(-1);
 	const [ loadingLeave, setLoadingLeave ] = useState(false);
 	const [ displayEditPassword, setDisplayEditPassword ] = useState(false);
-	const [ password, setPassword ] = useState("");
+	const [ passwordSet, setPasswordSet ] = useState<boolean>(false);
 	const [ displayAddMember, setDisplayAddMember ] = useState(false);
 	const [ error, setError ] = useState<string>("");
 	
@@ -152,7 +152,7 @@ export function ChannelAdmin () {
 		{
 			axios.get(`/channel/infos/${ channel.id }`)
 			.then( res => {
-				setPassword(res.data.password);
+				setPasswordSet(res.data.passwordSet);
 				// console.log("RES chan infos", res);
 				// ********* SET MEMBERS LIST
 				var memb = res.data.members.map( (m:any) => {
@@ -233,9 +233,9 @@ export function ChannelAdmin () {
 	var description;
 	if (channel && channel.type === 1)
 		description = "This channel is public. Everyone can join it.";
-	else if (channel && channel.type === 2 && password === "")
+	else if (channel && channel.type === 2 && !passwordSet)
 		description = "This channel is private. Nobody except the added members can see this channel. Add a password to make it visible to everyone and restrict access.";
-	else if (channel && channel.type === 2 && password !== "")
+	else if (channel && channel.type === 2 && passwordSet)
 		description = "This channel is private. Everyone can try to access it by providing a password. Remove the password to hide the channel to any non-member."
 	else
 		description = "This is a private conversation. Only you and your correspondant can see it."
@@ -251,7 +251,7 @@ export function ChannelAdmin () {
 			{ channel && displayEditPassword && 
 				<div id="card_modal" onClick={ (e:any) => { if (e.target.id === "card_modal") setDisplayEditPassword(false)}}>
 				<EditPassword
-					password={ password }
+					passwordSet={ passwordSet }
 					chan={ channel.id }
 					display={ setDisplayEditPassword }
 					refresh={ refresh }
@@ -335,7 +335,7 @@ export function ChannelAdmin () {
 			{ channel?.type === 2 && user?.id === ownerID && 
 				<div id="password_button" onClick={ () => setDisplayEditPassword(true) }>
 					<i className="fas fa-key" />
-					{ password ? "Edit password" : "Add a password" }
+					{ passwordSet ? "Edit password" : "Add a password" }
 				</div>
 			}
 			<div id="leave_button" onClick={ leave_chan } >

@@ -3,19 +3,20 @@ import React, { useEffect } from 'react';
 import '../../styles/parameters/Parameters.scss'
 import '../../styles/parameters/NameChange.scss';
 
-function NameChange () {
+type NameProps = {
+	username: string;
+}
+
+function NameChange ({ username } : NameProps) {
 	const [nameWasChanged, setNameWasChanged] = React.useState<boolean>(false);
 	const [nameNotChanged, setNameNotChanged] = React.useState<boolean>(false);
-	const [oldUsername, setOldUsername] = React.useState<string>("");
-	const [newUsername, setNewUsername] = React.useState<string>("");
+	const [oldUsername, setOldUsername] = React.useState<string>(username);
+	const [newUsername, setNewUsername] = React.useState<string>(username);
 
 	useEffect(() => {
-		axios.get("/users/infos/me")
-		.then(response => { setNewUsername(response.data.name);
-							setOldUsername(response.data.name);
-						})
-		.catch(error => { console.log(error.response); });
-	}, []);
+		setOldUsername(username);
+		setNewUsername(username);
+	}, [username]);
 
 	function nameIsSame () : boolean {
 		return (newUsername === oldUsername)
