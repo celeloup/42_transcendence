@@ -231,9 +231,9 @@ export default class UsersService {
             let achievement = null;
             if (user.friends.length === 1) {
               achievement = await this.achievementsService.getAchievementByName("So Alone...");
-            } else if (user.friends.length === 10) {
+            } else if (user.friends.length === 5) {
               achievement = await this.achievementsService.getAchievementByName("Not So Alone");
-            } else if (user.friends.length === 20) {
+            } else if (user.friends.length === 10) {
               achievement = await this.achievementsService.getAchievementByName("Social Butterfly");
             }
             if (achievement) {
