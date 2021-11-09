@@ -36,6 +36,57 @@ $green: #81A439;
 		}
 	}
 
+	#infos_error_game {
+		font-family: "Dogica";
+		line-height: 25px;
+		width: 600px;
+		margin: auto;
+		margin-top: 100px;
+		
+		.buttons {
+			display: flex;
+			margin-top: 50px;
+
+			div {
+				display: inline-block;
+				height: 30px;
+				background-color: $accent_color;
+				color: $background-color;
+				padding: 13px 15px 10px 15px;
+				cursor: pointer;
+				user-select: none;
+				font-size: 25px;
+				font-family: "Dogica";
+				position: relative;
+				margin: auto;
+				margin-bottom: 30px;
+
+				&:before {
+					content: "";
+					width: calc(100% - 8px);
+					height: 6px;
+					position: absolute;
+					background-color: $accent_color;
+					top: -4px;
+					left: 4px;
+				}
+				&:after {
+					content: "";
+					width: calc(100% - 8px);
+					height: 6px;
+					position: absolute;
+					background-color: $accent_color;
+					bottom: -4px;
+					left: 4px;
+				}
+
+				&:hover {
+					transform: scale(1.05);
+				}
+			}
+		}
+	}
+
 	#no_pending_game {
 		width: 400px;
 		border: 4px solid $accent_color;
@@ -69,6 +120,11 @@ $green: #81A439;
 
 	#waiting {
 		margin-top: 200px;
+		font-family: "Dogica";
+		color: $dark-gray;
+		p {
+			margin-top: 20px;
+		}
 	}
 
 	.game_background {

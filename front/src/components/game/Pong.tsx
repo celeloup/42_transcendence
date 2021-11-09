@@ -27,11 +27,12 @@ type Puck = {
 
 type endScreenProps = {
 	score1: number,
-	score2: number
+	score2: number,
+	setToDisplay: (s:string) => void
 }
 
-function EndScreen({ score1, score2 } : endScreenProps) {
-	var { setToDisplay } = useContext(AuthContext) as AuthContextType;
+function EndScreen({ score1, score2, setToDisplay } : endScreenProps) {
+	// var { setToDisplay } = useContext(AuthContext) as AuthContextType;
 	return (
 		<div id="end_screen">
 			<div> GAME FINISHED </div>
@@ -41,12 +42,29 @@ function EndScreen({ score1, score2 } : endScreenProps) {
 	)
 }
 
-function NoPendingGame() {
-	var { setToDisplay } = useContext(AuthContext) as AuthContextType;
+type InfoProps = {
+	setToDisplay: (s:string) => void,
+	message: string
+}
+
+function NoPendingGame({ setToDisplay } : InfoProps) {
+	// var { setToDisplay } = useContext(AuthContext) as AuthContextType;
 	return (
 		<div id="no_pending_game">
 			There is no current pending game.<br/> You can create a game yourself and challenge another player.
 			<div className="flex">
+				<div id="back_button" onClick={ ()=> setToDisplay("landing") }> <i className="fas fa-arrow-left"/>Go back </div>
+				<div id="create_game_button" onClick={ ()=> setToDisplay("create") }>CREATE A GAME</div>
+			</div>
+		</div>
+	)
+}
+
+function InfoError({ setToDisplay, message } : InfoProps) {
+	return (
+		<div id="infos_error_game">
+			{ message }
+			<div className="buttons">
 				<div id="back_button" onClick={ ()=> setToDisplay("landing") }> <i className="fas fa-arrow-left"/>Go back </div>
 				<div id="create_game_button" onClick={ ()=> setToDisplay("create") }>CREATE A GAME</div>
 			</div>
@@ -141,6 +159,7 @@ function Pong() {
 	// GAME POPUP
 	const [ endScreen, setEndScreen ] = useState<boolean>(false);
 	const [ noPending, setNoPending ] = useState<boolean>(false);
+	const [ declined, setDeclined ] = useState<boolean>(false);
 	const [ waiting, setWaiting ] = useState<boolean>(true);
 	
 	useEffect(() => {
@@ -190,8 +209,9 @@ function Pong() {
 		});
 
 		masterSocket?.on('invit_decline', (data:any) => {
-			alert("They declined !");
-			setEndScreen(true);
+			id = data;
+			// alert("They declined !");
+			setDeclined(true);
 		})
 
 		return () => {
@@ -274,8 +294,9 @@ function Pong() {
 				{ matchID && <>{ score[0] } MACHIN VS TRUC { score[1] }</> }
 				{ matchID ? " GAME START" : "[LOOKING FOR A PLAYER]"}
 			</div>
-			{ endScreen && <EndScreen score1={score[0]} score2={score[1]}/> }
-			{ noPending && <NoPendingGame /> }
+			{ endScreen && <EndScreen score1={ score[0] } score2={ score[1] } setToDisplay={ setToDisplay }/> }
+			{ noPending && <InfoError setToDisplay={ setToDisplay } message="No one is currently looking for a second player. Why don't you create your own game ?" /> }
+			{ declined && <InfoError setToDisplay={ setToDisplay } message={ `${ user2.name } refused your challenge (the coward). Maybe try creating a new game and challenge someone who won't be scared of your pong skills.` } /> }
 			{ !waiting && map === 2 && <Mario p1={ match.users[0].name } p2={ user2.name } scoreP1={score[0]} scoreP2={score[1]}/>}
 			{ !waiting && map === 3 && <Street p1={ match.users[0].name } p2={ user2.name } scoreP1={score[0]} scoreP2={score[1]} goal={goal} allP1={ match.users[0].points } allP2={ user2.points }/>}
 			{ !waiting && !noPending && <Sketch setup={ setup } draw={ draw } keyPressed={ keyPressed } keyReleased={ keyReleased }/> }

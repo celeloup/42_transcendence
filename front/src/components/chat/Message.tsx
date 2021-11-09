@@ -1,6 +1,8 @@
 import Avatar from "../profile/Avatar";
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
+import { useHistory } from "react-router-dom";
+import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
 
 type MessageProps = {
 	id: number,
@@ -24,6 +26,8 @@ function ProfileCard( {id, online, setDisplayCard, setBlockedUsers }: CardProps)
 	const [ me, setMe ] = useState<any>(null);
 	const [ isFriend, setIsFriend ] = useState(false);
 	const [ isBlocked, setIsBlocked ] = useState(false);
+	var { setChallenged, setToDisplay } = useContext(AuthContext) as AuthContextType;
+	const history = useHistory();
 	
 	useEffect(() => {
 		axios.get(`/users/infos/${id}`)
@@ -87,8 +91,6 @@ function ProfileCard( {id, online, setDisplayCard, setBlockedUsers }: CardProps)
 	}
 	
 	const [ loadingFriend, setLoadingFriend ] = useState(false);
-	
-
 	const FriendUser = () => {
 		setLoadingFriend(true);
 		if (isFriend)
@@ -123,7 +125,10 @@ function ProfileCard( {id, online, setDisplayCard, setBlockedUsers }: CardProps)
 	}
 
 	const Challenge = () => {
-		console.log("challenging ", user);
+		setChallenged(user);
+		setToDisplay("create");
+		history.push("/");
+		// console.log("challenging ", user);
 	}
 
 	var myself = <a href={"/profile/" + id}><div className="button" id="profile_button">See my profile</div></a>

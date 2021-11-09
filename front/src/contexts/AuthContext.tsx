@@ -5,21 +5,27 @@ import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.min.css';
 import { useHistory } from "react-router-dom";
 
-function InvitationNotification({socket, match, setToDisplay }:any) {
+function InvitationNotification({ closeToast, socket, match, setToDisplay }:any) {
 	const history = useHistory();
 	const accept = () => {
 		setToDisplay('pong');
 		socket.emit('accept_match', match);
+		// closeToast();
 		history.push("/");
 	}
 
 	const decline = () => {
+		closeToast();
 		socket.emit('decline_match', match);
 	}
 	
-	return (<div>
-		<div onClick={ accept }>ACCEPT</div>
-		<div onClick={ decline }>DECLINE</div>
+	return (
+	<div id="invitation">
+		<p><span>{ match.users[0].name }</span><br/>challenged you !</p>
+		<div id="buttons">
+			<div onClick={ accept }>ACCEPT</div>
+			<div onClick={ decline }>DECLINE</div>
+		</div>
 	</div>
 )}
 
@@ -41,7 +47,9 @@ export type ContextType = {
 	setUser: (user:User) => void,
 	masterSocket: any,
 	setToDisplay: (page:string) => void,
-	toDisplay: string
+	toDisplay: string,
+	challenged: any,
+	setChallenged: (user:any) => void
   }
 
 interface Props {
@@ -57,6 +65,7 @@ export const AuthProvider= ({ children } : Props) => {
 	const [ socket, setSocket ] = useState<any>(null);
 	const [ connect, setConnect ] = useState<boolean>(false);
 	const [ toDisplay, setToDisplay ] = useState<string>("landing");
+	const [ challenged, setChallenged ] = useState<any>(null);
 
 	useEffect(() : ReturnType<EffectCallback> => {
 		if (connect) {
@@ -66,10 +75,26 @@ export const AuthProvider= ({ children } : Props) => {
 		}
 	}, [setSocket, connect]);
 
+
 	useEffect(() => {
 		socket?.on('invitation', (data: any) => {
+			const decline = () => {
+				socket.emit('decline_match', data);
+			}
+			const options = {
+				onClose: decline,
+				autoClose: 6000,
+				type: toast.TYPE.SUCCESS,
+				icon: false,
+				hideProgressBar: false,
+				position: toast.POSITION.TOP_CENTER,
+				pauseOnHover: true,
+				pauseOnFocusLoss: true,
+				draggable: false,
+				closeOnClick: false
+			};
 			console.log("received invitation", data);
-			toast(<InvitationNotification socket={ socket } match={ data } setToDisplay={ setToDisplay } />);
+			toast(<InvitationNotification socket={ socket } match={ data } setToDisplay={ setToDisplay } />, options);
 		})
 	}, [socket])
 
@@ -95,9 +120,11 @@ export const AuthProvider= ({ children } : Props) => {
 			setUser:setUser, 
 			masterSocket: socket,
 			toDisplay: toDisplay,
-			setToDisplay: setToDisplay
+			setToDisplay: setToDisplay,
+			challenged: challenged,
+			setChallenged: setChallenged
 			}}>
 				{ children }
-				<ToastContainer draggable={false} />
+				<ToastContainer />
 		</AuthContext.Provider> );
 }

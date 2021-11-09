@@ -50,15 +50,24 @@ const SelectPlayer = ({ display, setInvitedPlayer } : SelectPlayerProps) => {
 }
 
 function GameCreation() {
-
 	var { setMatch } = useContext(GameContext) as ContextType;
-	var { masterSocket, setToDisplay, user } = useContext(AuthContext) as AuthContextType;
+	var { masterSocket, setToDisplay, user, challenged, setChallenged } = useContext(AuthContext) as AuthContextType;
 	const [ goal, setGoal ] = useState(10); // entre 1 et 20
 	const [ speed, setSpeed ] = useState(1); // 0 slow, 1 normal, 2 fast
 	const [ map, setMap ] = useState(1); // 1 space, 2 mario (street fighter ? )
 	const [ boost, setBoost ] = useState(false);
-	const [ invitedPlayer, setInvitedPlayer ] = useState<any>(null);
+	const [ invitedPlayer, setInvitedPlayer ] = useState<any>(challenged);
 	const [ displayChoosePlayer, setDisplayChoosePlayer ] = useState(false);
+
+	useEffect(() => {
+		setInvitedPlayer(challenged);
+	  }, [challenged]);
+
+	  useEffect(() => {
+		return () => {
+		  setChallenged(null);
+		};
+	  }, []);
 
 	const create_game = () => {
 		// var match = {

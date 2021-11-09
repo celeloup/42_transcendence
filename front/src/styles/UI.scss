@@ -1,6 +1,7 @@
 $background-color: #232323;
 $text-color: white;
 $accent_color: #FFCD27;
+$red: #BF3030;
 
 .rotate_right
 {
@@ -307,6 +308,75 @@ $accent_color: #FFCD27;
 // 	}
 // }
 
-// ********** USER SEARCH
+// ********** TOAST
+
+.Toastify__progress-bar {
+	background-color: $accent_color;
+}
+
+.Toastify__toast-container--top-center {
+	margin-top: 30px;
+}
+
+#invitation {
+	font-family: "Dogica";
+	color: $background-color;
+	p {
+		margin-top: 5px;
+		text-align: center;
+		span {
+			display: inline-block;
+			color: $accent_color;
+			font-size: 20px;
+			margin-bottom: 5px;
+		}
+	}
+
+	#buttons {
+		display: flex;
+		justify-content: space-between;
+		margin: 25px 0 15px 0;
+		// gap: 10px;
+	}
+	
+	#buttons div {
+		background-color: $accent_color;	
+		padding: 10px 20px;
+		position: relative;
+
+		&:before {
+			content: "";
+			width: calc(100% - 8px);
+			height: 6px;
+			position: absolute;
+			background-color: #FFCD27;
+			top: -4px;
+			left: 4px;
+		}
+		&:after {
+			content: "";
+			width: calc(100% - 8px);
+			height: 6px;
+			position: absolute;
+			background-color: #FFCD27;
+			bottom: -4px;
+			left: 4px;
+		}
+		&:hover {
+			transform: scale(1.1);
+		}
+	}
+
+	#buttons div:nth-child(2) {
+		background-color: $red;
+		color: $background-color;
+		&:before {
+			background-color: $red;
+		}
+		&:after {
+			background-color: $red;
+		}
+	}
+}
 
 

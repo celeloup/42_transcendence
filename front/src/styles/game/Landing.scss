@@ -17,7 +17,7 @@ $green: #81A439;
 		width: 100%;
         justify-content: center;
         align-items: center;
-        margin: 50px 0;
+        margin: 50px 0 100px 0;
         
         img {
             width: 280px;
@@ -54,7 +54,7 @@ $green: #81A439;
         flex-direction: row;
         justify-content: space-evenly;
 		// width: 98%;
-		height: 350px;
+		height: 280px;
 		margin: 30px;
 		background-color: $background-color;
         // border: 3px solid red;
@@ -169,6 +169,7 @@ $green: #81A439;
 
                     .name {
                         font-family: "Fira Mono";
+						height: 20px;
                         font-size: 20px;
                         color: white;
                         width: 60%;
