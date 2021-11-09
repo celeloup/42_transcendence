@@ -297,6 +297,12 @@ $red: #BF3030;
 	}
 }
 
+@media (max-height: 1000px) {
+	#time {
+		display: none;
+	}
+}
+
 // @media (max-height: 1000px) { 
 
 // 	#navBar {
