@@ -8,6 +8,8 @@ import axios from 'axios';
 
 import Coin from '../../assets/img/coin.svg';
 import KO from '../../assets/img/street_fighter_ko.png';
+import Telescope from '../../assets/img/telescope.svg';
+import TelescopeTop from '../../assets/img/telescope_top.svg';
 
 type Paddle = {
 	is_left: boolean,
@@ -44,29 +46,21 @@ function EndScreen({ score1, score2, setToDisplay } : endScreenProps) {
 
 type InfoProps = {
 	setToDisplay: (s:string) => void,
-	message: string
+	message: string,
+	type: number
 }
 
-function NoPendingGame({ setToDisplay } : InfoProps) {
-	// var { setToDisplay } = useContext(AuthContext) as AuthContextType;
-	return (
-		<div id="no_pending_game">
-			There is no current pending game.<br/> You can create a game yourself and challenge another player.
-			<div className="flex">
-				<div id="back_button" onClick={ ()=> setToDisplay("landing") }> <i className="fas fa-arrow-left"/>Go back </div>
-				<div id="create_game_button" onClick={ ()=> setToDisplay("create") }>CREATE A GAME</div>
-			</div>
-		</div>
-	)
-}
-
-function InfoError({ setToDisplay, message } : InfoProps) {
+function InfoError({ setToDisplay, message, type } : InfoProps) {
 	return (
 		<div id="infos_error_game">
-			{ message }
+			{ type === 1 &&
+			<div id="telescope_img"><img id="telescope_top" src={ TelescopeTop } alt="Telescope img top"/>
+			<img id="telescope" src={ Telescope } alt="Telescope img"/></div>
+			}
+			<p>{ message }</p>
 			<div className="buttons">
-				<div id="back_button" onClick={ ()=> setToDisplay("landing") }> <i className="fas fa-arrow-left"/>Go back </div>
-				<div id="create_game_button" onClick={ ()=> setToDisplay("create") }>CREATE A GAME</div>
+				<div id="back_button" onClick={ ()=> setToDisplay("landing") }> <i className="fas fa-arrow-left"/> Go back </div>
+				<div id="create_game_button" onClick={ ()=> setToDisplay("create") }>Create a game</div>
 			</div>
 		</div>
 	)
@@ -164,8 +158,10 @@ function Pong() {
 	
 	useEffect(() => {
 		let id:number;
+		let game_starting = false;
 		masterSocket?.on('game_starting', (data:any) => {
-			// console.log("game starting !", data);
+			console.log("game starting !", data);
+			game_starting = true;
 			axios.get(`/users/infos/${ data.user2_id}`)
 			.then (res => {
 				setMatch(data);
@@ -210,8 +206,13 @@ function Pong() {
 
 		masterSocket?.on('invit_decline', (data:any) => {
 			id = data;
-			// alert("They declined !");
-			setDeclined(true);
+			console.log("They declined !", data);
+			if (!game_starting)
+				setDeclined(true);
+		});
+
+		masterSocket?.on('cancel_game', (data:any) => {
+			console.log("game cancel", data);
 		})
 
 		return () => {
@@ -287,20 +288,28 @@ function Pong() {
 		}
 	};
 
+	let header_text;
+	if (noPending)
+		header_text = "[ NO PENDING GAME ]";
+	else if (declined)
+		header_text = "[ MATCH REQUEST DECLINED ]";
+	else if (waiting)
+		header_text = "[ WAITING FOR PLAYER 2 ]";
+
 	return (
 		<div id="pong_game">
 			<div className="window_header" >
 				<i className="fas fa-arrow-left back_button" onClick={ ()=> setToDisplay("landing") }/>
 				{ matchID && <>{ score[0] } MACHIN VS TRUC { score[1] }</> }
-				{ matchID ? " GAME START" : "[LOOKING FOR A PLAYER]"}
+				{ matchID ? " GAME START" : header_text }
 			</div>
 			{ endScreen && <EndScreen score1={ score[0] } score2={ score[1] } setToDisplay={ setToDisplay }/> }
-			{ noPending && <InfoError setToDisplay={ setToDisplay } message="No one is currently looking for a second player. Why don't you create your own game ?" /> }
-			{ declined && <InfoError setToDisplay={ setToDisplay } message={ `${ user2.name } refused your challenge (the coward). Maybe try creating a new game and challenge someone who won't be scared of your pong skills.` } /> }
+			{ noPending && <InfoError setToDisplay={ setToDisplay } type={ 1 } message="We searched the entire galaxy and no one is currently looking for a second player. Why don't you create your own game ?" /> }
+			{ declined && <InfoError setToDisplay={ setToDisplay } type={ 2 } message={ `The player refused your challenge (the coward). Maybe try creating a new game and challenge someone who won't be scared of your pong skills.` } /> }
 			{ !waiting && map === 2 && <Mario p1={ match.users[0].name } p2={ user2.name } scoreP1={score[0]} scoreP2={score[1]}/>}
 			{ !waiting && map === 3 && <Street p1={ match.users[0].name } p2={ user2.name } scoreP1={score[0]} scoreP2={score[1]} goal={goal} allP1={ match.users[0].points } allP2={ user2.points }/>}
 			{ !waiting && !noPending && <Sketch setup={ setup } draw={ draw } keyPressed={ keyPressed } keyReleased={ keyReleased }/> }
-			{ waiting && !noPending && <div id="waiting">
+			{ waiting && !noPending && !declined && <div id="waiting">
 				<i className="fas fa-spinner" />
 				<p>Waiting for a second player ...</p>
 			</div> }

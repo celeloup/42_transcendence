@@ -10,13 +10,12 @@ function InvitationNotification({ closeToast, socket, match, setToDisplay }:any)
 	const accept = () => {
 		setToDisplay('pong');
 		socket.emit('accept_match', match);
-		// closeToast();
 		history.push("/");
+		closeToast();
 	}
 
 	const decline = () => {
 		closeToast();
-		socket.emit('decline_match', match);
 	}
 	
 	return (
@@ -66,6 +65,7 @@ export const AuthProvider= ({ children } : Props) => {
 	const [ connect, setConnect ] = useState<boolean>(false);
 	const [ toDisplay, setToDisplay ] = useState<string>("landing");
 	const [ challenged, setChallenged ] = useState<any>(null);
+	const [ matchToDecline, setMatchToDecline ] = useState<number>(0);
 
 	useEffect(() : ReturnType<EffectCallback> => {
 		if (connect) {
@@ -74,6 +74,11 @@ export const AuthProvider= ({ children } : Props) => {
 			return () => newSocket.close();
 		}
 	}, [setSocket, connect]);
+
+	useEffect(() => {
+		if (matchToDecline)
+			socket.emit('decline_match', matchToDecline);
+	}, [matchToDecline])
 
 
 	useEffect(() => {
@@ -93,7 +98,7 @@ export const AuthProvider= ({ children } : Props) => {
 				draggable: false,
 				closeOnClick: false
 			};
-			console.log("received invitation", data);
+			// console.log("received invitation", data);
 			toast(<InvitationNotification socket={ socket } match={ data } setToDisplay={ setToDisplay } />, options);
 		})
 	}, [socket])

@@ -41,25 +41,41 @@ $green: #81A439;
 		line-height: 25px;
 		width: 600px;
 		margin: auto;
-		margin-top: 100px;
+		margin-top: 80px;
+
+		#telescope_img {
+			position: relative;
+			margin-bottom: 30px;
+		}
+
+		#telescope_top {
+			width: 180px;
+			transform: rotate(-15deg);
+			position: absolute;
+			top: 75px;
+			left: 200px;
+		}
+		#telescope {
+			width: 300px;
+		}
 		
 		.buttons {
 			display: flex;
 			margin-top: 50px;
+			gap: 30px;
+			justify-content: center;
 
 			div {
 				display: inline-block;
 				height: 30px;
 				background-color: $accent_color;
 				color: $background-color;
-				padding: 13px 15px 10px 15px;
+				padding: 10px 15px 7px 15px;
 				cursor: pointer;
 				user-select: none;
-				font-size: 25px;
+				font-size: 20px;
 				font-family: "Dogica";
 				position: relative;
-				margin: auto;
-				margin-bottom: 30px;
 
 				&:before {
 					content: "";
@@ -70,6 +86,7 @@ $green: #81A439;
 					top: -4px;
 					left: 4px;
 				}
+
 				&:after {
 					content: "";
 					width: calc(100% - 8px);
@@ -84,37 +101,6 @@ $green: #81A439;
 					transform: scale(1.05);
 				}
 			}
-		}
-	}
-
-	#no_pending_game {
-		width: 400px;
-		border: 4px solid $accent_color;
-		margin: auto;
-		margin-top: 50px;
-		padding: 20px;
-		border-radius: 5px;
-
-		#create_game_button {
-			background-color: $accent_color;
-			padding: 10px;
-			margin-top: 20px;
-			width: 150px;
-			cursor: pointer;
-			color: $background-color;
-			border-radius: 5px;
-		}
-
-		#back_button {
-			background-color: $dark-gray;
-			padding: 10px;
-			margin-top: 20px;
-			width: 150px;
-			cursor: pointer;
-			color: $background-color;
-			border-radius: 5px;
-
-			i{ margin-right: 10px;}
 		}
 	}
 
@@ -158,7 +144,7 @@ $green: #81A439;
 
 			.name {
 				text-transform: uppercase;
-				font-weight: 600;
+				// font-weight: 600;
 				margin: 0 20px;
 			}
 		}
