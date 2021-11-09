@@ -1,0 +1,364 @@
+$background-color: #232323;
+$text-color: white;
+$accent_color: #FFCD27;
+$light-gray: #E3E3E3;
+$dark-gray: #919191;
+$green: #81A439;
+$red: #BF3030;
+
+// #game
+// {
+// 	.window_header {
+// 		margin-bottom: 4px;
+// 		display: flex;
+// 		align-content: center;
+// 		justify-content: left;
+// 		padding-top: 8px;
+// 		height: 30px
+// 	}
+// }
+
+// #game_window
+// {
+// 	display: inline-block;
+// 	height: 100%;
+// 	width: 100%;
+// }
+
+#game_creation {
+
+	.back_button {
+		font-size: 26px;
+		cursor: pointer;
+		margin: -5px 30px 0 10px;
+		color: $dark-gray;
+
+		&:hover {
+			color: $background-color;
+			// transform: scale(1.15);
+		}
+	}
+
+	.fa-meteor {
+		font-size: 22px;
+		margin: -4px 10px 0 0;
+	}
+	
+	#game_settings_button {
+		display: flex;
+		font-family: "Dogica";
+		justify-content: space-evenly;
+		align-content: center;
+		margin-top: 60px;
+		padding-bottom: 140px;
+		
+		.settings_arrows {
+			width: 50px;
+			&.active {
+				cursor: pointer;
+			}
+			&.disabled {
+				cursor: initial;
+			}
+		}
+
+		.settings_value {
+			margin: 10px;
+			font-size: 30px;
+			user-select: none;
+			height: 40px;
+			padding: 25px 0;
+		}
+
+		#goal div:first-child, #speed div:first-child, #boost div:first-child, #map div:first-child {
+			font-size: 20px;
+			user-select: none;
+			// background-color: $accent_color;
+			padding: 14px 10px;
+			width: 100px;
+			margin: auto;
+			margin-bottom: 30px;
+			color: $background-color;
+			// border-radius: 5px;
+			background-image: url("../../assets/img/plate.svg");
+			background-size: contain;
+			background-repeat: no-repeat;
+		}
+
+		#goal .settings_value {
+			width: 100px;
+			text-align: center;
+			font-size: 50px;
+		}
+
+		#speed .settings_value {
+			width: 155px;
+			text-align: center;
+			cursor: pointer;
+			font-size: 25px;
+		}
+
+		.slow_speed p{
+			letter-spacing: 12px;
+			// width: 130px;
+			margin-left: 11px;
+		}
+
+		.fast_speed {
+			padding-left: 65px;
+			// letter-spacing: -5px;
+			background-image: url("../../assets/img/fast_line.svg");
+			background-size: 50%;
+			background-repeat: no-repeat;
+			// background-position: -65% 0% ;
+		}
+
+		.speedometer {
+			margin-bottom: 20px;
+			width: 120px;
+		}
+
+		#boost {
+			// z-index: -1;
+			#toggle {
+				padding-top: 15px;
+				position: relative;
+			}
+			p {
+				display: inline-block;
+				width: 85px;
+				user-select: none;
+				position: absolute;
+				font-size: 25px;
+				cursor: pointer;
+				left: 14%;
+				height: 45px;
+				top: 15%;
+				padding: 20px 0 0px 0;
+
+				&.active {
+					color: $background-color;
+				}
+
+				&.disabled {
+					color: white;
+				}
+			}
+			#off:before {
+				content: "";
+				height: 10px;
+				width: 68px;
+				position: absolute;
+				top: -10px;
+			}
+			#on {
+				top: 52%;
+			}
+			#on:before {
+				content: "";
+				height: 10px;
+				width: 68px;
+				position: absolute;
+				bottom: -10px;
+				left: 8px;
+			}
+			svg {
+				width: 85px;
+				// cursor: pointer;
+			}
+		}
+
+		#map .settings_value {
+			width: 140px;
+			color: transparent;
+			border: 4px solid $accent_color;
+			border-radius: 5px;
+			background-size: 90%;
+			background-repeat: no-repeat;
+			background-position: 65% 50%;
+
+			&.space {
+				background-image: url("../../assets/img/space_map_preview.svg");
+			}
+			&.street {
+				background-image: url("../../assets/img/street_fighter_preview.png");
+			}
+
+			&.mario {
+				background-image: url("../../assets/img/mario_preview_2.png");
+			}
+		}
+
+		.explanation {
+			width: 600px;
+			text-align: center;
+			line-height: 20px;
+			visibility: hidden;
+  			opacity: 0;
+  			transition: visibility 0.1s 0.1s, opacity 0.1s linear;
+			position: absolute;
+			top: 380px;
+			left: calc(782px / 2 - 600px / 2);
+			user-select: none;
+		}
+		
+		#map:hover {
+			.explanation {
+				visibility: visible;
+				opacity: 1;
+				transition: opactity 0.1s linear;
+			}
+		}
+
+		#speed:hover {
+			.explanation {
+				visibility: visible;
+				opacity: 1;
+				transition: opactity 0.1s linear;
+			}
+		}
+
+		#boost:hover {
+			.explanation {
+				visibility: visible;
+				opacity: 1;
+				transition: opactity 0.1s linear;
+			}
+		}
+
+		#goal:hover {
+			.explanation {
+				visibility: visible;
+				opacity: 1;
+				transition: opactity 0.1s linear;
+			}
+		}	
+	}
+
+	.button {
+		// max-width: 300px;
+		display: inline-block;
+		height: 30px;
+		background-color: $accent_color;
+		color: $background-color;
+		padding: 18px 20px 12px 20px;
+		cursor: pointer;
+		user-select: none;
+		font-size: 25px;
+		font-family: "Dogica";
+		position: relative;
+		margin: auto;
+		margin-bottom: 30px;
+
+		&:before {
+			content: "";
+			width: calc(100% - 8px);
+			height: 4px;
+			position: absolute;
+			background-color: $accent_color;
+			top: -4px;
+			left: 4px;
+		}
+		&:after {
+			content: "";
+			width: calc(100% - 8px);
+			height: 4px;
+			position: absolute;
+			background-color: $accent_color;
+			bottom: -4px;
+			left: 4px;
+		}
+
+		&:hover {
+			transform: scale(1.2);
+		}
+	}
+
+	#challenge_button {
+		background-color: $background-color;
+		color: white;
+		border-right: 4px solid $accent_color;
+		border-left: 4px solid $accent_color;
+		font-size: 18px;
+		padding: 18px 20px 5px 20px;
+		&:before {
+			width: 100%;
+			left: 0px;
+		}
+		&:after {
+			width: 100%;
+			left: 0px;
+		}
+		&:hover {
+			background-color: $accent_color;
+			color: $background-color;
+			transform: none;
+		}
+	}
+
+	#card_modal {
+		width: 100%;
+		height: 100%;
+		z-index: 3;
+	}
+
+	#choose_player_popup {
+		
+		background-color: $background-color;
+		border: 4px solid $accent_color;
+		color: white;
+		padding: 30px;
+		width: 280px;
+		position: relative;
+		margin: auto;
+		margin-top: 90px;
+		border-radius: 5px;
+
+		.fa-times {
+			position: absolute;
+			color: $accent_color;
+			top: 8px;
+			right: 10px;
+			font-size: 30px;
+			cursor: pointer;
+		}
+		&:before {
+			content:"choose_player_";
+			position: absolute;
+			top: -30px;
+			left: -4px;
+			background-color: $accent_color;
+			color: $background-color;
+			height: 20px;
+			padding: 5px 20px;
+			border-radius: 5px 5px 5px 0;
+		}
+
+		#submit {
+			width: 60%;
+			margin: auto;
+			margin-top: 20px;
+			border-radius: 5px;
+			border: 2px solid $accent_color;
+			padding: 10px;
+			user-select: none;
+
+			&.ready {
+				background-color: $accent_color;
+				color: $background-color;
+				cursor: pointer;
+			}
+		}
+
+		#choose_player_error {
+			background-color: $red;
+			color: $background-color;
+			width: 260px;
+			position: absolute;
+			top: -100px;
+			border-radius: 5px;
+			padding: 10px;
+			font-size: 15px;
+		}
+	}
+}

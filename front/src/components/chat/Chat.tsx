@@ -24,6 +24,7 @@ function BanPopup({ channel, close } : BanPopUpProps) {
 	)
 }
 
+
 type AskPasswordProps = {
 	channel: string,
 	chanID: number,
@@ -130,6 +131,19 @@ export function Chat() {
 			console.log("Error:", err);
 		})
 	}
+
+	useEffect(() => {
+		// select first channel if exist
+		if (!channel)
+		{
+			axios.get(`/channel`)
+			.then((res) => {
+				if (res.data.length !== 0)
+					setChannel(res.data[0]);
+			})
+			.catch((err) => console.log(err))
+		}
+	}, [])  // eslint-disable-line
 	
 	// ---------- SOCKETS
 	useEffect(() : ReturnType<EffectCallback> => {

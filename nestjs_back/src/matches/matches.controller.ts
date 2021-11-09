@@ -34,6 +34,9 @@ export default class MatchesController {
 
   @Post()
   @ApiOperation({summary: "Create a new match"})
+  @SerializeOptions({
+    groups: ['infos']
+  })
   async createMatch(@Body() match: CreateMatchDto){
     return this.matchesService.createMatch(match);
   }
