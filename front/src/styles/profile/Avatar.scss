@@ -22,6 +22,7 @@ $schemes: $scheme1 $scheme2 $scheme3;
             line-height: #{nth($scheme, 2)}px;
     		font-family: "Dogica", "Fira Mono";
     		font-size: calc(#{nth($scheme, 2)}px * 0.6);
+			text-align: center;
     	}
 
     	img {

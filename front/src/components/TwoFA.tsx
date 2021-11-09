@@ -1,6 +1,6 @@
 import axios from 'axios';
-import React, { useEffect } from 'react';
-import { BrowserRouter as Router, Switch, RouteComponentProps, Redirect } from 'react-router-dom';
+import React from 'react';
+import { Redirect } from 'react-router';
 import '../styles/parameters/TwofaModal.scss';
 
 function TwoFA () {

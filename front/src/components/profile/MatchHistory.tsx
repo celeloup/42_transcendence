@@ -46,7 +46,7 @@ function Match ( { data, my_id, focus, setFocus } : MatchProps ) {
     return (
         <div className={"match_wrapper" + ( focus ? "_focus" : "" )} onClick={() => { setFocus(data.id); }}>
             <div className="match_info">
-                <Avatar size={"medium"} id={me.id}/>
+                <Avatar size={"medium"} id={me.id} name={me.name} namespec={true}/>
                 <div className="name_display">
                     { me.winner && <i className="fas fa-crown"></i>}
                     <span>{ me.name }</span>
@@ -64,7 +64,7 @@ function Match ( { data, my_id, focus, setFocus } : MatchProps ) {
                     { them.winner && <i className="fas fa-crown"></i>}
                     <span>{ them.name }</span>
                 </div>
-                <Avatar size={"medium"} id={them.id}/>
+                <Avatar size={"medium"} id={them.id} name={them.name} namespec={true}/>
             </div>
             { focus && 
                 <div className="match_focus">
