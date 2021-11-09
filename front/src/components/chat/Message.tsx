@@ -17,12 +17,12 @@ type MessageProps = {
 type CardProps = {
 	id: number,
 	online: boolean,
+	user: any,
 	setDisplayCard: (set:boolean) => void,
 	setBlockedUsers: (blocked:any) => void
 }
 
-function ProfileCard( {id, online, setDisplayCard, setBlockedUsers }: CardProps) {
-	const [ user, setUser ] = useState<any>(null);
+function ProfileCard( {id, online, user, setDisplayCard, setBlockedUsers }: CardProps) {
 	const [ me, setMe ] = useState<any>(null);
 	const [ isFriend, setIsFriend ] = useState(false);
 	const [ isBlocked, setIsBlocked ] = useState(false);
@@ -30,15 +30,6 @@ function ProfileCard( {id, online, setDisplayCard, setBlockedUsers }: CardProps)
 	const history = useHistory();
 	
 	useEffect(() => {
-		axios.get(`/users/infos/${id}`)
-		.then( res => {
-			// console.log("GET USER", res);
-			setUser(res.data);
-			
-		})
-		.catch (err => {
-			console.log("Error:", err);
-		})
 		axios.get(`/users/infos/me`)
 		.then( res => {
 			// console.log("GET ME", res);
@@ -160,7 +151,7 @@ function ProfileCard( {id, online, setDisplayCard, setBlockedUsers }: CardProps)
 			{ user && me && <>
 				<div>
 					<a href={"/profile/" + user.id}>
-						<Avatar size={"medium"} id={id} />
+						<Avatar size={"medium"} id={id} name={user?.name} namespec={true} avatar={user?.avatar !== null} avaspec={true}/>
 						<div className={"user_status " + ( online ? "online" : "offline" )}></div>
 					</a>
 					<div>
@@ -183,6 +174,18 @@ function ProfileCard( {id, online, setDisplayCard, setBlockedUsers }: CardProps)
 
 export function Message ({ id, online, username, message, setBlockedUsers, blocked }: MessageProps) {
 	const [ displayCard, setDisplayCard ] = useState(false);
+	const [ user, setUser ] = useState<any>(null);
+
+	useEffect(() => {
+		axios.get(`/users/infos/${id}`)
+		.then( res => {
+			// console.log("GET USER", res);
+			setUser(res.data);
+		})
+		.catch (err => {
+			console.log("Error:", err);
+		})
+	}, [id]);
 	
 	const closeCard = (event: any) => {
 		const id = event.target.id;
@@ -195,7 +198,7 @@ export function Message ({ id, online, username, message, setBlockedUsers, block
 	return (
 		<div className={ blocked ? "chat_message blocked" : "chat_message" }>
 			<div className="pic" onClick={ () => setDisplayCard(true)}>
-				<Avatar size={"small"} id={id}/>
+				<Avatar size={"small"} id={id} name={username} namespec={true}/>
 				<div className={"user_status " + ( online ? "online" : "offline" )}></div>
 			</div>
 			<div className="content">
@@ -204,7 +207,7 @@ export function Message ({ id, online, username, message, setBlockedUsers, block
 			</div>
 			{ displayCard &&
 				<div id="card_modal" onClick={ closeCard }>
-					<ProfileCard id={ id } online={ online } setDisplayCard={ setDisplayCard } setBlockedUsers={ setBlockedUsers }/>
+					<ProfileCard id={ id } online={ online } user={ user } setDisplayCard={ setDisplayCard } setBlockedUsers={ setBlockedUsers }/>
 				</div>
 			}
 		</div>

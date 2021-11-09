@@ -5,26 +5,48 @@ import axios from "axios";
 type Props = {
     size: string;
     id: number;
+    name?: string;
+    namespec?: boolean;
+    avatar?: boolean;
+    avaspec?: boolean;
 }
 
-function Avatar ({ size, id } : Props) {
-	const [ hasAvatar, setHasAvatar ] = useState<boolean>(false);
-	const [ username, setUsername ] = useState<string>("");
+function Avatar ({ size, id, name = "", namespec = false, avatar = false, avaspec = false } : Props) {
+	const [ username, setUsername ] = useState<string>(name);
+	const [ hasAvatar, setHasAvatar ] = useState<boolean>(avatar);
 
     useEffect(() => {
         let mounted = true;
 
-        axios.get("/users/infos/" + id)
-        .then( response => {
-            if (mounted) {
-                setHasAvatar(response.data.avatar !== null);
-                setUsername(response.data.name);
-            }
-        })
-        .catch( error => { console.log(error.response); })
+        if (!namespec || !avaspec)
+        {
+            axios.get("/users/infos/" + id)
+            .then( response => {
+                if (mounted) {
+                    setHasAvatar(response.data.avatar !== null);
+                    setUsername(response.data.name);
+                }
+            })
+            .catch( error => { console.log(error.response); })
+        }
 
         return () => { mounted = false };
-	}, [id]);
+	}, [id, namespec, avaspec]);
+
+    useEffect(() => {
+        let mounted = true;
+
+        if (namespec)
+            if (mounted) {
+                setUsername(name);
+            }
+        if (avaspec)
+            if (mounted) {
+                setHasAvatar(avatar);
+            }
+
+        return () => { mounted = false };
+	}, [name, namespec, avatar, avaspec]);
 
     return (
         <div className={"avatar " + size}>

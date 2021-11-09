@@ -34,6 +34,7 @@ type Friend = {
 function Profile (props : any) {
 	const [loading, setLoading] = React.useState<boolean>(true);
 	const [username, setUsername] = React.useState<string>("");
+	const [hasAvatar, setHasAvatar] = React.useState<boolean>(false);
 	const [matches, setMatches] = React.useState<Match[]>([]);
 	const [nbVictories, setNbVictories] = React.useState<number>(0);
 	const [nbDefeats, setNbDefeats] = React.useState<number>(0);
@@ -53,6 +54,7 @@ function Profile (props : any) {
 		.then(response => {
 			if (mounted) {
 				setUsername(response.data.name);
+				setHasAvatar(response.data.avatar !== null);
 				setMatches(response.data.matches);
 				setNbVictories(response.data.victories);
 				setNbDefeats(response.data.defeats);
@@ -63,6 +65,14 @@ function Profile (props : any) {
 			}
 		})
 		.catch(error => { console.log(error.response); });
+
+		axios.get("/users/matches/" + userId)
+		.then(response => {
+			if (mounted) {
+				setMatches(response.data);
+			}				
+		})
+		.catch(error => { console.log(error.response); })
 
 		axios.get("/users/ranked")
 		.then(response => {
@@ -88,7 +98,7 @@ function Profile (props : any) {
 			{ !loading && <>
 				<div className="profile">
 					<div id="column_left">
-						<UserCard user_name={username} user_id={userId} rank={rank}
+						<UserCard user_name={username} user_id={userId} has_avatar={hasAvatar} rank={rank}
 							nb_victories={nbVictories} nb_defeats={nbDefeats} nb_points={nbPoints} online={ online.includes(userId) }/>
 						{ user!.id !== userId && <Buttons id={userId}/>}
 						<Friends friends={friends} online={online}/>
