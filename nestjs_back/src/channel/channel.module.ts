@@ -10,6 +10,8 @@ import Channel from './channel.entity';
 import ChannelController from "./channel.controller";
 import muteObj from "./mute.entity";
 import muteObjModule from "./muteObj.module";
+import { channels } from './channels.json';
+import UsersService from "../users/users.service";
 
 @Module({
 	imports: [
@@ -22,4 +24,29 @@ import muteObjModule from "./muteObj.module";
 	controllers: [ChannelController],
 	exports: [ChannelService] 
 })
-export default class ChannelModule { }
+export default class ChannelModule {
+	constructor(
+    private readonly channelService: ChannelService,
+    private readonly usersService: UsersService,
+    ) {
+    for (const channel of channels) {
+      this.channelService.getChannelByName(channel.name)
+      .catch(async () => {
+        let trials = 5;
+        while (trials) {
+          try {
+            const { id } = await this.usersService.getByName(channel.owner)
+            delete channel.owner
+            this.channelService.createChannel(channel, id);
+            return;
+          } catch (error) {
+            await new Promise(f => setTimeout(f, 1000));
+          }
+          --trials;
+        }
+        delete channel.owner;
+        this.channelService.createChannel(channel, 1);
+      });
+    }
+  }
+}
