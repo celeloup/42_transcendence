@@ -120,6 +120,15 @@ export default class ChannelService {
     throw new HttpException('Channel with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
+  async getChannelByName(name: string) {
+    let channel = await this.channelRepository.findOne({ name });
+    if (channel) {
+      await this.checkMuteTime(channel);
+      return channel;
+    }
+    throw new HttpException('Channel with this name does not exist', HttpStatus.NOT_FOUND);
+  }
+
   async getOwnerByChannelId(id: number) {
     let channel = await this.channelRepository.findOne(id, { relations: ['owner'] });
     if (channel) {

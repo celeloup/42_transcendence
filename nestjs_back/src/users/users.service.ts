@@ -27,6 +27,14 @@ export default class UsersService {
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
+  async getByName(name: string): Promise<User> {
+    const user = await this.usersRepository.findOne({ name });
+    if (user) {
+      return user;
+    }
+    throw new HttpException('User with this name does not exist', HttpStatus.NOT_FOUND);
+  }
+
   async getRankedUsers(): Promise<User[]> {
     const users = await this.usersRepository.find({ order: { points: "DESC" }});
     if (users) {
