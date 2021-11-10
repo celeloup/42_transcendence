@@ -25,12 +25,18 @@ export default class MatchesController {
   @ApiParam({name: 'id', type: Number, description: 'match id'})
   @Get(':id')
   @ApiOperation({summary: "Get a match"})
+  @SerializeOptions({
+    groups: ['infos']
+  })
   getMatchById(@Param() { id }: FindOneParams) {
     return this.matchesService.getMatchById(Number(id));
   }
 
   @Post()
   @ApiOperation({summary: "Create a new match"})
+  @SerializeOptions({
+    groups: ['infos']
+  })
   async createMatch(@Body() match: CreateMatchDto){
     return this.matchesService.createMatch(match);
   }

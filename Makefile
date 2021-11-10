@@ -5,10 +5,15 @@ DS := docker stack
 all: up logs
 
 up:
+<<<<<<< HEAD
 	if [ ! -d "postgres_data" ]; then mkdir postgres_data; fi
 	$(DC) --project-name $(NAME) up --detach
+=======
+	#if [ -d "postgres_data" ]; then mkdir postgres_data; fi
+	$(DC) --project-name $(NAME) up -d
+>>>>>>> master
 logs:
-	$(DC) --project-name $(NAME) logs --follow front back postgres
+	$(DC) --project-name $(NAME) logs --follow back postgres front
 front.logs:
 	$(DC) --project-name $(NAME) logs --follow front
 front.shell:

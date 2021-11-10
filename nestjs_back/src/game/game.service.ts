@@ -51,9 +51,10 @@ export default class GameService {
         let round = new Round(match.id.toString(), match.user1_id, match.user2_id, match.speed, match.goal, match.boost_available, match.map);
         this.currentGames.set(match.id, round);
         // this.currentGames.push(round);
+        // await this.matchService.updateMatch(match.id, match);
 
         //on lance le jeu, retourne 1 si la partie a ete annule
-        if (await this.startGame(server, round, usersSocket, this.playingUsers)) {
+        if (await this.startGame(server, round, usersSocket, this.playingUsers, match)) {
             this.deleteMatchObjet(match.id);
             this.currentGames.delete(match.id);
             return;
@@ -71,7 +72,7 @@ export default class GameService {
         this.currentGames.delete(match.id);
     }
 
-    async startGame(server: Server, param: Round, users: Map<number, Socket>, inGame: Array<number>) {
+    async startGame(server: Server, param: Round, users: Map<number, Socket>, inGame: Array<number>, match: Match) {
         let idGame = param.id_game;
         let socketPlayer1 = users.get(param.id_player1);
         let socketPlayer2 = users.get(param.id_player2);
@@ -81,7 +82,7 @@ export default class GameService {
             server.in(idGame).emit('cancel_game', idGame);
             return 1;
         }
-        server.in(idGame).emit('game_starting', idGame);
+        server.in(idGame).emit('game_starting', match );
 
         //on ajoute les joueurs a la liste des users en cours de jeu et on attend laisse une pause avant de lancer la partie;
         inGame.push(param.id_player1);

@@ -33,24 +33,30 @@ function UserList ( { setStatus, setMessage } : Props) {
 	const [rerender, setRerender] = useState<boolean>(true);
 
 	useEffect(() => {
+		let mounted = true;
+
 		axios.get('/users')
 		.then ( response => {
-			setAdmins(response.data.filter(function(user : User) {
-				return (!user.site_banned && user.site_owner);
-			}));
-			setModerators(response.data.filter(function(user : User) {
-				return (!user.site_banned && !user.site_owner && user.site_moderator);
-			}));
-			setOthers(response.data.filter(function(user : User) {
-				return (!user.site_banned && !user.site_owner && !user.site_moderator);
-			}));
-			setBanned(response.data.filter(function(user : User) {
-				return (user.site_banned);
-			}));
+			if (mounted) {
+				setAdmins(response.data.filter(function(user : User) {
+					return (!user.site_banned && user.site_owner);
+				}));
+				setModerators(response.data.filter(function(user : User) {
+					return (!user.site_banned && !user.site_owner && user.site_moderator);
+				}));
+				setOthers(response.data.filter(function(user : User) {
+					return (!user.site_banned && !user.site_owner && !user.site_moderator);
+				}));
+				setBanned(response.data.filter(function(user : User) {
+					return (user.site_banned);
+				}));
+			}
 		})
 		.catch ( error => {
 			console.log(error.response); 
 		})
+
+		return () => { mounted = false };
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [rerender]);
 

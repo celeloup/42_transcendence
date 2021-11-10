@@ -1,9 +1,9 @@
 import { useContext, useEffect, useState } from 'react';
-import { GameContext, ContextType } from '../../contexts/GameContext';
 import { AuthContext, ContextType as AuthContextType} from '../../contexts/AuthContext';
-import { Socket } from 'dgram';
 import axios from "axios";
 import Sabers from '../../assets/img/sabers.svg';
+import Ticket from '../../assets/img/join_game_ticket.svg';
+import Create from '../../assets/img/create_game.svg';
 import "../../styles/game/Landing.scss";
 
 function Landing() {
@@ -12,48 +12,46 @@ function Landing() {
 	const [matches, setMatches] = useState<any[]>([]);
 
 	useEffect(() => {
+		let mounted = true;
+
 		axios.get("/users/ranked")
-		.then(response => { setLeaderboard(response.data); })
+		.then(response => {
+			if (mounted) {
+				setLeaderboard(response.data);
+			}
+		})
 		.catch(error => { console.log(error.response); })
 
-		masterSocket.emit("get_current_games");
-		masterSocket?.on("current_games", (data : any) => { console.log(data);
-			setMatches(data);
+		masterSocket?.emit("get_current_games");
+		masterSocket?.on("current_games", (data : number[]) => {
+			if (mounted) {
+				resolveMatches(data);
+			}
 		});
-		// setMatches([{ user1_id:"yoooo", score_user1: 42, user2_id: 3, score_user2: 24},
-		// 			{ user1_id: "cclaude", score_user1: 1, user2_id: 4, score_user2: 7},
-		// 			{ user1_id: "boooooooooooooooooooo", score_user1: 10, user2_id: 2, score_user2: 99},
-		// 			{ user1_id: "cclaude", score_user1: 1, user2_id: 4, score_user2: 7},
-		// 			{ user1_id: "boooooooooooooooooooo", score_user1: 14, user2_id: 2, score_user2: 99},
-		// 			{ user1_id: "cclaude", score_user1: 1, user2_id: 4, score_user2: 7},
-		// 			{ user1_id: "boooooooooooooooooooo", score_user1: 40, user2_id: 2, score_user2: 99},
-		// 			{ user1_id: "cclaude", score_user1: 1, user2_id: 4, score_user2: 7},
-		// 			{ user1_id: "boooooooooooooooooooo", score_user1: 66, user2_id: 2, score_user2: 99},
-		// 			]);
-	}, []);
+
+		return () => { mounted = false };
+	}, [masterSocket]);
 
 	function find_match() {
 		masterSocket.emit('match_player');
 		setToDisplay("pong");
 	}
 
-	const leaderboard_divs = leaderboard.slice(0, 100).map((user, i) => 
-		<a href={ "/profile/" + user.id } key={i}>
-			<span className="rank">#{i + 1}</span>
-			<span className="name">{ user.name }</span>
-			<span className="points">{ user.points }</span>
-		</a>
-	);
-
-	const match_divs = matches.map((match, i) => 
-		<div>
-			<span className="name">{ match.user1_id }</span>
-			<span className="score">{ match.score_user1 }</span>
-			<img className="logo" src={ Sabers } alt="sabers"></img>
-			<span className="score">{ match.score_user2 }</span>
-			<span className="name">{ match.user2_id }</span>
-		</div>
-	);
+	function resolveMatches (matches : number[]) {
+		Promise.all(
+			matches.map(async (match) => {
+				let matchInfo = await axios.get("/matches/" + match);
+				return ({
+					name1: matchInfo.data.users[0].name,
+					name2: matchInfo.data.users[1].name,
+					score1: matchInfo.data.score_user1,
+					score2: matchInfo.data.score_user2
+				});
+			})
+		)
+		.then( response => { setMatches(response); })
+		.catch( error => { console.log(error.response); })
+	}
 
 	return (
 		<div id="landing_game">
@@ -61,16 +59,45 @@ function Landing() {
 			<i className="fas fa-rocket"></i>game_
 			</div>
 			<div id="game_start_buttons">
-				<div onClick={ () => setToDisplay("create") }>CREATE GAME <br/>(a changer par image)</div>
-				<div onClick={ find_match }>JOIN GAME <br/>(matchmaking)<br/>(a changer par image)</div>
+				<img src={ Create } alt="Create a game" onClick={ () => setToDisplay("create") } />
+				<span>OR</span>
+				<img src={ Ticket } alt="Join a game" onClick={ find_match } />
 			</div>
 			<div id="landing_displays">
 				<div className="match_list">
-					{ match_divs }
+					{ matches.length === 0 &&
+						<>
+							<div>
+								<span>No one is playing, or waiting for an opponent.</span>
+							</div>
+							<div>
+								Why not create your own match ?
+							</div>
+						</>
+					}
+					{ matches.length > 0 &&
+						matches.map((match, i) =>
+							<div key={i}>
+								<span className="name">{ match.name1 }</span>
+								<span className="score">{ match.score1 }</span>
+								<img className="logo" src={ Sabers } alt="sabers" />
+								<span className="score">{ match.score2 }</span>
+								<span className="name">{ match.name2 }</span>
+							</div>
+						)
+					}
 				</div>
 				<div className="leaderboard">
 					<div className="leaderbox">
-						{ leaderboard_divs }
+						{
+							leaderboard.slice(0, 100).map((user, i) => 
+								<a href={ "/profile/" + user.id } key={i}>
+									<span className="rank">#{i + 1}</span>
+									<span className="name">{ user.name }</span>
+									<span className="points">{ user.points }</span>
+								</a>
+							)
+						}
 					</div>
 				</div>
 			</div>

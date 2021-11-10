@@ -47,44 +47,21 @@ export default class MatchesService {
   async createMatch(matchData: CreateMatchDto) {
     const newMatch = await this.matchesRepository.create({
       ...matchData,
-      users: [await this.usersService.getById(matchData.user1_id),
-      await this.usersService.getById(matchData.user2_id)]
+      users: [
+        await this.usersService.getById(matchData.user1_id),
+        await this.usersService.getById(matchData.user2_id)
+      ]
     });
     await this.matchesRepository.save(newMatch);
-
-    const user1 = await this.usersService.getById(matchData.user1_id);
-    let achievement = null;
-    if (user1.matches.length === 1) {
-      achievement = await this.achievementsService.getAchievementByName("Newbie");
-    } else if (user1.matches.length === 10) {
-      achievement = await this.achievementsService.getAchievementByName("Casual");
-    } else if (user1.matches.length === 100) {
-      achievement = await this.achievementsService.getAchievementByName("Nolife");
-    }
-    if (achievement) {
-      user1.achievements.push(achievement);
-      await this.usersRepository.save(user1);
-    }
-    
-    const user2 = await this.usersService.getById(matchData.user2_id);
-    achievement = null;
-    if (user2.matches.length === 1) {
-      achievement = await this.achievementsService.getAchievementByName("Newbie");
-    } else if (user2.matches.length === 10) {
-      achievement = await this.achievementsService.getAchievementByName("Casual");
-    } else if (user2.matches.length === 100) {
-      achievement = await this.achievementsService.getAchievementByName("Nolife");
-    }
-    if (achievement) {
-      user2.achievements.push(achievement);
-      await this.usersRepository.save(user2);
-    }
     return newMatch;
   }
 
+  //called from a websocket via updateMatch
   async weHaveAWinner(match: & Match) {
-    const user1 = await this.usersService.getAllInfosByUserId(match.user1_id);
-    const user2 = await this.usersService.getAllInfosByUserId(match.user2_id);
+    const user1 = await this.usersService.getAllInfosByUserIdNoThrow(match.user1_id);
+    const user2 = await this.usersService.getAllInfosByUserIdNoThrow(match.user2_id);
+    if (!user1 || !user2)
+      return ;
     user1.points += match.score_user1;
     user2.points += match.score_user2;
     if (match.score_user1 === match.goal) {
@@ -116,6 +93,32 @@ export default class MatchesService {
       }
       user1.defeats++;
     }
+    
+    let achievement = null;
+    if (user1.matches.length === 1) {
+      achievement = await this.achievementsService.getAchievementByName("Newbie");
+    } else if (user1.matches.length === 10) {
+      achievement = await this.achievementsService.getAchievementByName("Casual");
+    } else if (user1.matches.length === 100) {
+      achievement = await this.achievementsService.getAchievementByName("Nolife");
+    }
+    if (achievement) {
+      user1.achievements.push(achievement);
+      await this.usersRepository.save(user1);
+    }
+    
+    achievement = null;
+    if (user2.matches.length === 1) {
+      achievement = await this.achievementsService.getAchievementByName("Newbie");
+    } else if (user2.matches.length === 10) {
+      achievement = await this.achievementsService.getAchievementByName("Casual");
+    } else if (user2.matches.length === 100) {
+      achievement = await this.achievementsService.getAchievementByName("Nolife");
+    }
+    if (achievement) {
+      user2.achievements.push(achievement);
+      await this.usersRepository.save(user2);
+    }
     const user1win = match.score_user1 === match.goal
     match.winner = user1win ? match.user1_id : match.user2_id;
     await this.matchesRepository.save(match);
@@ -124,16 +127,23 @@ export default class MatchesService {
     return match;
   }
 
+  //called from a websocket
   async updateMatch(id: number, updatedMatch: & Match) {
     //await this.getMatchById(id);
     if (updatedMatch.score_user1 === updatedMatch.goal || updatedMatch.score_user2 === updatedMatch.goal)
       return await this.weHaveAWinner(updatedMatch);
-    else
-      await this.matchesRepository.save(updatedMatch);
+    return await this.matchesRepository.save(updatedMatch);
   }
 
+  //called from a websocket
   async deleteMatch(match_id: number) {
-    let match = await this.getMatchById(match_id);
+    const match = await this.matchesRepository.findOne(match_id, {
+      relations: ['users'], order: {
+        createdDate: "DESC"
+      }
+    });
+    if (!match)
+      return ;
     match.users = [];
     await this.matchesRepository.save(match);
     await this.matchesRepository.delete(match_id);

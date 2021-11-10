@@ -1,0 +1,238 @@
+$background-color: #232323;
+$text-color: white;
+$accent_color: #FFCD27;
+$light-gray: #E3E3E3;
+$dark-gray: #919191;
+$green: #81A439;
+
+
+#pong_game {
+	position: relative;
+
+	.flex {
+		display: flex;
+		justify-content: space-evenly;
+	}
+	
+	#end_screen {
+		border: 4px solid $accent_color;
+		position: absolute;
+		padding: 20px;
+		top: 40%;
+		left: 35%;
+		width: 200px;
+		// height: 200px;
+		background-color: $background-color;
+
+		#back_button {
+			background-color: $accent_color;
+			color: $background-color;
+			cursor: pointer;
+			width: 150px;
+			height: 30px;
+			margin: auto;
+			margin-top: 20px;
+			border-radius: 5px;
+		}
+	}
+
+	#infos_error_game {
+		font-family: "Dogica";
+		line-height: 25px;
+		width: 600px;
+		margin: auto;
+		margin-top: 80px;
+
+		#telescope_img {
+			position: relative;
+			margin-bottom: 30px;
+		}
+
+		#telescope_top {
+			width: 180px;
+			transform: rotate(-15deg);
+			position: absolute;
+			top: 75px;
+			left: 200px;
+		}
+		#telescope {
+			width: 300px;
+		}
+		
+		.buttons {
+			display: flex;
+			margin-top: 50px;
+			gap: 30px;
+			justify-content: center;
+
+			div {
+				display: inline-block;
+				height: 30px;
+				background-color: $accent_color;
+				color: $background-color;
+				padding: 10px 15px 7px 15px;
+				cursor: pointer;
+				user-select: none;
+				font-size: 20px;
+				font-family: "Dogica";
+				position: relative;
+
+				&:before {
+					content: "";
+					width: calc(100% - 8px);
+					height: 6px;
+					position: absolute;
+					background-color: $accent_color;
+					top: -4px;
+					left: 4px;
+				}
+
+				&:after {
+					content: "";
+					width: calc(100% - 8px);
+					height: 6px;
+					position: absolute;
+					background-color: $accent_color;
+					bottom: -4px;
+					left: 4px;
+				}
+
+				&:hover {
+					transform: scale(1.05);
+				}
+			}
+		}
+	}
+
+	#waiting {
+		margin-top: 200px;
+		font-family: "Dogica";
+		color: $dark-gray;
+		p {
+			margin-top: 20px;
+		}
+	}
+
+	.game_background {
+		position: absolute;
+		height: 632px;
+		width: 790px;
+		top: 42px;
+		left: -4px;
+		z-index: -1;
+		background-size: 100%;
+		background-repeat: no-repeat;
+		background-position: 65% 50% ;
+
+		&#mario {
+			background-image: url(../../assets/img/mario_bg.jpeg);
+			display: flex;
+			justify-content: space-between;
+
+			#p1, #p2{
+				margin: 20px;
+				font-family: "Dogica";
+				font-size: 18px;
+				display: flex;
+				align-content: center;
+
+				img {
+					height: 18px;
+					margin: 0 5px;
+				}
+			}
+
+			.name {
+				text-transform: uppercase;
+				// font-weight: 600;
+				margin: 0 20px;
+			}
+		}
+
+		&#street {
+			background-image: url(../../assets/img/street_fighter_bg.jpeg);
+			background-size: cover;
+			background-position: 20% 20%;
+			
+			#first_line, #last_line {
+				display: flex;
+				justify-content: space-between;
+			}
+
+			#life_bar {
+				display: flex;
+				justify-content: center;
+				align-items: center;
+				
+				img {
+					height: 32px;
+				}
+
+				#p1_bar {
+					text-align: right;
+				}
+
+				#p2_bar {
+					text-align: left;
+				}
+
+				#p1_bar, #p2_bar {
+					width: 300px;
+					height: 22px;
+					border-top: 2px solid white;
+					border-bottom: 2px solid white;
+					background-color: #fe0000;
+					position: relative;
+
+					&:before {
+						content: "";
+						background-color: white;
+						position: absolute;
+						width: 2px;
+						height: 22px;
+						top: 0;
+					}
+
+					span {
+						display: inline-block;
+						height: 100%;
+						background-color: #fefe00;
+					}
+
+				}
+
+				#p1_bar:before {
+					left: -2px;
+				}
+
+				#p2_bar:before {
+					right: -2px;
+				}
+			}
+
+			#last_line {
+				margin: 10px 50px;
+				img { transform: scale(0.9) }
+			}
+
+			#p1, #p2{
+				margin: 10px 20px 5px 20px;
+				img:first-child{
+					margin-right: 50px;
+				}
+			}
+		}
+	}
+
+	.fa-spinner {
+		font-size: 56px;
+		margin: 20px;
+		color: $accent_color;
+		animation: spin 2s steps(5, end) infinite;
+	}
+	
+	@keyframes spin {
+		0% { transform: rotate(0deg); }
+		100% { transform: rotate(360deg); }
+	}
+}

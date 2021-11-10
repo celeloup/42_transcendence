@@ -15,15 +15,31 @@ $green: #81A439;
 	#game_start_buttons {
 		display: flex;
 		width: 100%;
-		justify-content: space-evenly;
-		margin: 50px 0;
+        justify-content: center;
+        align-items: center;
+        margin: 50px 0 100px 0;
+        
+        img {
+            width: 280px;
+            cursor: pointer;
+            &:hover {
+				transform: scale(1.1);
+			}
+        }
+
+        span {
+            font-family: "Dogica";
+            font-size: 26px;
+            user-select: none;
+            margin: 0 30px;
+        }
 
 		div {
 			width: 250px;
 			height: 100px;
 			background-color: $accent_color;
 			color: $background-color;
-			cursor: pointer;
+			
 			padding: 20px;
 
 			
@@ -37,9 +53,9 @@ $green: #81A439;
         display: flex;
         flex-direction: row;
         justify-content: space-evenly;
-		width: 98%;
-		height: 350px;
-		margin: auto;
+		// width: 98%;
+		height: 280px;
+		margin: 30px;
 		background-color: $background-color;
         // border: 3px solid red;
 
@@ -96,18 +112,19 @@ $green: #81A439;
         .leaderboard {
             width: 38%;
             height: 100%;
-            border: 3px solid $accent_color;
+            border: 4px solid $accent_color;
             border-radius: 0px 5px 5px 5px;
             background-color: $background-color;
+            position: relative;
 
             &:before {
                 content: "leaderboard_";
                 font-family: "Dogica";
-                position: relative;
-                top: -6%;
-                left: -16%;
+                position: absolute;
+                top: -33px;
+                left: -4px;
                 height: 20px;
-                padding: 5px 21px;
+                padding: 8px 21px 5px 21px;
                 border-radius: 5px 5px 0px 0px;
                 background-color: $accent_color;
                 color: $background-color;
@@ -117,7 +134,7 @@ $green: #81A439;
                 width: 100%;
                 height: 99%;
                 position: relative;
-                top: -17px;
+                padding: 5px;
                 display: flex;
                 flex-direction: column;
                 overflow: hidden;
@@ -127,7 +144,7 @@ $green: #81A439;
                     display: flex;
                     flex-direction: row;
                     justify-content: space-between;
-                    width: 90%;
+                    align-items: center;
                     height: 6%;
                     border: 10px solid transparent;
                     border-radius: 5px;
@@ -137,6 +154,10 @@ $green: #81A439;
                     &:hover {
                         background-color: gray;
                         cursor: pointer;
+
+                        .points {
+                            color: white;
+                        }
                     }
 
                     .rank {
@@ -148,6 +169,7 @@ $green: #81A439;
 
                     .name {
                         font-family: "Fira Mono";
+						height: 20px;
                         font-size: 20px;
                         color: white;
                         width: 60%;

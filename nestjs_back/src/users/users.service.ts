@@ -63,12 +63,25 @@ export default class UsersService {
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
+  async userIsInTheMatch(match: Match, user_id: number){
+    var users = match.users
+    if (!users || !users[0] || !users[1] || (users[0].id !== user_id && users[1].id !== user_id))
+      return false;
+    else
+      return true;
+  }
+
   async getMatchesByUserId(id: number) {
-    const matches = await this.matchesRepository.find({
-      where: [{ user1_id: id }, { user2_id: id }], order: { createdDate: "DESC" }, relations: ['users']
+    var matches = await this.matchesRepository.find({
+      order: { createdDate: "DESC" }, relations: ['users']
     });
+    var matches2= [];
     if (matches)
-      return matches;
+      for (var match of matches)
+        if ((await this.userIsInTheMatch(match, id)))
+          await matches2.push(match);
+    if (matches2)
+      return matches2;
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
@@ -93,8 +106,8 @@ export default class UsersService {
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
-  async getAllInfosByUserId(id: number) {
-    const user = await this.usersRepository.findOne(
+  async getAllInfosByUserIdNoThrow(id: number) {
+    return await this.usersRepository.findOne(
       id, {
       relations: [
         'achievements',
@@ -109,6 +122,10 @@ export default class UsersService {
         'blocked',
         'blockedBy']
     })
+  }
+
+  async getAllInfosByUserId(id: number) {
+    const user = await this.getAllInfosByUserIdNoThrow(id);
     if (user)
       return user;
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
@@ -214,9 +231,9 @@ export default class UsersService {
             let achievement = null;
             if (user.friends.length === 1) {
               achievement = await this.achievementsService.getAchievementByName("So Alone...");
-            } else if (user.friends.length === 10) {
+            } else if (user.friends.length === 5) {
               achievement = await this.achievementsService.getAchievementByName("Not So Alone");
-            } else if (user.friends.length === 20) {
+            } else if (user.friends.length === 10) {
               achievement = await this.achievementsService.getAchievementByName("Social Butterfly");
             }
             if (achievement) {

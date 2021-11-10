@@ -9,9 +9,10 @@ type StatusDisplayProps = {
 type UserCardProps = {
 	user_name: string,
     user_id: number,
+    has_avatar: boolean,
     rank: number,
-    nb_matches: number,
     nb_victories: number,
+    nb_defeats: number,
     nb_points: number,
     online: boolean,
 }
@@ -25,12 +26,12 @@ export function StatusDisplay ( { state }: StatusDisplayProps) {
     )
 }
 
-function UserCard ({ user_name, user_id, rank, nb_matches, nb_victories, nb_points, online }: UserCardProps) {
+function UserCard ({ user_name, user_id, has_avatar, rank, nb_victories, nb_defeats, nb_points, online }: UserCardProps) {
     return (
         <WindowBorder id='user_window' w='319' h='208' double={true}>
             <div id='user_card'>
                 <div id='row_top'>
-                    <Avatar size={"large"} id={user_id}/>
+                    <Avatar size={"large"} id={user_id} name={user_name} namespec={true} avatar={has_avatar} avaspec={true}/>
                     <div className="column_right">
                         <span className="name">{user_name}</span>
                         <StatusDisplay state={online ? 'online' : 'offline'} />
@@ -47,7 +48,7 @@ function UserCard ({ user_name, user_id, rank, nb_matches, nb_victories, nb_poin
                     </div>
                     <i className="fas fa-trophy"></i>
                     <div>
-                        <span>{nb_matches - nb_victories}</span>
+                        <span>{nb_defeats}</span>
                         <span>defeats</span>
                     </div>
                 </div>
@@ -55,7 +56,7 @@ function UserCard ({ user_name, user_id, rank, nb_matches, nb_victories, nb_poin
                     <i>{">> "}</i>
                     <i>{nb_points}</i>
                     {" points in "}
-                    <i>{nb_matches}</i>
+                    <i>{nb_victories + nb_defeats}</i>
                     {" matches"}
                     <i>{" <<"}</i>
                 </span>

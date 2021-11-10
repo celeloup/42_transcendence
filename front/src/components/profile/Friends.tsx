@@ -24,7 +24,7 @@ function Friend ( { infos, online } : Prop) {
     return (
         <a href={ "/profile/" + infos.id }>
             <div className ='friends_info'>
-                <Avatar size={"medium"} id={infos.id}/>
+                <Avatar size={"medium"} id={infos.id} name={infos.name} namespec={true}/>
 		    	<p>{ infos.name }</p>
 	        	<div className={`dot_status ${online ? 'online': 'offline'}`} ></div>
 	        </div>
