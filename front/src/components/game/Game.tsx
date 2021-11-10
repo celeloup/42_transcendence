@@ -1,4 +1,4 @@
-import { useContext, useEffect } from 'react';
+import { useContext } from 'react';
 import WindowBorder from '../ui_components/WindowBorder';
 // import { GameContext, ContextType } from '../../contexts/GameContext';
 import { AuthContext, ContextType as AuthContextType} from '../../contexts/AuthContext';
@@ -8,13 +8,7 @@ import GameCreation from './GameCreation';
 import Pong from './Pong';
 
 function Game() {
-	var { toDisplay, setToDisplay } = useContext(AuthContext) as AuthContextType;
-
-	// useEffect(
-	// 	() => {
-	// 	  setToDisplay("false");
-	// 	},
-	// [setToDisplay]);
+	var { toDisplay } = useContext(AuthContext) as AuthContextType;
 
 	var content;
 	if (toDisplay === "create")

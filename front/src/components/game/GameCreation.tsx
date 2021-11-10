@@ -43,7 +43,7 @@ const SelectPlayer = ({ display, setInvitedPlayer } : SelectPlayerProps) => {
 		<div id="choose_player_popup">
 			<i className="fas fa-times" onClick={ () => display(false) }/>
 			[ select a player to challenge ]
-			<SearchUser theme="yo" list={ users } select={ setUser } byID={false}/>
+			<SearchUser theme="yo" list={ users } select={ setUser } byID={ false }/>
 			<div className={ user !== 0 ? "ready" : "" } id="submit" onClick={ handleSubmit }>Select</div>
 		</div>
 	)
@@ -70,15 +70,6 @@ function GameCreation() {
 	  }, []);
 
 	const create_game = () => {
-		// var match = {
-		// 	"user1_id": user?.id,
-		// 	"user2_id": invitedPlayer ? invitedPlayer.id : 1,
-		// 	"map": map,
-		// 	"speed": speed,
-		// 	"goal": goal,
-		// 	"boost_available": boost
-		//   };
-		// console.log(match);
 		axios.post('/matches', {
 			"friendly": true,
 			"user1_id": user?.id,

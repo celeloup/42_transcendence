@@ -1,5 +1,7 @@
 import "../../styles/UI.scss";
-import { useState } from 'react';
+import React from 'react';
+import { useState, useContext } from 'react';
+import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
 
 type SearchUserProps = {
 	theme: string,
@@ -9,6 +11,7 @@ type SearchUserProps = {
 }
 
 function SearchUser({ theme, list, select, byID = true } : SearchUserProps) {
+	let { user } = useContext(AuthContext) as AuthContextType;
 	const [ search, setSearch ] = useState("");
 	const [ selected, setSelected ] = useState<number>(0);
 
@@ -20,6 +23,8 @@ function SearchUser({ theme, list, select, byID = true } : SearchUserProps) {
 			select(user)
 	}
 
+
+
 	return (
 		<div id="search_user">
 			<div className="search_bar">
@@ -27,11 +32,11 @@ function SearchUser({ theme, list, select, byID = true } : SearchUserProps) {
 				<i id="searchButton" className="fas fa-search"></i>
 			</div>
 			<div id="list">
-				{ list.map((user:any) => {
-					if (user.name.includes(search))
-						return <div onClick={ () => pick(user) } key={ user.id } className={ selected === user.id ? "selected" : "" }>{ user.name }</div>
+				{ list.map((u:any, i:number) => {
+					if (u.name.includes(search) && u.id !== user?.id)
+						return <div onClick={ () => pick(u) } key={ i } className={ (selected === u.id || selected === u )? "selected" : "" }>{ u.name }</div>
 					else
-						return <></>
+						return (<React.Fragment key={i}></React.Fragment>);
 					} ) }
 			</div>
 		</div>
