@@ -69,6 +69,17 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		@MessageBody() room: number,
 		@ConnectedSocket() client: Socket,
 	) {
+		// Check if this room is a pending game
+		let game = this.pendingGame.find(x => x.id === room);
+		if (game)
+		{
+			const user = await this.authenticationService.getUserFromSocket(client);
+			if (user && game.user1_id === user.id) {
+				this.gameService.deleteMatchObjet(game.id);
+				let i = this.pendingGame.indexOf(game);
+				this.pendingGame.splice(i, 1);
+			}
+		}
 		this.gameService.leaveRoom(room.toString(), client);
 	}
 
@@ -79,7 +90,12 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		@ConnectedSocket() client: Socket,
 	) {
 		let guest_socket = this.connectedUsers.get(match.user2_id);
+		if (!guest_socket) {
+			client.emit('challenged_user_offline', match);
+			return ;
+		}
 		guest_socket.emit('invitation', match);
+		this.gameService.joinRoom(this.server, match.id.toString(), client);
 	}
 	
 	//accepte une invitation a jouer, join les 2 joueurs dans la room et lance la partie
@@ -97,7 +113,6 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		}
 
 		this.gameService.joinRoom(this.server, match.id.toString(), client);
-		this.gameService.joinRoom(this.server, match.id.toString(), sender_socket);
 		this.gameService.launchGame(this.server, match, this.connectedUsers);
 	}
 
@@ -109,7 +124,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 	) {
 		let sender_socket = this.connectedUsers.get(match.user1_id);
 		if (sender_socket != undefined) {
-			sender_socket.emit('invit_decline', match.id.toString());
+			sender_socket.emit('invit_decline', match);
 		}
 		this.gameService.deleteMatchObjet(match.id);
 	}
