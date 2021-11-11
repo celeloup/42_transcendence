@@ -44,21 +44,73 @@ $green: #81A439;
 		border: 4px solid $accent_color;
 		position: absolute;
 		padding: 20px;
-		top: 40%;
-		left: 35%;
-		width: 200px;
-		// height: 200px;
-		background-color: $background-color;
+		top: calc(50% - 140px);
+		left: calc(50% - 230px);
+		// width: 260px;
+		background-color: $accent-color;
+		color: $background-color;
+		font-family: "Dogica";
+
+		div:first-child {
+			font-size: 36px;
+		}
+
+		#scores {
+			display: flex;
+			margin-top: 30px;
+			width: 100%;
+			justify-content: space-between;
+			align-items: center;
+
+			#p1, #p2 {
+				display: flex;
+				flex-direction: column;
+				gap: 20px;
+				font-size: 20px;
+				width: 150px;
+				span:nth-child(2) {
+					font-size: 36px;
+				}
+			}
+
+			div:nth-child(2) {
+				font-size: 46px;
+				margin: 0 20px;
+			}
+		}
 
 		#back_button {
-			background-color: $accent_color;
-			color: $background-color;
+			background-color:$background-color ;
+			color: $accent_color;
 			cursor: pointer;
 			width: 150px;
-			height: 30px;
+			height: 20px;
+			padding: 10px;
 			margin: auto;
-			margin-top: 20px;
-			border-radius: 5px;
+			margin-top: 40px;
+			
+			&:hover {
+				transform: scale(1.1);
+			}
+		}
+
+		&:before {
+			content: "";
+			width: calc(100% - 8px);
+			height: 12px;
+			position: absolute;
+			background-color: $accent_color;
+			top: -12px;
+			left: 4px;
+		}
+		&:after {
+			content: "";
+			width: calc(100% - 8px);
+			height: 12px;
+			position: absolute;
+			background-color: $accent_color;
+			bottom: -12px;
+			left: 4px;
 		}
 	}
 

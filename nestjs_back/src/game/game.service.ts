@@ -42,6 +42,7 @@ export default class GameService {
     }
 
     deleteMatchObjet(matchId: number) {
+        console.log("***** GAME HAS BEEN DELETED *************************");
         this.matchService.deleteMatch(matchId);
     }
 
@@ -51,7 +52,8 @@ export default class GameService {
         let round = new Round(match.id.toString(), match.user1_id, match.user2_id, match.speed, match.goal, match.boost_available, match.map);
         this.currentGames.set(match.id, round);
         // this.currentGames.push(round);
-        // await this.matchService.updateMatch(match.id, match);
+        match = await this.matchService.updateMatch(match.id, match);
+        // console.log("*** LAUNCH GAME (websocket) ****", match);
 
         //on lance le jeu, retourne 1 si la partie a ete annule
         if (await this.startGame(server, round, usersSocket, this.playingUsers, match)) {

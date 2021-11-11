@@ -211,7 +211,7 @@ function Pong() {
 				<div>{ header }</div>
 			</div>
 
-			{ endScreen && <EndScreen score1={ score[0] } score2={ score[1] } setToDisplay={ setToDisplay }/> }
+			{ endScreen && <EndScreen user1={ match.users[0] } user2={ match.users[1] } score1={ score[0] } score2={ score[1] } setToDisplay={ setToDisplay }/> }
 			{ noPending && <InfoError setToDisplay={ setToDisplay } type={ 1 } /> }
 			{ declined && <InfoError setToDisplay={ setToDisplay } type={ 2 } user={ declined }/> }
 			{ canceledGame && <InfoError setToDisplay={ setToDisplay } type={ 3 } user={ canceledGame }/> }

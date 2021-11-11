@@ -71,7 +71,7 @@ function GameCreation() {
 
 	const create_game = () => {
 		axios.post('/matches', {
-			"friendly": true,
+			"friendly": false,
 			"user1_id": user?.id,
 			"user2_id": invitedPlayer ? invitedPlayer.id : 1,
 			"map": map,

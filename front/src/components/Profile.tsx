@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import axios from "axios";
 import UserCard from './profile/UserCard';
 import Buttons from './profile/Buttons';
@@ -44,6 +44,8 @@ function Profile (props : any) {
 	const [achievements, setAchievements] = React.useState<any[]>([]);
 	const [online, setOnline] = React.useState<number[]>([]);
 	const { masterSocket, user } = useContext(AuthContext) as AuthContextType;
+
+	const [userP, setUserP] = useState<any>(null); 
 	
 	const userId = +props.match.params.id;
 
@@ -61,6 +63,7 @@ function Profile (props : any) {
 				setNbPoints(response.data.points);
 				setFriends(response.data.friends);
 				setAchievements(response.data.achievements);
+				setUserP(response.data);
 				setLoading(false);
 			}
 		})
@@ -70,7 +73,7 @@ function Profile (props : any) {
 		.then(response => {
 			if (mounted) {
 				setMatches(response.data);
-			}				
+			}
 		})
 		.catch(error => { console.log(error.response); })
 
@@ -100,7 +103,7 @@ function Profile (props : any) {
 					<div id="column_left">
 						<UserCard user_name={username} user_id={userId} has_avatar={hasAvatar} rank={rank}
 							nb_victories={nbVictories} nb_defeats={nbDefeats} nb_points={nbPoints} online={ online.includes(userId) }/>
-						{ user!.id !== userId && <Buttons id={userId}/>}
+						{ user!.id !== userId && <Buttons id={userId} user={ userP }/>}
 						<Friends friends={friends} online={online}/>
 					</div>
 					<div id="column_right">

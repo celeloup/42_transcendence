@@ -146,7 +146,7 @@ export default class MatchesService {
       let user1 = await this.usersService.getByIdNoThrow(user1_id);
       match.users[0] = user1;
       match.user1_id = user1_id;
-    }    
+    }
     if (match.user2_id !== user2_id){
       let user2 = await this.usersService.getByIdNoThrow(user2_id);
       match.users[1] = user2;
@@ -159,10 +159,12 @@ export default class MatchesService {
   //called from a websocket
   async updateMatch(id: number, updatedMatch: & Match) {
     let originMatch = await this.getMatchByIdNoThrow(id);
+    if (!originMatch)
+      return ;
     if (originMatch.user1_id !== updatedMatch.user1_id || originMatch.user2_id !== updatedMatch.user2_id)
       originMatch = await this.updateMatchUsers(originMatch, updatedMatch.user1_id, updatedMatch.user2_id)
     originMatch.score_user1 = updatedMatch.score_user1;
-    originMatch.score_user2 = updatedMatch.score_user2;    
+    originMatch.score_user2 = updatedMatch.score_user2;
     if (updatedMatch.score_user1 === updatedMatch.goal || updatedMatch.score_user2 === updatedMatch.goal)
       return await this.weHaveAWinner(originMatch);
     return await this.matchesRepository.save(originMatch);

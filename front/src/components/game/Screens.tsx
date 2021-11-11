@@ -1,21 +1,46 @@
+import { useContext } from 'react';
+import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
 
 import Coin from '../../assets/img/coin.svg';
 import KO from '../../assets/img/street_fighter_ko.png';
 import Telescope from '../../assets/img/telescope.svg';
 import TelescopeTop from '../../assets/img/telescope_top.svg';
 
+
 type endScreenProps = {
+	user1: any,
+	user2: any,
 	score1: number,
 	score2: number,
-	setToDisplay: (s:string) => void
+	setToDisplay: (s:string) => void,
+	interrupted ?:boolean
 }
 
-function EndScreen({ score1, score2, setToDisplay } : endScreenProps) {
+function EndScreen({ user1, user2, score1, score2, setToDisplay, interrupted = false } : endScreenProps) {
+	var { user } = useContext(AuthContext) as AuthContextType;
+	let message;
+	if ((user1.id === user?.id && score1 > score2) || (user2.id === user?.id && score2 > score1))
+		message = "YOU WIN";
+	else if ((user1.id === user?.id && score1 < score2) || (user2.id === user?.id && score2 < score1))
+		message = "YOU LOSE";
+	else
+		message = "END OF MATCH"
 	return (
 		<div id="end_screen">
-			<div> GAME FINISHED </div>
-			<div>{ score1 } VS { score2 }</div>
-			<div id="back_button" onClick={ ()=> setToDisplay("landing") }> Return home </div>
+			<div>{ message }</div>
+			{ interrupted && <div>Your opponent left the game</div>}
+			<div id="scores">
+				<div id="p1">
+					<span>{ user1.name }</span>
+					<span>{ score1 }</span>
+				</div>
+				<div>VS</div>
+				<div id="p2">
+					<span>{ user2.name }</span>
+					<span>{ score2 }</span>
+				</div>
+			</div>
+			<div id="back_button" onClick={ ()=> setToDisplay("landing") }><i className="fas fa-arrow-left"/> Go back</div>
 		</div>
 	)
 }
