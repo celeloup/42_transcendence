@@ -1,5 +1,6 @@
 import { useContext, useEffect, useState } from 'react';
 import { AuthContext, ContextType as AuthContextType} from '../../contexts/AuthContext';
+import { NavLink } from 'react-router-dom';
 import axios from "axios";
 import Sabers from '../../assets/img/sabers.svg';
 import Ticket from '../../assets/img/join_game_ticket.svg';
@@ -66,14 +67,9 @@ function Landing() {
 			<div id="landing_displays">
 				<div className="match_list">
 					{ matches.length === 0 &&
-						<>
-							<div>
-								<span>No one is playing, or waiting for an opponent.</span>
-							</div>
-							<div>
-								Why not create your own match ?
-							</div>
-						</>
+						<div>
+							<span>No one is playing, or waiting for an opponent.</span>
+						</div>
 					}
 					{ matches.length > 0 &&
 						matches.map((match, i) =>
@@ -91,11 +87,11 @@ function Landing() {
 					<div className="leaderbox">
 						{
 							leaderboard.slice(0, 100).map((user, i) => 
-								<a href={ "/profile/" + user.id } key={i}>
+								<NavLink to={ "/profile/" + user.id } key={i}>
 									<span className="rank">#{i + 1}</span>
 									<span className="name">{ user.name }</span>
 									<span className="points">{ user.points }</span>
-								</a>
+								</NavLink>
 							)
 						}
 					</div>

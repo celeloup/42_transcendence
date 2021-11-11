@@ -312,6 +312,12 @@ $schemes: $scheme1 $scheme2;
 						flex-direction: row;
 						justify-content: space-evenly;
 						align-items: center;
+
+						.avatar_display {
+							border: none;
+							border-radius: 3px;
+							outline: solid black 1px;
+						}
 		
 						.name_display {
 							display: flex;

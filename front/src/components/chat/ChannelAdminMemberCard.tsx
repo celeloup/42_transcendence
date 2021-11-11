@@ -84,9 +84,15 @@ export function MemberCard ( { member, channelID, setRefresh, refresh, hasRights
 	// const [ error, setError ] = useState("You don't have the rights to perform this action !");
 
 	useEffect(() => {
-		admin ? setAdminState("active") : setAdminState("inactive");
-		banned ? setBannedState("active") : setBannedState("inactive");
-		muted ? setMutedState("active") : setMutedState("inactive");
+		let mounted = true;
+
+		if (mounted) {
+			admin ? setAdminState("active") : setAdminState("inactive");
+			banned ? setBannedState("active") : setBannedState("inactive");
+			muted ? setMutedState("active") : setMutedState("inactive");
+		}
+
+		return () => { mounted = false };
 	}, [admin, banned, muted])
 
 	function adminUpdate(admin:string) {

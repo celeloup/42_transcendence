@@ -3,6 +3,7 @@ import { useState, useEffect, useContext } from 'react';
 import '../../styles/chat/ChatList.scss';
 import { ChannelContext, ContextType } from '../../contexts/ChannelContext';
 import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
+import Avatar from "../profile/Avatar";
 import CreateChan from './CreateChan';
 import React from 'react';
 
@@ -34,11 +35,20 @@ function Channel({ chan } : ChannelProps) {
 	else
 		selected = false;
 
-	var name = chan.type !== 3 ? chan.name : (chan.members[0].id === user?.id ? chan.members[1].name : chan.members[0].name);
+	let name = chan.name;
+	let img = <Avatar size={"small"} id={-1} name={chan.name} namespec={true} avatar={false} avaspec={true}></Avatar>
+
+	if (chan.type === 3) {
+		let friendId = (chan.members[0].id === user?.id ? chan.members[1].id : chan.members[0].id);
+		let friendName = (chan.members[0].id === user?.id ? chan.members[1].name : chan.members[0].name)
+
+		name = friendName;
+		img = <Avatar size={"small"} id={friendId} name={friendName} namespec={true}></Avatar>
+	}
 
 	return (
 		<div className={ selected ? "channel selected" : "channel" } onClick={ selectChannel }>
-			<div className={ "channelImg " + chan.type }></div>
+			{ img }
 			<div className="channelName">{ name }</div>
 		</div>
 	)
@@ -99,10 +109,14 @@ function ChannelList () {
 	var { user } = useContext(AuthContext) as AuthContextType;
 
 	useEffect(() => {
+		let mounted = true;
+
 		axios.get(`/users/infos/me`)
 		.then( res => {
 			// console.log("GET infos me", res);
-			setBlockedUsers(res.data.blocked);
+			if (mounted) {
+				setBlockedUsers(res.data.blocked);
+			}
 		})
 		.catch (err => {
 			console.log("Error:", err);
@@ -127,8 +141,10 @@ function ChannelList () {
 				axios.get(`/users/channels/${ user?.id }`)
 				.then( res => {
 					var chans2 = res.data.filter((c:any) => c.type !== 1);
-					setChannels(chans.concat(chans2));
-					setIsLoading(false);
+					if (mounted) {
+						setChannels(chans.concat(chans2));
+						setIsLoading(false);
+					}
 				})
 				.catch (err => {
 					console.log("Error:", err);
@@ -144,13 +160,17 @@ function ChannelList () {
 					else
 						return (false);
 				});
-				setChannels(chans);
-				setIsLoading(false);
+				if (mounted) {
+					setChannels(chans);
+					setIsLoading(false);
+				}
 			}
 		})
 		.catch (err => {
 			console.log("Error:", err);
 		})
+
+		return () => { mounted = false };
 	}, []); // eslint-disable-line
 
 	var publicChans = channels.filter((chan:any) => chan.type === 1);
