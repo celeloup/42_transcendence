@@ -30,11 +30,17 @@ function CreateChan({ type, hide } : CreateChanProps) {
 	const [users, setUsers] = useState<any[]>([]);
 	
 	useEffect(() => {
+		let mounted = true;
+
 		axios.get('/users')
 		.then ( res => {
-			setUsers(res.data);
+			if (mounted) {
+				setUsers(res.data);
+			}
 		})
 		.catch (err => { console.log(err); })
+
+		return () => { mounted = false };
 	}, []);
 
 	// ------ Style password

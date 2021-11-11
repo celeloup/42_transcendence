@@ -83,14 +83,20 @@ const AddMember = ({ chan, display, refresh, setRefresh } : AddMemberProps) => {
 	const [ error, setError ] = useState<string>("");
 
 	useEffect(() => {
+		let mounted = true;
+
 		axios.get(`/users`)
 		.then( res => {
 			// console.log(res.data);
-			setMissingMembers(res.data);
+			if (mounted) {
+				setMissingMembers(res.data);
+			}
 		})
 		.catch( err => {
 			console.log(err);
 		})
+
+		return () => { mounted = false };
 	}, []);
 
 	const handleSubmit = () => {

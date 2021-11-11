@@ -8,21 +8,6 @@ import Achievements from './profile/Achievements';
 import '../styles/Profile.scss';
 import { AuthContext, ContextType as AuthContextType } from '../contexts/AuthContext';
 
-type Match = {
-	boost_available: boolean;
-	createdDate: string;
-	friendly: boolean;
-	goal: number;
-	id: number;
-	map: number;
-	score_user1: number;
-	score_user2: number;
-	speed: number;
-	user1_id: number;
-	user2_id: number;
-	winner: number;
-}
-
 type Friend = {
 	id: number;
 	name: string;
@@ -35,7 +20,7 @@ function Profile (props : any) {
 	const [loading, setLoading] = React.useState<boolean>(true);
 	const [username, setUsername] = React.useState<string>("");
 	const [hasAvatar, setHasAvatar] = React.useState<boolean>(false);
-	const [matches, setMatches] = React.useState<Match[]>([]);
+	const [matches, setMatches] = React.useState<any[]>([]);
 	const [nbVictories, setNbVictories] = React.useState<number>(0);
 	const [nbDefeats, setNbDefeats] = React.useState<number>(0);
 	const [nbPoints, setNbPoints] = React.useState<number>(0);
@@ -55,7 +40,6 @@ function Profile (props : any) {
 			if (mounted) {
 				setUsername(response.data.name);
 				setHasAvatar(response.data.avatar !== null);
-				setMatches(response.data.matches);
 				setNbVictories(response.data.victories);
 				setNbDefeats(response.data.defeats);
 				setNbPoints(response.data.points);
@@ -84,6 +68,12 @@ function Profile (props : any) {
 
 		masterSocket?.emit("get_users");
 		masterSocket?.on("connected_users", (data : any) => {
+			if (mounted) {
+				setOnline(data);
+			}
+		});
+
+		masterSocket?.on("update_online_users", (data : any) => {
 			if (mounted) {
 				setOnline(data);
 			}

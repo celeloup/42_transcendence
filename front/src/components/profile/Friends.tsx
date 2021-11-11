@@ -1,5 +1,6 @@
 import WindowBorder from "../ui_components/WindowBorder";
 import Avatar from "./Avatar";
+import { NavLink } from 'react-router-dom';
 import '../../styles/Profile.scss';
 
 type FriendType = {
@@ -22,13 +23,13 @@ type Props = {
 
 function Friend ( { infos, online } : Prop) {
     return (
-        <a href={ "/profile/" + infos.id }>
+        <NavLink to={ "/profile/" + infos.id }>
             <div className ='friends_info'>
                 <Avatar size={"medium"} id={infos.id} name={infos.name} namespec={true}/>
 		    	<p>{ infos.name }</p>
 	        	<div className={`dot_status ${online ? 'online': 'offline'}`} ></div>
 	        </div>
-        </a>
+        </NavLink>
     )
 }
 
