@@ -68,7 +68,7 @@ export default class MatchesService {
     const user1 = await this.usersService.getAllInfosByUserIdNoThrow(match.user1_id);
     const user2 = await this.usersService.getAllInfosByUserIdNoThrow(match.user2_id);
     if (!user1 || !user2)
-      return ;
+      return;
     user1.points += match.score_user1;
     user2.points += match.score_user2;
     if (match.score_user1 === match.goal) {
@@ -100,7 +100,7 @@ export default class MatchesService {
       }
       user1.defeats++;
     }
-    
+
     let achievement = null;
     if (user1.matches.length === 1) {
       achievement = await this.achievementsService.getAchievementByName("Newbie");
@@ -113,7 +113,7 @@ export default class MatchesService {
       user1.achievements.push(achievement);
       await this.usersRepository.save(user1);
     }
-    
+
     achievement = null;
     if (user2.matches.length === 1) {
       achievement = await this.achievementsService.getAchievementByName("Newbie");
@@ -141,31 +141,38 @@ export default class MatchesService {
   //   return await this.matchesRepository.save(updatedMatch);
   // }
 
-  async updateMatchUsers(match: &Match, user1_id: number, user2_id: number){
-    if (match.user1_id !== user1_id){
+  async updateMatchUsers(match: & Match, user1_id: number, user2_id: number) {
+    if (match.user1_id !== user1_id) {
       let user1 = await this.usersService.getByIdNoThrow(user1_id);
       match.users[0] = user1;
       match.user1_id = user1_id;
-    }    
-    if (match.user2_id !== user2_id){
+    }
+    if (match.user2_id !== user2_id) {
       let user2 = await this.usersService.getByIdNoThrow(user2_id);
       match.users[1] = user2;
       match.user2_id = user2_id;
     }
     await this.matchesRepository.save(match);
     return match;
-  } 
+  }
 
   //called from a websocket
   async updateMatch(id: number, updatedMatch: & Match) {
-    let originMatch = await this.getMatchByIdNoThrow(id);
-    if (originMatch.user1_id !== updatedMatch.user1_id || originMatch.user2_id !== updatedMatch.user2_id)
-      originMatch = await this.updateMatchUsers(originMatch, updatedMatch.user1_id, updatedMatch.user2_id)
-    originMatch.score_user1 = updatedMatch.score_user1;
-    originMatch.score_user2 = updatedMatch.score_user2;    
+    let match = await this.getMatchByIdNoThrow(id);
+    if (match) {
+      if (match.user1_id !== updatedMatch.user1_id || match.user2_id !== updatedMatch.user2_id)
+        match = await this.updateMatchUsers(match, updatedMatch.user1_id, updatedMatch.user2_id)
+      match.score_user1 = updatedMatch.score_user1;
+      match.score_user2 = updatedMatch.score_user2;
+      await this.matchesRepository.save(match);
+    }
+    else {
+      await this.matchesRepository.save(updatedMatch)
+      match = updatedMatch
+    }
     if (updatedMatch.score_user1 === updatedMatch.goal || updatedMatch.score_user2 === updatedMatch.goal)
-      return await this.weHaveAWinner(originMatch);
-    return await this.matchesRepository.save(originMatch);
+      return await this.weHaveAWinner(match);
+    return match;
   }
 
   //called from a websocket
@@ -176,7 +183,7 @@ export default class MatchesService {
       }
     });
     if (!match)
-      return ;
+      return;
     match.users = [];
     await this.matchesRepository.save(match);
     await this.matchesRepository.delete(match_id);
