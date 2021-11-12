@@ -42,6 +42,7 @@ function Pong() {
 	const [ declined, setDeclined ] = useState<any>(null);
 	const [ canceledGame, setCanceledGame ] = useState<any>(null);
 	const [ userOffline, setUserOffline ] = useState<any>(null);
+	const [ interrupted, setInterrupted ] = useState<boolean>(false);
 	const [ waiting, setWaiting ] = useState<boolean>(true);
 	
 	useEffect(() => {
@@ -84,6 +85,7 @@ function Pong() {
 		
 		masterSocket?.on('interrupted_game', (data:any) => {
 			if (mounted) {
+				setInterrupted(true);
 				setEndScreen(true);
 				setPuck({ x: -100, y: -100, r: 12, boost_activated: [] });
 			}
@@ -211,7 +213,7 @@ function Pong() {
 				<div>{ header }</div>
 			</div>
 
-			{ endScreen && <EndScreen user1={ match.users[0] } user2={ match.users[1] } score1={ score[0] } score2={ score[1] } setToDisplay={ setToDisplay }/> }
+			{ endScreen && <EndScreen user1={ match.users[0] } user2={ match.users[1] } score1={ score[0] } score2={ score[1] } setToDisplay={ setToDisplay } interrupted={ interrupted }/> }
 			{ noPending && <InfoError setToDisplay={ setToDisplay } type={ 1 } /> }
 			{ declined && <InfoError setToDisplay={ setToDisplay } type={ 2 } user={ declined }/> }
 			{ canceledGame && <InfoError setToDisplay={ setToDisplay } type={ 3 } user={ canceledGame }/> }

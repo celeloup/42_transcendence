@@ -97,7 +97,7 @@ function Match ( { data, my_id, focus, setFocus } : MatchProps ) {
 function MatchHistory ( { matches, my_id } : HistoryProps ) {
     const [focus, setFocus] = React.useState<number>(-1);
     const match_divs = matches.map((match) => <Match key={match.id} data={match} my_id={my_id} focus={focus === match.id} setFocus={setFocus}/>)
-
+    console.log(matches);
     return (
         <WindowBorder id='history_window' w='620' h='480'>
             <div>

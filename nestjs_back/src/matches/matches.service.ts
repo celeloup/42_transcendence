@@ -71,7 +71,7 @@ export default class MatchesService {
       return ;
     user1.points += match.score_user1;
     user2.points += match.score_user2;
-    if (match.score_user1 === match.goal) {
+    if (match.score_user1 === match.goal || match.winner === user1.id) {
       user1.victories++;
       let achievement = null;
       if (user1.victories === 1) {
@@ -126,7 +126,7 @@ export default class MatchesService {
       user2.achievements.push(achievement);
       await this.usersRepository.save(user2);
     }
-    const user1win = match.score_user1 === match.goal
+    const user1win = match.score_user1 === match.goal || match.winner === user1.id;
     match.winner = user1win ? match.user1_id : match.user2_id;
     await this.matchesRepository.save(match);
     await this.usersRepository.save(user1);
@@ -165,7 +165,9 @@ export default class MatchesService {
       originMatch = await this.updateMatchUsers(originMatch, updatedMatch.user1_id, updatedMatch.user2_id)
     originMatch.score_user1 = updatedMatch.score_user1;
     originMatch.score_user2 = updatedMatch.score_user2;
-    if (updatedMatch.score_user1 === updatedMatch.goal || updatedMatch.score_user2 === updatedMatch.goal)
+    originMatch.winner = updatedMatch.winner;
+    console.log("updateMatch() originMatch.winner = ", originMatch.winner);
+    if (updatedMatch.winner || updatedMatch.score_user1 === updatedMatch.goal || updatedMatch.score_user2 === updatedMatch.goal)
       return await this.weHaveAWinner(originMatch);
     return await this.matchesRepository.save(originMatch);
   }

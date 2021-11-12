@@ -19,7 +19,7 @@ type endScreenProps = {
 function EndScreen({ user1, user2, score1, score2, setToDisplay, interrupted = false } : endScreenProps) {
 	var { user } = useContext(AuthContext) as AuthContextType;
 	let message;
-	if ((user1.id === user?.id && score1 > score2) || (user2.id === user?.id && score2 > score1))
+	if (interrupted || (user1.id === user?.id && score1 > score2) || (user2.id === user?.id && score2 > score1))
 		message = "YOU WIN";
 	else if ((user1.id === user?.id && score1 < score2) || (user2.id === user?.id && score2 < score1))
 		message = "YOU LOSE";
@@ -28,7 +28,8 @@ function EndScreen({ user1, user2, score1, score2, setToDisplay, interrupted = f
 	return (
 		<div id="end_screen">
 			<div>{ message }</div>
-			{ interrupted && <div>Your opponent left the game</div>}
+			{ interrupted && (user?.id === user2.id || user?.id === user1.id) && <div>Your opponent left the game</div> }
+			{ interrupted && (user?.id !== user2.id && user?.id !== user1.id) && <div>One of the player left the game</div> }
 			<div id="scores">
 				<div id="p1">
 					<span>{ user1.name }</span>
