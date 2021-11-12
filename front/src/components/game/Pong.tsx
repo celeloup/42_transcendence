@@ -27,8 +27,8 @@ function Pong() {
 	const width: number = 782;
 	const paddle_margin: number = 10;
 
-	let { masterSocket, setToDisplay } = useContext(AuthContext) as AuthContextType;
-	let { matchID, setMatchID, setMatch, match } = useContext(GameContext) as ContextType;
+	let { masterSocket, setToDisplay, toDisplay } = useContext(AuthContext) as AuthContextType;
+	let { setMatch, match } = useContext(GameContext) as ContextType;
 
 	// GAME OBJECTS
 	const [ puck, setPuck ] = useState<Puck>({ x: -100, y: -100, r: 12, boost_activated: [] });
@@ -127,13 +127,22 @@ function Pong() {
 			if (no_pending_game === false && id !== -1)
 			{
 				masterSocket.emit('leave_game', id);
-				setMatchID("");
 				setMatch(null);
 			}
 			mounted = false
 		}
 	}, [masterSocket]) // eslint-disable-line
 
+	useEffect(() => {
+		let mounted = true;
+		if (mounted)
+			setEndScreen(false);
+			setNoPending(false);
+			setInterrupted(false);
+		return () => {
+			mounted = false
+		}
+	}, [ match ])
 	
 	// ------------- CANVAS
 	function separation(p5: p5Types) {

@@ -5,7 +5,7 @@ import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.min.css';
 import { useHistory} from "react-router-dom";
 
-function InvitationNotification({ closeToast, socket, match, setToDisplay }:any) {
+function InvitationNotification({ closeToast, socket, match, setToDisplay, toDisplay }:any) {
 	const history = useHistory();
 	let test = false;
 	
@@ -18,6 +18,8 @@ function InvitationNotification({ closeToast, socket, match, setToDisplay }:any)
 
 	const accept = () => {
 		test = true;
+		// if (toDisplay === 'pong')
+		// 	setToDisplay('landing');
 		setToDisplay('pong');
 		socket.emit('accept_match', match);
 		history.push("/");
@@ -74,7 +76,6 @@ export const AuthProvider= ({ children } : Props) => {
 	const [ connect, setConnect ] = useState<boolean>(false);
 	const [ toDisplay, setToDisplay ] = useState<string>("landing");
 	const [ challenged, setChallenged ] = useState<any>(null);
-	const [ matchToDecline, setMatchToDecline ] = useState<number>(0);
 
 	useEffect(() : ReturnType<EffectCallback> => {
 		if (connect) {
@@ -98,7 +99,7 @@ export const AuthProvider= ({ children } : Props) => {
 				closeOnClick: false
 			};
 			// console.log("received invitation", data);
-			toast(<InvitationNotification socket={ socket } match={ data } setToDisplay={ setToDisplay } />, options);
+			toast(<InvitationNotification socket={ socket } match={ data } setToDisplay={ setToDisplay } toDisplay={toDisplay}/>, options);
 		})
 	}, [socket])
 

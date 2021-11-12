@@ -42,7 +42,6 @@ export default class GameService {
     }
 
     deleteMatchObjet(matchId: number) {
-        console.log("***** GAME HAS BEEN DELETED *************************");
         this.matchService.deleteMatch(matchId);
     }
 
@@ -53,7 +52,6 @@ export default class GameService {
         this.currentGames.set(match.id, round);
         // this.currentGames.push(round);
         match = await this.matchService.updateMatch(match.id, match);
-        // console.log("*** LAUNCH GAME (websocket) ****", match);
 
         //on lance le jeu, retourne 1 si la partie a ete annule
         if (await this.startGame(server, round, usersSocket, this.playingUsers, match)) {
@@ -66,7 +64,6 @@ export default class GameService {
         match.score_user1 = round.score_player1;
         match.score_user2 = round.score_player2;
         match.winner = round.victory;
-        console.log(match.winner);
 
         //on save le game et on retire les infos "en cours";
         await this.matchService.updateMatch(match.id, match);
@@ -108,7 +105,6 @@ export default class GameService {
             server.in(idGame).emit('finish_game', param);
             return 0;
         }
-        console.log(missingPlayer, param.id_player1, param.id_player2);
         if (missingPlayer == 1) {
             param.victory = param.id_player2;
         }

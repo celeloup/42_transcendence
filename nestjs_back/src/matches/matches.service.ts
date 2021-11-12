@@ -166,7 +166,6 @@ export default class MatchesService {
     originMatch.score_user1 = updatedMatch.score_user1;
     originMatch.score_user2 = updatedMatch.score_user2;
     originMatch.winner = updatedMatch.winner;
-    console.log("updateMatch() originMatch.winner = ", originMatch.winner);
     if (updatedMatch.winner || updatedMatch.score_user1 === updatedMatch.goal || updatedMatch.score_user2 === updatedMatch.goal)
       return await this.weHaveAWinner(originMatch);
     return await this.matchesRepository.save(originMatch);

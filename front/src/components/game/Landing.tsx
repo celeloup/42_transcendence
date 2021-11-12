@@ -25,9 +25,10 @@ function Landing() {
 
 		masterSocket?.emit("get_current_games");
 		masterSocket?.on("current_games", (data : number[]) => {
-			if (mounted) {
-				resolveMatches(data);
-			}
+			console.log(data);
+			// if (mounted) {
+				// resolveMatches(data);
+			// }
 		});
 
 		return () => { mounted = false };
@@ -73,7 +74,7 @@ function Landing() {
 					}
 					{ matches.length > 0 &&
 						matches.map((match, i) =>
-							<div key={i}>
+							<div key={i} onClick={ () => { console.log(match.id); }}>
 								<span className="name">{ match.name1 }</span>
 								<span className="score">{ match.score1 }</span>
 								<img className="logo" src={ Sabers } alt="sabers" />

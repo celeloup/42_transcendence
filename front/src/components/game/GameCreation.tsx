@@ -15,10 +15,8 @@ type SelectPlayerProps = {
 }
 
 const SelectPlayer = ({ display, setInvitedPlayer } : SelectPlayerProps) => {
-	// const [ isLoading, setIsLoading ] = useState(false);
 	const [ users, setUsers ] = useState<any[]>([]);
 	const [ user, setUser ] = useState(0);
-	// var { masterSocket } = useContext(AuthContext) as AuthContextType;
 
 	useEffect(() => {
 		axios.get(`/users`)
@@ -58,6 +56,7 @@ function GameCreation() {
 	const [ boost, setBoost ] = useState(false);
 	const [ invitedPlayer, setInvitedPlayer ] = useState<any>(challenged);
 	const [ displayChoosePlayer, setDisplayChoosePlayer ] = useState(false);
+	const [ isLoading, setIsLoading ] = useState(false);
 
 	useEffect(() => {
 		setInvitedPlayer(challenged);
@@ -70,6 +69,7 @@ function GameCreation() {
 	  }, []);
 
 	const create_game = () => {
+		setIsLoading(true);
 		axios.post('/matches', {
 			"friendly": false,
 			"user1_id": user?.id,
@@ -79,7 +79,7 @@ function GameCreation() {
 			"goal": goal,
 			"boost_available": boost
 		  })
-		  .then( res => { 
+		  .then( res => {
 			  	// console.log("create match success !", res.data);
 				setMatch(res.data);
 				if (invitedPlayer)
@@ -88,7 +88,7 @@ function GameCreation() {
 					masterSocket.emit('create_game', res.data);
 				setToDisplay("pong");
 			} )
-		  .catch ( err => { alert("create match fail :("); console.log(err) } )
+		  .catch ( err => { alert("create match fail :("); console.log(err); setIsLoading(false); } )
 	}
 
 	function updateGoal(direction: string){
@@ -168,7 +168,7 @@ function GameCreation() {
 				</div>
 			</div>
 			<div id="challenge_button" className="button" onClick={ () => setDisplayChoosePlayer(true) }>{ invitedPlayer ? "CHALLENGE " + invitedPlayer.name.toUpperCase() : "CHALLENGE A PLAYER" }</div>
-			<br/><div id="create_game_button" className="button" onClick={ create_game }>CREATE GAME</div>
+			<br/><div id="create_game_button" className="button" onClick={ create_game }>{ isLoading ? "Loading..." : "CREATE GAME" }</div>
 		</div>
 )}
 
