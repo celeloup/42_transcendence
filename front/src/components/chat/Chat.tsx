@@ -154,9 +154,8 @@ export function Chat() {
 	useEffect(() : ReturnType<EffectCallback> => {
 		let mounted = true;
 		const newSocket:any = io(`${process.env.REACT_APP_BACK_URL}/channel`, { transports: ["websocket"] });
-
-		setSocket(newSocket);
-
+		if (mounted)
+			setSocket(newSocket);
 		return () => { mounted = false; newSocket.close() };
 	}, [setSocket]);
 
@@ -282,6 +281,7 @@ export function Chat() {
 
 		masterSocket?.emit("get_users");
 		masterSocket?.on("connected_users", (data : any) => {
+			console.log(data);
 			if (mounted) {
 				setUsersOnline(data);
 			}

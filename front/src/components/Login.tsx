@@ -16,19 +16,29 @@ function Login() {
 	};
 
 	useEffect(() => {
+		let mounted = true;
 		if (ghostLogin !== 0)
 		{
 			axios.post(`/authentication/log-in`, { "id42": ghostLogin })
 			.then (response => {
 				// console.log(response);
-				login(response.data);
-				setRedir(true);
-				setGhostLogin(0);
+				if (mounted) {
+					login(response.data);
+					setRedir(true);
+					setGhostLogin(0);
+				}
 			})
 			.catch(error => {
-				console.log("Error catch :", error);
-				setGhostLogin(0);
+				if (error.response.status === 403)
+					console.log("ERROR:", error.response.data.message);
+				else
+					console.log("ERROR:", error);
+				if (mounted)
+					setGhostLogin(0);
 			})
+		}
+		return () => {
+			mounted = false
 		}
 	}, [ghostLogin]); // eslint-disable-line
 

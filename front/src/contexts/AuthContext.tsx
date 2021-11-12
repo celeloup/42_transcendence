@@ -14,7 +14,7 @@ function InvitationNotification({ closeToast, socket, match, setToDisplay, toDis
 			if (!test)
 				socket.emit('decline_match', match);
 		}
-	}, [])
+	}, []) // eslint-disable-line
 
 	const accept = () => {
 		test = true;
@@ -76,6 +76,7 @@ export const AuthProvider= ({ children } : Props) => {
 	const [ connect, setConnect ] = useState<boolean>(false);
 	const [ toDisplay, setToDisplay ] = useState<string>("landing");
 	const [ challenged, setChallenged ] = useState<any>(null);
+	const history = useHistory();
 
 	useEffect(() : ReturnType<EffectCallback> => {
 		if (connect) {
@@ -101,7 +102,12 @@ export const AuthProvider= ({ children } : Props) => {
 			// console.log("received invitation", data);
 			toast(<InvitationNotification socket={ socket } match={ data } setToDisplay={ setToDisplay } toDisplay={toDisplay}/>, options);
 		})
-	}, [socket])
+
+		socket?.on('user_is_ban_site', (data: any) => {
+			logoutContext();
+			history.push("/");
+		})
+	}, [socket]) // eslint-disable-line
 
 	const loginContext = (userIN:User) => {
 		// console.log("Context login : ", user);

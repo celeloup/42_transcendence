@@ -27,7 +27,7 @@ function Pong() {
 	const width: number = 782;
 	const paddle_margin: number = 10;
 
-	let { masterSocket, setToDisplay, toDisplay } = useContext(AuthContext) as AuthContextType;
+	let { masterSocket, setToDisplay } = useContext(AuthContext) as AuthContextType;
 	let { setMatch, match } = useContext(GameContext) as ContextType;
 
 	// GAME OBJECTS
@@ -56,9 +56,10 @@ function Pong() {
 		masterSocket?.on('game_starting', (data:any) => {
 			// console.log("game starting !", data);
 			if (mounted)
+			{
 				setMatch(data);
-			if (mounted)
 				setWaiting(false);
+			}
 			if (!game_starting)
 				game_starting = true;
 			if (id === -1)
@@ -68,6 +69,8 @@ function Pong() {
 		masterSocket?.on('new_frame', (data:any) => {
 			// console.log("new frame :", data);
 			if (mounted) {
+				if (waiting)
+					setWaiting(false);
 				setPuck(data.puck);
 				setPaddleLeft(data.paddle_player1);
 				setPaddleRight(data.paddle_player2);

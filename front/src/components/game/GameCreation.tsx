@@ -66,7 +66,7 @@ function GameCreation() {
 		return () => {
 		  setChallenged(null);
 		};
-	  }, []);
+	  }, []);  // eslint-disable-line
 
 	const create_game = () => {
 		setIsLoading(true);

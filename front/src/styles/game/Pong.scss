@@ -51,9 +51,13 @@ $green: #81A439;
 		color: $background-color;
 		font-family: "Dogica";
 
+		#player_left {
+			margin-top: 10px;
+		}
+
 		div:first-child {
 			font-size: 36px;
-			margin-bottom: 10px;
+			// padding-bottom: 10px;
 		}
 
 		#scores {

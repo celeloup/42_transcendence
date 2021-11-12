@@ -1,7 +1,8 @@
 import WindowBorder from "../ui_components/WindowBorder";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import UserCategory from './UserCategory';
+import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
 import '../../styles/admin/UserList.scss';
 
 type User = {
@@ -31,6 +32,8 @@ function UserList ( { setStatus, setMessage } : Props) {
 	const [banned, setBanned] = useState<User[]>([]);
 	const [searched, setSearched] = useState<string>("");
 	const [rerender, setRerender] = useState<boolean>(true);
+
+	let { masterSocket } = useContext(AuthContext) as AuthContextType;
 
 	useEffect(() => {
 		let mounted = true;
@@ -105,6 +108,7 @@ function UserList ( { setStatus, setMessage } : Props) {
 		function: (id : number) => {
 			axios.put('/users/ban/me', { userId: id })
 			.then (response => {
+				masterSocket.emit('ban_site_user', id);
 				setStatus(<p className="stats"><i>Success</i> ✔️</p>);
 				setMessage(<p className="stats">User was <i>banned</i>.</p>);
 				setRerender(!rerender);

@@ -61,7 +61,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		@MessageBody() room: number,
 		@ConnectedSocket() client: Socket,
 	) {
-		this.gameService.joinRoom(this.server, client.toString(), client)
+		this.gameService.joinRoom(this.server, room.toString(), client)
 	}
 
 	@SubscribeMessage('leave_game')
@@ -175,7 +175,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 	) {
 		let player: number;
 		let id: number = Number(data.id_game);
-		let game: Round = this.gameService.getCurrentGames().get(id);
+		let game: Round = this.gameService.getCurrentGames().get(id)[0];
 
 		//on verifie l'id envoye en param
 		if (game === undefined) {
@@ -200,7 +200,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 	//renvoie la liste des jeux en cours
 	@SubscribeMessage('get_current_games')
 	async requestCurrentGames(@ConnectedSocket() socket: Socket) {
-		this.logger.log(`List of current games`);
+		// this.logger.log(`List of current games`);
 		socket.emit('current_games', Array.from(this.gameService.getCurrentGames().values()));
 	}
 
@@ -211,4 +211,15 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		socket.emit('connected_users', Array.from(this.connectedUsers.keys()), this.gameService.getPlayingUsers());
 	}
 
+	@SubscribeMessage('ban_site_user')
+	async sendBanAlert(
+		@MessageBody() id: number,
+		@ConnectedSocket() client: Socket,
+	) {
+		let guest_socket = this.connectedUsers.get(id);
+		if (!guest_socket) {
+			return ;
+		}
+		guest_socket.emit('user_is_ban_site');
+	}
 }
