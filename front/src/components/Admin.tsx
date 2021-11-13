@@ -12,7 +12,7 @@ function Admin () {
 	const [matches, setMatches] = useState<any[]>([]);
 	const [online, setOnline] = React.useState<number[]>([]);
 	const [playing, setPlaying] = React.useState<number[]>([]);
-	const { masterSocket, user } = useContext(AuthContext) as AuthContextType;
+	const { masterSocket } = useContext(AuthContext) as AuthContextType;
 
 	useEffect(() => {
 		let mounted = true;
