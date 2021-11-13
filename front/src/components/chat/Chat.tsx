@@ -138,10 +138,10 @@ export function Chat() {
 		// select first channel if exist
 		if (!channel)
 		{
-			axios.get(`/channel`)
+			axios.get(`/channel/1`)
 			.then((res) => {
-				if (mounted && res.data.length !== 0) {
-					setChannel(res.data[0]);
+				if (mounted) {
+					setChannel(res.data);
 				}
 			})
 			.catch((err) => console.log(err))
@@ -281,7 +281,7 @@ export function Chat() {
 
 		masterSocket?.emit("get_users");
 		masterSocket?.on("connected_users", (data : any) => {
-			console.log(data);
+			// console.log(data);
 			if (mounted) {
 				setUsersOnline(data);
 			}
