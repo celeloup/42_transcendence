@@ -27,7 +27,13 @@ export function Route({ typeOfRoute, ...routeProps}: RouteProps) {
 					id42: response.data.id42,
 					isTwoFactorAuth: response.data.isTwoFactorAuthenticationEnabled,
 				}
-				login(user);
+				if (user.site_banned === true)
+				{
+					console.log("ERROR: You were banned from the website by an admin.");
+					logout();
+				}
+				else
+					login(user);
 				setLoading(false);
 			})
 			.catch(error => {

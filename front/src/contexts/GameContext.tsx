@@ -4,9 +4,7 @@ export type ContextType = {
 	toDisplay: string,
 	setToDisplay: (page:string) => void,
 	match: any,
-	setMatch: (match:any) => void,
-	matchID:string,
-	setMatchID: (id:string) => void
+	setMatch: (match:any) => void
 }
 
 interface Props {
@@ -19,16 +17,13 @@ export const GameProvider = ({ children } : Props) => {
 
 	const [ toDisplay, setToDisplay ] = useState<string>("landing");
 	const [ match, setMatch ] = useState<any>(null);
-	const [ matchID, setMatchID ] = useState<string>("");
 
 	return ( <GameContext.Provider 
 			value={{ 
 				toDisplay: toDisplay,
 				setToDisplay: setToDisplay,
 				match: match,
-				setMatch: setMatch,
-				matchID: matchID,
-				setMatchID: setMatchID
+				setMatch: setMatch
 			}}>
 				{ children }
 			</GameContext.Provider> );

@@ -13,15 +13,15 @@ export default class GameService {
     private logger: Logger = new Logger("GameService");
 
     private usersRoom: Map<Socket, string> = new Map();
-    private currentGames: Map<number, Round> = new Map();
+    private currentGames: Map<number, [Round, Match]> = new Map();
     private playingUsers: number[] = [];
 
     getCurrentGames() {
         return this.currentGames;
     }
 
-    setCurrentGames(id: number, param: Round) {
-        this.currentGames.set(id, param);
+    setCurrentGames(id: number, paramR: Round, paramM: Match) {
+        this.currentGames.set(id, [paramR, paramM]);
     }
 
     getPlayingUsers() {
@@ -49,14 +49,15 @@ export default class GameService {
 
         //on initialise la game avec les parametres de jeu envoye par le front et on l'ajoute aux matchs en cours
         let round = new Round(match.id.toString(), match.user1_id, match.user2_id, match.speed, match.goal, match.boost_available, match.map);
-        this.currentGames.set(match.id, round);
-        // this.currentGames.push(round);
-        // await this.matchService.updateMatch(match.id, match);
+        match = await this.matchService.updateMatch(match.id, match);
+		this.currentGames.set(match.id, [round, match]);
+		server.emit('update_current_games', Array.from(this.currentGames.values()));
 
         //on lance le jeu, retourne 1 si la partie a ete annule
         if (await this.startGame(server, round, usersSocket, this.playingUsers, match)) {
             this.deleteMatchObjet(match.id);
             this.currentGames.delete(match.id);
+			server.emit('update_current_games', Array.from(this.currentGames.values()));
             return;
         }
 
@@ -70,6 +71,7 @@ export default class GameService {
         delete this.playingUsers[round.id_player1];
         delete this.playingUsers[round.id_player2];
         this.currentGames.delete(match.id);
+		server.emit('update_current_games', Array.from(this.currentGames.values()));
     }
 
     async startGame(server: Server, param: Round, users: Map<number, Socket>, inGame: Array<number>, match: Match) {
@@ -79,10 +81,10 @@ export default class GameService {
 
         //on verifie que les joueurs sont encore dans la room avant de lancer
         if (this.checkDisconnection(idGame, socketPlayer1, socketPlayer2, this.usersRoom) > 0) {
-            server.in(idGame).emit('cancel_game', idGame);
+            server.in(idGame).emit('cancel_game', match);
             return 1;
         }
-        server.in(idGame).emit('game_starting', match );
+        server.in(idGame).emit('game_starting', match);
 
         //on ajoute les joueurs a la liste des users en cours de jeu et on attend laisse une pause avant de lancer la partie;
         inGame.push(param.id_player1);

@@ -15,10 +15,8 @@ type SelectPlayerProps = {
 }
 
 const SelectPlayer = ({ display, setInvitedPlayer } : SelectPlayerProps) => {
-	// const [ isLoading, setIsLoading ] = useState(false);
 	const [ users, setUsers ] = useState<any[]>([]);
 	const [ user, setUser ] = useState(0);
-	// var { masterSocket } = useContext(AuthContext) as AuthContextType;
 
 	useEffect(() => {
 		axios.get(`/users`)
@@ -43,7 +41,7 @@ const SelectPlayer = ({ display, setInvitedPlayer } : SelectPlayerProps) => {
 		<div id="choose_player_popup">
 			<i className="fas fa-times" onClick={ () => display(false) }/>
 			[ select a player to challenge ]
-			<SearchUser theme="yo" list={ users } select={ setUser } byID={false}/>
+			<SearchUser theme="yo" list={ users } select={ setUser } byID={ false }/>
 			<div className={ user !== 0 ? "ready" : "" } id="submit" onClick={ handleSubmit }>Select</div>
 		</div>
 	)
@@ -58,6 +56,7 @@ function GameCreation() {
 	const [ boost, setBoost ] = useState(false);
 	const [ invitedPlayer, setInvitedPlayer ] = useState<any>(challenged);
 	const [ displayChoosePlayer, setDisplayChoosePlayer ] = useState(false);
+	const [ isLoading, setIsLoading ] = useState(false);
 
 	useEffect(() => {
 		setInvitedPlayer(challenged);
@@ -67,20 +66,12 @@ function GameCreation() {
 		return () => {
 		  setChallenged(null);
 		};
-	  }, []);
+	  }, []);  // eslint-disable-line
 
 	const create_game = () => {
-		// var match = {
-		// 	"user1_id": user?.id,
-		// 	"user2_id": invitedPlayer ? invitedPlayer.id : 1,
-		// 	"map": map,
-		// 	"speed": speed,
-		// 	"goal": goal,
-		// 	"boost_available": boost
-		//   };
-		// console.log(match);
+		setIsLoading(true);
 		axios.post('/matches', {
-			"friendly": true,
+			"friendly": false,
 			"user1_id": user?.id,
 			"user2_id": invitedPlayer ? invitedPlayer.id : 1,
 			"map": map,
@@ -88,7 +79,7 @@ function GameCreation() {
 			"goal": goal,
 			"boost_available": boost
 		  })
-		  .then( res => { 
+		  .then( res => {
 			  	// console.log("create match success !", res.data);
 				setMatch(res.data);
 				if (invitedPlayer)
@@ -97,7 +88,7 @@ function GameCreation() {
 					masterSocket.emit('create_game', res.data);
 				setToDisplay("pong");
 			} )
-		  .catch ( err => { alert("create match fail :("); console.log(err) } )
+		  .catch ( err => { alert("create match fail :("); console.log(err); setIsLoading(false); } )
 	}
 
 	function updateGoal(direction: string){
@@ -177,7 +168,7 @@ function GameCreation() {
 				</div>
 			</div>
 			<div id="challenge_button" className="button" onClick={ () => setDisplayChoosePlayer(true) }>{ invitedPlayer ? "CHALLENGE " + invitedPlayer.name.toUpperCase() : "CHALLENGE A PLAYER" }</div>
-			<br/><div id="create_game_button" className="button" onClick={ create_game }>CREATE GAME</div>
+			<br/><div id="create_game_button" className="button" onClick={ create_game }>{ isLoading ? "Loading..." : "CREATE GAME" }</div>
 		</div>
 )}
 

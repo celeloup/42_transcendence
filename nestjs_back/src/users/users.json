@@ -1,0 +1,36 @@
+{
+	"users": [
+    {
+      "name": "ghosty",
+      "email": "ghosty@mail.com",
+      "id42": 1,
+      "site_owner": false,
+      "site_banned": false,
+      "site_moderator": false
+    },
+    {
+      "name": "administraghost",
+      "email": "administraghost@mail.com",
+      "id42": 2,
+      "site_owner": true,
+      "site_banned": false,
+      "site_moderator": true
+    },
+    {
+      "name": "casper",
+      "email": "casper@mail.com",
+      "id42": 3,
+      "site_owner": false,
+      "site_banned": false,
+      "site_moderator": false
+    },
+    {
+      "name": "modoghost",
+      "email": "modoghost@mail.com",
+      "id42": 4,
+      "site_owner": false,
+      "site_banned": false,
+      "site_moderator": true
+    }
+	]
+}

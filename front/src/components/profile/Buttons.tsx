@@ -1,14 +1,19 @@
 import '../../styles/Profile.scss';
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
+import { useHistory } from "react-router-dom";
+import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
 
 type Props = {
     id: number;
+	user: any;
 }
 
-function Buttons ({ id } : Props) {
+function Buttons ({ id, user } : Props) {
 	const [ isFriend, setIsFriend ] = useState(false);
 	const [ isBlocked, setIsBlocked ] = useState(false);
+	var { setChallenged, setToDisplay } = useContext(AuthContext) as AuthContextType;
+	const history = useHistory();
 
     useEffect(() => {
 		let mounted = true;
@@ -86,6 +91,13 @@ function Buttons ({ id } : Props) {
 		}
 	}
 
+	const Challenge = () => {
+		setChallenged(user);
+		setToDisplay("create");
+		history.push("/");
+		// console.log("challenging ", user);
+	}
+
     return (
         <div className="buttons">
             <div>
@@ -99,7 +111,7 @@ function Buttons ({ id } : Props) {
                 </button>
             </div>
             <div>
-                <button>
+                <button onClick={ Challenge }>
                     CHALLENGE
                     <i className="fas fa-rocket"></i>
                 </button>

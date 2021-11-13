@@ -8,8 +8,8 @@ import JwtStrategy from '../authentication/strategy/jwt.strategy';
 import UsersController from './users.controller';
 import AchievementsModule from '../achievements/achievements.module';
 import Achievement from '../achievements/achievement.entity';
-import Match from 'src/matches/match.entity';
-import { truncate } from 'fs';
+import Match from '../matches/match.entity';
+import { users } from './users.json';
  
 @Module({
   imports: [
@@ -33,40 +33,6 @@ import { truncate } from 'fs';
 })
 export default class UsersModule {
   constructor(private readonly usersService: UsersService) {
-    const users = [
-      {
-        name: 'ghosty',
-        email: 'ghosty@mail.com',
-        id42: 1,
-        site_owner: false,
-        site_banned: false,
-        site_moderator: false
-      },
-      {
-        name: 'administraghost',
-        email: 'administraghost@mail.com',
-        id42: 2,
-        site_owner: true,
-        site_banned: false,
-        site_moderator: true
-      },
-      {
-        name: 'casper',
-        email: 'casper@mail.com',
-        id42: 3,
-        site_owner: false,
-        site_banned: false,
-        site_moderator: false
-      },
-      {
-        name: 'modoghost',
-        email: 'modoghost@mail.com',
-        id42: 4,
-        site_owner: false,
-        site_banned: false,
-        site_moderator: true
-      }
-    ]
     for (const user of users) {
       this.usersService.getBy42Id(user.id42)
       .then(response => {

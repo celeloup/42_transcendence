@@ -19,12 +19,27 @@ export default class UsersService {
     private matchesRepository: Repository<Match>
   ) { }
 
-  async getById(id: number): Promise<User> {
+  async getByIdNoThrow(id: number): Promise<User> {
     const user = await this.usersRepository.findOne({ id });
     if (user) {
       return user;
     }
+  }
+
+  async getById(id: number): Promise<User> {
+    const user = await this.getByIdNoThrow(id);
+    if (user) {
+      return user;
+    }
     throw new HttpException('User with this id does not exist', HttpStatus.NOT_FOUND);
+  }
+
+  async getByName(name: string): Promise<User> {
+    const user = await this.usersRepository.findOne({ name });
+    if (user) {
+      return user;
+    }
+    throw new HttpException('User with this name does not exist', HttpStatus.NOT_FOUND);
   }
 
   async getRankedUsers(): Promise<User[]> {
