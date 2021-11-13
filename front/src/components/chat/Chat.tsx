@@ -121,6 +121,7 @@ export function Chat() {
 	const [ askPassword, setAskPassword ] = useState(false);
 	const { masterSocket } = useContext(AuthContext) as AuthContextType;
 	const [ usersOnline, setUsersOnline ] = useState<any[]>([]);
+	const [ usersPlaying, setUsersPlaying ] = useState<any[]>([]);
 
 	const joinChan = () => {
 		axios.put(`/channel/join/${ channel?.id }`)
@@ -287,10 +288,11 @@ export function Chat() {
 			}
 		});
 
-		masterSocket?.on("update_online_users", (data : any) => {
+		masterSocket?.on("connected_users", (onlineList : any, playingList : any) => {
 			if (mounted) {
-				setUsersOnline(data);
-		 	}
+				setUsersOnline(onlineList);
+				setUsersPlaying(playingList);
+			}
 		});
 
 		return () => { mounted = false };
@@ -338,6 +340,7 @@ export function Chat() {
 			key={ mes.id }
 			id={ mes.author.id }
 			online={ usersOnline.includes(mes.author.id) }
+			playing={ usersPlaying.includes(mes.author.id) }
 			username={ mes.author.name }
 			message={ mes.content }
 			setBlockedUsers={ setBlockedUsers }

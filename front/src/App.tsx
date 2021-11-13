@@ -78,7 +78,7 @@ const App = () => {
 							component={ Profile }
 						/>
 						<Route
-							typeOfRoute="protected"
+							typeOfRoute="admin"
 							exact={true}
 							path='/admin'
 							component={ Admin }

@@ -28,6 +28,7 @@ function Profile (props : any) {
 	const [friends, setFriends] = React.useState<Friend[]>([]);
 	const [achievements, setAchievements] = React.useState<any[]>([]);
 	const [online, setOnline] = React.useState<number[]>([]);
+	const [playing, setPlaying] = React.useState<number[]>([]);
 	const { masterSocket, user } = useContext(AuthContext) as AuthContextType;
 	
 	const userId = +props.match.params.id;
@@ -67,9 +68,10 @@ function Profile (props : any) {
 		.catch(error => { console.log(error.response); })
 
 		masterSocket?.emit("get_users");
-		masterSocket?.on("connected_users", (data : any) => {
+		masterSocket?.on("connected_users", (onlineList : any, playingList : any) => {
 			if (mounted) {
-				setOnline(data);
+				setOnline(onlineList);
+				setPlaying(playingList);
 			}
 		});
 
@@ -89,9 +91,9 @@ function Profile (props : any) {
 				<div className="profile">
 					<div id="column_left">
 						<UserCard user_name={username} user_id={userId} has_avatar={hasAvatar} rank={rank}
-							nb_victories={nbVictories} nb_defeats={nbDefeats} nb_points={nbPoints} online={ online.includes(userId) }/>
+							nb_victories={nbVictories} nb_defeats={nbDefeats} nb_points={nbPoints} online={ online.includes(userId) } playing={ playing.includes(userId) }/>
 						{ user!.id !== userId && <Buttons id={userId}/>}
-						<Friends friends={friends} online={online}/>
+						<Friends friends={friends} online={online} playing={playing} me={ user!.id === userId }/>
 					</div>
 					<div id="column_right">
 						<MatchHistory matches={matches} my_id={userId}/>

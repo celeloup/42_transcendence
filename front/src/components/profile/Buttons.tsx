@@ -2,19 +2,6 @@ import '../../styles/Profile.scss';
 import { useState, useEffect } from "react";
 import axios from "axios";
 
-// type FriendType = {
-// 	id: number;
-// 	name: string;
-// 	site_owner: boolean;
-// 	site_moderator: boolean;
-// 	site_banned: boolean;
-// }
-
-// type Prop = {
-//     infos: FriendType;
-//     online: boolean;
-// }
-
 type Props = {
     id: number;
 }

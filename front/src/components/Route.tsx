@@ -2,6 +2,7 @@ import { RouteProps as RouterRouteProps, Route as RouterRoute } from 'react-rout
 import React from 'react';
 import { AuthContext, ContextType } from '../contexts/AuthContext';
 import Login from './Login';
+import Home from './Home';
 import axios from 'axios';
 
 export type RouteProps = {
@@ -9,7 +10,7 @@ export type RouteProps = {
 } & RouterRouteProps;
 	  
 export function Route({ typeOfRoute, ...routeProps}: RouteProps) {
-	var { isAuth, login, logout } = React.useContext(AuthContext) as ContextType;
+	var { isAuth, user, login, logout } = React.useContext(AuthContext) as ContextType;
 	const [loading, setLoading] = React.useState<boolean>(true);
 	
 	React.useEffect(() => {
@@ -50,7 +51,16 @@ export function Route({ typeOfRoute, ...routeProps}: RouteProps) {
 			} else {
 				return <Login></Login>;
 			}
-		} else {
+		}
+		else if (typeOfRoute === "admin")
+		{
+			if (isAuth && (user?.site_owner || user?.site_moderator)) {
+				return <RouterRoute{...routeProps} />;
+			} else {
+				return <Home></Home>;
+			}
+		}
+		else {
 			return <RouterRoute{...routeProps} />;
 		}
 	}
