@@ -99,9 +99,7 @@ function Landing() {
 						matches.map((match, i) =>
 							<div key={i} onClick={ () => { SpectateMatch(match, setToDisplay, masterSocket, setMatch); }}>
 								<span className="name">{ match.users[0].name }</span>
-								{/* <span className="score">{ match.score1 }</span> */}
 								<img className="logo" src={ Sabers } alt="sabers" />
-								{/* <span className="score">{ match.score2 }</span> */}
 								<span className="name">{ match.users[1].name }</span>
 							</div>
 						)
@@ -111,7 +109,7 @@ function Landing() {
 					<div className="leaderbox">
 						{
 							leaderboard.slice(0, 100).map((user, i) => 
-								<NavLink to={ "/profile/" + user.id } key={i}>
+								<NavLink to={ "/profile/" + user.id } className="navlink" key={i}>
 									<span className="rank">#{i + 1}</span>
 									<span className="name">{ user.name }</span>
 									<span className="points">{ user.points }</span>

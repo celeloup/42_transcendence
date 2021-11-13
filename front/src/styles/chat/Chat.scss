@@ -5,6 +5,7 @@ $light-gray: #E3E3E3;
 $dark-gray: #919191;
 $profile-gray: #3E3E3E;
 $green: #81A439;
+$orange: orange;
 
 #chat
 {
@@ -100,6 +101,10 @@ $green: #81A439;
 
 			&.online {
 				background-color: $green;
+			}
+
+			&.playing {
+				background-color: $orange;
 			}
 		}
 	}
@@ -198,6 +203,7 @@ $green: #81A439;
 	left:0;
 	width: 382px;
 	height: 670px;
+	z-index: 1;
 }
 
 .profile_card {
@@ -241,6 +247,10 @@ $green: #81A439;
 	
 				&.online {
 					background-color: $green;
+				}
+
+				&.playing {
+					background-color: $orange;
 				}
 			}
 		}

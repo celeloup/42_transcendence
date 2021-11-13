@@ -3,6 +3,7 @@ $text-color: white;
 $accent_color: #FFCD27;
 $online_dot: #81A439;
 $offline_dot: #919191;
+$playing_dot: orange;
 $profile_background: rgb(65, 62, 62);
 $dark-gray: #3E3E3E;
 $gray: #919191;
@@ -114,6 +115,10 @@ $schemes: $scheme1 $scheme2;
 
 							&.offline {
 								background-color: $offline_dot;
+							}
+
+							&.playing {
+								background-color: $playing_dot;
 							}
 						}
 						
@@ -270,6 +275,10 @@ $schemes: $scheme1 $scheme2;
 
 					&.offline {
 						background-color: $offline_dot;
+					}
+
+					&.playing {
+						background-color: $playing_dot;
 					}
 				}
 			}
