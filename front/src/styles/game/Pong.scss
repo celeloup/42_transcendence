@@ -39,6 +39,20 @@ $green: #81A439;
 		display: flex;
 		justify-content: space-evenly;
 	}
+
+	#countdown {
+		position: absolute;
+		font-size: 150px;
+		
+		font-family: "Dogica";
+		width: 782px;
+		text-align: center;
+		top: 250px;
+
+		&.yellow {
+			color: $accent-color;
+		}
+	}
 	
 	#end_screen {
 		border: 4px solid $accent_color;
@@ -70,10 +84,11 @@ $green: #81A439;
 			#p1, #p2 {
 				display: flex;
 				flex-direction: column;
-				gap: 20px;
+				// gap: 20px;
 				font-size: 20px;
 				width: 150px;
 				span:nth-child(2) {
+					margin-top: 20px;
 					font-size: 46px;
 				}
 			}
@@ -89,7 +104,6 @@ $green: #81A439;
 			color: $accent_color;
 			cursor: pointer;
 			width: 150px;
-			height: 20px;
 			padding: 10px;
 			margin: auto;
 			margin-top: 40px;
@@ -352,6 +366,7 @@ $green: #81A439;
 			}
 
 			#p1, #p2{
+				width: 250px;
 				margin: 10px 20px 5px 20px;
 				img:first-child{
 					margin-right: 50px;
