@@ -61,7 +61,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		@MessageBody() room: number,
 		@ConnectedSocket() client: Socket,
 	) {
-		this.gameService.joinRoom(this.server, client.toString(), client)
+		this.gameService.joinRoom(this.server, room.toString(), client)
 	}
 
 	@SubscribeMessage('leave_game')
@@ -69,6 +69,17 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		@MessageBody() room: number,
 		@ConnectedSocket() client: Socket,
 	) {
+		// Check if this room is a pending game
+		let game = this.pendingGame.find(x => x.id === room);
+		if (game)
+		{
+			const user = await this.authenticationService.getUserFromSocket(client);
+			if (user && game.user1_id === user.id) {
+				this.gameService.deleteMatchObjet(game.id);
+				let i = this.pendingGame.indexOf(game);
+				this.pendingGame.splice(i, 1);
+			}
+		}
 		this.gameService.leaveRoom(room.toString(), client);
 	}
 
@@ -79,7 +90,12 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		@ConnectedSocket() client: Socket,
 	) {
 		let guest_socket = this.connectedUsers.get(match.user2_id);
+		if (!guest_socket) {
+			client.emit('challenged_user_offline', match);
+			return ;
+		}
 		guest_socket.emit('invitation', match);
+		this.gameService.joinRoom(this.server, match.id.toString(), client);
 	}
 	
 	//accepte une invitation a jouer, join les 2 joueurs dans la room et lance la partie
@@ -97,7 +113,6 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		}
 
 		this.gameService.joinRoom(this.server, match.id.toString(), client);
-		this.gameService.joinRoom(this.server, match.id.toString(), sender_socket);
 		this.gameService.launchGame(this.server, match, this.connectedUsers);
 	}
 
@@ -109,7 +124,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 	) {
 		let sender_socket = this.connectedUsers.get(match.user1_id);
 		if (sender_socket != undefined) {
-			sender_socket.emit('invit_decline', match.id.toString());
+			sender_socket.emit('invit_decline', match);
 		}
 		this.gameService.deleteMatchObjet(match.id);
 	}
@@ -160,7 +175,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 	) {
 		let player: number;
 		let id: number = Number(data.id_game);
-		let game: Round = this.gameService.getCurrentGames().get(id);
+		let game: Round = this.gameService.getCurrentGames().get(id)[0];
 
 		//on verifie l'id envoye en param
 		if (game === undefined) {
@@ -185,8 +200,8 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 	//renvoie la liste des jeux en cours
 	@SubscribeMessage('get_current_games')
 	async requestCurrentGames(@ConnectedSocket() socket: Socket) {
-		this.logger.log(`List of current games`);
-		socket.emit('current_games', Array.from(this.gameService.getCurrentGames().keys()));
+		// this.logger.log(`List of current games`);
+		socket.emit('current_games', Array.from(this.gameService.getCurrentGames().values()));
 	}
 
 	//renvoie la liste des users et des personnes en train de jouer
@@ -196,4 +211,15 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		socket.emit('connected_users', Array.from(this.connectedUsers.keys()), this.gameService.getPlayingUsers());
 	}
 
+	@SubscribeMessage('ban_site_user')
+	async sendBanAlert(
+		@MessageBody() id: number,
+		@ConnectedSocket() client: Socket,
+	) {
+		let guest_socket = this.connectedUsers.get(id);
+		if (!guest_socket) {
+			return ;
+		}
+		guest_socket.emit('user_is_ban_site');
+	}
 }

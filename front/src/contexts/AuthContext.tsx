@@ -3,11 +3,23 @@ import { EffectCallback, useState, useEffect } from 'react';
 import { io } from "socket.io-client";
 import { ToastContainer, toast } from "react-toastify";
 import 'react-toastify/dist/ReactToastify.min.css';
-import { useHistory } from "react-router-dom";
+import { useHistory} from "react-router-dom";
 
-function InvitationNotification({ closeToast, socket, match, setToDisplay }:any) {
+function InvitationNotification({ closeToast, socket, match, setToDisplay, toDisplay }:any) {
 	const history = useHistory();
+	let test = false;
+	
+	useEffect(() => {
+		return () => {
+			if (!test)
+				socket.emit('decline_match', match);
+		}
+	}, []) // eslint-disable-line
+
 	const accept = () => {
+		test = true;
+		// if (toDisplay === 'pong')
+		// 	setToDisplay('landing');
 		setToDisplay('pong');
 		socket.emit('accept_match', match);
 		history.push("/");
@@ -27,7 +39,6 @@ function InvitationNotification({ closeToast, socket, match, setToDisplay }:any)
 		</div>
 	</div>
 )}
-
 
 export type User = {
 	id: number,
@@ -65,7 +76,7 @@ export const AuthProvider= ({ children } : Props) => {
 	const [ connect, setConnect ] = useState<boolean>(false);
 	const [ toDisplay, setToDisplay ] = useState<string>("landing");
 	const [ challenged, setChallenged ] = useState<any>(null);
-	const [ matchToDecline, setMatchToDecline ] = useState<number>(0);
+	const history = useHistory();
 
 	useEffect(() : ReturnType<EffectCallback> => {
 		if (connect) {
@@ -76,18 +87,8 @@ export const AuthProvider= ({ children } : Props) => {
 	}, [setSocket, connect]);
 
 	useEffect(() => {
-		if (matchToDecline)
-			socket.emit('decline_match', matchToDecline);
-	}, [matchToDecline])
-
-
-	useEffect(() => {
 		socket?.on('invitation', (data: any) => {
-			const decline = () => {
-				socket.emit('decline_match', data);
-			}
 			const options = {
-				onClose: decline,
 				autoClose: 6000,
 				type: toast.TYPE.SUCCESS,
 				icon: false,
@@ -99,9 +100,14 @@ export const AuthProvider= ({ children } : Props) => {
 				closeOnClick: false
 			};
 			// console.log("received invitation", data);
-			toast(<InvitationNotification socket={ socket } match={ data } setToDisplay={ setToDisplay } />, options);
+			toast(<InvitationNotification socket={ socket } match={ data } setToDisplay={ setToDisplay } toDisplay={toDisplay}/>, options);
 		})
-	}, [socket])
+
+		socket?.on('user_is_ban_site', (data: any) => {
+			logoutContext();
+			history.push("/");
+		})
+	}, [socket]) // eslint-disable-line
 
 	const loginContext = (userIN:User) => {
 		// console.log("Context login : ", user);

@@ -1,4 +1,4 @@
-import React, { useEffect, useContext } from 'react';
+import React, { useEffect, useContext, useState } from 'react';
 import axios from "axios";
 import UserCard from './profile/UserCard';
 import Buttons from './profile/Buttons';
@@ -7,21 +7,6 @@ import MatchHistory from './profile/MatchHistory';
 import Achievements from './profile/Achievements';
 import '../styles/Profile.scss';
 import { AuthContext, ContextType as AuthContextType } from '../contexts/AuthContext';
-
-type Match = {
-	boost_available: boolean;
-	createdDate: string;
-	friendly: boolean;
-	goal: number;
-	id: number;
-	map: number;
-	score_user1: number;
-	score_user2: number;
-	speed: number;
-	user1_id: number;
-	user2_id: number;
-	winner: number;
-}
 
 type Friend = {
 	id: number;
@@ -35,7 +20,7 @@ function Profile (props : any) {
 	const [loading, setLoading] = React.useState<boolean>(true);
 	const [username, setUsername] = React.useState<string>("");
 	const [hasAvatar, setHasAvatar] = React.useState<boolean>(false);
-	const [matches, setMatches] = React.useState<Match[]>([]);
+	const [matches, setMatches] = React.useState<any[]>([]);
 	const [nbVictories, setNbVictories] = React.useState<number>(0);
 	const [nbDefeats, setNbDefeats] = React.useState<number>(0);
 	const [nbPoints, setNbPoints] = React.useState<number>(0);
@@ -44,6 +29,8 @@ function Profile (props : any) {
 	const [achievements, setAchievements] = React.useState<any[]>([]);
 	const [online, setOnline] = React.useState<number[]>([]);
 	const { masterSocket, user } = useContext(AuthContext) as AuthContextType;
+
+	const [userP, setUserP] = useState<any>(null); 
 	
 	const userId = +props.match.params.id;
 
@@ -55,12 +42,12 @@ function Profile (props : any) {
 			if (mounted) {
 				setUsername(response.data.name);
 				setHasAvatar(response.data.avatar !== null);
-				setMatches(response.data.matches);
 				setNbVictories(response.data.victories);
 				setNbDefeats(response.data.defeats);
 				setNbPoints(response.data.points);
 				setFriends(response.data.friends);
 				setAchievements(response.data.achievements);
+				setUserP(response.data);
 				setLoading(false);
 			}
 		})
@@ -70,7 +57,7 @@ function Profile (props : any) {
 		.then(response => {
 			if (mounted) {
 				setMatches(response.data);
-			}				
+			}
 		})
 		.catch(error => { console.log(error.response); })
 
@@ -89,6 +76,12 @@ function Profile (props : any) {
 			}
 		});
 
+		masterSocket?.on("update_online_users", (data : any) => {
+			if (mounted) {
+				setOnline(data);
+			}
+		});
+
 		return () => { mounted = false };
 	}, [userId, masterSocket]);
 
@@ -100,7 +93,7 @@ function Profile (props : any) {
 					<div id="column_left">
 						<UserCard user_name={username} user_id={userId} has_avatar={hasAvatar} rank={rank}
 							nb_victories={nbVictories} nb_defeats={nbDefeats} nb_points={nbPoints} online={ online.includes(userId) }/>
-						{ user!.id !== userId && <Buttons id={userId}/>}
+						{ user!.id !== userId && <Buttons id={userId} user={ userP }/>}
 						<Friends friends={friends} online={online}/>
 					</div>
 					<div id="column_right">

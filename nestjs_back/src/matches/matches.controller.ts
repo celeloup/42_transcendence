@@ -45,7 +45,7 @@ export default class MatchesController {
   // @Put(':id')
   // @ApiOperation({summary: "Update a match"})
   // async updateMatch(@Param() { id }: FindOneParams, @Body() match: UpdateMatchDto){
-  //   return this.matchesService.updateMatch(Number(id), match);
+  //   return this.matchesService.updateMatchTest(Number(id), match);
   // }
 
   @Delete('/:id')

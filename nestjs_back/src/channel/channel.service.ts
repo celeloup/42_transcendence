@@ -8,6 +8,7 @@ import CreateChannelDto from './dto/createChannel.dto';
 import UsersService from '../users/users.service';
 import PasswordDto from './dto/password.dto';
 import muteObj from './mute.entity';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export default class ChannelService {
@@ -165,11 +166,12 @@ export default class ChannelService {
   async changePassword(channel_id: number, owner_id: number, password: PasswordDto) {
     const channel = await this.getAllInfosByChannelId(channel_id);
     if ((await this.isOwner(channel_id, owner_id))) {
-      //Flavien laisse libre cours à ta créativité
-      channel.password = password.password;
-      channel.passwordSet = true;
       if (channel.password === "")
         channel.passwordSet = false;
+      else {
+        channel.passwordSet = true;
+        channel.password = await bcrypt.hash(password.password, 10);
+      }
       return (await this.channelRepository.save(channel));
     }
     throw new HttpException('Only the owner of a channel can change its password', HttpStatus.NOT_FOUND);
@@ -251,11 +253,15 @@ export default class ChannelService {
     return false;
   }
 
-  async passwordOK(channel: Channel, password: string){
-    if(!channel.passwordSet || channel.password === password) //Flavien, as philosopher David Guetta would say, the world is yours
+  async passwordOK(channel: Channel, password: string) {
+    if (!channel.passwordSet)
       return true;
-    else 
-      return false;
+    const isPasswordMatching = await bcrypt.compare(
+      password,
+      channel.password
+    );
+    return isPasswordMatching;
+
   }
 
   async joinChannel(channel_id: number, user_id: number, password: string) {
@@ -498,7 +504,7 @@ export default class ChannelService {
       name: channelData.name,
       owner: channelOwner,
       type: channelData.type,
-      password: channelData.password, //Flavien
+      password: channelData.password ? await bcrypt.hash(channelData.password, 10) : "", //Flavien
       members: [channelOwner],
       admins: [channelOwner],
       banned: [],

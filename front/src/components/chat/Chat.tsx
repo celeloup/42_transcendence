@@ -133,50 +133,69 @@ export function Chat() {
 	}
 
 	useEffect(() => {
+		let mounted = true;
+
 		// select first channel if exist
 		if (!channel)
 		{
 			axios.get(`/channel`)
 			.then((res) => {
-				if (res.data.length !== 0)
+				if (mounted && res.data.length !== 0) {
 					setChannel(res.data[0]);
+				}
 			})
 			.catch((err) => console.log(err))
 		}
+
+		return () => { mounted = false };
 	}, [])  // eslint-disable-line
 	
 	// ---------- SOCKETS
 	useEffect(() : ReturnType<EffectCallback> => {
+		let mounted = true;
 		const newSocket:any = io(`${process.env.REACT_APP_BACK_URL}/channel`, { transports: ["websocket"] });
-		setSocket(newSocket);
-		return () => newSocket.close();
+		if (mounted)
+			setSocket(newSocket);
+		return () => { mounted = false; newSocket.close() };
 	}, [setSocket]);
 
 	useEffect(() => {
+		let mounted = true;
+
 		socket?.on('receive_message', (data:any) => {
 			// console.log("RECEIVED :", data);
-			setMessages(oldArray => [...oldArray, data]);
+			if (mounted) {
+				setMessages(oldArray => [...oldArray, data]);
+			}
 		});
 
 		socket?.on('room_join', (data:any) => {
 			// console.log("JOINED ROOM", data, channel);
-			setDisplayList(false);
-			setMsgIsLoading(true);
+			if (mounted) {
+				setDisplayList(false);
+				setMsgIsLoading(true);
+			}
 			axios.get(`/channel/messages/${ data }`)
 			.then( res => {
 				// console.log("GET MESSAGES", res);
-				setMessages(res.data);
-				setMsgIsLoading(false);
+				if (mounted) {
+					setMessages(res.data);
+					setMsgIsLoading(false);
+				}
 			})
 			.catch (err => {
 				console.log("Error:", err);
-				setMsgIsLoading(false);
+				if (mounted) {
+					setMsgIsLoading(false);
+				}
 			})
 		});
 		
 		socket?.on('user_banned', (data:any) => {
 			console.log("I HAVE BEEN BANNED", data, channel);
-			setHasBeenBanned(data);
+			if (mounted) {
+				setHasBeenBanned(data);
+			}
 		})
 
 		socket?.on('user_muted', (data:any) => {
@@ -188,6 +207,8 @@ export function Chat() {
 			console.log("I HAVE BEEN UNMUTED", data, channel);
 			// setHasBeenBanned(data);
 		})
+
+		return () => { mounted = false };
 	}, [socket]) // eslint-disable-line
 
 	useEffect(() => {
@@ -203,9 +224,12 @@ export function Chat() {
 	
 	// ---------- JOIN && GET BLOCKED USERS
 	useEffect(() => {
-		setAskPassword(false);
-		setHasBeenBanned(-1);
-		// console.log("CHAN:", channel);
+		let mounted = true;
+
+		if (mounted) {
+			setAskPassword(false);
+			setHasBeenBanned(-1);
+		}
 		if (channel)
 		{
 			axios.get(`/channel/infos/${ channel.id }`)
@@ -214,16 +238,16 @@ export function Chat() {
 				var member = res.data.members.some((mem:any) => mem.id === user?.id) ? true : false;
 				if (banned)
 				{
-					if (channel)
+					if (mounted && channel)
 						setHasBeenBanned(channel.id);
 				}
 				else if (!member)
 				{
-					if (user?.site_owner || user?.site_moderator)
+					if (mounted && (user?.site_owner || user?.site_moderator))
 						joinChan();
-					else if (channel && channel.type === 1)
+					else if (mounted && channel && channel.type === 1)
 						joinChan();
-					else if (channel && channel.type === 2)
+					else if (mounted && channel && channel.type === 2)
 						setAskPassword(true);
 				}
 				else
@@ -233,22 +257,43 @@ export function Chat() {
 				console.log("Error:", err);
 			})
 		}
-		setMsgIsLoading(true);
+		if (mounted) {
+			setMsgIsLoading(true);
+		}
 		
 		axios.get(`/users/infos/me`)
 			.then( res => {
 				// console.log("GET infos me", res);
-				setBlockedUsers(res.data.blocked);
+				if (mounted) {
+					setBlockedUsers(res.data.blocked);
+				}
 			})
 			.catch (err => {
 				console.log("Error:", err);
 			})
+
+		return () => { mounted = false };
 	}, [channel]) // eslint-disable-line
 
 	// ----------- USERS ONLINE
 	useEffect(() => {
+		let mounted = true;
+
 		masterSocket?.emit("get_users");
-		masterSocket?.on("connected_users", (data : any) => { setUsersOnline(data); });
+		masterSocket?.on("connected_users", (data : any) => {
+			console.log(data);
+			if (mounted) {
+				setUsersOnline(data);
+			}
+		});
+
+		masterSocket?.on("update_online_users", (data : any) => {
+			if (mounted) {
+				setUsersOnline(data);
+		 	}
+		});
+
+		return () => { mounted = false };
 	}, [masterSocket]);
 
 	const closeBan = () => {

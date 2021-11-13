@@ -19,13 +19,13 @@ type HistoryProps = {
 function Match ( { data, my_id, focus, setFocus } : MatchProps ) {
     const player1 = {
         id: data.user1_id,
-        name: "data.users[0].name",
+        name: (data.user1_id === data.users[0].id ? data.users[0].name : data.users[1].name),
         score: data.score_user1,
         winner: data.winner === data.user1_id
     };
     const player2 = {
         id: data.user2_id,
-        name: "data.users[1].name",
+        name: (data.user2_id === data.users[0].id ? data.users[0].name : data.users[1].name),
         score: data.score_user2,
         winner: data.winner === data.user2_id
     };
@@ -46,7 +46,9 @@ function Match ( { data, my_id, focus, setFocus } : MatchProps ) {
     return (
         <div className={"match_wrapper" + ( focus ? "_focus" : "" )} onClick={() => { setFocus(data.id); }}>
             <div className="match_info">
-                <Avatar size={"medium"} id={me.id} name={me.name} namespec={true}/>
+                <div className="avatar_display">
+                    <Avatar size={"medium"} id={me.id} name={me.name} namespec={true}/>
+                </div>
                 <div className="name_display">
                     { me.winner && <i className="fas fa-crown"></i>}
                     <span>{ me.name }</span>
@@ -64,7 +66,9 @@ function Match ( { data, my_id, focus, setFocus } : MatchProps ) {
                     { them.winner && <i className="fas fa-crown"></i>}
                     <span>{ them.name }</span>
                 </div>
-                <Avatar size={"medium"} id={them.id} name={them.name} namespec={true}/>
+                <div className="avatar_display">
+                    <Avatar size={"medium"} id={them.id} name={them.name} namespec={true}/>
+                </div>
             </div>
             { focus && 
                 <div className="match_focus">

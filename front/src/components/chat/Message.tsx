@@ -1,7 +1,7 @@
 import Avatar from "../profile/Avatar";
 import { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
-import { useHistory } from "react-router-dom";
+import { useHistory, NavLink } from "react-router-dom";
 import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
 
 type MessageProps = {
@@ -30,11 +30,15 @@ function ProfileCard( {id, online, user, setDisplayCard, setBlockedUsers }: Card
 	const history = useHistory();
 	
 	useEffect(() => {
+		let mounted = true;
+
 		axios.get(`/users/infos/me`)
 		.then( res => {
 			// console.log("GET ME", res);
-			setMe(res.data);
-			if (id !== res.data.id)
+			if (mounted) {
+				setMe(res.data);
+			}
+			if (mounted && id !== res.data.id)
 			{
 				if (res.data.friends.find((x:any) => x.id === id))
 					setIsFriend(true);
@@ -49,11 +53,17 @@ function ProfileCard( {id, online, user, setDisplayCard, setBlockedUsers }: Card
 		.catch (err => {
 			console.log("Error:", err);
 		})
+
+		return () => { mounted = false };
 	}, [id]);
 	
 	const [ loadingBlock, setLoadingBlock ] = useState(false);
 	const BlockUser = () => {
-		setLoadingBlock(true);
+		let mounted = true;
+
+		if (mounted) {
+			setLoadingBlock(true);
+		}
 		if (isBlocked)
 		{
 			axios.delete(`/users/block/me`, {
@@ -61,9 +71,11 @@ function ProfileCard( {id, online, user, setDisplayCard, setBlockedUsers }: Card
 			})
 			.then( res => {
 				// console.log(res.data);
-				setBlockedUsers(res.data);
-				setIsBlocked(false);
-				setLoadingBlock(false);
+				if (mounted) {
+					setBlockedUsers(res.data);
+					setIsBlocked(false);
+					setLoadingBlock(false);
+				}
 			})
 			.catch( err => { console.log("Error:", err)});
 		}
@@ -73,30 +85,41 @@ function ProfileCard( {id, online, user, setDisplayCard, setBlockedUsers }: Card
 			})
 			.then( res => {
 				// console.log(res.data);
-				setBlockedUsers(res.data);
-				setIsBlocked(true);
-				setLoadingBlock(false);
+				if (mounted) {
+					setBlockedUsers(res.data);
+					setIsBlocked(true);
+					setLoadingBlock(false);
+				}
 			})
 			.catch( err => { console.log("Error:", err)});
 		}
+
+		return () => { mounted = false };
 	}
 	
 	const [ loadingFriend, setLoadingFriend ] = useState(false);
 	const FriendUser = () => {
-		setLoadingFriend(true);
+		let mounted = true;
+
+		if (mounted) {
+			setLoadingFriend(true);
+		}
 		if (isFriend)
 		{
 			axios.delete(`/users/friend/me`, {
 				data: { userId: id}
 			})
 			.then( res => {
-				console.log(res.data);
-				setIsFriend(false);
-				setLoadingFriend(false);
+				if (mounted) {
+					setIsFriend(false);
+					setLoadingFriend(false);
+				}
 			})
 			.catch( err => { 
 				console.log("Error:", err);
-				setLoadingFriend(false);
+				if (mounted) {
+					setLoadingFriend(false);
+				}
 			});
 		}
 		else {
@@ -104,15 +127,20 @@ function ProfileCard( {id, online, user, setDisplayCard, setBlockedUsers }: Card
 				userId: id
 			})
 			.then( res => {
-				console.log(res.data);
-				setIsFriend(true);
-				setLoadingFriend(false);
+				if (mounted) {
+					setIsFriend(true);
+					setLoadingFriend(false);
+				}
 			})
 			.catch( err => { 
 				console.log("Error:", err);
-				setLoadingFriend(false);
+				if (mounted) {
+					setLoadingFriend(false);
+				}
 			});
 		}
+
+		return () => { mounted = false };
 	}
 
 	const Challenge = () => {
@@ -122,7 +150,7 @@ function ProfileCard( {id, online, user, setDisplayCard, setBlockedUsers }: Card
 		// console.log("challenging ", user);
 	}
 
-	var myself = <a href={"/profile/" + id}><div className="button" id="profile_button">See my profile</div></a>
+	var myself = <NavLink to={"/profile/" + id}><div className="button" id="profile_button">See my profile</div></NavLink>
 	var someone = <> 
 		<div className="flex">
 			<div className="button" onClick={ FriendUser }>
@@ -150,16 +178,16 @@ function ProfileCard( {id, online, user, setDisplayCard, setBlockedUsers }: Card
 			<i className="fas fa-times close_icon" onClick={()=> setDisplayCard(false)}> </i> 
 			{ user && me && <>
 				<div>
-					<a href={"/profile/" + user.id}>
+					<NavLink to={"/profile/" + user.id}>
 						<Avatar size={"medium"} id={id} name={user?.name} namespec={true} avatar={user?.avatar !== null} avaspec={true}/>
 						<div className={"user_status " + ( online ? "online" : "offline" )}></div>
-					</a>
+					</NavLink>
 					<div>
-						<a href={"/profile/" + user.id}>
+						<NavLink to={"/profile/" + user.id}>
 							<div className="username">
 								{ user.name }
 							</div>
-						</a>
+						</NavLink>
 						<div className="stats_profile_card">
 							 { user.victories } victories | { user.defeats } defeats
 						</div>

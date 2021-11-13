@@ -9,6 +9,32 @@ $green: #81A439;
 #pong_game {
 	position: relative;
 
+	.window_header > div {
+		width: calc(100% - 128px);
+		// text-align: center;
+		color: $dark-gray;
+		display: flex;
+		justify-content: space-around;
+		div {
+			font-family: "Fira Mono";
+			i {
+				margin-right: 10px;
+			}
+		}
+	}
+
+	.back_button {
+		font-size: 26px;
+		cursor: pointer;
+		margin: -5px 30px 0 10px;
+		color: $dark-gray;
+
+		&:hover {
+			color: $background-color;
+			// transform: scale(1.15);
+		}
+	}
+
 	.flex {
 		display: flex;
 		justify-content: space-evenly;
@@ -18,21 +44,78 @@ $green: #81A439;
 		border: 4px solid $accent_color;
 		position: absolute;
 		padding: 20px;
-		top: 40%;
-		left: 35%;
-		width: 200px;
-		// height: 200px;
-		background-color: $background-color;
+		top: calc(50% - 140px);
+		left: calc(50% - 230px);
+		// width: 260px;
+		background-color: $accent-color;
+		color: $background-color;
+		font-family: "Dogica";
+
+		#player_left {
+			margin-top: 10px;
+		}
+
+		div:first-child {
+			font-size: 36px;
+			// padding-bottom: 10px;
+		}
+
+		#scores {
+			display: flex;
+			margin-top: 30px;
+			width: 100%;
+			justify-content: space-between;
+			align-items: center;
+
+			#p1, #p2 {
+				display: flex;
+				flex-direction: column;
+				gap: 20px;
+				font-size: 20px;
+				width: 150px;
+				span:nth-child(2) {
+					font-size: 46px;
+				}
+			}
+
+			div:nth-child(2) {
+				font-size: 46px;
+				margin: 0 20px;
+			}
+		}
 
 		#back_button {
-			background-color: $accent_color;
-			color: $background-color;
+			background-color:$background-color ;
+			color: $accent_color;
 			cursor: pointer;
 			width: 150px;
-			height: 30px;
+			height: 20px;
+			padding: 10px;
 			margin: auto;
-			margin-top: 20px;
-			border-radius: 5px;
+			margin-top: 40px;
+			
+			&:hover {
+				transform: scale(1.1);
+			}
+		}
+
+		&:before {
+			content: "";
+			width: calc(100% - 8px);
+			height: 12px;
+			position: absolute;
+			background-color: $accent_color;
+			top: -12px;
+			left: 4px;
+		}
+		&:after {
+			content: "";
+			width: calc(100% - 8px);
+			height: 12px;
+			position: absolute;
+			background-color: $accent_color;
+			bottom: -12px;
+			left: 4px;
 		}
 	}
 
@@ -41,11 +124,17 @@ $green: #81A439;
 		line-height: 25px;
 		width: 600px;
 		margin: auto;
-		margin-top: 80px;
+		margin-top: 60px;
+
+		#title {
+			font-size: 25px;
+			margin-bottom: 10px;
+			color: $accent-color;
+		}
 
 		#telescope_img {
 			position: relative;
-			margin-bottom: 30px;
+			margin-bottom: 40px;
 		}
 
 		#telescope_top {
@@ -124,28 +213,75 @@ $green: #81A439;
 		background-repeat: no-repeat;
 		background-position: 65% 50% ;
 
-		&#mario {
-			background-image: url(../../assets/img/mario_bg.jpeg);
+		&#space {
 			display: flex;
 			justify-content: space-between;
+			font-family: "Dogica";
 
-			#p1, #p2{
+			#p1, #p2, #scores{
 				margin: 20px;
-				font-family: "Dogica";
-				font-size: 18px;
-				display: flex;
-				align-content: center;
+				width: 200px;
+				// background-color: red;
+			}
 
+			#p1 {
+				text-align: left;
+			}
+			#p2 {
+				text-align: right;
+			}
+
+			#scores {
+				display: flex;
+				justify-content: center;
+				// gap : 30px;
+				span {
+					// background-color: green;
+					display: inline-block;
+					font-size: 40px;
+					width: 100px;
+					// margin: 0 15px;
+				}
+			}
+		}
+
+		&#mario {
+			background-image: url(../../assets/img/mario_bg.jpeg);
+			font-family: "Dogica";
+			
+			#points {
+				display: flex;
+				justify-content: space-between;
+			}
+			
+			#p1, #p2 {
+				display: flex;
+				margin: 0 20px;
+				font-size: 18px;
+				align-content: center;
 				img {
 					height: 18px;
 					margin: 0 5px;
 				}
 			}
 
-			.name {
-				text-transform: uppercase;
-				// font-weight: 600;
-				margin: 0 20px;
+			#p1 .all_score {
+				margin-right: 40px;
+			}
+
+			#p2 .all_score {
+				margin-left: 40px;
+			}
+
+			#names {
+				font-size: 20px;
+				width: calc(100% - 40px);
+				display: flex;
+				justify-content: space-between;
+				margin: 20px 20px 15px 20px;
+				span {
+					text-transform: uppercase;
+				}
 			}
 		}
 

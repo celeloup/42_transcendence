@@ -13,7 +13,7 @@ import axios from 'axios';
 import PageWrapper from './components/ui_components/PageWrapper';
 
 function OAuth({ location } : RouteComponentProps) { 
-	const { login } = React.useContext(AuthContext) as ContextType;
+	const { login, logout } = React.useContext(AuthContext) as ContextType;
 	let code:string = location.search;
 
 	const [loading, setLoading] = React.useState(true);
@@ -31,15 +31,21 @@ function OAuth({ location } : RouteComponentProps) {
 					id42: response.data.id42,
 					isTwoFactorAuth: response.data.isTwoFactorAuthenticationEnabled,
 				}
-				login(user);
+				if (user.site_banned === true)
+				{
+					console.log("ERROR: You were banned from the website by an admin.");
+					logout();
+				}
+				else
+					login(user);
 				setIsTwoFA(response.data.isTwoFactorAuthenticationEnabled);
 				setLoading(false);
-
 			})
 			.catch(error => {
-				console.log("Error catch :", error.response);
-				// if (!error.data)
-				// 	alert("Looks like the back is down !!\n\nERR_EMPTY_RESPONSE");
+				if (error.response.status === 403)
+					console.log("Error catch :", error.response.data.message);
+				else
+					console.log(error);
 				setLoading(false);
 			})
 	}, [code]); // eslint-disable-line
