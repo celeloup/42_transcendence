@@ -19,57 +19,89 @@ export default class ChannelController {
   //change to only site admin at the end
   @Get()
   @ApiOperation({ summary: "Get all channels / Open route for the moment => In the end for admins only" })
-  getAllChannels() {
-    return this.channelService.getAllChannels();
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  getAllChannels(@Req() req: RequestWithUser) {
+    const { user } = req;
+    return this.channelService.getAllChannels(user.id);
   }
 
   @Get(':id')
   @ApiOperation({ summary: "Get a channel" })
   @ApiParam({ name: 'id', type: Number, description: 'channel id' })
-  getChannelById(@Param() { id }: FindOneParams) {
-    return this.channelService.getChannelById(Number(id));
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  getChannelById(@Req() req: RequestWithUser, @Param() { id }: FindOneParams) {
+    const { user } = req;
+    return this.channelService.getChannelById(Number(id), user.id);
   }
 
   @Get('owner/:id')
   @ApiOperation({ summary: "Get owner of a channel" })
   @ApiParam({ name: 'id', type: Number, description: 'channel id' })
-  getOwnerByChannelId(@Param() { id }: FindOneParams) {
-    return this.channelService.getOwnerByChannelId(Number(id));
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  getOwnerByChannelId(@Req() req: RequestWithUser, @Param() { id }: FindOneParams) {
+    const { user } = req;
+    return this.channelService.getOwnerByChannelId(Number(id), user.id);
   }
 
   @Get('members/:id')
   @ApiOperation({ summary: "Get members of a channel" })
   @ApiParam({ name: 'id', type: Number, description: 'channel id' })
-  getMembersByChannelId(@Param() { id }: FindOneParams) {
-    return this.channelService.getMembersByChannelId(Number(id));
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  getMembersByChannelId(@Req() req: RequestWithUser, @Param() { id }: FindOneParams) {
+    const { user } = req;
+    return this.channelService.getMembersByChannelId(Number(id), user.id);
   }
 
   @Get('admins/:id')
   @ApiOperation({ summary: "Get admins of a channel" })
   @ApiParam({ name: 'id', type: Number, description: 'channel id' })
-  getAdminsByChannelId(@Param() { id }: FindOneParams) {
-    return this.channelService.getAdminsByChannelId(Number(id));
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  getAdminsByChannelId(@Req() req: RequestWithUser, @Param() { id }: FindOneParams) {
+    const { user } = req;
+    return this.channelService.getAdminsByChannelId(Number(id), user.id);
   }
 
   @Get('infos/:id')
   @ApiOperation({ summary: "Get informations of a channel" })
   @ApiParam({ name: 'id', type: Number, description: 'channel id' })
-  getAllInfosChannelId(@Param() { id }: FindOneParams) {
-    return this.channelService.getAllInfosByChannelId(Number(id));
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  getAllInfosChannelId(@Req() req: RequestWithUser, @Param() { id }: FindOneParams) {
+    const { user } = req;
+    return this.channelService.getAllInfosByChannelId(Number(id), user.id);
   }
 
   @Get('nextunmutedate/:id')
   @ApiOperation({ summary: "Get next unmute date of a channel" })
   @ApiParam({ name: 'id', type: Number, description: 'channel id' })
-  getNextUnmuteDate(@Param() { id }: FindOneParams) {
-    return this.channelService.getNextUnmuteDate(Number(id));
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  getNextUnmuteDate(@Req() req: RequestWithUser,@Param() { id }: FindOneParams) {
+    const { user } = req;
+    return this.channelService.getNextUnmuteDate(Number(id), user.id);
   }
 
   //Change for site admins at the end
   @Get('messages')
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
   @ApiOperation({ summary: "Get all messages // open route for now; for site admins only in the end" })
-  getAllMessages() {
-    return this.channelService.getAllMessagesOfAllChannels();
+  getAllMessages(@Req() req: RequestWithUser) {
+    const { user } = req;
+    return this.channelService.getAllMessagesOfAllChannels(user.id);
   }
 
 

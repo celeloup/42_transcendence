@@ -101,7 +101,9 @@ export default class ChannelService {
       (await this.refreshMutedUsers(channel));
   }
 
-  async getAllChannels() {
+    //
+  async getAllChannels(user_is: Number) {
+  //  if (await this.usersService)
     let channels = await this.channelRepository.find({ relations: ['historic', 'members', 'muted', 'muteDates', 'admins', 'owner'] });
     if (channels) {
       for (var channel of channels)
@@ -112,6 +114,7 @@ export default class ChannelService {
     throw new HttpException('No channel has been created yet', HttpStatus.NOT_FOUND);
   }
 
+  //
   async getChannelById(id: number) {
     let channel = await this.channelRepository.findOne(id);
     if (channel) {
@@ -121,6 +124,7 @@ export default class ChannelService {
     throw new HttpException('Channel with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
+  //
   async getChannelByName(name: string) {
     let channel = await this.channelRepository.findOne({ name });
     if (channel) {
@@ -130,6 +134,7 @@ export default class ChannelService {
     throw new HttpException('Channel with this name does not exist', HttpStatus.NOT_FOUND);
   }
 
+  //
   async getOwnerByChannelId(id: number) {
     let channel = await this.channelRepository.findOne(id, { relations: ['owner'] });
     if (channel) {
