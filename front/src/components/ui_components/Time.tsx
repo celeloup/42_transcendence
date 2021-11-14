@@ -4,6 +4,8 @@ export default function Time() {
     const [ time, setTime ] = useState<string>("");
     
     function showTime(){
+        let mounted = true;
+
         var date = new Date();
         var h = date.getHours(); // 0 - 23
         var m = date.getMinutes(); // 0 - 59
@@ -12,8 +14,13 @@ export default function Time() {
         var m2 = (m < 10) ? "0" + m : m;
         
         var time = h2 + ":" + m2;
-        setTime(time);
-        setTimeout(showTime, 1000);
+        
+        if (mounted) {
+            setTime(time);
+            setTimeout(showTime, 1000);
+        }
+
+        return () => { mounted = false };
     }
     useEffect(() => {
         showTime();

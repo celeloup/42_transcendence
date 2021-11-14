@@ -17,6 +17,7 @@ function Login() {
 
 	useEffect(() => {
 		let mounted = true;
+	
 		if (ghostLogin !== 0)
 		{
 			axios.post(`/authentication/log-in`, { "id42": ghostLogin })
@@ -37,9 +38,8 @@ function Login() {
 					setGhostLogin(0);
 			})
 		}
-		return () => {
-			mounted = false
-		}
+
+		return () => { mounted = false };
 	}, [ghostLogin]); // eslint-disable-line
 
 	if (!redir)

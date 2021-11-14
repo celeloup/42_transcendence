@@ -42,7 +42,7 @@ function OAuth({ location } : RouteComponentProps) {
 				setLoading(false);
 			})
 			.catch(error => {
-				if (error.response.status === 403)
+				if (error.reponse && error.response.status === 403)
 					console.log("Error catch :", error.response.data.message);
 				else
 					console.log(error);
@@ -84,7 +84,7 @@ const App = () => {
 							component={ Profile }
 						/>
 						<Route
-							typeOfRoute="protected"
+							typeOfRoute="admin"
 							exact={true}
 							path='/admin'
 							component={ Admin }

@@ -7,6 +7,7 @@ import { AuthContext, ContextType as AuthContextType } from '../../contexts/Auth
 type MessageProps = {
 	id: number,
 	online: boolean,
+	playing: boolean,
 	username: string,
 	message: string,
 	setBlockedUsers: (blocked:any) => void,
@@ -17,12 +18,13 @@ type MessageProps = {
 type CardProps = {
 	id: number,
 	online: boolean,
+	playing: boolean,
 	user: any,
 	setDisplayCard: (set:boolean) => void,
 	setBlockedUsers: (blocked:any) => void
 }
 
-function ProfileCard( {id, online, user, setDisplayCard, setBlockedUsers }: CardProps) {
+function ProfileCard( {id, online, playing, user, setDisplayCard, setBlockedUsers }: CardProps) {
 	const [ me, setMe ] = useState<any>(null);
 	const [ isFriend, setIsFriend ] = useState(false);
 	const [ isBlocked, setIsBlocked ] = useState(false);
@@ -180,7 +182,7 @@ function ProfileCard( {id, online, user, setDisplayCard, setBlockedUsers }: Card
 				<div>
 					<NavLink to={"/profile/" + user.id}>
 						<Avatar size={"medium"} id={id} name={user?.name} namespec={true} avatar={user?.avatar !== null} avaspec={true}/>
-						<div className={"user_status " + ( online ? "online" : "offline" )}></div>
+						<div className={"user_status " + ( playing ? 'playing' : (online ? "online" : "offline" ) ) }></div>
 					</NavLink>
 					<div>
 						<NavLink to={"/profile/" + user.id}>
@@ -200,7 +202,7 @@ function ProfileCard( {id, online, user, setDisplayCard, setBlockedUsers }: Card
 	)
 }
 
-export function Message ({ id, online, username, message, setBlockedUsers, blocked }: MessageProps) {
+export function Message ({ id, online, playing, username, message, setBlockedUsers, blocked }: MessageProps) {
 	const [ displayCard, setDisplayCard ] = useState(false);
 	const [ user, setUser ] = useState<any>(null);
 
@@ -227,7 +229,7 @@ export function Message ({ id, online, username, message, setBlockedUsers, block
 		<div className={ blocked ? "chat_message blocked" : "chat_message" }>
 			<div className="pic" onClick={ () => setDisplayCard(true)}>
 				<Avatar size={"small"} id={id} name={username} namespec={true}/>
-				<div className={"user_status " + ( online ? "online" : "offline" )}></div>
+				<div className={"user_status " + ( playing ? 'playing' : (online ? "online" : "offline" ) )}></div>
 			</div>
 			<div className="content">
 				<div className="username" onClick={ () => setDisplayCard(true)}>{ username }</div>
@@ -235,7 +237,7 @@ export function Message ({ id, online, username, message, setBlockedUsers, block
 			</div>
 			{ displayCard &&
 				<div id="card_modal" onClick={ closeCard }>
-					<ProfileCard id={ id } online={ online } user={ user } setDisplayCard={ setDisplayCard } setBlockedUsers={ setBlockedUsers }/>
+					<ProfileCard id={ id } online={ online } playing={ playing } user={ user } setDisplayCard={ setDisplayCard } setBlockedUsers={ setBlockedUsers }/>
 				</div>
 			}
 		</div>

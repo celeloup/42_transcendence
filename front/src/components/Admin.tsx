@@ -1,5 +1,6 @@
 import WindowBorder from "./ui_components/WindowBorder";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
+import { AuthContext, ContextType as AuthContextType } from '../contexts/AuthContext';
 import axios from "axios";
 import UserList from './admin/UserList';
 import '../styles/admin/Admin.scss';
@@ -9,6 +10,9 @@ function Admin () {
 	const [message, setMessage] = useState<any>(<p className="stats"><i>What</i> will you do ?</p>);
 	const [nbUsers, setNbUsers] = useState<number>(0);
 	const [matches, setMatches] = useState<any[]>([]);
+	const [online, setOnline] = React.useState<number[]>([]);
+	const [playing, setPlaying] = React.useState<number[]>([]);
+	const { masterSocket } = useContext(AuthContext) as AuthContextType;
 
 	useEffect(() => {
 		let mounted = true;
@@ -33,6 +37,26 @@ function Admin () {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, []);
 
+	useEffect(() => {
+		let mounted = true;
+
+		masterSocket?.emit("get_users");
+		masterSocket?.on("connected_users", (onlineList : any, playingList : any) => {
+			if (mounted) {
+				setOnline(onlineList);
+				setPlaying(playingList);
+			}
+		});
+
+		masterSocket?.on("update_online_users", (data : any) => {
+			if (mounted) {
+				setOnline(data);
+			}
+		});
+
+		return () => { mounted = false };
+	}, [masterSocket]);
+
 	return (
 		<div className="admin_page">
 			<div className="container">
@@ -53,9 +77,9 @@ function Admin () {
 						<div>
 							<p className="stats"><i>Stats</i></p>
 							<p className="stats">There is a total of <i>{nbUsers}</i> users.</p>
-							<p className="stats"><i>{"?"}</i> of them are online.</p>
-							<p className="stats">They've played a total of <i>{ matches.length }</i> matches.</p>
-							<p className="stats"><i>{ "?" /*matches.filter((m: any) => m.winner === null).length*/ }</i> of those are currently being played.</p>
+							<p className="stats"><i>{online.length}</i> of them are online.</p>
+							<p className="stats"><i>{playing.length}</i> of them are playing.</p>
+							<p className="stats">A total of <i>{ matches.length }</i> matches have been played.</p>
 						</div>
 					</WindowBorder>
 				</div>
