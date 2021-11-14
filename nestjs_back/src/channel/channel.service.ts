@@ -327,6 +327,8 @@ export default class ChannelService {
   async passwordOK(channel: Channel, password: string, user_id: number) {
     if (!channel.passwordSet ||(await this.usersService.isSiteAdmin(user_id)))
       return true;
+    if (!password)
+      return false
     const isPasswordMatching = await bcrypt.compare(
       password,
       channel.password
