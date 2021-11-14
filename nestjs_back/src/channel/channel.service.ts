@@ -103,11 +103,11 @@ export default class ChannelService {
   }
 
   async getPublicChannels() {
-    let publicChannels = await this.channelRepository.find({ where: { type: 1 }, relations: ['historic', 'members', 'muted', 'muteDates', 'admins', 'owner'] });
+    let publicChannels = await this.channelRepository.find({ where: { type: 1 }, relations: ['members', 'owner', 'admins', 'banned', 'muted', 'historic', 'muteDates'] });
     if (publicChannels) {
       for (var channel of publicChannels)
         await this.checkMuteTime(channel);
-      publicChannels = await this.channelRepository.find({ where: { type: 1 }, relations: ['historic', 'members', 'muted', 'muteDates', 'admins', 'owner'] });
+      publicChannels = await this.channelRepository.find({ where: { type: 1 }, relations: ['members', 'owner', 'admins', 'banned', 'muted', 'historic', 'muteDates'] });
       return publicChannels;
     }
   }
@@ -119,7 +119,7 @@ export default class ChannelService {
   }
 
   async getMyPrivateChannels(user_id: number) {
-    let privateChannels = await this.channelRepository.find({ where: { type: 2 }, relations: ['historic', 'members', 'muted', 'muteDates', 'admins', 'owner'] })
+    let privateChannels = await this.channelRepository.find({ where: { type: 2 }, relations: ['members', 'owner', 'admins', 'banned', 'muted', 'historic', 'muteDates'] })
     let myPrivateChannels: Channel[] = []
     for (var channel of privateChannels)
       if ((await this.isAMember(channel.id, user_id)))
@@ -132,8 +132,8 @@ export default class ChannelService {
     return myPrivateChannels
   }
 
-  async getMyDMs(user_id: number){
-    let DMs = await this.channelRepository.find({ where: { type: 3 }, relations: ['historic', 'members', 'muted', 'muteDates', 'admins', 'owner'] })
+  async getMyDMs(user_id: number) {
+    let DMs = await this.channelRepository.find({ where: { type: 3 }, relations: ['members', 'owner', 'admins', 'banned', 'muted', 'historic', 'muteDates'] })
     let myDMs: Channel[] = []
     for (var DM of DMs)
       if ((await this.isAMember(DM.id, user_id)))
@@ -143,9 +143,9 @@ export default class ChannelService {
 
   async getMyChannels(user_id: number) {
     let publicChannels = await this.getPublicChannels()
-      let privateChannels: Channel[] = []
+    let privateChannels: Channel[] = []
     if (await this.usersService.isSiteAdmin(user_id))
-      privateChannels = await this.channelRepository.find({ where: { type: 2 }, relations: ['historic', 'members', 'muted', 'muteDates', 'admins', 'owner'] })
+      privateChannels = await this.channelRepository.find({ where: { type: 2 }, relations: ['members', 'owner', 'admins', 'banned', 'muted', 'historic', 'muteDates'] })
     else
       privateChannels = await this.getMyPrivateChannels(user_id)
     let DM = await this.getMyDMs(user_id)
@@ -158,14 +158,14 @@ export default class ChannelService {
   async getAllChannels(user_id: number) {
     // let channels: Channel[] = [];
     // return channels
-    // let channels = await this.channelRepository.find({ relations: ['historic', 'members', 'muted', 'muteDates', 'admins', 'owner'] });
+    // let channels = await this.channelRepository.find({ relations: ['members', 'owner', 'admins', 'banned', 'muted', 'historic', 'muteDates'] });
     // if (channels) {
     //   for (var channel of channels)
     //     await this.checkMuteTime(channel);
-    //   channels = await this.channelRepository.find({ relations: ['historic', 'members', 'muted', 'muteDates', 'admins', 'owner'] });
+    //   channels = await this.channelRepository.find({ relations: ['members', 'owner', 'admins', 'banned', 'muted', 'historic', 'muteDates'] });
     //   return channels;
     // }
-     throw new HttpException('Deprecated route. Use GET api/channel/mine instead', HttpStatus.FORBIDDEN);
+    throw new HttpException('Deprecated route. Use GET api/channel/mine instead', HttpStatus.FORBIDDEN);
   }
 
   async getChannelById(id: number) {
@@ -216,11 +216,11 @@ export default class ChannelService {
     let channel = await this.channelRepository.findOne(channel_id);
     if (channel) {
       await this.checkMuteTime(channel);
-    let myChannels = await this.getMyChannels(user_id)
-    let index = myChannels.findIndex(element => element.id === channel_id)
-    if (index !== -1)
-      return myChannels[index]
-    throw new HttpException('No right to see this channel infos', HttpStatus.FORBIDDEN);
+      let myChannels = await this.getMyChannels(user_id)
+      let index = myChannels.findIndex(element => element.id === channel_id)
+      if (index !== -1)
+        return myChannels[index]
+      throw new HttpException('No right to see this channel infos', HttpStatus.FORBIDDEN);
     }
     throw new HttpException('Channel with this id does not exist', HttpStatus.NOT_FOUND);
   }
