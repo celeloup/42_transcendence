@@ -114,7 +114,7 @@ export default class ChannelService {
 
   // = private channels with a password
   async getViewablePrivateChannels() {
-    let viewablePrivateChannels = await this.channelRepository.find({ where: { type: 2, passwordSet: true }, relations: ['admins', 'owner', 'members', 'banned', 'muted', 'mutedDates'] })
+    let viewablePrivateChannels = await this.channelRepository.find({ where: { type: 2, passwordSet: true }, relations: ['admins', 'owner', 'members', 'banned', 'muted', 'muteDates'] })
     return viewablePrivateChannels
   }
 
