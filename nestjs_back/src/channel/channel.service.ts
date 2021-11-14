@@ -114,7 +114,7 @@ export default class ChannelService {
 
   // = private channels with a password
   async getViewablePrivateChannels() {
-    let viewablePrivateChannels = await this.channelRepository.find({ where: { type: 2, passwordSet: true }, relations: ['admins', 'owner'] })
+    let viewablePrivateChannels = await this.channelRepository.find({ where: { type: 2, passwordSet: true }, relations: ['admins', 'owner', 'members', 'banned', 'muted', 'mutedDates'] })
     return viewablePrivateChannels
   }
 
@@ -340,9 +340,12 @@ export default class ChannelService {
     let newMember = await this.usersService.getAllInfosByUserId(user_id);
     if (channel.type === 1 /* public */ || (channel.type === 2 /* private */ && await this.passwordOK(channel, password))) {
       if (!(await this.isAMember(channel_id, user_id))) {
-        channel.members.push(newMember);
-        await this.channelRepository.save(channel);
-        return channel;
+        if (!(await this.isBanned(channel_id, user_id))) {
+          channel.members.push(newMember);
+          await this.channelRepository.save(channel);
+          return channel;
+        }
+        throw new HttpException('User is banned from this channel', HttpStatus.FORBIDDEN);
       }
       throw new HttpException('User is already a member of this channel', HttpStatus.OK);
     }
