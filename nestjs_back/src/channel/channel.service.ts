@@ -324,8 +324,8 @@ export default class ChannelService {
     return false;
   }
 
-  async passwordOK(channel: Channel, password: string) {
-    if (!channel.passwordSet)
+  async passwordOK(channel: Channel, password: string, user_id: number) {
+    if (!channel.passwordSet ||(await this.usersService.isSiteAdmin(user_id)))
       return true;
     const isPasswordMatching = await bcrypt.compare(
       password,
@@ -338,7 +338,7 @@ export default class ChannelService {
   async joinChannel(channel_id: number, user_id: number, password: string) {
     let channel = await this.getAllInfosByChannelId(channel_id);
     let newMember = await this.usersService.getAllInfosByUserId(user_id);
-    if (channel.type === 1 /* public */ || (channel.type === 2 /* private */ && await this.passwordOK(channel, password))) {
+    if (channel.type === 1 /* public */ || (channel.type === 2 /* private */ && await this.passwordOK(channel, password, user_id))) {
       if (!(await this.isAMember(channel_id, user_id))) {
         if (!(await this.isBanned(channel_id, user_id))) {
           channel.members.push(newMember);
