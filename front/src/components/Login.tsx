@@ -52,8 +52,6 @@ function Login() {
 				</a>
 				<div id="ghosts">
 					<div className="ghost_button" onClick={ () => { ghost_authenticate(1); } }><i className="fas fa-ghost"></i>GHOSTY</div>
-					<div className="ghost_button" onClick={ () => { ghost_authenticate(2); } }><i className="fas fa-ghost"></i>ADMINISTRAGHOST</div>
-					<div className="ghost_button" onClick={ () => { ghost_authenticate(4); } }><i className="fas fa-ghost"></i>MODOGHOST</div>
 					<div className="ghost_button" onClick={ () => { ghost_authenticate(3); } }><i className="fas fa-ghost"></i>CASPER</div>
 				
 				</div>
