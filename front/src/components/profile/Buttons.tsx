@@ -4,19 +4,6 @@ import axios from "axios";
 import { useHistory } from "react-router-dom";
 import { AuthContext, ContextType as AuthContextType } from '../../contexts/AuthContext';
 
-// type FriendType = {
-// 	id: number;
-// 	name: string;
-// 	site_owner: boolean;
-// 	site_moderator: boolean;
-// 	site_banned: boolean;
-// }
-
-// type Prop = {
-//     infos: FriendType;
-//     online: boolean;
-// }
-
 type Props = {
     id: number;
 	user: any;

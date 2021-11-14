@@ -16,59 +16,100 @@ export default class ChannelController {
     private readonly channelService: ChannelService
   ) { }
 
-  //change to only site admin at the end
+  //Throw error deprecated
   @Get()
-  @ApiOperation({ summary: "Get all channels / Open route for the moment => In the end for admins only" })
-  getAllChannels() {
-    return this.channelService.getAllChannels();
+  @ApiOperation({ summary: "DEPRECATED. Use channel/mine instead" })
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  getAllChannels(@Req() req: RequestWithUser) {
+    const { user } = req;
+    return this.channelService.getAllChannels(user.id);
+  }
+
+  @Get('mine')
+  @ApiOperation({ summary: "Get my channels" })
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  getMyChannels(@Req() req: RequestWithUser) {
+    const { user } = req;
+    return this.channelService.getMyChannels(user.id);
   }
 
   @Get(':id')
   @ApiOperation({ summary: "Get a channel" })
   @ApiParam({ name: 'id', type: Number, description: 'channel id' })
-  getChannelById(@Param() { id }: FindOneParams) {
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  getChannelById(@Req() req: RequestWithUser, @Param() { id }: FindOneParams) {
+    const { user } = req;
     return this.channelService.getChannelById(Number(id));
   }
 
   @Get('owner/:id')
   @ApiOperation({ summary: "Get owner of a channel" })
   @ApiParam({ name: 'id', type: Number, description: 'channel id' })
-  getOwnerByChannelId(@Param() { id }: FindOneParams) {
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  getOwnerByChannelId(@Req() req: RequestWithUser, @Param() { id }: FindOneParams) {
+    const { user } = req;
     return this.channelService.getOwnerByChannelId(Number(id));
   }
 
   @Get('members/:id')
   @ApiOperation({ summary: "Get members of a channel" })
   @ApiParam({ name: 'id', type: Number, description: 'channel id' })
-  getMembersByChannelId(@Param() { id }: FindOneParams) {
-    return this.channelService.getMembersByChannelId(Number(id));
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  getMembersByChannelId(@Req() req: RequestWithUser, @Param() { id }: FindOneParams) {
+    const { user } = req;
+    return this.channelService.getMembersByChannelId(Number(id), user.id);
   }
 
   @Get('admins/:id')
   @ApiOperation({ summary: "Get admins of a channel" })
   @ApiParam({ name: 'id', type: Number, description: 'channel id' })
-  getAdminsByChannelId(@Param() { id }: FindOneParams) {
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  getAdminsByChannelId(@Req() req: RequestWithUser, @Param() { id }: FindOneParams) {
+    const { user } = req;
     return this.channelService.getAdminsByChannelId(Number(id));
   }
 
   @Get('infos/:id')
   @ApiOperation({ summary: "Get informations of a channel" })
   @ApiParam({ name: 'id', type: Number, description: 'channel id' })
-  getAllInfosChannelId(@Param() { id }: FindOneParams) {
-    return this.channelService.getAllInfosByChannelId(Number(id));
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  getAllInfosChannelId(@Req() req: RequestWithUser, @Param() { id }: FindOneParams) {
+    const { user } = req;
+    return this.channelService.getSecuredInfosByChannelId(Number(id), user.id);
   }
 
   @Get('nextunmutedate/:id')
   @ApiOperation({ summary: "Get next unmute date of a channel" })
   @ApiParam({ name: 'id', type: Number, description: 'channel id' })
-  getNextUnmuteDate(@Param() { id }: FindOneParams) {
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  getNextUnmuteDate(@Req() req: RequestWithUser,@Param() { id }: FindOneParams) {
+    const { user } = req;
     return this.channelService.getNextUnmuteDate(Number(id));
   }
 
-  //Change for site admins at the end
   @Get('messages')
-  @ApiOperation({ summary: "Get all messages // open route for now; for site admins only in the end" })
-  getAllMessages() {
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  @ApiOperation({ summary: "DEPRECATED ROUTE DO NOT USE" })
+  getAllMessages(@Req() req: RequestWithUser) {
+    const { user } = req;
     return this.channelService.getAllMessagesOfAllChannels();
   }
 

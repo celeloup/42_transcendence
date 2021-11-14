@@ -121,9 +121,10 @@ export function Chat() {
 	const [ askPassword, setAskPassword ] = useState(false);
 	const { masterSocket } = useContext(AuthContext) as AuthContextType;
 	const [ usersOnline, setUsersOnline ] = useState<any[]>([]);
+	const [ usersPlaying, setUsersPlaying ] = useState<any[]>([]);
 
 	const joinChan = () => {
-		axios.put(`/channel/join/${ channel?.id }`)
+		axios.put(`/channel/join/${ channel?.id }`, { "password": "" })
 		.then( res => {
 			socket.emit('join_chan', channel?.id);
 		})
@@ -138,10 +139,10 @@ export function Chat() {
 		// select first channel if exist
 		if (!channel)
 		{
-			axios.get(`/channel`)
+			axios.get(`/channel/1`)
 			.then((res) => {
-				if (mounted && res.data.length !== 0) {
-					setChannel(res.data[0]);
+				if (mounted) {
+					setChannel(res.data);
 				}
 			})
 			.catch((err) => console.log(err))
@@ -234,6 +235,7 @@ export function Chat() {
 		{
 			axios.get(`/channel/infos/${ channel.id }`)
 			.then( res => {
+				// console.log(res);
 				var banned = res.data.banned.some((ban:any) => ban.id === user?.id) ? true : false;
 				var member = res.data.members.some((mem:any) => mem.id === user?.id) ? true : false;
 				if (banned)
@@ -241,7 +243,7 @@ export function Chat() {
 					if (mounted && channel)
 						setHasBeenBanned(channel.id);
 				}
-				else if (!member)
+				if (!member)
 				{
 					if (mounted && (user?.site_owner || user?.site_moderator))
 						joinChan();
@@ -281,16 +283,17 @@ export function Chat() {
 
 		masterSocket?.emit("get_users");
 		masterSocket?.on("connected_users", (data : any) => {
-			console.log(data);
+			// console.log(data);
 			if (mounted) {
 				setUsersOnline(data);
 			}
 		});
 
-		masterSocket?.on("update_online_users", (data : any) => {
+		masterSocket?.on("connected_users", (onlineList : any, playingList : any) => {
 			if (mounted) {
-				setUsersOnline(data);
-		 	}
+				setUsersOnline(onlineList);
+				setUsersPlaying(playingList);
+			}
 		});
 
 		return () => { mounted = false };
@@ -338,6 +341,7 @@ export function Chat() {
 			key={ mes.id }
 			id={ mes.author.id }
 			online={ usersOnline.includes(mes.author.id) }
+			playing={ usersPlaying.includes(mes.author.id) }
 			username={ mes.author.name }
 			message={ mes.content }
 			setBlockedUsers={ setBlockedUsers }

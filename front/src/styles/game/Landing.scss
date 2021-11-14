@@ -85,7 +85,7 @@ $green: #81A439;
                 }
 
                 .name {
-                    width: 30%;
+                    width: 35%;
                     padding-top: 4%;
                     font-family: "Dogica";
                     font-size: 13px;
@@ -95,16 +95,14 @@ $green: #81A439;
                     text-overflow: ellipsis;
                 }
 
-                .score {
-                    width: 10%;
-                    padding-top: 4%;
-                    font-family: "Dogica";
-                    font-size: 18px;
-                    color: white;
-                }
-
                 .logo {
                     height: 100%;
+                }
+
+                i {
+                    font-size: 22px;
+                    color: $light-gray;
+                    padding-top: 10px;
                 }
             }
         }
@@ -132,7 +130,7 @@ $green: #81A439;
 
             .leaderbox {
                 width: 100%;
-                height: 99%;
+                height: 96%;
                 position: relative;
                 padding: 5px;
                 display: flex;
@@ -140,7 +138,7 @@ $green: #81A439;
                 overflow: hidden;
                 overflow-y: scroll;
 
-                a {
+                .navlink {
                     display: flex;
                     flex-direction: row;
                     justify-content: space-between;

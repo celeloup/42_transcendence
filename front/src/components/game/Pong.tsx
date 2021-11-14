@@ -6,6 +6,27 @@ import p5Types from "p5";
 import Sketch from "react-p5";
 import '../../styles/game/Pong.scss';
 
+type Props = {
+	map:number
+}
+
+function Countdown({map}:Props) {
+    const [ counter, setCounter ] = useState(3);
+    
+    useEffect(() => {
+		let mounted = true;
+		if (mounted && counter > 0)
+			setTimeout(() => setCounter(counter - 1), 1000);
+		return () => { mounted = false; }
+    }, [counter])
+    
+    return (
+        <div id="countdown" className={ map === 1 ? "yellow" : ""}>
+            { counter > 0 ? counter : "GO!" }
+        </div>
+	)
+}
+
 type Paddle = {
 	is_left: boolean,
 	x: number,
@@ -43,6 +64,7 @@ function Pong() {
 	const [ canceledGame, setCanceledGame ] = useState<any>(null);
 	const [ userOffline, setUserOffline ] = useState<any>(null);
 	const [ interrupted, setInterrupted ] = useState<boolean>(false);
+	const [ showCountdown, setShowCountdown ] = useState(false);
 	const [ waiting, setWaiting ] = useState<boolean>(true);
 	
 	useEffect(() => {
@@ -59,6 +81,7 @@ function Pong() {
 			{
 				setMatch(data);
 				setWaiting(false);
+				setShowCountdown(true);
 			}
 			if (!game_starting)
 				game_starting = true;
@@ -71,6 +94,7 @@ function Pong() {
 			if (mounted) {
 				if (waiting)
 					setWaiting(false);
+				setShowCountdown(false);
 				setPuck(data.puck);
 				setPaddleLeft(data.paddle_player1);
 				setPaddleRight(data.paddle_player2);
@@ -230,6 +254,7 @@ function Pong() {
 			{ declined && <InfoError setToDisplay={ setToDisplay } type={ 2 } user={ declined }/> }
 			{ canceledGame && <InfoError setToDisplay={ setToDisplay } type={ 3 } user={ canceledGame }/> }
 			{ userOffline && <InfoError setToDisplay={ setToDisplay } type={ 4 } user={ userOffline }/> }
+			{ showCountdown && <Countdown map={match.map}/> }
 			
 			{ !waiting && match.map === 1 && 
 				<Space
