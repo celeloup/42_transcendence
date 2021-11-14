@@ -83,6 +83,28 @@ services:
     networks:
       - net
 
+  pgadmin:
+    image: dpage/pgadmin4
+    deploy:
+      restart_policy:
+        condition: on-failure
+      placement:
+        constraints:
+          - node.labels.server == true
+      resources:
+        limits:
+            memory: 512M
+        reservations:
+            memory: 256M
+    ports:
+      - "8081:80"
+    volumes:
+      - ./pgadmin/_data:/root/.pgadmin
+    env_file:
+      - docker.env
+    networks:
+      - net
+
 networks:
   net:
     driver: overlay
