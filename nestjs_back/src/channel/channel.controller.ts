@@ -16,15 +16,25 @@ export default class ChannelController {
     private readonly channelService: ChannelService
   ) { }
 
-  //change to only site admin at the end
+  //Throw error deprecated
   @Get()
-  @ApiOperation({ summary: "Get all channels / Open route for the moment => In the end for admins only" })
+  @ApiOperation({ summary: "DEPRECATED. Use channel/mine instead" })
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')
   @UseGuards(JwtTwoFactorGuard)
   getAllChannels(@Req() req: RequestWithUser) {
     const { user } = req;
     return this.channelService.getAllChannels(user.id);
+  }
+
+  @Get('mine')
+  @ApiOperation({ summary: "Get my channels" })
+  @ApiBearerAuth('bearer-authentication')
+  @ApiCookieAuth('cookie-authentication')
+  @UseGuards(JwtTwoFactorGuard)
+  getMyChannels(@Req() req: RequestWithUser) {
+    const { user } = req;
+    return this.channelService.getMyChannels(user.id);
   }
 
   @Get(':id')
@@ -35,7 +45,7 @@ export default class ChannelController {
   @UseGuards(JwtTwoFactorGuard)
   getChannelById(@Req() req: RequestWithUser, @Param() { id }: FindOneParams) {
     const { user } = req;
-    return this.channelService.getChannelById(Number(id), user.id);
+    return this.channelService.getChannelById(Number(id));
   }
 
   @Get('owner/:id')
@@ -46,7 +56,7 @@ export default class ChannelController {
   @UseGuards(JwtTwoFactorGuard)
   getOwnerByChannelId(@Req() req: RequestWithUser, @Param() { id }: FindOneParams) {
     const { user } = req;
-    return this.channelService.getOwnerByChannelId(Number(id), user.id);
+    return this.channelService.getOwnerByChannelId(Number(id));
   }
 
   @Get('members/:id')
@@ -68,7 +78,7 @@ export default class ChannelController {
   @UseGuards(JwtTwoFactorGuard)
   getAdminsByChannelId(@Req() req: RequestWithUser, @Param() { id }: FindOneParams) {
     const { user } = req;
-    return this.channelService.getAdminsByChannelId(Number(id), user.id);
+    return this.channelService.getAdminsByChannelId(Number(id));
   }
 
   @Get('infos/:id')
@@ -79,7 +89,7 @@ export default class ChannelController {
   @UseGuards(JwtTwoFactorGuard)
   getAllInfosChannelId(@Req() req: RequestWithUser, @Param() { id }: FindOneParams) {
     const { user } = req;
-    return this.channelService.getAllInfosByChannelId(Number(id), user.id);
+    return this.channelService.getSecuredInfosByChannelId(Number(id), user.id);
   }
 
   @Get('nextunmutedate/:id')
@@ -90,18 +100,17 @@ export default class ChannelController {
   @UseGuards(JwtTwoFactorGuard)
   getNextUnmuteDate(@Req() req: RequestWithUser,@Param() { id }: FindOneParams) {
     const { user } = req;
-    return this.channelService.getNextUnmuteDate(Number(id), user.id);
+    return this.channelService.getNextUnmuteDate(Number(id));
   }
 
-  //Change for site admins at the end
   @Get('messages')
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')
   @UseGuards(JwtTwoFactorGuard)
-  @ApiOperation({ summary: "Get all messages // open route for now; for site admins only in the end" })
+  @ApiOperation({ summary: "DEPRECATED ROUTE DO NOT USE" })
   getAllMessages(@Req() req: RequestWithUser) {
     const { user } = req;
-    return this.channelService.getAllMessagesOfAllChannels(user.id);
+    return this.channelService.getAllMessagesOfAllChannels();
   }
 
 

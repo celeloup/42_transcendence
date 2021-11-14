@@ -58,9 +58,10 @@ export default class ChannelService {
     throw new HttpException('Only members and site admins can see messages of a channel', HttpStatus.FORBIDDEN);
   }
 
-  //OPEN ROUTE FOR NOW. At the end only for site admins
+  //DEPRECATED cause not secure
   async getAllMessagesOfAllChannels() {
-    return await this.messagesRepository.find();
+    throw new HttpException('DEPRECATED ROUTE', HttpStatus.FORBIDDEN);
+    //return await this.messagesRepository.find();
   }
 
   async getNextExpiredMuteDate(muteObjs: muteObj[]) {
@@ -74,7 +75,7 @@ export default class ChannelService {
     return next;
   }
 
-  async getNextUnmuteDate(channel_id: number){
+  async getNextUnmuteDate(channel_id: number) {
     let channel = await this.getAllInfosByChannelId(channel_id);
     return await this.getNextExpiredMuteDate(channel.muteDates);
   }
@@ -101,20 +102,72 @@ export default class ChannelService {
       (await this.refreshMutedUsers(channel));
   }
 
-    //
-  async getAllChannels(user_is: Number) {
-  //  if (await this.usersService)
-    let channels = await this.channelRepository.find({ relations: ['historic', 'members', 'muted', 'muteDates', 'admins', 'owner'] });
-    if (channels) {
-      for (var channel of channels)
+  async getPublicChannels() {
+    let publicChannels = await this.channelRepository.find({ where: { type: 1 }, relations: ['historic', 'members', 'muted', 'muteDates', 'admins', 'owner'] });
+    if (publicChannels) {
+      for (var channel of publicChannels)
         await this.checkMuteTime(channel);
-      channels = await this.channelRepository.find({ relations: ['historic', 'members', 'muted', 'muteDates', 'admins', 'owner'] });
-      return channels;
+      publicChannels = await this.channelRepository.find({ where: { type: 1 }, relations: ['historic', 'members', 'muted', 'muteDates', 'admins', 'owner'] });
+      return publicChannels;
     }
-    throw new HttpException('No channel has been created yet', HttpStatus.NOT_FOUND);
   }
 
-  //
+  // = private channels with a password
+  async getViewablePrivateChannels() {
+    let viewablePrivateChannels = await this.channelRepository.find({ where: { type: 2, passwordSet: true }, relations: ['admins', 'owner'] })
+    return viewablePrivateChannels
+  }
+
+  async getMyPrivateChannels(user_id: number) {
+    let privateChannels = await this.channelRepository.find({ where: { type: 2 }, relations: ['historic', 'members', 'muted', 'muteDates', 'admins', 'owner'] })
+    let myPrivateChannels: Channel[] = []
+    for (var channel of privateChannels)
+      if ((await this.isAMember(channel.id, user_id)))
+        myPrivateChannels.push(channel)
+
+    let otherViewablePrivateChannels = await this.getViewablePrivateChannels()
+    for (var channel of otherViewablePrivateChannels)
+      if (!(await this.isAMember(channel.id, user_id)))
+        myPrivateChannels.push(channel)
+    return myPrivateChannels
+  }
+
+  async getMyDMs(user_id: number){
+    let DMs = await this.channelRepository.find({ where: { type: 3 }, relations: ['historic', 'members', 'muted', 'muteDates', 'admins', 'owner'] })
+    let myDMs: Channel[] = []
+    for (var DM of DMs)
+      if ((await this.isAMember(DM.id, user_id)))
+        myDMs.push(DM)
+    return myDMs
+  }
+
+  async getMyChannels(user_id: number) {
+    let publicChannels = await this.getPublicChannels()
+      let privateChannels: Channel[] = []
+    if (await this.usersService.isSiteAdmin(user_id))
+      privateChannels = await this.channelRepository.find({ where: { type: 2 }, relations: ['historic', 'members', 'muted', 'muteDates', 'admins', 'owner'] })
+    else
+      privateChannels = await this.getMyPrivateChannels(user_id)
+    let DM = await this.getMyDMs(user_id)
+    let myChannels: Channel[] = []
+    myChannels = publicChannels.concat(privateChannels, DM)
+    return myChannels
+  }
+
+  //FOR DEBUG PURPOSE ONLY. NOT SECURE
+  async getAllChannels(user_id: number) {
+    // let channels: Channel[] = [];
+    // return channels
+    // let channels = await this.channelRepository.find({ relations: ['historic', 'members', 'muted', 'muteDates', 'admins', 'owner'] });
+    // if (channels) {
+    //   for (var channel of channels)
+    //     await this.checkMuteTime(channel);
+    //   channels = await this.channelRepository.find({ relations: ['historic', 'members', 'muted', 'muteDates', 'admins', 'owner'] });
+    //   return channels;
+    // }
+     throw new HttpException('Deprecated route. Use GET api/channel/mine instead', HttpStatus.FORBIDDEN);
+  }
+
   async getChannelById(id: number) {
     let channel = await this.channelRepository.findOne(id);
     if (channel) {
@@ -124,7 +177,6 @@ export default class ChannelService {
     throw new HttpException('Channel with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
-  //
   async getChannelByName(name: string) {
     let channel = await this.channelRepository.findOne({ name });
     if (channel) {
@@ -134,7 +186,6 @@ export default class ChannelService {
     throw new HttpException('Channel with this name does not exist', HttpStatus.NOT_FOUND);
   }
 
-  //
   async getOwnerByChannelId(id: number) {
     let channel = await this.channelRepository.findOne(id, { relations: ['owner'] });
     if (channel) {
@@ -143,10 +194,12 @@ export default class ChannelService {
     throw new HttpException('Channel with this id does not exist', HttpStatus.NOT_FOUND);
   }
 
-  async getMembersByChannelId(id: number) {
+  async getMembersByChannelId(id: number, user_id: number) {
     let channel = await this.channelRepository.findOne(id, { relations: ['members'] });
     if (channel) {
-      return channel.members;
+      if (await this.isAMember(channel.id, user_id) || await this.usersService.isSiteAdmin(user_id))
+        return channel.members;
+      throw new HttpException('Private information dude', HttpStatus.FORBIDDEN);
     }
     throw new HttpException('Channel with this id does not exist', HttpStatus.NOT_FOUND);
   }
@@ -155,6 +208,19 @@ export default class ChannelService {
     let channel = await this.channelRepository.findOne(id, { relations: ['admins'] });
     if (channel) {
       return channel.admins;
+    }
+    throw new HttpException('Channel with this id does not exist', HttpStatus.NOT_FOUND);
+  }
+
+  async getSecuredInfosByChannelId(channel_id: number, user_id: number) {
+    let channel = await this.channelRepository.findOne(channel_id);
+    if (channel) {
+      await this.checkMuteTime(channel);
+    let myChannels = await this.getMyChannels(user_id)
+    let index = myChannels.findIndex(element => element.id === channel_id)
+    if (index !== -1)
+      return myChannels[index]
+    throw new HttpException('No right to see this channel infos', HttpStatus.FORBIDDEN);
     }
     throw new HttpException('Channel with this id does not exist', HttpStatus.NOT_FOUND);
   }
@@ -280,7 +346,7 @@ export default class ChannelService {
       }
       throw new HttpException('User is already a member of this channel', HttpStatus.OK);
     }
-    throw new HttpException('Wrong password' , HttpStatus.FORBIDDEN);
+    throw new HttpException('Wrong password', HttpStatus.FORBIDDEN);
   }
 
   async addMember(channel_id: number, other_id: number, user_id: number) {
@@ -515,7 +581,7 @@ export default class ChannelService {
       banned: [],
       muted: [],
     });
-    if (newChannel. type !== 2 || newChannel.password === "")
+    if (newChannel.type !== 2 || newChannel.password === "")
       newChannel.passwordSet = false;
     else
       newChannel.passwordSet = true;
