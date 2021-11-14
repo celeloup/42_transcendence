@@ -114,7 +114,7 @@ export default class ChannelService {
 
   // = private channels with a password
   async getViewablePrivateChannels() {
-    let viewablePrivateChannels = await this.channelRepository.find({ where: { type: 2, passwordSet: true }, relations: ['admins', 'owner', 'members', 'banned', 'muted', 'mutedDates'] })
+    let viewablePrivateChannels = await this.channelRepository.find({ where: { type: 2, passwordSet: true }, relations: ['admins', 'owner', 'members', 'banned', 'muted', 'muteDates'] })
     return viewablePrivateChannels
   }
 
@@ -327,6 +327,8 @@ export default class ChannelService {
   async passwordOK(channel: Channel, password: string, user_id: number) {
     if (!channel.passwordSet ||(await this.usersService.isSiteAdmin(user_id)))
       return true;
+    if (!password)
+      return false
     const isPasswordMatching = await bcrypt.compare(
       password,
       channel.password
