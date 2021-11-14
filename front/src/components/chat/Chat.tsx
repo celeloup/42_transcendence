@@ -124,7 +124,7 @@ export function Chat() {
 	const [ usersPlaying, setUsersPlaying ] = useState<any[]>([]);
 
 	const joinChan = () => {
-		axios.put(`/channel/join/${ channel?.id }`)
+		axios.put(`/channel/join/${ channel?.id }`, { "password": "" })
 		.then( res => {
 			socket.emit('join_chan', channel?.id);
 		})
@@ -235,6 +235,7 @@ export function Chat() {
 		{
 			axios.get(`/channel/infos/${ channel.id }`)
 			.then( res => {
+				// console.log(res);
 				var banned = res.data.banned.some((ban:any) => ban.id === user?.id) ? true : false;
 				var member = res.data.members.some((mem:any) => mem.id === user?.id) ? true : false;
 				if (banned)
@@ -242,7 +243,7 @@ export function Chat() {
 					if (mounted && channel)
 						setHasBeenBanned(channel.id);
 				}
-				else if (!member)
+				if (!member)
 				{
 					if (mounted && (user?.site_owner || user?.site_moderator))
 						joinChan();
