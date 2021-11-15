@@ -6,11 +6,34 @@ $dark-gray: #919191;
 $profile-gray: #3E3E3E;
 $green: #81A439;
 $orange: orange;
+$red: #BF3030;
 
 #chat
 {
 	width: 100%;
 	height: 100%;
+
+	#muted_message {
+		z-index: 3;
+		background-color: $red;
+		color: $background-color;
+		width: 260px;
+		position: absolute;
+		top: 55px;
+		left: 40px;
+		border-radius: 5px;
+		padding: 10px 25px 10px 15px;
+		font-size: 15px;
+		text-align: left;
+
+		.fa-times {
+			position: absolute;
+			top: 5px;
+			right: 8px;
+			font-size: 25px;
+			cursor: pointer;
+		}
+	}
 }
 
 // *********** HEADER
