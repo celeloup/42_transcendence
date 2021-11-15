@@ -4,8 +4,6 @@ export default function Time() {
     const [ time, setTime ] = useState<string>("");
     
     function showTime(){
-        let mounted = true;
-
         var date = new Date();
         var h = date.getHours(); // 0 - 23
         var m = date.getMinutes(); // 0 - 59
@@ -15,15 +13,20 @@ export default function Time() {
         
         var time = h2 + ":" + m2;
         
-        if (mounted) {
-            setTime(time);
-            setTimeout(showTime, 1000);
-        }
-
-        return () => { mounted = false };
+        setTime(time);
+        const clearID: any = setTimeout(showTime, 1000);
+        return clearID;
     }
+
     useEffect(() => {
-        showTime();
+        let clean: any = -1;
+
+        clean = showTime();
+        
+        return () => {
+            if (clean !== -1)
+                clearTimeout(clean);
+        };
     }, []) // eslint-disable-line
     
     return (

@@ -141,10 +141,12 @@ function ChannelList () {
 	var dms = channels.filter((chan:any) => {
 		if (chan.type === 3)
 		{
+			if (chan.members.length < 2)
+				return (false);
 			var m = chan.members[0].id === user?.id ? chan.members[1] : chan.members[0];
 			var ret = blockedUsers.every((b, i) => {
 				if (b.id === m.id)
-					return false;
+					return (false);
 				return (true);
 			})
 			return (ret);

@@ -11,7 +11,7 @@ import "../../styles/game/Landing.scss";
 function SpectateMatch(matchToSpectate:any, setToDisplay: (s:string) => void, masterSocket:any, setMatch: (m:any) => void)
 {
 	setMatch(matchToSpectate);
-	console.log(matchToSpectate.id);
+	// console.log(matchToSpectate.id);
 	setToDisplay('pong');
 	masterSocket.emit('join_game', matchToSpectate.id);
 }
@@ -60,23 +60,6 @@ function Landing() {
 		masterSocket.emit('match_player');
 		setToDisplay("pong");
 	}
-
-	// function resolveMatches (matches : number[]) {
-	// 	Promise.all(
-	// 		matches.map(async (match) => {
-	// 			let matchInfo = await axios.get("/matches/" + match);
-	// 			return ({
-	// 				name1: matchInfo.data.users[0].name,
-	// 				name2: matchInfo.data.users[1].name,
-	// 				score1: matchInfo.data.score_user1,
-	// 				score2: matchInfo.data.score_user2,
-	// 				id: matchInfo.data.id
-	// 			});
-	// 		})
-	// 	)
-	// 	.then( response => { setMatches(response); })
-	// 	.catch( error => { console.log(error.response); })
-	// }
 
 	return (
 		<div id="landing_game">

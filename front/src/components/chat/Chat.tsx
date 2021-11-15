@@ -43,7 +43,6 @@ function AskPassword({ channel, chanID, socket, setAskPassword } : AskPasswordPr
 	const handleSubmit = (e:any) => {
 		e.preventDefault();
 		setIsLoading(true);
-		console.log(chanPassword);
 		axios.put(`/channel/join/${ chanID }`, { "password": chanPassword })
 		.then( res => {
 			socket.emit('join_chan', chanID);
@@ -60,13 +59,13 @@ function AskPassword({ channel, chanID, socket, setAskPassword } : AskPasswordPr
 		<div id="ask_password">
 			{ imsg !== -1 && <div id="error_msg"><i className="fas fa-exclamation-triangle" />{ erroMsg[imsg < 6 ? imsg : 0 ] }</div> }
 			<span className="chan" >{ channel }</span> is a private channel and requires a password to join.
-			<form onSubmit={ handleSubmit }>
+			<form onSubmit={ handleSubmit } autoComplete="off">
 				<label id="passwordLabel">
 					<input
 						autoFocus={ true }
 						autoComplete="off"
 						className={ typePassword ? "passwordInput" : ""} 
-						type="text"
+						type={ typePassword ? "password" : "text"}
 						value={ chanPassword }
 						onChange={ (e) => setChanPassword(e.target.value) }
 					/>
@@ -282,14 +281,16 @@ export function Chat() {
 		let mounted = true;
 
 		masterSocket?.emit("get_users");
-		masterSocket?.on("connected_users", (data : any) => {
-			// console.log(data);
-			if (mounted) {
-				setUsersOnline(data);
-			}
-		});
 
 		masterSocket?.on("connected_users", (onlineList : any, playingList : any) => {
+			// console.log("online:", onlineList, "playing", playingList);
+			if (mounted) {
+				setUsersOnline(onlineList);
+				setUsersPlaying(playingList);
+			}
+		});
+		masterSocket?.on("update_online_users", (onlineList : any, playingList : any) => {
+			// console.log("online:", onlineList, "playing", playingList);
 			if (mounted) {
 				setUsersOnline(onlineList);
 				setUsersPlaying(playingList);
@@ -341,7 +342,7 @@ export function Chat() {
 			key={ mes.id }
 			id={ mes.author.id }
 			online={ usersOnline.includes(mes.author.id) }
-			playing={ usersPlaying.includes(mes.author.id) }
+			playing={ usersPlaying ? usersPlaying.includes(mes.author.id) : false }
 			username={ mes.author.name }
 			message={ mes.content }
 			setBlockedUsers={ setBlockedUsers }
@@ -374,7 +375,7 @@ export function Chat() {
 				</div>
 				<div id="chat_input" className={ channel === null ? "disabled" : ""}>
 					<i className="fas fa-chevron-right"></i>
-					<form onSubmit={ handleSubmit }>
+					<form onSubmit={ handleSubmit } autoComplete="off">
 						<input 
 							type="text"
 							autoFocus={true}

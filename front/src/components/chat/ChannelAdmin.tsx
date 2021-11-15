@@ -46,7 +46,7 @@ const EditPassword = ({ passwordSet, chan, display, setRefresh, refresh,} : Edit
 		<div id="edit_password_popup">
 			<i className="fas fa-times" onClick={ () => display(false) }/>
 			[ Edit the password. ]
-			<form onSubmit={ handleSubmit }>
+			<form onSubmit={ handleSubmit } autoComplete="off">
 				<label id="passwordLabel">
 					<input
 						autoFocus={ true }

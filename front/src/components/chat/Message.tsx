@@ -146,9 +146,13 @@ function ProfileCard( {id, online, playing, user, setDisplayCard, setBlockedUser
 	}
 
 	const Challenge = () => {
-		setChallenged(user);
-		setToDisplay("create");
+		let mounted = true;
+		if (mounted) {
+			setChallenged(user);
+			setToDisplay("create");
+		}
 		history.push("/");
+		return () => { mounted = false };
 		// console.log("challenging ", user);
 	}
 
@@ -207,14 +211,17 @@ export function Message ({ id, online, playing, username, message, setBlockedUse
 	const [ user, setUser ] = useState<any>(null);
 
 	useEffect(() => {
+		let mounted = true;
 		axios.get(`/users/infos/${id}`)
 		.then( res => {
 			// console.log("GET USER", res);
-			setUser(res.data);
+			if (mounted)
+				setUser(res.data);
 		})
 		.catch (err => {
 			console.log("Error:", err);
 		})
+		return () => { mounted = false };
 	}, [id]);
 	
 	const closeCard = (event: any) => {
