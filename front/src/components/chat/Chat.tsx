@@ -289,6 +289,7 @@ export function Chat() {
 				setUsersPlaying(playingList);
 			}
 		});
+
 		masterSocket?.on("update_online_users", (onlineList : any, playingList : any) => {
 			// console.log("online:", onlineList, "playing", playingList);
 			if (mounted) {

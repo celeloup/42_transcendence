@@ -41,6 +41,7 @@ function Achievements ({ achievements } : Props) {
 
     useEffect(() => {
         for (let t = 1 ; t < 4 ; t++) {
+            setTable[t - 1](makeAchievement(Hidden));
             for (let l = 3 ; l > 0 ; l--) {
                 let achievement = achievements.find(a => (a['type'] === t && a['level'] === l));
                 if (achievement) {

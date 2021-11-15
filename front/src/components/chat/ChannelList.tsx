@@ -39,8 +39,8 @@ function Channel({ chan } : ChannelProps) {
 	let img = <Avatar size={"small"} id={-1} name={chan.name} namespec={true} avatar={false} avaspec={true}></Avatar>
 
 	if (chan.type === 3) {
-		let friendId = (chan.members[0].id === user?.id ? chan.members[1].id : chan.members[0].id);
-		let friendName = (chan.members[0].id === user?.id ? chan.members[1].name : chan.members[0].name)
+		let friendId = (chan.members[0]?.id === user?.id ? chan.members[1].id : chan.members[0]?.id);
+		let friendName = (chan.members[0]?.id === user?.id ? chan.members[1].name : chan.members[0]?.name)
 
 		name = friendName;
 		img = <Avatar size={"small"} id={friendId} name={friendName} namespec={true}></Avatar>
