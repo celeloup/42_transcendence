@@ -43,7 +43,7 @@ function AskPassword({ channel, chanID, socket, setAskPassword } : AskPasswordPr
 	const handleSubmit = (e:any) => {
 		e.preventDefault();
 		setIsLoading(true);
-		console.log(chanPassword);
+		// console.log(chanPassword);
 		axios.put(`/channel/join/${ chanID }`, { "password": chanPassword })
 		.then( res => {
 			socket.emit('join_chan', chanID);
@@ -281,13 +281,6 @@ export function Chat() {
 		let mounted = true;
 
 		masterSocket?.emit("get_users");
-		masterSocket?.on("connected_users", (data : any) => {
-			console.log(data);
-			if (mounted) {
-				setUsersOnline(data);
-			}
-		});
-
 		masterSocket?.on("connected_users", (onlineList : any, playingList : any) => {
 			if (mounted) {
 				setUsersOnline(onlineList);

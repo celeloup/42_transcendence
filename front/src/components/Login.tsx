@@ -12,7 +12,12 @@ function Login() {
 
 	const [ ghostLogin, setGhostLogin ] = useState<number>(0);
 	const ghost_authenticate = (id42:number) => {
-		setGhostLogin(id42);
+		let mounted = true;
+
+		if (mounted)
+			setGhostLogin(id42);
+
+		return () => { mounted = false };
 	};
 
 	useEffect(() => {
