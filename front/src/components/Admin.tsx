@@ -47,7 +47,6 @@ function Admin () {
 				setPlaying(playingList);
 			}
 		});
-
 		masterSocket?.on("update_online_users", (onlineList : any, playingList : any) => {
 			if (mounted) {
 				setOnline(onlineList);

@@ -281,17 +281,13 @@ export function Chat() {
 		let mounted = true;
 
 		masterSocket?.emit("get_users");
-
 		masterSocket?.on("connected_users", (onlineList : any, playingList : any) => {
-			// console.log("online:", onlineList, "playing", playingList);
 			if (mounted) {
 				setUsersOnline(onlineList);
 				setUsersPlaying(playingList);
 			}
 		});
-
 		masterSocket?.on("update_online_users", (onlineList : any, playingList : any) => {
-			// console.log("online:", onlineList, "playing", playingList);
 			if (mounted) {
 				setUsersOnline(onlineList);
 				setUsersPlaying(playingList);
