@@ -72,8 +72,6 @@ export default class GameService {
             
             this.deletePlayingUser(round.id_player1);
             this.deletePlayingUser(round.id_player2);
-            // delete this.playingUsers[round.id_player1];
-            // delete this.playingUsers[round.id_player2];
             server.emit('update_online_users', Array.from(usersSocket.keys()), this.playingUsers);
 			
             return;
@@ -86,9 +84,7 @@ export default class GameService {
 
         //on save le game et on retire les infos "en cours";
         await this.matchService.updateMatch(match.id, match);
-        
-        // delete this.playingUsers[round.id_player1];
-        // delete this.playingUsers[round.id_player2];
+
         this.deletePlayingUser(round.id_player1);
         this.deletePlayingUser(round.id_player2);
         server.emit('update_online_users', Array.from(usersSocket.keys()), this.playingUsers);
@@ -108,10 +104,6 @@ export default class GameService {
             return 1;
         }
         server.in(idGame).emit('game_starting', match);
-
-        //on ajoute les joueurs a la liste des users en cours de jeu et on attend laisse une pause avant de lancer la partie;
-        // inGame.push(param.id_player1);
-        // inGame.push(param.id_player2);
 
         this.logger.log(`Start game ${param.id_game} in 5 seconds`);
         await new Promise(f => setTimeout(f, 5000));

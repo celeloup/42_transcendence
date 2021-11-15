@@ -107,14 +107,14 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     const user: User = await this.authenticationService.getUserFromSocket(client);
 	var memberSocket: Socket;
 	for (let [key, value] of this.listSocket.entries()) {
-		if (key.id === data.memberID) {
-			memberSocket = value;
-		}
+      if (key.id === data.memberID) {
+        memberSocket = value;
+      }
 	  }
-    if (user) {
-		console.log("**** Emitting mute user", data.channelID);
-		memberSocket.emit('user_muted', data.channelID);
-    }
+    // if (user) {
+		// console.log("**** Emitting mute user", data.channelID);
+		// memberSocket.emit('user_muted', data.channelID);
+    // }
   }
 
   @SubscribeMessage('unmute_user')
@@ -171,6 +171,7 @@ export default class ChannelGateway implements OnGatewayInit, OnGatewayConnectio
     if (!(is_member) || is_muted) {
       this.logger.log('Unauthorized access');
       this.logger.log(`Date: ${date}`);
+      client.emit('user_muted', data.recipient.id);
       return ;
     }
     this.logger.log(`Message from ${this.connectedUsers.get(client)} to ${data.recipient.name}: ${data.content}`);

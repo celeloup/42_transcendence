@@ -83,10 +83,11 @@ function AskPassword({ channel, chanID, socket, setAskPassword } : AskPasswordPr
 
 type ChatHeaderProps = {
 	hasBeenBanned: Number,
-	askPassword: boolean
+	askPassword: boolean,
+	setIsMuted: (a:boolean) => void
 }
 
-function ChatHeader({ hasBeenBanned, askPassword} : ChatHeaderProps) {
+function ChatHeader({ hasBeenBanned, askPassword, setIsMuted } : ChatHeaderProps) {
 	var { channel, toggleDisplayList, toggleDisplayAdmin } = useContext(ChannelContext) as ContextType;
 	var { user } = useContext(AuthContext) as AuthContextType;
 
@@ -100,11 +101,11 @@ function ChatHeader({ hasBeenBanned, askPassword} : ChatHeaderProps) {
 		
 	return (
 		<div className="window_header chat_header">
-			<i className="fas fa-bars header_button" onClick={ toggleDisplayList }></i>
+			<i className="fas fa-bars header_button" onClick={ () => { toggleDisplayList(); setIsMuted(false); } }></i>
 			<div className="header_title">
 				<i className="fas fa-user-friends"></i>{ name }
 			</div>
-			{ channel && !askPassword && hasBeenBanned !== channel.id && <i className="fas fa-cog header_button" onClick={ toggleDisplayAdmin }></i> }
+			{ channel && !askPassword && hasBeenBanned !== channel.id && <i className="fas fa-cog header_button" onClick={ () => { toggleDisplayAdmin(); setIsMuted(false); } }></i> }
 		</div>
 	)
 }
@@ -114,11 +115,13 @@ export function Chat() {
 	const [ newMessage, setNewMessage ] = useState("");
 	const [ msgIsLoading, setMsgIsLoading ] = useState(false);
 	const [ blockedUsers, setBlockedUsers ] = useState<any[]>([]);
+	
 	var { displayList, displayAdmin, channel, socket, setSocket, setChannel, setDisplayList, toggleDisplayAdmin } = useContext(ChannelContext) as ContextType;
-	var { user } = useContext(AuthContext) as AuthContextType;
+	var { user, masterSocket } = useContext(AuthContext) as AuthContextType;
+	
 	const [ hasBeenBanned, setHasBeenBanned ] = useState<Number>(-1);
+	const [ isMuted, setIsMuted ] = useState(false);
 	const [ askPassword, setAskPassword ] = useState(false);
-	const { masterSocket } = useContext(AuthContext) as AuthContextType;
 	const [ usersOnline, setUsersOnline ] = useState<any[]>([]);
 	const [ usersPlaying, setUsersPlaying ] = useState<any[]>([]);
 
@@ -192,21 +195,20 @@ export function Chat() {
 		});
 		
 		socket?.on('user_banned', (data:any) => {
-			console.log("I HAVE BEEN BANNED", data, channel);
+			// console.log("I HAVE BEEN BANNED", data);
 			if (mounted) {
 				setHasBeenBanned(data);
 			}
 		})
 
 		socket?.on('user_muted', (data:any) => {
-			console.log("I HAVE BEEN MUTED", data, channel);
-			// setHasBeenBanned(data);
+			// console.log("I HAVE BEEN MUTED", data);
+			setIsMuted(true);
 		})
 
-		socket?.on('user_unmuted', (data:any) => {
-			console.log("I HAVE BEEN UNMUTED", data, channel);
-			// setHasBeenBanned(data);
-		})
+		// socket?.on('user_unmuted', (data:any) => {
+		// 	console.log("I HAVE BEEN UNMUTED", data);
+		// })
 
 		return () => { mounted = false };
 	}, [socket]) // eslint-disable-line
@@ -319,11 +321,14 @@ export function Chat() {
 		e.preventDefault();
 		if (newMessage !== "" && channel !== null)
 		{
+			
 			const message : any = {
 				content: newMessage,
 				recipient: channel
 			};
 			setNewMessage("");
+			if (isMuted)
+				setIsMuted(false);
 			socket.emit('send_message', message);
 			// console.log("SENT :", message);
 			inputRef.current?.focus();
@@ -353,9 +358,14 @@ export function Chat() {
 			<div id="chat">
 				{ displayList && <ChannelList/> }
 				{ displayAdmin && <ChannelAdmin/> }
-				<ChatHeader hasBeenBanned={ hasBeenBanned } askPassword={ askPassword }/>
+				<ChatHeader hasBeenBanned={ hasBeenBanned } askPassword={ askPassword } setIsMuted={ setIsMuted }/>
 				{ channel && hasBeenBanned === channel.id && <BanPopup channel={ channel ? channel.name : "" } close={ closeBan }/> }
 				{ channel && askPassword && <AskPassword channel={ channel.name } chanID={ channel.id } socket={ socket } setAskPassword={ setAskPassword }/> }
+				{ isMuted && 
+					<div id="muted_message">
+						<i className="fas fa-exclamation-triangle" /> You have been muted by a moderator. <i className="fas fa-times" onClick={ () => setIsMuted(false) }/>
+					</div>
+				}
 				<div id="chat_messages">
 					{ channel === null && 
 						<div className="no_chan_msg">
