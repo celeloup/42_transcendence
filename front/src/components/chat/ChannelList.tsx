@@ -121,49 +121,12 @@ function ChannelList () {
 		.catch (err => {
 			console.log("Error:", err);
 		})
-		
-		axios.get(`/channel/`)
+
+		axios.get(`/channel/mine`)
 		.then( res => {
-			var admin = user?.site_owner || user?.site_moderator;
-			var chans:any;
-			if (!admin)
-			{
-				// Filter to get all inaccessible
-				chans = res.data.filter((c:any) => {
-					if (c.type === 1)
-						return (true);
-					else if (c.type === 2 && c.passwordSet)
-						return (c.members.some((mem:any) => mem.id === user?.id) ? false : true)
-					else
-						return (false);
-				});
-				// Get channels user is already in
-				axios.get(`/users/channels/${ user?.id }`)
-				.then( res => {
-					var chans2 = res.data.filter((c:any) => c.type !== 1);
-					if (mounted) {
-						setChannels(chans.concat(chans2));
-						setIsLoading(false);
-					}
-				})
-				.catch (err => {
-					console.log("Error:", err);
-				})
-			}
-			else
-			{
-				chans = res.data.filter((c:any) => {
-					if (c.type !== 3)
-						return (true);
-					else if (c.type === 3)
-						return (c.members.some((mem:any) => mem.id === user?.id) ? true : false)
-					else
-						return (false);
-				});
-				if (mounted) {
-					setChannels(chans);
-					setIsLoading(false);
-				}
+			if (mounted) {
+				setChannels(res.data);
+				setIsLoading(false);
 			}
 		})
 		.catch (err => {
@@ -178,10 +141,12 @@ function ChannelList () {
 	var dms = channels.filter((chan:any) => {
 		if (chan.type === 3)
 		{
+			if (chan.members.length < 2)
+				return (false);
 			var m = chan.members[0].id === user?.id ? chan.members[1] : chan.members[0];
 			var ret = blockedUsers.every((b, i) => {
 				if (b.id === m.id)
-					return false;
+					return (false);
 				return (true);
 			})
 			return (ret);

@@ -43,7 +43,6 @@ function AskPassword({ channel, chanID, socket, setAskPassword } : AskPasswordPr
 	const handleSubmit = (e:any) => {
 		e.preventDefault();
 		setIsLoading(true);
-		// console.log(chanPassword);
 		axios.put(`/channel/join/${ chanID }`, { "password": chanPassword })
 		.then( res => {
 			socket.emit('join_chan', chanID);
@@ -60,13 +59,13 @@ function AskPassword({ channel, chanID, socket, setAskPassword } : AskPasswordPr
 		<div id="ask_password">
 			{ imsg !== -1 && <div id="error_msg"><i className="fas fa-exclamation-triangle" />{ erroMsg[imsg < 6 ? imsg : 0 ] }</div> }
 			<span className="chan" >{ channel }</span> is a private channel and requires a password to join.
-			<form onSubmit={ handleSubmit }>
+			<form onSubmit={ handleSubmit } autoComplete="off">
 				<label id="passwordLabel">
 					<input
 						autoFocus={ true }
 						autoComplete="off"
 						className={ typePassword ? "passwordInput" : ""} 
-						type="text"
+						type={ typePassword ? "password" : "text"}
 						value={ chanPassword }
 						onChange={ (e) => setChanPassword(e.target.value) }
 					/>
@@ -124,7 +123,7 @@ export function Chat() {
 	const [ usersPlaying, setUsersPlaying ] = useState<any[]>([]);
 
 	const joinChan = () => {
-		axios.put(`/channel/join/${ channel?.id }`)
+		axios.put(`/channel/join/${ channel?.id }`, { "password": "" })
 		.then( res => {
 			socket.emit('join_chan', channel?.id);
 		})
@@ -139,10 +138,10 @@ export function Chat() {
 		// select first channel if exist
 		if (!channel)
 		{
-			axios.get(`/channel`)
+			axios.get(`/channel/1`)
 			.then((res) => {
-				if (mounted && res.data.length !== 0) {
-					setChannel(res.data[0]);
+				if (mounted) {
+					setChannel(res.data);
 				}
 			})
 			.catch((err) => console.log(err))
@@ -235,6 +234,7 @@ export function Chat() {
 		{
 			axios.get(`/channel/infos/${ channel.id }`)
 			.then( res => {
+				// console.log(res);
 				var banned = res.data.banned.some((ban:any) => ban.id === user?.id) ? true : false;
 				var member = res.data.members.some((mem:any) => mem.id === user?.id) ? true : false;
 				if (banned)
@@ -242,7 +242,7 @@ export function Chat() {
 					if (mounted && channel)
 						setHasBeenBanned(channel.id);
 				}
-				else if (!member)
+				if (!member)
 				{
 					if (mounted && (user?.site_owner || user?.site_moderator))
 						joinChan();
@@ -281,7 +281,17 @@ export function Chat() {
 		let mounted = true;
 
 		masterSocket?.emit("get_users");
+
 		masterSocket?.on("connected_users", (onlineList : any, playingList : any) => {
+			// console.log("online:", onlineList, "playing", playingList);
+			if (mounted) {
+				setUsersOnline(onlineList);
+				setUsersPlaying(playingList);
+			}
+		});
+
+		masterSocket?.on("update_online_users", (onlineList : any, playingList : any) => {
+			// console.log("online:", onlineList, "playing", playingList);
 			if (mounted) {
 				setUsersOnline(onlineList);
 				setUsersPlaying(playingList);
@@ -333,7 +343,7 @@ export function Chat() {
 			key={ mes.id }
 			id={ mes.author.id }
 			online={ usersOnline.includes(mes.author.id) }
-			playing={ usersPlaying.includes(mes.author.id) }
+			playing={ usersPlaying ? usersPlaying.includes(mes.author.id) : false }
 			username={ mes.author.name }
 			message={ mes.content }
 			setBlockedUsers={ setBlockedUsers }
@@ -366,7 +376,7 @@ export function Chat() {
 				</div>
 				<div id="chat_input" className={ channel === null ? "disabled" : ""}>
 					<i className="fas fa-chevron-right"></i>
-					<form onSubmit={ handleSubmit }>
+					<form onSubmit={ handleSubmit } autoComplete="off">
 						<input 
 							type="text"
 							autoFocus={true}

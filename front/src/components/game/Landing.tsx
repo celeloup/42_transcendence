@@ -61,23 +61,6 @@ function Landing() {
 		setToDisplay("pong");
 	}
 
-	// function resolveMatches (matches : number[]) {
-	// 	Promise.all(
-	// 		matches.map(async (match) => {
-	// 			let matchInfo = await axios.get("/matches/" + match);
-	// 			return ({
-	// 				name1: matchInfo.data.users[0].name,
-	// 				name2: matchInfo.data.users[1].name,
-	// 				score1: matchInfo.data.score_user1,
-	// 				score2: matchInfo.data.score_user2,
-	// 				id: matchInfo.data.id
-	// 			});
-	// 		})
-	// 	)
-	// 	.then( response => { setMatches(response); })
-	// 	.catch( error => { console.log(error.response); })
-	// }
-
 	return (
 		<div id="landing_game">
 			<div className="window_header" >
