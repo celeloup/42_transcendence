@@ -131,7 +131,7 @@ function Pong() {
 				id = data.id;
 			// console.log("They declined !", data);
 			if (!game_starting && mounted)
-				setDeclined(data.users[1].name);
+				setDeclined(data.users ? data.users[1].name : "Your opponent");
 		});
 
 		masterSocket?.on('cancel_game', (data:any) => {
@@ -139,7 +139,7 @@ function Pong() {
 			if (!id)
 				id = data.id;
 			if (mounted)
-				setCanceledGame(data.users[0].name);
+				setCanceledGame(data.users ? data.users[0].name : "your opponent");
 		})
 
 		masterSocket?.on('challenged_user_offline', (data:any) => {
@@ -147,7 +147,7 @@ function Pong() {
 			if (!id)
 				id = data.id;
 			if (mounted)
-				setUserOffline(data.users[1].name);
+				setUserOffline(data.users ? data.users[1].name : "Your opponent");
 		})
 
 		return () => {

@@ -123,7 +123,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		
 		//si l'host s'est deco entre temps on annule le match
 		if (sender_socket === undefined) {
-			client.emit('cancel_game', match.id.toString());
+			client.emit('cancel_game', match);
 			return ;
 		}
 
