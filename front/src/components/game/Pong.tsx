@@ -162,10 +162,11 @@ function Pong() {
 
 	useEffect(() => {
 		let mounted = true;
-		if (mounted)
+		if (mounted) {
 			setEndScreen(false);
 			setNoPending(false);
 			setInterrupted(false);
+		}
 		return () => {
 			mounted = false
 		}
@@ -199,7 +200,7 @@ function Pong() {
 		if (match.map === 1)
 			separation(p5);
 		p5.ellipse(puck.x, puck.y, puck.r * 2, puck.r * 2);
-		p5.fill(255,0,0);
+		p5.fill(255, 205, 39);
 		puck.boost_activated.forEach(sensor => {
 			p5.ellipse(sensor.x, sensor.y, puck.r * 2, puck.r *2);
 		});

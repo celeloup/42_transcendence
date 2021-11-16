@@ -6,7 +6,7 @@ all: up logs
 
 up:
 	if [ ! -d "postgres_data" ]; then mkdir postgres_data; fi
-	$(DC) --project-name $(NAME) up --detach
+	$(DC) --project-name $(NAME) up -d --build postgres front back 
 logs:
 	$(DC) --project-name $(NAME) logs --follow back postgres front
 front.logs:
@@ -27,19 +27,19 @@ ps:
 	$(DC) --project-name $(NAME) ps
 clean.linux:
 	$(DC) --project-name $(NAME) down --rmi all --volumes
-	sudo rm -fr ./nestjs_back/dist
-	sudo rm -fr ./nestjs_back/node_modules
+	sudo rm -fr ./back/dist
+	sudo rm -fr ./back/node_modules
+	sudo rm -fr ./back/avatars
 	sudo rm -fr ./front/dist
 	sudo rm -fr ./front/node_modules
-	sudo rm -fr ./websocket_client/node_modules
 	sudo rm -fr ./postgres_data
 clean:
 	$(DC) --project-name $(NAME) down --rmi all --volumes
-	rm -fr ./nestjs_back/dist
-	rm -fr ./nestjs_back/node_modules
+	rm -fr ./back/dist
+	rm -fr ./back/node_modules
+	rm -fr ./back/avatars
 	rm -fr ./front/dist
 	rm -fr ./front/node_modules
-	rm -fr ./websocket_client/node_modules
 	rm -fr ./postgres_data
 # ONLINE VERSION RULES - WIP
 stack.up:
@@ -56,10 +56,10 @@ stack.logs.back:
 stack.logs.db:
 	docker service logs -f $(NAME)_postgres
 stack.clean:
-	sudo rm -fr ./nestjs_back/dist
-	sudo rm -fr ./nestjs_back/node_modules
+	udo rm -fr ./back/dist
+	sudo rm -fr ./back/node_modules
+	sudo rm -fr ./back/avatars
 	sudo rm -fr ./front/dist
 	sudo rm -fr ./front/node_modules
-	sudo rm -fr ./websocket_client/node_modules
 	sudo rm -fr ./postgres_data
 

@@ -228,6 +228,9 @@ $green: #81A439;
 		background-position: 65% 50% ;
 
 		&#space {
+			background-image: url(../../assets/img/space_bg.svg);
+			//background-size: cover;
+			//background-position: 20% 20%;
 			display: flex;
 			justify-content: space-between;
 			font-family: "Dogica";

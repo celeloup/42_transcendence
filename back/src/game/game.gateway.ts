@@ -39,7 +39,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		if (user) {
 			this.connectedUsers.set(user.id, client);
 			this.logger.log(`Connection : ${user.name}`);
-			this.server.emit('update_online_users', Array.from(this.connectedUsers.keys()));
+			this.server.emit('update_online_users', Array.from(this.connectedUsers.keys()), this.gameService.getPlayingUsers());
 		}
 	}
 
@@ -52,7 +52,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		if (user) {
 			this.connectedUsers.delete(user.id);
 			this.logger.log(`Deconnection : ${user.name}`);
-			this.server.emit('update_online_users', Array.from(this.connectedUsers.keys()));
+			this.server.emit('update_online_users', Array.from(this.connectedUsers.keys()), this.gameService.getPlayingUsers());
 		}
 	}
 

@@ -180,7 +180,7 @@ function CreateChan({ type, hide } : CreateChanProps) {
 
 				<div className="infosChan"> { chanInfo } </div>
 				
-				<form onSubmit={ handleSubmit }>
+				<form onSubmit={ handleSubmit } autoComplete="off">
 					{ chanForm }
 					{ errorList }
 					<input 

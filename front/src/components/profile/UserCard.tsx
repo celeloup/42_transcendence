@@ -32,7 +32,7 @@ function UserCard ({ user_name, user_id, has_avatar, rank, nb_victories, nb_defe
         <WindowBorder id='user_window' w='319' h='208' double={true}>
             <div id='user_card'>
                 <div id='row_top'>
-                    <Avatar size={"large"} id={user_id} name={user_name} namespec={true} avatar={has_avatar} avaspec={true}/>
+                    <Avatar size={"large"} id={user_id} name={user_name} namespec={true}/>
                     <div className="column_right">
                         <span className="name">{user_name}</span>
                         <StatusDisplay state={playing ? 'playing' : (online ? 'online' : 'offline') } />

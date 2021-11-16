@@ -12,12 +12,18 @@ type Props = {
 }
 
 function Avatar ({ size, id, name = "", namespec = false, avatar = false, avaspec = false } : Props) {
-	const [ username, setUsername ] = useState<string>(name);
-	const [ hasAvatar, setHasAvatar ] = useState<boolean>(avatar);
+	const [ username, setUsername ] = useState<string>("");
+	const [ hasAvatar, setHasAvatar ] = useState<boolean>(false);
+    const [ src, setSrc ] = useState<string>(process.env.REACT_APP_BACK_URL + "/api/users/avatar/" + id);
 
     useEffect(() => {
         let mounted = true;
 
+        if (mounted) {
+            setUsername(name);
+            setHasAvatar(avatar);
+            setSrc(process.env.REACT_APP_BACK_URL + "/api/users/avatar/" + id);
+        }
         if (!namespec || !avaspec)
         {
             axios.get("/users/infos/" + id)
@@ -31,26 +37,11 @@ function Avatar ({ size, id, name = "", namespec = false, avatar = false, avaspe
         }
 
         return () => { mounted = false };
-	}, [id, namespec, avaspec]);
-
-    useEffect(() => {
-        let mounted = true;
-
-        if (namespec)
-            if (mounted) {
-                setUsername(name);
-            }
-        if (avaspec)
-            if (mounted) {
-                setHasAvatar(avatar);
-            }
-
-        return () => { mounted = false };
-	}, [name, namespec, avatar, avaspec]);
+	}, [id, name, avatar, namespec, avaspec]);
 
     return (
         <div className={"avatar " + size}>
-            { hasAvatar && <img src={ process.env.REACT_APP_BACK_URL + "/api/users/avatar/" + id } alt="avtr"/> }
+            { hasAvatar && <img src={ src } alt="avtr"/> }
             { !hasAvatar && <span>{ username.charAt(0) }</span> }
         </div>
     )

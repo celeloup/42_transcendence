@@ -39,8 +39,8 @@ function Channel({ chan } : ChannelProps) {
 	let img = <Avatar size={"small"} id={-1} name={chan.name} namespec={true} avatar={false} avaspec={true}></Avatar>
 
 	if (chan.type === 3) {
-		let friendId = (chan.members[0].id === user?.id ? chan.members[1].id : chan.members[0].id);
-		let friendName = (chan.members[0].id === user?.id ? chan.members[1].name : chan.members[0].name)
+		let friendId = (chan.members[0]?.id === user?.id ? chan.members[1].id : chan.members[0]?.id);
+		let friendName = (chan.members[0]?.id === user?.id ? chan.members[1].name : chan.members[0]?.name)
 
 		name = friendName;
 		img = <Avatar size={"small"} id={friendId} name={friendName} namespec={true}></Avatar>
@@ -141,10 +141,12 @@ function ChannelList () {
 	var dms = channels.filter((chan:any) => {
 		if (chan.type === 3)
 		{
+			if (chan.members.length < 2)
+				return (false);
 			var m = chan.members[0].id === user?.id ? chan.members[1] : chan.members[0];
 			var ret = blockedUsers.every((b, i) => {
 				if (b.id === m.id)
-					return false;
+					return (false);
 				return (true);
 			})
 			return (ret);

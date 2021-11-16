@@ -11,7 +11,7 @@ import "../../styles/game/Landing.scss";
 function SpectateMatch(matchToSpectate:any, setToDisplay: (s:string) => void, masterSocket:any, setMatch: (m:any) => void)
 {
 	setMatch(matchToSpectate);
-	console.log(matchToSpectate.id);
+	// console.log(matchToSpectate.id);
 	setToDisplay('pong');
 	masterSocket.emit('join_game', matchToSpectate.id);
 }
@@ -61,23 +61,6 @@ function Landing() {
 		setToDisplay("pong");
 	}
 
-	// function resolveMatches (matches : number[]) {
-	// 	Promise.all(
-	// 		matches.map(async (match) => {
-	// 			let matchInfo = await axios.get("/matches/" + match);
-	// 			return ({
-	// 				name1: matchInfo.data.users[0].name,
-	// 				name2: matchInfo.data.users[1].name,
-	// 				score1: matchInfo.data.score_user1,
-	// 				score2: matchInfo.data.score_user2,
-	// 				id: matchInfo.data.id
-	// 			});
-	// 		})
-	// 	)
-	// 	.then( response => { setMatches(response); })
-	// 	.catch( error => { console.log(error.response); })
-	// }
-
 	return (
 		<div id="landing_game">
 			<div className="window_header" >
@@ -89,20 +72,30 @@ function Landing() {
 				<img src={ Ticket } alt="Join a game" onClick={ find_match } />
 			</div>
 			<div id="landing_displays">
-				<div className="match_list">
+				<div className="left_displays">
+					<span className="title">How to play ?</span>
+					<span className="rules">
+						→ Create a game with custom settings, or join a pending game.
+						<br></br>
+						→ Move your paddle up and down with the UP ↑ and DOWN ↓ keys.
+						<br></br>
+						→ Have fun !
+					</span>
+					<span className="title">Watch a live game !</span>
 					{ matches.length === 0 &&
-						<div>
-							<span>No one is playing, or waiting for an opponent.</span>
-						</div>
+						<span className="rules">No one is playing right now.</span>
 					}
 					{ matches.length > 0 &&
-						matches.map((match, i) =>
-							<div key={i} onClick={ () => { SpectateMatch(match, setToDisplay, masterSocket, setMatch); }}>
-								<span className="name">{ match.users[0].name }</span>
-								<img className="logo" src={ Sabers } alt="sabers" />
-								<span className="name">{ match.users[1].name }</span>
-							</div>
-						)
+						<div className="match_list">
+							{ matches.map((match, i) =>
+								<div key={i} onClick={ () => { SpectateMatch(match, setToDisplay, masterSocket, setMatch); }}>
+									<span className="name">{ match.users[0].name }</span>
+									<img className="logo" src={ Sabers } alt="sabers" />
+									<span className="name">{ match.users[1].name }</span>
+									<i className="fas fa-eye"></i>
+								</div>
+							)}
+						</div>
 					}
 				</div>
 				<div className="leaderboard">

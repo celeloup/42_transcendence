@@ -21,7 +21,6 @@ export default function Fusibles() {
             setOnline(data.length);
             // console.log("conntected:", data.length)
         });
-        
         masterSocket?.on("update_online_users", (data: any) => {
             // console.log("update online:", data);
             setOnline(data.length);
