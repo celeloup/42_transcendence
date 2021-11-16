@@ -46,6 +46,21 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 	async handleDisconnect(client: Socket) {
 		const user = await this.authenticationService.getUserFromSocket(client);
 
+		let room = this.gameService.getUsersRoom().get(client);
+		if (room)
+		{
+			let game = this.pendingGame.find(x => x.id === parseInt(room));
+			if (game)
+			{
+				const user = await this.authenticationService.getUserFromSocket(client);
+				if (user && game.user1_id === user.id) {
+					this.gameService.deleteMatchObjet(game.id);
+					let i = this.pendingGame.indexOf(game);
+					this.pendingGame.splice(i, 1);
+				}
+			}
+		}
+		
 		//le user quitte ses rooms quand il est deco;
 		this.gameService.leaveRoom(null, client, false);
 
@@ -108,7 +123,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		
 		//si l'host s'est deco entre temps on annule le match
 		if (sender_socket === undefined) {
-			client.emit('cancel_game', match.id.toString());
+			client.emit('cancel_game', match);
 			return ;
 		}
 
