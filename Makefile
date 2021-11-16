@@ -28,13 +28,15 @@ clean.linux:
 	$(DC) --project-name $(NAME) down --rmi all --volumes
 	sudo rm -fr ./back/dist
 	sudo rm -fr ./back/node_modules
+	sudo rm -fr ./back/avatars
 	sudo rm -fr ./front/dist
 	sudo rm -fr ./front/node_modules
 	sudo rm -fr ./postgres_data
 clean:
 	$(DC) --project-name $(NAME) down --rmi all --volumes
-	rm -fr ./nestjs/dist
-	rm -fr ./nestjs/node_modules
+	rm -fr ./back/dist
+	rm -fr ./back/node_modules
+	rm -fr ./back/avatars
 	rm -fr ./front/dist
 	rm -fr ./front/node_modules
 	rm -fr ./postgres_data
