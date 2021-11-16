@@ -28,6 +28,10 @@ export default class GameService {
         return this.playingUsers;
     }
 
+    getUsersRoom() {
+        return this.usersRoom;
+    }
+
     checkDisconnection(game: string, player1: Socket, player2: Socket, usersRoom: Map<Socket, string>) {
         if (usersRoom.get(player1) != game) {
             if (usersRoom.get(player2) != game) {
