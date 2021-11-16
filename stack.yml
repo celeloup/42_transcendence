@@ -3,8 +3,7 @@ version: '3.8'
 services:
 
   front:
-    image: node:14.17.6-alpine3.12
-    command: sh -c "npm install && npm start"
+    image: transcendance:front
     deploy:
       restart_policy:
         condition: on-failure
@@ -24,18 +23,12 @@ services:
         - "traefik.http.routers.transcendance-front.priority=1"
         - "traefik.http.routers.transcendance-front.tls=true"
         - "traefik.http.routers.transcendance-front.tls.certresolver=letsencryptresolver"
-    environment:
-      HOST: 0.0.0.0
-    volumes:
-      - ./front/.:/usr/src/app
-    working_dir: /usr/src/app
     networks:
       - net
       - traefik-public
 
   back:
-    image: node:15.14.0-alpine3.12
-    command: sh -c "npm install && npm run start:dev"
+    image: transcendance:back
     deploy:
       restart_policy:
         condition: on-failure
@@ -55,9 +48,6 @@ services:
         - "traefik.http.routers.transcendance-back.priority=2"
         - "traefik.http.routers.transcendance-back.tls=true"
         - "traefik.http.routers.transcendance-back.tls.certresolver=letsencryptresolver"
-    volumes:
-      - ./nestjs_back/.:/usr/src/app
-    working_dir: /usr/src/app
     networks:
       - net
       - traefik-public
@@ -78,28 +68,6 @@ services:
     volumes:
       - ./postgres-entrypoint:/docker-entrypoint-initdb.d
       - ./postgres_data:/var/lib/postgresql/data
-    env_file:
-      - docker.env
-    networks:
-      - net
-
-  pgadmin:
-    image: dpage/pgadmin4
-    deploy:
-      restart_policy:
-        condition: on-failure
-      placement:
-        constraints:
-          - node.labels.server == true
-      resources:
-        limits:
-            memory: 512M
-        reservations:
-            memory: 256M
-    ports:
-      - "8081:80"
-    volumes:
-      - ./pgadmin/_data:/root/.pgadmin
     env_file:
       - docker.env
     networks:
