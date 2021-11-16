@@ -58,8 +58,8 @@ stack.logs.back:
 stack.logs.db:
 	docker service logs -f $(NAME)_postgres
 stack.clean:
-	docker image rm transcendance:back
-	docker image rm transcendance:front
+	docker image rm -f transcendance:back
+	docker image rm -f transcendance:front
 	sudo rm -fr ./back/dist
 	sudo rm -fr ./back/node_modules
 	sudo rm -fr ./back/avatars
