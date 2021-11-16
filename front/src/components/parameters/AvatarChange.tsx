@@ -42,15 +42,15 @@ function AvatarChange ({hasAvatar, username, id} : AvatarProps) {
                     className="pic_input" type="file"
                     onChange={changePicture}> 
                 </input> }
-				{ !hasAvatar && <>
+				{ !hasAvatar &&
 					<div className="pic_base_text">
-					<input
-						className="pic_input" type="file"
-						onChange={changePicture}>
-					</input>
-                	    <span>{ username.charAt(0) }</span>
-            		</div>
-				</> }
+						{ username.charAt(0) }
+						<input
+							className="pic_input" type="file"
+							onChange={changePicture}>
+						</input>
+					</div>
+				}
 				<i className="pic_pencil fas fa-pen"></i>
 			</div>
 			{ avatarNotChanged && 
