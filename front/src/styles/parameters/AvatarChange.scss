@@ -51,23 +51,37 @@ $darker-gray: #3E3E3E;
 .pic_base_text {
 	position: relative;
 	top: -20px;
+	display: inline-block;
 	width: 231px;
 	height: 231px;
+	line-height: 231px;
+	font-family: "Dogica", "Fira Mono";
+	font-size: 138px;
+	text-align: center;
 	background-color: $darker-gray;
 	color: white;
-	font-family: "Dogica", "Fira Mono";
-	font-size: 180px;
-
-	span {
-		position: relative;
-		top: 30px;
-		pointer-events: none;
-
-		@supports (-moz-appearance:none) {
-			top: -20px;
-		}
-	}
 }
+
+// .pic_base_text {
+// 	position: relative;
+// 	top: -20px;
+// 	width: 231px;
+// 	height: 231px;
+// 	background-color: $darker-gray;
+// 	color: white;
+// 	font-family: "Dogica", "Fira Mono";
+// 	font-size: 180px;
+
+// 	span {
+// 		position: relative;
+// 		top: 30px;
+// 		pointer-events: none;
+
+// 		@supports (-moz-appearance:none) {
+// 			top: -20px;
+// 		}
+// 	}
+// }
 
 .pic_pencil {
 	position: absolute;

@@ -9,8 +9,8 @@ import Fusibles from './Fusibles';
 import HistogramBar from '../../assets/img/histogram_bar.svg';
 import Squares from '../../assets/img/little_squares.svg';
 // import Radar from '../../assets/img/radar.svg';
-import Time from './Time';
-// import Temp from '../../assets/img/temp.svg';
+// import Time from './Time';
+import Temp from '../../assets/img/temp.svg';
 import Viseur from '../../assets/img/viseur.svg';
 
 type Props = {
@@ -25,7 +25,8 @@ function PageWrapper( { children }: Props) {
 		<>
 		{ display && <header className="App-header">
 			<img className="square" src={ Squares } alt="Decoration (squares)"/>
-			<Time />
+			{/* <Time /> */}
+			<img className="temp" src={ Temp } alt="Decoration (temp)"/>
 			<div id="logo_wrapper">
 				<Logo />
 				<img className="viseur" src={ Viseur } alt="Decoration (viseur)"/>

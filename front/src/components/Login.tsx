@@ -18,7 +18,7 @@ function Login() {
 			history.push("/");
 		})
 		.catch(error => {
-			if (error.response.status === 403)
+			if (error.response && error.response.status === 403)
 				console.log("ERROR:", error.response.data.message);
 			else
 				console.log("ERROR:", error);

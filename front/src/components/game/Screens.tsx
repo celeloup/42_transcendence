@@ -67,8 +67,10 @@ function InfoError({ setToDisplay, type, user } : InfoProps) {
 	return (
 		<div id="infos_error_game">
 			{ type === 1 &&
-				<div id="telescope_img"><img id="telescope_top" src={ TelescopeTop } alt="Telescope img top"/>
-				<img id="telescope" src={ Telescope } alt="Telescope img"/></div>
+				<div id="telescope_img">
+					<img id="telescope_top" src={ TelescopeTop } alt="Telescope img top"/>
+					<img id="telescope" src={ Telescope } alt="Telescope img"/>
+				</div>
 			}
 			{ type === 1 && <p id="title">No match found</p>}
 			{ type === 2 && <p id="title">Match declined</p>}
