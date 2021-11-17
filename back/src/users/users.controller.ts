@@ -318,13 +318,16 @@ export default class UsersController {
 
   @Post('avatar/me')
   @ApiOperation({ summary: "Upload an avatar" })
+  @ApiResponse({
+    status: 201,
+    description: 'Upload successful'
+  })
+  @ApiResponse({
+    status: 415,
+    description: 'Only jpg or png image files are allowed'
+  })
   @ApiBearerAuth('bearer-authentication')
   @ApiCookieAuth('cookie-authentication')
-  @ApiResponse({
-    status: 200,
-    description: 'The avatar has been successfully uploaded to the server',
-    type: [User]
-  })
   @UseGuards(JwtTwoFactorGuard)
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -352,7 +355,7 @@ export default class UsersController {
   )
   async uploadAvatar(@Req() req: RequestWithUser, @UploadedFile() file: Express.Multer.File) {
     const { user } = req;
-    return this.userService.setAvatar(user.id, file.path);
+    this.userService.setAvatar(user.id, file.path);
   }
 
   @Get('avatar/:id')
