@@ -1,4 +1,6 @@
 import { extname } from 'path';
+import { FileFilterCallback } from 'multer';
+import { HttpException, HttpStatus } from '@nestjs/common';
 
 export const editFileName = (req: any, file: any, callback: any) => {
   const name = file.originalname.split('.')[0];
@@ -10,9 +12,9 @@ export const editFileName = (req: any, file: any, callback: any) => {
   callback(null, `${name}-${randomName}${fileExtName}`);
 };
 
-export const imageFileFilter = (req: any, file: any, callback: any) => {
-  if (!file.originalname.match(/\.(jpg|jpeg|png|gif)$/)) {
-    return callback(new Error('Only image files are allowed!'), false);
+export const imageFileFilter = (req: Request, file: Express.Multer.File, callback: FileFilterCallback) => {
+  if (!file.originalname.match(/\.(jpg|jpeg|png)$/)) {
+    return callback(new HttpException('Only jpg or png image files are allowed', HttpStatus.UNSUPPORTED_MEDIA_TYPE));
   }
   callback(null, true);
 };
