@@ -107,6 +107,7 @@ export default class GameGateway implements OnGatewayInit, OnGatewayConnection, 
 		let guest_socket = this.connectedUsers.get(match.user2_id);
 		if (!guest_socket) {
 			client.emit('challenged_user_offline', match);
+			this.gameService.deleteMatchObjet(match.id);
 			return ;
 		}
 		guest_socket.emit('invitation', match);
