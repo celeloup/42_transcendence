@@ -9,7 +9,7 @@ services:
         condition: on-failure
       placement:
         constraints:
-          - node.labels.server == true
+          - node.labels.role == main
       resources:
         limits:
           memory: 2G
@@ -34,7 +34,7 @@ services:
         condition: on-failure
       placement:
         constraints:
-          - node.labels.server == true
+          - node.labels.role == main
       resources:
         limits:
           memory: 2G
@@ -63,7 +63,7 @@ services:
         condition: on-failure
       placement:
         constraints:
-          - node.labels.server == true
+          - node.labels.role == main
       resources:
         limits:
             memory: 512M
