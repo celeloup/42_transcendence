@@ -14,7 +14,7 @@ export default class FortyTwoStrategy extends PassportStrategy(Strategy, '42')
 		private http: HttpService
 	) {
 		super({
-			authorizationURL: `${configService.get('OAUTH_URL')}authorize?client_id=${configService.get('OAUTH_CLIENT_ID')}&redirect_uri=${configService.get('OAUTH_CALLBACK_PARAM')}&response_type=code`,
+			authorizationURL: `${configService.get('OAUTH_URL')}authorize?client_id=${configService.get('OAUTH_CLIENT_ID')}&redirect_uri=${configService.get('OAUTH_CALLBACK_URL')}&response_type=code`,
 			tokenURL        : `${configService.get('OAUTH_URL')}token`,
 			clientID        : configService.get('OAUTH_CLIENT_ID'),
 			clientSecret    : configService.get('OAUTH_CLIENT_SECRET'),

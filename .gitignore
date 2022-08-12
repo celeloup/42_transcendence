@@ -8,3 +8,5 @@ todo_list
 init_docker.sh
 pgadmin
 .vscode
+**/.env
+docker.env

@@ -9,8 +9,8 @@
       "site_moderator": false
     },
     {
-      "name": "administraghost",
-      "email": "administraghost@mail.com",
+      "name": "admin",
+      "email": "admin@mail.com",
       "id42": 2,
       "site_owner": true,
       "site_banned": false,
@@ -25,10 +25,42 @@
       "site_moderator": false
     },
     {
-      "name": "modoghost",
-      "email": "modoghost@mail.com",
-      "id42": 4,
-      "site_owner": false,
+      "name": "celeloup",
+      "email": "celeloup@student.42.fr",
+      "id42": 37864,
+      "site_owner": true,
+      "site_banned": false,
+      "site_moderator": true
+    },
+    {
+      "name": "fhenrion",
+      "email": "fhenrion@student.42.fr",
+      "id42": 50299,
+      "site_owner": true,
+      "site_banned": false,
+      "site_moderator": true
+    },
+    {
+      "name": "cclaude",
+      "email": "cclaude@student.42.fr",
+      "id42": 55946,
+      "site_owner": true,
+      "site_banned": false,
+      "site_moderator": true
+    },
+    {
+      "name": "jgonfroy",
+      "email": "jgonfroy@student.42.fr",
+      "id42": 63147,
+      "site_owner": true,
+      "site_banned": false,
+      "site_moderator": true
+    },
+    {
+      "name": "amartin-",
+      "email": "amartin-@student.42.fr",
+      "id42": 55904,
+      "site_owner": true,
       "site_banned": false,
       "site_moderator": true
     }

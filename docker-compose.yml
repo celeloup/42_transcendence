@@ -2,24 +2,14 @@ version: '3'
 
 services:
   front:
-    image: node:14.17.6-alpine3.12
-    command: sh -c "npm install && npm start"
+    build: ./front
     ports:
       - "3000:3000"
-    environment:
-      HOST: 0.0.0.0
-    volumes:
-      - ./front/.:/usr/src/app
-    working_dir: /usr/src/app
 
   back:
-    image: node:15.14.0-alpine3.12
-    command: sh -c "npm install && npm run start:dev"
+    build: ./back
     ports:
       - "8080:8080"
-    volumes:
-      - ./back/.:/usr/src/app
-    working_dir: /usr/src/app
 
   postgres:
     image: postgres:latest
@@ -29,22 +19,3 @@ services:
     env_file:
       - docker.env
 
-  pgadmin:
-    links:
-      - postgres:postgres
-    container_name: pgadmin
-    image: dpage/pgadmin4
-    ports:
-      - "8081:80"
-    volumes:
-      - ./pgadmin/_data:/root/.pgadmin
-    env_file:
-      - docker.env
-
-  # websocket_client:
-  #   image: node:15.14.0-alpine3.12
-  #   command: sh -c "npm install && npm run nodemon"
-  #   volumes:
-  #     - ./pgadmin/_data:/root/.pgadmin
-  #   env_file:
-  #     - docker.env
